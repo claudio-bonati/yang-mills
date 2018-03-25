@@ -626,8 +626,6 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-ONE_FILE_COMPILATION_FALSE
-ONE_FILE_COMPILATION_TRUE
 CRYPTO_COMPILATION_FALSE
 CRYPTO_COMPILATION_TRUE
 ST_dim
@@ -724,7 +722,6 @@ ac_user_opts='
 enable_option_checking
 enable_silent_rules
 enable_dependency_tracking
-enable_one_file_compilation
 enable_use_openmp
 enable_openmp
 '
@@ -1360,7 +1357,6 @@ Optional Features:
                           do not reject slow dependency extractors
   --disable-dependency-tracking
                           speeds up one-time build
-  --enable-one-file-compilation     to enable compilation using only one file
   --enable-use-openmp     to enable the use of openmp
   --disable-openmp        do not use OpenMP
 
@@ -4604,14 +4600,6 @@ _ACEOF
 
 
 ### ENABLING & CO
-# Check whether --enable-one-file-compilation was given.
-if test "${enable_one_file_compilation+set}" = set; then :
-  enableval=$enable_one_file_compilation; one_file_mode=yes
-else
-  one_file_mode=no
-fi
-
-
 # Check whether --enable-use-openmp was given.
 if test "${enable_use_openmp+set}" = set; then :
   enableval=$enable_use_openmp; use_openmp=yes
@@ -4733,12 +4721,6 @@ $as_echo "#define HASH_MODE /**/" >>confdefs.h
 
 fi
 
-if test x${one_file_mode} = xyes; then
-
-$as_echo "#define ONE_FILE_MODE /**/" >>confdefs.h
-
-fi
-
 if test x${use_openmp} = xyes; then
 
 $as_echo "#define OPENMP_MODE /**/" >>confdefs.h
@@ -4838,15 +4820,6 @@ else
   CRYPTO_COMPILATION_TRUE='#'
   CRYPTO_COMPILATION_FALSE=
 fi
-
- if test x${one_file_mode} = xyes; then
-  ONE_FILE_COMPILATION_TRUE=
-  ONE_FILE_COMPILATION_FALSE='#'
-else
-  ONE_FILE_COMPILATION_TRUE='#'
-  ONE_FILE_COMPILATION_FALSE=
-fi
-
 
 
 ac_config_files="$ac_config_files Makefile"
@@ -4986,10 +4959,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CRYPTO_COMPILATION_TRUE}" && test -z "${CRYPTO_COMPILATION_FALSE}"; then
   as_fn_error $? "conditional \"CRYPTO_COMPILATION\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ONE_FILE_COMPILATION_TRUE}" && test -z "${ONE_FILE_COMPILATION_FALSE}"; then
-  as_fn_error $? "conditional \"ONE_FILE_COMPILATION\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

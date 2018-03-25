@@ -1,7 +1,7 @@
 bin_PROGRAMS = debug_rng \
                debug_su2 \
                debug_sun \
-               yang_mills
+               yang_mills_stdupd
 
 dSFMT = ./include/dSFMT-common.h \
         ./include/dSFMT.h \
@@ -54,38 +54,18 @@ sun = ./include/sun_aux.h \
       ./lib/sun.c \
       ./lib/sun_upd.c 
 
-
-if ONE_FILE_COMPILATION
-  yang_mills_SOURCES=./src/yang_mills.c \
-                     $(dSFMT)
-  EXTRA_DIST = ./src/input.in \
-               $(endian) \
-               $(funcpoint) \
-               $(gauge_conf) \
-               $(geometry) \
-               $(gparam) \
-               ./include/macro.h \
-               $(mymalloc) \
-               $(random) \
-               $(su2) \
-               $(sun) 
-
-  DISTCHECK_CONFIGURE_FLAGS = --enable-one-file-compilation
-else
-  yang_mills_SOURCES=./src/yang_mills.c \
-                     $(dSFMT)  \
-                     $(endian) \
-                     $(funcpoint) \
-                     $(gauge_conf) \
-                     $(geometry) \
-                     $(gparam) \
-                     ./include/macro.h \
-                     $(mymalloc) \
-                     $(random) \
-                     $(su2) \
-                     $(sun) 
-  EXTRA_DIST = ./src/input.in 
-endif
+yang_mills_stdupd_SOURCES=./src/yang_mills_stdupd.c \
+                          $(dSFMT)  \
+                          $(endian) \
+                          $(funcpoint) \
+                          $(gauge_conf) \
+                          $(geometry) \
+                          $(gparam) \
+                          ./include/macro.h \
+                          $(mymalloc) \
+                          $(random) \
+                          $(su2) \
+                          $(sun) 
 
 debug_rng_SOURCES=./src/debug_rng.c \
                   $(dSFMT) \
@@ -107,6 +87,8 @@ debug_sun_SOURCES=./src/debug_sun.c \
                   $(random) \
                   $(su2) \
                   $(sun)
+
+EXTRA_DIST = ./src/input.in 
 
 AM_CFLAGS = -std=c99 -O3 -Wall -Wextra -pedantic -Werror -Wconversion @OPENMP_CFLAGS@
 

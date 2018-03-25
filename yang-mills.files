@@ -43,5 +43,5 @@ lib/sun_upd.c
 src/debug_rng.c
 src/debug_su2.c
 src/debug_sun.c
-src/yang_mills.c
+src/yang_mills_stdupd.c
 config.h

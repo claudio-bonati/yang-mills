@@ -74,11 +74,6 @@ AC_TYPE_UINT64_T
 
 
 ### ENABLING & CO
-AC_ARG_ENABLE([one-file-compilation], 
-              [  --enable-one-file-compilation     to enable compilation using only one file], 
-              [one_file_mode=yes], 
-              [one_file_mode=no])
-
 AC_ARG_ENABLE([use-openmp], 
               [  --enable-use-openmp     to enable the use of openmp], 
               [use_openmp=yes], 
@@ -113,10 +108,6 @@ fi
 
 if test x${has_md5}x${has_crypto} = xyesxyes; then
   AC_DEFINE(HASH_MODE,, [Activate the computation of the hash function of the configuration])
-fi
-
-if test x${one_file_mode} = xyes; then
-  AC_DEFINE(ONE_FILE_MODE,, [Activate the one file compilation])
 fi
 
 if test x${use_openmp} = xyes; then
@@ -167,8 +158,6 @@ fi
 ### CONDITIONALS
 
 AM_CONDITIONAL([CRYPTO_COMPILATION], [test x${has_crypto}x${has_md5} = xyesxyes])
-AM_CONDITIONAL([ONE_FILE_COMPILATION], [test x${one_file_mode} = xyes])
-
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

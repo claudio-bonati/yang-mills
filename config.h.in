@@ -63,9 +63,6 @@
 /* Number of threads to be used in OpenMP */
 #undef NTHREADS
 
-/* Activate the one file compilation */
-#undef ONE_FILE_MODE
-
 /* Enable the use of openmp */
 #undef OPENMP_MODE
 

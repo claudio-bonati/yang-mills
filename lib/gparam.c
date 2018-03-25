@@ -300,10 +300,6 @@ void print_parameters(GParam const * const param, time_t time_start, time_t time
     fprintf(fp, "| Simulation details |\n");
     fprintf(fp, "+--------------------+\n\n");
 
-    #ifdef ONE_FILE_MODE
-      fprintf(fp, "compiled in the single file mode\n\n");
-    #endif 
-
     #ifdef OPENMP_MODE
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif

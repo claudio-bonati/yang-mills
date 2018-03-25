@@ -12,44 +12,11 @@
   #include<omp.h>
 #endif
 
-#ifndef ONE_FILE_MODE
-  #include"../include/function_pointers.h"
-  #include"../include/gauge_conf.h"
-  #include"../include/geometry.h"
-  #include"../include/gparam.h"
-  #include"../include/random.h"
-#else
-  #include"../include/endianness.h"
-  #include"../include/function_pointers.h"
-  #include"../include/gauge_conf.h"
-  #include"../include/geometry.h"
-  #include"../include/gparam.h"
-  #include"../include/macro.h"
-  #include"../include/mymalloc.h"
-  #include"../include/random.h"
-  #include"../include/su2.h"
-  #include"../include/su2_upd.h"
-  #include"../include/sun_aux.h"
-  #include"../include/sun.h"
-  #include"../include/sun_upd.h"
-
-  #include"../lib/endianness.c"
-  #include"../lib/function_pointers.c"
-  #include"../lib/gauge_conf_def.c"
-  #include"../lib/gauge_conf_meas.c"
-  #include"../lib/gauge_conf_transfer.c"
-  #include"../lib/gauge_conf_upd.c"
-  #include"../lib/geometry.c"
-  #include"../lib/gparam.c"
-  #include"../lib/mymalloc.c"
-  #include"../lib/random.c"
-  #include"../lib/su2.c"
-  #include"../lib/su2_upd.c"
-  #include"../lib/sun_aux.c"
-  #include"../lib/sun.c"
-  #include"../lib/sun_upd.c"
-#endif
-
+#include"../include/function_pointers.h"
+#include"../include/gauge_conf.h"
+#include"../include/geometry.h"
+#include"../include/gparam.h"
+#include"../include/random.h"
 
 void real_main(char *in_file)
     {
@@ -154,7 +121,7 @@ int main (int argc, char **argv)
 
     if(argc != 2)
       {
-      printf("Program %s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
+      printf("\nPackage %s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
       printf("Claudio Bonati %s\n", PACKAGE_BUGREPORT);
       printf("Usage: %s input_file\n\n", argv[0]);
 
@@ -167,10 +134,6 @@ int main (int argc, char **argv)
 
       #ifdef DEBUG
         printf("\n\tDEBUG mode\n");
-      #endif
-
-      #ifdef ONE_FILE_MODE
-        printf("\n\tcompiled in the single file mode\n");
       #endif
 
       #ifdef OPENMP_MODE

@@ -77,7 +77,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = debug_rng$(EXEEXT) debug_su2$(EXEEXT) \
-	debug_sun$(EXEEXT) yang_mills$(EXEEXT)
+	debug_sun$(EXEEXT) yang_mills_stdupd$(EXEEXT)
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -118,41 +118,18 @@ am_debug_sun_OBJECTS = ./src/debug_sun.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_5) $(am__objects_6)
 debug_sun_OBJECTS = $(am_debug_sun_OBJECTS)
 debug_sun_LDADD = $(LDADD)
-am__yang_mills_SOURCES_DIST = ./src/yang_mills.c \
-	./include/dSFMT-common.h ./include/dSFMT.h \
-	./include/dSFMT-params11213.h ./include/dSFMT-params1279.h \
-	./include/dSFMT-params132049.h ./include/dSFMT-params19937.h \
-	./include/dSFMT-params216091.h ./include/dSFMT-params2203.h \
-	./include/dSFMT-params4253.h ./include/dSFMT-params44497.h \
-	./include/dSFMT-params521.h ./include/dSFMT-params86243.h \
-	./include/dSFMT-params.h ./lib/dSFMT.c ./include/endianness.h \
-	./lib/endianness.c ./include/function_pointers.h \
-	./lib/function_pointers.c ./include/gauge_conf.h \
-	./lib/gauge_conf_def.c ./lib/gauge_conf_meas.c \
-	./lib/gauge_conf_upd.c ./include/geometry.h ./lib/geometry.c \
-	./include/gparam.h ./lib/gparam.c ./include/macro.h \
-	./include/mymalloc.h ./lib/mymalloc.c ./include/myrngparam.h \
-	./include/random.h ./lib/random.c ./include/su2.h \
-	./include/su2_upd.h ./lib/su2.c ./lib/su2_upd.c \
-	./include/sun_aux.h ./include/sun.h ./include/sun_upd.h \
-	./lib/sun_aux.c ./lib/sun.c ./lib/sun_upd.c
 am__objects_7 = ./lib/function_pointers.$(OBJEXT)
 am__objects_8 = ./lib/gauge_conf_def.$(OBJEXT) \
 	./lib/gauge_conf_meas.$(OBJEXT) ./lib/gauge_conf_upd.$(OBJEXT)
 am__objects_9 = ./lib/geometry.$(OBJEXT)
 am__objects_10 = ./lib/mymalloc.$(OBJEXT)
-@ONE_FILE_COMPILATION_FALSE@am_yang_mills_OBJECTS =  \
-@ONE_FILE_COMPILATION_FALSE@	./src/yang_mills.$(OBJEXT) \
-@ONE_FILE_COMPILATION_FALSE@	$(am__objects_1) $(am__objects_3) \
-@ONE_FILE_COMPILATION_FALSE@	$(am__objects_7) $(am__objects_8) \
-@ONE_FILE_COMPILATION_FALSE@	$(am__objects_9) $(am__objects_4) \
-@ONE_FILE_COMPILATION_FALSE@	$(am__objects_10) $(am__objects_2) \
-@ONE_FILE_COMPILATION_FALSE@	$(am__objects_5) $(am__objects_6)
-@ONE_FILE_COMPILATION_TRUE@am_yang_mills_OBJECTS =  \
-@ONE_FILE_COMPILATION_TRUE@	./src/yang_mills.$(OBJEXT) \
-@ONE_FILE_COMPILATION_TRUE@	$(am__objects_1)
-yang_mills_OBJECTS = $(am_yang_mills_OBJECTS)
-yang_mills_LDADD = $(LDADD)
+am_yang_mills_stdupd_OBJECTS = ./src/yang_mills_stdupd.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_3) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9) $(am__objects_4) \
+	$(am__objects_10) $(am__objects_2) $(am__objects_5) \
+	$(am__objects_6)
+yang_mills_stdupd_OBJECTS = $(am_yang_mills_stdupd_OBJECTS)
+yang_mills_stdupd_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -182,9 +159,9 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(debug_rng_SOURCES) $(debug_su2_SOURCES) \
-	$(debug_sun_SOURCES) $(yang_mills_SOURCES)
+	$(debug_sun_SOURCES) $(yang_mills_stdupd_SOURCES)
 DIST_SOURCES = $(debug_rng_SOURCES) $(debug_su2_SOURCES) \
-	$(debug_sun_SOURCES) $(am__yang_mills_SOURCES_DIST)
+	$(debug_sun_SOURCES) $(yang_mills_stdupd_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -371,36 +348,19 @@ sun = ./include/sun_aux.h \
       ./lib/sun.c \
       ./lib/sun_upd.c 
 
-@ONE_FILE_COMPILATION_FALSE@yang_mills_SOURCES = ./src/yang_mills.c \
-@ONE_FILE_COMPILATION_FALSE@                     $(dSFMT)  \
-@ONE_FILE_COMPILATION_FALSE@                     $(endian) \
-@ONE_FILE_COMPILATION_FALSE@                     $(funcpoint) \
-@ONE_FILE_COMPILATION_FALSE@                     $(gauge_conf) \
-@ONE_FILE_COMPILATION_FALSE@                     $(geometry) \
-@ONE_FILE_COMPILATION_FALSE@                     $(gparam) \
-@ONE_FILE_COMPILATION_FALSE@                     ./include/macro.h \
-@ONE_FILE_COMPILATION_FALSE@                     $(mymalloc) \
-@ONE_FILE_COMPILATION_FALSE@                     $(random) \
-@ONE_FILE_COMPILATION_FALSE@                     $(su2) \
-@ONE_FILE_COMPILATION_FALSE@                     $(sun) 
+yang_mills_stdupd_SOURCES = ./src/yang_mills_stdupd.c \
+                          $(dSFMT)  \
+                          $(endian) \
+                          $(funcpoint) \
+                          $(gauge_conf) \
+                          $(geometry) \
+                          $(gparam) \
+                          ./include/macro.h \
+                          $(mymalloc) \
+                          $(random) \
+                          $(su2) \
+                          $(sun) 
 
-@ONE_FILE_COMPILATION_TRUE@yang_mills_SOURCES = ./src/yang_mills.c \
-@ONE_FILE_COMPILATION_TRUE@                     $(dSFMT)
-
-@ONE_FILE_COMPILATION_FALSE@EXTRA_DIST = ./src/input.in 
-@ONE_FILE_COMPILATION_TRUE@EXTRA_DIST = ./src/input.in \
-@ONE_FILE_COMPILATION_TRUE@               $(endian) \
-@ONE_FILE_COMPILATION_TRUE@               $(funcpoint) \
-@ONE_FILE_COMPILATION_TRUE@               $(gauge_conf) \
-@ONE_FILE_COMPILATION_TRUE@               $(geometry) \
-@ONE_FILE_COMPILATION_TRUE@               $(gparam) \
-@ONE_FILE_COMPILATION_TRUE@               ./include/macro.h \
-@ONE_FILE_COMPILATION_TRUE@               $(mymalloc) \
-@ONE_FILE_COMPILATION_TRUE@               $(random) \
-@ONE_FILE_COMPILATION_TRUE@               $(su2) \
-@ONE_FILE_COMPILATION_TRUE@               $(sun) 
-
-@ONE_FILE_COMPILATION_TRUE@DISTCHECK_CONFIGURE_FLAGS = --enable-one-file-compilation
 debug_rng_SOURCES = ./src/debug_rng.c \
                   $(dSFMT) \
                   $(random)
@@ -422,6 +382,7 @@ debug_sun_SOURCES = ./src/debug_sun.c \
                   $(su2) \
                   $(sun)
 
+EXTRA_DIST = ./src/input.in 
 AM_CFLAGS = -std=c99 -O3 -Wall -Wextra -pedantic -Werror -Wconversion @OPENMP_CFLAGS@
 CLEANFILES = dati*.dat log*.dat dati*.log conf*.dat* input_check.in 
 all: config.h
@@ -566,7 +527,7 @@ debug_su2$(EXEEXT): $(debug_su2_OBJECTS) $(debug_su2_DEPENDENCIES) $(EXTRA_debug
 debug_sun$(EXEEXT): $(debug_sun_OBJECTS) $(debug_sun_DEPENDENCIES) $(EXTRA_debug_sun_DEPENDENCIES) 
 	@rm -f debug_sun$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_sun_OBJECTS) $(debug_sun_LDADD) $(LIBS)
-./src/yang_mills.$(OBJEXT): src/$(am__dirstamp) \
+./src/yang_mills_stdupd.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 ./lib/function_pointers.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
@@ -581,9 +542,9 @@ debug_sun$(EXEEXT): $(debug_sun_OBJECTS) $(debug_sun_DEPENDENCIES) $(EXTRA_debug
 ./lib/mymalloc.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 
-yang_mills$(EXEEXT): $(yang_mills_OBJECTS) $(yang_mills_DEPENDENCIES) $(EXTRA_yang_mills_DEPENDENCIES) 
-	@rm -f yang_mills$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(yang_mills_OBJECTS) $(yang_mills_LDADD) $(LIBS)
+yang_mills_stdupd$(EXEEXT): $(yang_mills_stdupd_OBJECTS) $(yang_mills_stdupd_DEPENDENCIES) $(EXTRA_yang_mills_stdupd_DEPENDENCIES) 
+	@rm -f yang_mills_stdupd$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(yang_mills_stdupd_OBJECTS) $(yang_mills_stdupd_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -611,7 +572,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_rng.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_sun.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_stdupd.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
