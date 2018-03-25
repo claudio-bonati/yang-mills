@@ -1,0 +1,18 @@
+size  4 4 4 4 
+
+beta  5.705
+
+sample 10
+thermal 0
+overrelax 5 
+measevery 1
+
+start                   0   (0=ordered  1=random  2=from saved configuration)
+saveconf_back_every     5   (if 0 does not save, else save backup configurations every ... updates)
+saveconf_analysis_every 5   (if 0 does not save, else save backup configurations every ... updates)
+
+conf_file  conf.dat
+data_file  dati.dat
+log_file   log.dat
+
+randseed 0    (0=time)
