@@ -8,6 +8,8 @@
 #include"su2_upd.h"
 #include"sun.h"
 #include"sun_upd.h"
+#include"u1.h"
+#include"u1_upd.h"
 
 void (*one)(GAUGE_GROUP * restrict A);         // A=1
 void (*zero)(GAUGE_GROUP * restrict A);        // A=0

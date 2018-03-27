@@ -331,7 +331,9 @@ void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const
           {
           equal(&matrix, &(GC->lattice[si][mu]));
 
-          #if NCOLOR==2
+          #if NCOLOR==1
+            MD5_Update(&mdContext, &(matrix.comp), sizeof(double complex));
+          #elif NCOLOR==2
             for(k=0; k<4; k++)
                {
                MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double));

@@ -1,6 +1,7 @@
 bin_PROGRAMS = debug_rng \
                debug_su2 \
                debug_sun \
+               debug_u1 \
                yang_mills_stdupd
 
 dSFMT = ./include/dSFMT-common.h \
@@ -54,6 +55,11 @@ sun = ./include/sun_aux.h \
       ./lib/sun.c \
       ./lib/sun_upd.c 
 
+u1 = ./include/u1.h \
+     ./include/u1_upd.h \
+     ./lib/u1.c \
+     ./lib/u1_upd.c
+
 yang_mills_stdupd_SOURCES=./src/yang_mills_stdupd.c \
                           $(dSFMT)  \
                           $(endian) \
@@ -65,7 +71,8 @@ yang_mills_stdupd_SOURCES=./src/yang_mills_stdupd.c \
                           $(mymalloc) \
                           $(random) \
                           $(su2) \
-                          $(sun) 
+                          $(sun) \
+                          $(u1) 
 
 debug_rng_SOURCES=./src/debug_rng.c \
                   $(dSFMT) \
@@ -87,6 +94,14 @@ debug_sun_SOURCES=./src/debug_sun.c \
                   $(random) \
                   $(su2) \
                   $(sun)
+
+debug_u1_SOURCES=./src/debug_u1.c \
+                  $(dSFMT) \
+                  $(endian) \
+                  $(gparam) \
+                  ./include/macro.h \
+                  $(random) \
+                  $(u1)
 
 EXTRA_DIST = ./src/input.in 
 

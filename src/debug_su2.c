@@ -37,7 +37,7 @@ int main(void)
   times_equal_real_Su2(&mI, -1.0);  // mI=-1.0
   times_dag2_Su2(&T, &M, &M);
   plus_equal_Su2(&T, &mI);
-  if(sqrtdet_Su2(&T) <=MIN_VALUE) 
+  if(norm_Su2(&T) <=MIN_VALUE)
     {
     printf("    OK\n");
     }
@@ -61,7 +61,7 @@ int main(void)
   printf("  Heatbath ...");
   times_dag2_Su2(&T, &M, &M);
   plus_equal_Su2(&T, &mI);
-  if(sqrtdet_Su2(&T) <=MIN_VALUE) 
+  if(norm_Su2(&T) <=MIN_VALUE)
     {
     printf("    OK\n");
     }
@@ -80,7 +80,7 @@ int main(void)
   printf("  Overrelaxation ...");
   times_dag2_Su2(&T, &M, &M);
   plus_equal_Su2(&T, &mI);
-  if(sqrtdet_Su2(&T) <=MIN_VALUE) 
+  if(norm_Su2(&T) <=MIN_VALUE)
     {
     printf("    OK\n");
     }

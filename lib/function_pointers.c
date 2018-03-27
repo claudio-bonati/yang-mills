@@ -7,11 +7,49 @@
 #include"../include/su2_upd.h"
 #include"../include/sun.h"
 #include"../include/sun_upd.h"
-
+#include"../include/u1.h"
+#include"../include/u1_upd.h"
 
 void init_function_pointers(void)
   {
-  #if NCOLOR == 2
+  #if NCOLOR == 1
+
+  one  = &one_U1;
+  zero = &zero_U1;
+  equal     = &equal_U1;
+  equal_dag = &equal_dag_U1;
+  plus_equal     = &plus_equal_U1;
+  plus_equal_dag = &plus_equal_dag_U1;
+  minus_equal     = &minus_equal_U1;
+  minus_equal_times_real  = &minus_equal_times_real_U1;
+  minus_equal_dag = &minus_equal_dag_U1;
+  lin_comb       = &lin_comb_U1;
+  lin_comb_dag1  = &lin_comb_dag1_U1;
+  lin_comb_dag2  = &lin_comb_dag2_U1;
+  lin_comb_dag12 = &lin_comb_dag12_U1;
+  times_equal_real = &times_equal_real_U1;
+  times_equal     = &times_equal_U1;
+  times_equal_dag = &times_equal_dag_U1;
+  times       = &times_U1;
+  times_dag1  = &times_dag1_U1;
+  times_dag2  = &times_dag2_U1;
+  times_dag12 = &times_dag12_U1;
+  rand_matrix = &rand_matrix_U1;
+  norm = &norm_U1;
+  retr = &retr_U1;
+  imtr = &imtr_U1;
+  unitarize = &unitarize_U1;
+  taexp = &taexp_U1;
+  print_on_screen = &print_on_screen_U1;
+  print_on_file   = &print_on_file_U1;
+  print_on_binary_file_bigen   = &print_on_binary_file_bigen_U1;
+  read_from_file   = &read_from_file_U1;
+  read_from_binary_file_bigen   = &read_from_binary_file_bigen_U1;
+  single_heatbath = &single_heatbath_U1;
+  single_overrelaxation = &single_overrelaxation_U1;
+  cool = &cool_U1;
+
+  #elif NCOLOR == 2
 
   one  = &one_Su2;
   zero = &zero_Su2;

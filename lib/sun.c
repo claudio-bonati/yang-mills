@@ -779,6 +779,9 @@ void rand_algebra_gauss_matrix_SuN(SuN * restrict A)
     #endif
   #endif
 
+  #if NCOLOR==1
+    (void) A; // just to avoid warnings
+  #else
   int i, j;
   double d1, d2, dd[NCOLOR-1];
   const double nfactor=sqrt(2.0/(double)(NCOLOR*NCOLOR-NCOLOR));
@@ -823,6 +826,7 @@ void rand_algebra_gauss_matrix_SuN(SuN * restrict A)
     }
 
   times_equal_real_SuN(A, 1./sqrt(2.0));
+  #endif
   }
 
 
