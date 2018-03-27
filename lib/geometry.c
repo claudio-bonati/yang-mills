@@ -19,7 +19,8 @@ void init_indexing_lexeo(void)
   si_to_cart = &lexeo_to_cart;
   lex_to_si = &lex_to_lexeo;
   si_to_lex = &lexeo_to_lex;
-  sisp_and_t_to_si=&lexsp_and_t_to_lexeo;
+  sisp_and_t_to_si=&lexeosp_and_t_to_lexeo;
+  si_to_sisp_and_t=&lexeo_to_lexeosp_and_t;
   }
 
 
@@ -125,8 +126,8 @@ long nnm(Geometry const * const geo, long r, int i)
 
 void test_geometry(Geometry const * const geo, GParam const * const param)
   {
-  long si, ris_test, si_bis;
-  int dir, cart[STDIM];
+  long si, ris_test, si_bis, sisp;
+  int dir, cart[STDIM], cartsp[STDIM-1], t;
 
   // test of lex_to_cart <-> cart_to_lex
   for(si=0; si < param->d_volume; si++)
@@ -169,6 +170,45 @@ void test_geometry(Geometry const * const geo, GParam const * const param)
           }
         }
      }
+
+  // test of lexsp_to_cartsp <-> cartsp_to_lexsp
+  for(sisp=0; sisp < param->d_space_vol; sisp++)
+     {
+     lexsp_to_cartsp(cartsp, sisp, param);
+     ris_test=cartsp_to_lexsp(cartsp, param);
+
+     if(sisp != ris_test)
+       {
+       fprintf(stderr, "Problems while testing geometry! (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     }
+
+  // test of lexeosp_to_cartsp <-> cartsp_to_lexeosp
+  for(sisp=0; sisp < param->d_space_vol; sisp++)
+     {
+     lexeosp_to_cartsp(cartsp, sisp, param);
+     ris_test=cartsp_to_lexeosp(cartsp, param);
+
+     if(sisp != ris_test)
+       {
+       fprintf(stderr, "Problems while testing geometry! (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     }
+
+   // test of lexeosp_and_t_to_lexeo <-> lexeo_to_lexeosp_and_t
+   for(si=0; si<param->d_volume; si++)
+      {
+      lexeo_to_lexeosp_and_t(&sisp, &t, si, param);
+      ris_test=lexeosp_and_t_to_lexeo(sisp, t, param);
+
+      if(si != ris_test)
+        {
+        fprintf(stderr, "Problems while testing geometry! (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
+      }
   }
 
 
@@ -183,12 +223,15 @@ long cart_to_lex(int const * const cartcoord, GParam const * const param)
 
   ris=0;
   aux=1;
-  for(i=0; i<STDIM; i++)
+  for(i=STDIM-1; i>=0; i--)
      {
      ris+=cartcoord[i]*aux;
      aux*=param->d_size[i];
      }
-  // ris=cartcoord[0] + param->d_size[0]*cartcoord[1] + param->d_size[0]*param->d_size[1]*cartcoord[2] + ...
+
+  // ris=cartcoord[STDIM-1] + param->d_size[STDIM-1]*cartcoord[STDIM-2] + ---- +
+  //     + param->d_size[STDIM-1]*..*param->d_size[1]*cartcoord[0]
+  // with this convention time is the slowest coordinate
 
   return ris;
   }
@@ -200,13 +243,13 @@ void lex_to_cart(int *cartcoord, long lex, GParam const * const param)
   int i;
   long aux[STDIM];
 
-  aux[0]=1;
+  aux[0]=param->d_space_vol; // param->d_space_vol = param->d_volume / param->d_size[0]
   for(i=1; i<STDIM; i++)
      {
-     aux[i]=aux[i-1]*(param->d_size[i-1]);
+     aux[i]=aux[i-1]/(param->d_size[i]);
      }
 
-  for(i=STDIM-1; i>=0; i--)
+  for(i=0; i<STDIM; i++)
      {
      cartcoord[i]=(int) (lex/aux[i]);
      lex-=aux[i]*cartcoord[i];
@@ -308,10 +351,169 @@ long lexeo_to_lex(long lexeo, GParam const * const param)
   }
 
 
-// lexicographic spatial and time -> lexicographic index
-long lexsp_and_t_to_lexeo(long lexsp, int t, GParam const * const param)
+// spatial cartesian coordinates -> spatial lexicographic index
+long cartsp_to_lexsp(int const * const ccsp, GParam const * const param)
   {
-  return t+param->d_size[0]*lexsp;
+  // remembrer that ccsp has length STDIM-2
+  int i;
+  long ris, aux;
+
+  ris=0;
+  aux=1;
+  for(i=STDIM-2; i>=0; i--)
+     {
+     ris+=ccsp[i]*aux;
+     aux*=param->d_size[i+1];
+     }
+
+  // ris=ccsp[STDIM-2] + param->d_size[STDIM-1]*ccsp[STDIM-3] + ---- +
+  //     + param->d_size[STDIM-1]*..*param->d_size[2]*ccsp[0]
+
+  return ris;
+  }
+
+
+// spatial lexicographic index -> spatial cartesian coordinates
+void lexsp_to_cartsp(int *ccsp, long lexsp, GParam const * const param)
+  {
+  int i;
+  long aux[STDIM];
+
+  aux[0]=param->d_space_vol;
+  for(i=1; i<STDIM; i++)
+     {
+     aux[i]=aux[i-1]/(param->d_size[i]);
+     }
+
+  for(i=0; i<STDIM-1; i++)
+     {
+     ccsp[i]=(int) (lexsp/aux[i+1]);
+     lexsp-=aux[i+1]*ccsp[i];
+     }
+  }
+
+
+// spatial cartesian coordinates -> spatial lexicographic eo index
+long cartsp_to_lexeosp(int const * const ccsp, GParam const * const param)
+  {
+  long lexsp;
+  int i, eo;
+
+  lexsp=cartsp_to_lexsp(ccsp, param);
+
+  eo=0;
+  for(i=0; i<STDIM-1; i++)
+     {
+     eo+=ccsp[i];
+     }
+
+  if(eo % 2==0)
+    {
+    return lexsp/2;
+    }
+  else
+    {
+    return (lexsp + param->d_space_vol)/2;
+    }
+  }
+
+
+// spatial lexicographic eo index -> spatial cartesian coordinates
+void lexeosp_to_cartsp(int *ccsp, long lexeosp, GParam const * const param)
+  {
+  long lexsp;
+  int i, eo;
+
+  if(param->d_space_vol % 2 == 0)
+    {
+    if(lexeosp < param->d_space_vol/2)
+      {
+      lexsp=2*lexeosp;
+      }
+    else
+      {
+      lexsp=2*(lexeosp - param->d_space_vol/2);
+      }
+    lexsp_to_cartsp(ccsp, lexsp, param);
+
+    eo=0;
+    for(i=0; i<STDIM-1; i++)
+       {
+       eo+=ccsp[i];
+       }
+    eo = eo % 2;
+
+    if( (eo == 0 && lexeosp >= param->d_space_vol/2) ||
+        (eo == 1 && lexeosp < param->d_space_vol/2) )
+      {
+      lexsp+=1;
+      lexsp_to_cartsp(ccsp, lexsp, param);
+      }
+    }
+  else
+    {
+    if(lexeosp <= param->d_space_vol/2)
+      {
+      lexsp=2*lexeosp;
+      }
+    else
+      {
+      lexsp=2*(lexeosp - param->d_space_vol/2)-1;
+      }
+    lexsp_to_cartsp(ccsp, lexsp, param);
+    }
+  }
+
+
+// spatial lexicographic index -> spatial lexicographic eo index
+long lexsp_to_lexeosp(long lexsp, GParam const * const param)
+  {
+  int ccsop[STDIM];
+
+  lexsp_to_cartsp(ccsop, lexsp, param);
+
+  return cartsp_to_lexeosp(ccsop, param);
+  }
+
+
+//  spatial lexicographic eo index -> spatial lexicographic index
+long lexeosp_to_lexsp(long lexeosp, GParam const * const param)
+  {
+  int ccsp[STDIM];
+
+  lexeosp_to_cartsp(ccsp, lexeosp, param);
+
+  return cartsp_to_lexsp(ccsp, param);
+  }
+
+
+// lexicographic eo spatial and time -> lexicographic eo index
+long lexeosp_and_t_to_lexeo(long lexeosp, int t, GParam const * const param)
+  {
+  int cc[STDIM];
+
+  lexeosp_to_cartsp(cc+1, lexeosp, param);
+  cc[0]=t;
+
+  return cart_to_lexeo(cc, param);
+  }
+
+
+// lexicographic eo index -> lexicographic eo spatial and time
+void lexeo_to_lexeosp_and_t(long *lexeosp, int *t, long lexeo, GParam const * const param)
+  {
+  int i, cc[STDIM], ccsp[STDIM-1];
+
+  lexeo_to_cart(cc, lexeo, param);
+
+  *t=cc[0];
+
+  for(i=0; i<STDIM-1; i++)
+     {
+     ccsp[i]=cc[i+1];
+     }
+
+  *lexeosp=cartsp_to_lexeosp(ccsp, param);
   }
 
 

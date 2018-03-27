@@ -15,9 +15,9 @@ void (*si_to_cart)(int *cartcoord, long si, GParam const * const param);     // 
 long (*lex_to_si)(long lex, GParam const * const param);          // lexicographic -> single index
 long (*si_to_lex)(long si, GParam const * const param);           // lexicographic -> single index
 long (*sisp_and_t_to_si)(long sisp, int t, GParam const * const param); // single index spatial and time -> single index tot
+void (*si_to_sisp_and_t)(long *sisp, int *t, long si, GParam const * const param); // single index tot -> single index spatial and time
 
 // general functions
-
 void init_indexing_lexeo(void); // has to be called before init_geometry
 
 void init_geometry(Geometry * restrict geo, GParam const * const param);
@@ -39,7 +39,16 @@ void lexeo_to_cart(int *cartcoord, long lexeo, GParam const * const param);  // 
 long lex_to_lexeo(long lex, GParam const * const param);                     //  lexicographic index -> lexicographic eo index
 long lexeo_to_lex(long lexeo, GParam const * const param);                   //  lexicographic eo index -> lexicographic index
 
-long lexsp_and_t_to_lexeo(long lexsp, int t, GParam const * const param);    // lexicographic spatial and time -> lexicographic index
+long cartsp_to_lexsp(int const * const ccsp, GParam const * const param); // spatial cartesian coordinates -> spatial lexicographic index
+void lexsp_to_cartsp(int *ccsp, long lexsp, GParam const * const param);  // spatial lexicographic index -> spatial cartesian coordinates
 
+long cartsp_to_lexeosp(int const * const ccsp, GParam const * const param);  // spatial cartesian coordinates -> spatial lexicographic eo index
+void lexeosp_to_cartsp(int *ccsp, long lexeosp, GParam const * const param); // spatial lexicographic eo index -> spatial cartesian coordinates
+
+long lexsp_to_lexeosp(long lexsp, GParam const * const param);     //  spatial lexicographic index -> spatial lexicographic eo index
+long lexeosp_to_lexsp(long lexeosp, GParam const * const param);   //  spatial lexicographic eo index -> spatial lexicographic index
+
+long lexeosp_and_t_to_lexeo(long lexeosp, int t, GParam const * const param);    // lexicographic eo spatial and time -> lexicographic eo index
+void lexeo_to_lexeosp_and_t(long *lexeosp, int *t, long lexeo, GParam const * const param); // lex. eo index -> lex. eo spatial and t
 
 #endif
