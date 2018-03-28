@@ -58,7 +58,7 @@ void real_main(char *in_file)
     // count starts from 1 to avoid problems using %
     for(count=1; count < param.d_sample + 1; count++)
        {
-       update_w(&GC, &geo, &param);
+       update(&GC, &geo, &param);
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {

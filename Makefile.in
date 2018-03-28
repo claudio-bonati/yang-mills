@@ -87,8 +87,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = debug_rng$(EXEEXT) debug_su2$(EXEEXT) \
-	debug_sun$(EXEEXT) debug_u1$(EXEEXT) \
-	yang_mills_stdupd$(EXEEXT)
+	debug_sun$(EXEEXT) debug_u1$(EXEEXT) yang_mills_local$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -137,13 +136,13 @@ am__objects_9 = ./lib/gauge_conf_def.$(OBJEXT) \
 	./lib/gauge_conf_meas.$(OBJEXT) ./lib/gauge_conf_upd.$(OBJEXT)
 am__objects_10 = ./lib/geometry.$(OBJEXT)
 am__objects_11 = ./lib/mymalloc.$(OBJEXT)
-am_yang_mills_stdupd_OBJECTS = ./src/yang_mills_stdupd.$(OBJEXT) \
+am_yang_mills_local_OBJECTS = ./src/yang_mills_local.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_3) $(am__objects_8) \
 	$(am__objects_9) $(am__objects_10) $(am__objects_4) \
 	$(am__objects_11) $(am__objects_2) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7)
-yang_mills_stdupd_OBJECTS = $(am_yang_mills_stdupd_OBJECTS)
-yang_mills_stdupd_LDADD = $(LDADD)
+yang_mills_local_OBJECTS = $(am_yang_mills_local_OBJECTS)
+yang_mills_local_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -174,10 +173,10 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(debug_rng_SOURCES) $(debug_su2_SOURCES) \
 	$(debug_sun_SOURCES) $(debug_u1_SOURCES) \
-	$(yang_mills_stdupd_SOURCES)
+	$(yang_mills_local_SOURCES)
 DIST_SOURCES = $(debug_rng_SOURCES) $(debug_su2_SOURCES) \
 	$(debug_sun_SOURCES) $(debug_u1_SOURCES) \
-	$(yang_mills_stdupd_SOURCES)
+	$(yang_mills_local_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -373,7 +372,7 @@ u1 = ./include/u1.h \
      ./lib/u1.c \
      ./lib/u1_upd.c
 
-yang_mills_stdupd_SOURCES = ./src/yang_mills_stdupd.c \
+yang_mills_local_SOURCES = ./src/yang_mills_local.c \
                           $(dSFMT)  \
                           $(endian) \
                           $(funcpoint) \
@@ -569,7 +568,7 @@ debug_sun$(EXEEXT): $(debug_sun_OBJECTS) $(debug_sun_DEPENDENCIES) $(EXTRA_debug
 debug_u1$(EXEEXT): $(debug_u1_OBJECTS) $(debug_u1_DEPENDENCIES) $(EXTRA_debug_u1_DEPENDENCIES) 
 	@rm -f debug_u1$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_u1_OBJECTS) $(debug_u1_LDADD) $(LIBS)
-./src/yang_mills_stdupd.$(OBJEXT): src/$(am__dirstamp) \
+./src/yang_mills_local.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 ./lib/function_pointers.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
@@ -584,9 +583,9 @@ debug_u1$(EXEEXT): $(debug_u1_OBJECTS) $(debug_u1_DEPENDENCIES) $(EXTRA_debug_u1
 ./lib/mymalloc.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 
-yang_mills_stdupd$(EXEEXT): $(yang_mills_stdupd_OBJECTS) $(yang_mills_stdupd_DEPENDENCIES) $(EXTRA_yang_mills_stdupd_DEPENDENCIES) 
-	@rm -f yang_mills_stdupd$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(yang_mills_stdupd_OBJECTS) $(yang_mills_stdupd_LDADD) $(LIBS)
+yang_mills_local$(EXEEXT): $(yang_mills_local_OBJECTS) $(yang_mills_local_DEPENDENCIES) $(EXTRA_yang_mills_local_DEPENDENCIES) 
+	@rm -f yang_mills_local$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(yang_mills_local_OBJECTS) $(yang_mills_local_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -617,7 +616,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_sun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_u1.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_stdupd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_local.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

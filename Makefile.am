@@ -2,7 +2,7 @@ bin_PROGRAMS = debug_rng \
                debug_su2 \
                debug_sun \
                debug_u1 \
-               yang_mills_stdupd
+               yang_mills_local
 
 dSFMT = ./include/dSFMT-common.h \
         ./include/dSFMT.h \
@@ -60,7 +60,7 @@ u1 = ./include/u1.h \
      ./lib/u1.c \
      ./lib/u1_upd.c
 
-yang_mills_stdupd_SOURCES=./src/yang_mills_stdupd.c \
+yang_mills_local_SOURCES=./src/yang_mills_local.c \
                           $(dSFMT)  \
                           $(endian) \
                           $(funcpoint) \

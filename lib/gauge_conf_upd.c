@@ -232,7 +232,7 @@ void compute_quadri(Gauge_Conf  *GC,
 */
 
 // perform a complete update
-void update_w(Gauge_Conf * restrict GC,
+void update(Gauge_Conf * restrict GC,
               Geometry const * const restrict geo,
               GParam const * const restrict param)
    {

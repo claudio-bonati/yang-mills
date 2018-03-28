@@ -78,7 +78,7 @@ void overrelaxation_w(Gauge_Conf * restrict GC,
                       GParam const * const restrict param,
                       long r,
                       int i);
-void update_w(Gauge_Conf * restrict GC,
+void update(Gauge_Conf * restrict GC,
               Geometry const * const restrict geo,
               GParam const * const restrict param);
 
