@@ -7,6 +7,7 @@
 #include"../include/su2_upd.h"
 #include"../include/sun.h"
 #include"../include/sun_upd.h"
+#include"../include/tens_prod.h"
 #include"../include/u1.h"
 #include"../include/u1_upd.h"
 
@@ -45,6 +46,7 @@ void init_function_pointers(void)
   print_on_binary_file_bigen   = &print_on_binary_file_bigen_U1;
   read_from_file   = &read_from_file_U1;
   read_from_binary_file_bigen   = &read_from_binary_file_bigen_U1;
+  TensProd_init=&TensProd_init_U1;
   single_heatbath = &single_heatbath_U1;
   single_overrelaxation = &single_overrelaxation_U1;
   cool = &cool_U1;
@@ -82,6 +84,7 @@ void init_function_pointers(void)
   print_on_binary_file_bigen   = &print_on_binary_file_bigen_Su2;
   read_from_file   = &read_from_file_Su2;
   read_from_binary_file_bigen   = &read_from_binary_file_bigen_Su2;
+  TensProd_init=&TensProd_init_Su2;
   single_heatbath = &single_heatbath_Su2;
   single_overrelaxation = &single_overrelaxation_Su2;
   cool = &cool_Su2;
@@ -119,6 +122,7 @@ void init_function_pointers(void)
   print_on_binary_file_bigen   = &print_on_binary_file_bigen_SuN;
   read_from_file   = &read_from_file_SuN;
   read_from_binary_file_bigen   = &read_from_binary_file_bigen_SuN;
+  TensProd_init=&TensProd_init_SuN;
   single_heatbath = &single_heatbath_SuN;
   single_overrelaxation = &single_overrelaxation_SuN;
   cool = &cool_SuN;

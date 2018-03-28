@@ -4,6 +4,7 @@
 #include<stdio.h>
 
 #include"macro.h"
+#include"tens_prod.h"
 
 //
 // An Su2 matrix is represented as comp[0]+i\sum_{j=1}^3 comp[j]\sigma_j where
@@ -81,5 +82,6 @@ void read_from_binary_file_noswap_Su2(FILE *fp, Su2 *A);
 void read_from_binary_file_swap_Su2(FILE *fp, Su2 *A);
 void read_from_binary_file_bigen_Su2(FILE *fp, Su2 *A);
 
+void TensProd_init_Su2(TensProd * restrict TP, Su2 const * restrict A1, Su2 const * restrict A2);
 
 #endif

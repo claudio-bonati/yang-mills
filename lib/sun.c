@@ -12,6 +12,7 @@
 #include"../include/random.h"
 #include"../include/sun.h"
 #include"../include/sun_upd.h"
+#include"../include/tens_prod.h"
 
 //#define DEBUG
 
@@ -1517,5 +1518,38 @@ void read_from_binary_file_bigen_SuN(FILE *fp, SuN *A)
     read_from_binary_file_noswap_SuN(fp, A);
     }
   }
+
+
+void TensProd_init_SuN(TensProd * restrict TP, SuN const * restrict A1, SuN const * restrict A2)
+  {
+  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+  TP = __builtin_assume_aligned(TP, DOUBLE_ALIGN);
+  A1 = __builtin_assume_aligned(A1, DOUBLE_ALIGN);
+  A2 = __builtin_assume_aligned(A2, DOUBLE_ALIGN);
+  #else
+    #ifdef __INTEL_COMPILER
+     __assume_aligned(TP, DOUBLE_ALIGN);
+     __assume_aligned(A1, DOUBLE_ALIGN);
+     __assume_aligned(A2, DOUBLE_ALIGN);
+    #endif
+  #endif
+
+  int i, j, k, l;
+
+  for(i=0; i<NCOLOR; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        for(k=0; k<NCOLOR; k++)
+           {
+           for(l=0; l<NCOLOR; l++)
+              {
+              TP->comp[i][j][k][l]=conj(A1->comp[m(i,j)])*A2->comp[m(k,l)];
+              }
+           }
+        }
+     }
+  }
+
 
 #endif

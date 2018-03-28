@@ -367,6 +367,9 @@ sun = ./include/sun_aux.h \
       ./lib/sun.c \
       ./lib/sun_upd.c 
 
+tens_prod = ./include/tens_prod.h \
+            ./lib/tens_prod.c
+
 u1 = ./include/u1.h \
      ./include/u1_upd.h \
      ./lib/u1.c \
@@ -417,7 +420,7 @@ debug_u1_SOURCES = ./src/debug_u1.c \
 
 EXTRA_DIST = ./src/input.in 
 AM_CFLAGS = -std=c99 -O3 -Wall -Wextra -pedantic -Werror -Wconversion @OPENMP_CFLAGS@
-CLEANFILES = dati*.dat log*.dat dati*.log conf*.dat* input_check.in 
+CLEANFILES = dati*.dat log*.dat dati*.log conf*.dat* 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

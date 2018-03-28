@@ -5,6 +5,7 @@
 #include<stdio.h>
 
 #include"macro.h"
+#include"tens_prod.h"
 
 typedef struct U1 {
      double complex comp __attribute__((aligned(DOUBLE_ALIGN)));
@@ -74,6 +75,9 @@ void read_from_file_U1(FILE *fp, U1 *A);
 void read_from_binary_file_noswap_U1(FILE *fp, U1 *A);
 void read_from_binary_file_swap_U1(FILE *fp, U1 *A);
 void read_from_binary_file_bigen_U1(FILE *fp, U1 *A);
+
+void TensProd_init_U1(TensProd * restrict TP, U1 const * restrict A1, U1 const * restrict A2);
+
 
 #endif // U1_H
 

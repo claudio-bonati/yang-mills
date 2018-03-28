@@ -933,4 +933,52 @@ void read_from_binary_file_bigen_Su2(FILE *fp, Su2 *A)
     }
   }
 
+
+void TensProd_init_Su2(TensProd * restrict TP, Su2 const * restrict A1, Su2 const * restrict A2)
+  {
+  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+  TP = __builtin_assume_aligned(TP, DOUBLE_ALIGN);
+  A1 = __builtin_assume_aligned(A1, DOUBLE_ALIGN);
+  A2 = __builtin_assume_aligned(A2, DOUBLE_ALIGN);
+  #else
+    #ifdef __INTEL_COMPILER
+     __assume_aligned(TP, DOUBLE_ALIGN);
+     __assume_aligned(A1, DOUBLE_ALIGN);
+     __assume_aligned(A2, DOUBLE_ALIGN);
+    #endif
+  #endif
+
+  int i, j, k, l;
+  double complex aux1[4] __attribute__((aligned(DOUBLE_ALIGN)));
+  double complex aux2[4] __attribute__((aligned(DOUBLE_ALIGN)));
+
+  // reconstruct the complex form of the matrices
+  aux1[m(0,0)] = A1->comp[0]+I*A1->comp[3];
+  aux1[m(0,1)] = A1->comp[2]+I*A1->comp[1];
+  aux1[m(1,0)] =-A1->comp[2]+I*A1->comp[1];
+  aux1[m(1,1)] = A1->comp[0]-I*A1->comp[3];
+
+  aux2[m(0,0)] = A2->comp[0]+I*A2->comp[3];
+  aux2[m(0,1)] = A2->comp[2]+I*A2->comp[1];
+  aux2[m(1,0)] =-A2->comp[2]+I*A2->comp[1];
+  aux2[m(1,1)] = A2->comp[0]-I*A2->comp[3];
+
+  for(i=0; i<2; i++)
+     {
+     for(j=0; j<2; j++)
+        {
+        for(k=0; k<2; k++)
+           {
+           for(l=0; l<2; l++)
+              {
+              TP->comp[i][j][k][l]=conj(aux1[m(i,j)])*aux2[m(k,l)];
+              }
+           }
+        }
+     }
+  }
+
+
+
+
 #endif

@@ -9,6 +9,7 @@
 #include"../include/endianness.h"
 #include"../include/macro.h"
 #include"../include/random.h"
+#include"../include/tens_prod.h"
 #include"../include/u1.h"
 
 //#define DEBUG
@@ -777,6 +778,25 @@ void read_from_binary_file_bigen_U1(FILE *fp, U1 *A)
     read_from_binary_file_noswap_U1(fp, A);
     }
   }
+
+
+void TensProd_init_U1(TensProd * restrict TP, U1 const * restrict A1, U1 const * restrict A2)
+  {
+  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+  TP = __builtin_assume_aligned(TP, DOUBLE_ALIGN);
+  A1 = __builtin_assume_aligned(A1, DOUBLE_ALIGN);
+  A2 = __builtin_assume_aligned(A2, DOUBLE_ALIGN);
+  #else
+    #ifdef __INTEL_COMPILER
+     __assume_aligned(TP, DOUBLE_ALIGN);
+     __assume_aligned(A1, DOUBLE_ALIGN);
+     __assume_aligned(A2, DOUBLE_ALIGN);
+    #endif
+  #endif
+
+  TP->comp[0][0][0][0]=conj(A1->comp)*A2->comp;
+  }
+
 
 
 #endif

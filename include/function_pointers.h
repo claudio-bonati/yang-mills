@@ -8,6 +8,7 @@
 #include"su2_upd.h"
 #include"sun.h"
 #include"sun_upd.h"
+#include"tens_prod.h"
 #include"u1.h"
 #include"u1_upd.h"
 
@@ -80,6 +81,8 @@ void (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A);
 void (*read_from_file)(FILE *fp, GAUGE_GROUP *A);
 void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A);
 void (*read_from_binary_file_swap)(FILE *fp, GAUGE_GROUP *A);
+
+void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2);
 
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param);
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple);

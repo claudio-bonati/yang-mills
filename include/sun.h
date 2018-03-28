@@ -5,6 +5,7 @@
 #include<stdio.h>
 
 #include"macro.h"
+#include"tens_prod.h"
 
 typedef struct SuN {
    double complex comp[NCOLOR*NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
@@ -85,5 +86,6 @@ void read_from_binary_file_noswap_SuN(FILE *fp, SuN *A);
 void read_from_binary_file_swap_SuN(FILE *fp, SuN *A);
 void read_from_binary_file_bigen_SuN(FILE *fp, SuN *A);
 
+void TensProd_init_SuN(TensProd * restrict TP, SuN const * restrict A1, SuN const * restrict A2);
 
 #endif
