@@ -186,6 +186,47 @@ void readinput(char *in_file, GParam *param)
                   param->d_saveconf_analysis_every=temp_i;
                   }
 
+           else if(strncmp(str, "multihit", 8)==0)
+                  {
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_multihit=temp_i;
+                  }
+           else if(strncmp(str, "ml_step1", 8)==0)
+                  {
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_ml_step1=temp_i;
+                  }
+           else if(strncmp(str, "up_level1", 9)==0)
+                  {
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_up_level1=temp_i;
+                  }
+           else if(strncmp(str, "dist_poly", 9)==0)
+                  {
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_dist_poly=temp_i;
+                  }
+
            else if(strncmp(str, "conf_file", 9)==0)
                   { 
                   err=fscanf(input, "%s", temp_str);
@@ -330,16 +371,16 @@ void init_data_file(FILE **dataf, GParam const * const param)
 
 
 // print simulation parameters
-void print_parameters(GParam const * const param, time_t time_start, time_t time_end)
+void print_parameters_local(GParam const * const param, time_t time_start, time_t time_end)
     {
     FILE *fp;
     int i;
     double diff_sec;
 
     fp=fopen(param->d_log_file, "w");
-    fprintf(fp, "+--------------------+\n");
-    fprintf(fp, "| Simulation details |\n");
-    fprintf(fp, "+--------------------+\n\n");
+    fprintf(fp, "+-----------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_local |\n");
+    fprintf(fp, "+-----------------------------------------+\n\n");
 
     #ifdef OPENMP_MODE
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
@@ -387,6 +428,74 @@ void print_parameters(GParam const * const param, time_t time_start, time_t time
 
     fclose(fp);
     }
+
+
+// print simulation parameters
+void print_parameters_polycorr(GParam const * const param, time_t time_start, time_t time_end)
+    {
+    FILE *fp;
+    int i;
+    double diff_sec;
+
+    fp=fopen(param->d_log_file, "w");
+    fprintf(fp, "+--------------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_polycorr |\n");
+    fprintf(fp, "+--------------------------------------------+\n\n");
+
+    #ifdef OPENMP_MODE
+     fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
+    #endif
+
+    fprintf(fp, "number of colors: %d\n", NCOLOR);
+    fprintf(fp, "spacetime dimensionality: %s\n\n", QUOTEME(STDIM));
+
+    fprintf(fp, "lattice: %d", param->d_size[0]);
+    for(i=1; i<STDIM; i++)
+       {
+       fprintf(fp, "x%d", param->d_size[i]);
+       }
+    fprintf(fp, "\n\n");
+
+    fprintf(fp, "beta: %.10lf\n", param->d_beta);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "sample:    %d\n", param->d_sample);
+    fprintf(fp, "thermal:   %d\n", param->d_thermal);
+    fprintf(fp, "overrelax: %d\n", param->d_overrelax);
+    fprintf(fp, "measevery: %d\n", param->d_measevery);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "start:                   %d\n", param->d_start);
+    fprintf(fp, "saveconf_back_every:     %d\n", param->d_saveconf_back_every);
+    fprintf(fp, "saveconf_analysis_every: %d\n", param->d_saveconf_analysis_every);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "multihit:   %d\n", param->d_multihit);
+    fprintf(fp, "ml_step1:   %d\n", param->d_ml_step1);
+    fprintf(fp, "up_level1:  %d\n", param->d_up_level1);
+    fprintf(fp, "dist_poly:  %d\n", param->d_dist_poly);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "randseed: %u\n", param->d_randseed);
+    fprintf(fp, "\n");
+
+    diff_sec = difftime(time_end, time_start);
+    fprintf(fp, "Simulation time: %.3lf seconds\n", diff_sec );
+    fprintf(fp, "\n");
+
+    if(endian()==0)
+      {
+      fprintf(fp, "Little endian machine\n\n");
+      }
+    else
+      {
+      fprintf(fp, "Big endian machine\n\n");
+      }
+
+    fclose(fp);
+    }
+
+
 
 
 #endif

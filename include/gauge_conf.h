@@ -14,7 +14,13 @@
 
 typedef struct Gauge_Conf {
   long update_index;
+
   GAUGE_GROUP **lattice;
+
+  // for computing the polyakov loop correlator with multilevel
+  TensProd *ml_polycorr_ris_level1;
+  TensProd *ml_polycorr_tmp_level1;
+
   } Gauge_Conf;
 
 
@@ -38,6 +44,10 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC1,
 void compute_md5sum(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                     Gauge_Conf const * const GC,
                     GParam const * const param);
+void init_gauge_conf_polycorr(Gauge_Conf *GC,
+                              GParam const * const param);
+void end_gauge_conf_polycorr(Gauge_Conf *GC);
+
 
 
 // in gauge_conf_meas.c

@@ -7,9 +7,15 @@ thermal 0
 overrelax 5 
 measevery 1
 
-start                   0  # (0=ordered  1=random  2=from saved configuration)
-saveconf_back_every     5  # (if 0 does not save, else save backup configurations every ... updates)
-saveconf_analysis_every 5  # (if 0 does not save, else save backup configurations every ... updates)
+start                   0  # 0=ordered  1=random  2=from saved configuration
+saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates
+saveconf_analysis_every 5  # if 0 does not save, else save backup configurations every ... updates
+
+#for multilevel
+multihit   10  # number of multihit step
+ml_step1   4   # step for level 1
+up_level1  10  # number of updates for level 1
+dist_poly  2   # distance between the polyakov loop 
 
 #output files
 conf_file  conf.dat

@@ -24,7 +24,13 @@ typedef struct GParam {
   int d_saveconf_back_every;
   int d_saveconf_analysis_every;
 
-  // file names
+  // for multilevel
+  int d_multihit;
+  int d_ml_step1;
+  int d_up_level1;
+  int d_dist_poly;
+
+  // output file names
   char d_conf_file[STD_STRING_LENGTH];
   char d_data_file[STD_STRING_LENGTH];
   char d_log_file[STD_STRING_LENGTH];
@@ -44,6 +50,7 @@ void remove_white_line_and_comments(FILE *input);
 void readinput(char *in_file, GParam *param);
 void init_derived_constants(GParam *param);
 void init_data_file(FILE **dataf, GParam const * const param);
-void print_parameters(GParam const * const param, time_t time_start, time_t time_end);
+void print_parameters_local(GParam const * const param, time_t time_start, time_t time_end);
+void print_parameters_polycorr(GParam const * const param, time_t time_start, time_t time_end);
 
 #endif

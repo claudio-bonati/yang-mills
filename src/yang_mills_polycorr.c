@@ -1,5 +1,5 @@
-#ifndef YM_LOCAL_C
-#define YM_LOCAL_C
+#ifndef YM_POLYCORR_C
+#define YM_POLYVORR_C
 
 #include"../include/macro.h"
 
@@ -53,6 +53,9 @@ void real_main(char *in_file)
     // initialize gauge configuration
     init_gauge_conf(&GC, &param);
 
+    // initialize multilevel
+    init_gauge_conf_polycorr(&GC, &param);
+
     // montecarlo
     time(&time1);
     // count starts from 1 to avoid problems using %
@@ -60,10 +63,10 @@ void real_main(char *in_file)
        {
        update(&GC, &geo, &param);
 
-       if(count % param.d_measevery ==0 && count >= param.d_thermal)
-         {
-         perform_measures_localobs(&GC, &geo, &param, datafilep);
-         }
+//       if(count % param.d_measevery ==0 && count >= param.d_thermal)
+//         {
+//         perform_measures_localobs(&GC, &geo, &param, datafilep);
+//         }
 
        // save configuration for backup
        if(param.d_saveconf_back_every!=0)
@@ -103,10 +106,13 @@ void real_main(char *in_file)
       }
 
     // print simulation details
-    print_parameters_local(&param, time1, time2);
+    print_parameters_polycorr(&param, time1, time2);
 
     // free gauge configuration
     end_gauge_conf(&GC, &param);
+
+    // end multilevel
+    end_gauge_conf_polycorr(&GC);
 
     // free geometry
     free_geometry(&geo, &param);
