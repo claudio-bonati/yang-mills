@@ -1,13 +1,17 @@
 #ifndef GAUGE_CONF_MULTI_C
 #define GAUGE_CONF_MULTI_C
 
+#include"../include/macro.h"
+
 #include<complex.h>
+#ifdef OPENMP_MODE
+  #include<omp.h>
+#endif
 #include<stdlib.h>
 
 #include"../include/function_pointers.h"
 #include"../include/gauge_conf.h"
 #include"../include/gparam.h"
-#include"../include/macro.h"
 #include"../include/mymalloc.h"
 #include"../include/tens_prod.h"
 
@@ -65,15 +69,25 @@ void compute_local_poly(Gauge_Conf const * const restrict GC,
                         int dt,
                         GAUGE_GROUP *loc_poly)
   {
-  int i;
+  int i, num_hit;
   long r;
 
   GAUGE_GROUP matrix;
 
-  for(r=0; r<param->d_space_vol; r++)
+  if(param->d_dist_poly>1)
+    {
+    num_hit=param->d_multihit;
+    }
+  else
+    {
+    num_hit=0;
+    }
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(r)
+  #endif
+  for(r=0; r<param->d_space_vol/2; r++)
      {
-     // polyakov loop correlators     // note: if param->d_dist_poly<2 the multihit is never used
-                                      //       see the first line of the multihit function
      one(&(loc_poly[r]));
      for(i=0; i<dt; i++)
         {
@@ -82,11 +96,30 @@ void compute_local_poly(Gauge_Conf const * const restrict GC,
                  param,
                  sisp_and_t_to_si(r, t_start+i, param),
                  0,
-                 param->d_multihit,
+                 num_hit,
                  &matrix);
         times_equal(&(loc_poly[r]), &matrix);
         }
-     }// end of the loop on r
+     }
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(r)
+  #endif
+  for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
+     {
+     one(&(loc_poly[r]));
+     for(i=0; i<dt; i++)
+        {
+        multihit(GC,
+                 geo,
+                 param,
+                 sisp_and_t_to_si(r, t_start+i, param),
+                 0,
+                 num_hit,
+                 &matrix);
+        times_equal(&(loc_poly[r]), &matrix);
+        }
+     }
   }
 
 
@@ -148,24 +181,59 @@ void multilevel1(Gauge_Conf * restrict GC,
     for(upd=0; upd< param->d_up_level1; upd++)
        {
        // heatbath
-       for(r=0; r<param->d_space_vol; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(r)
+       #endif
+       for(r=0; r<param->d_space_vol/2; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(r)
+       #endif
+       for(r=param->d_space_vol/2; r<param->d_space_vol; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+
+
        for(i=1; i<dt; i++)
           {
           for(dir=0; dir<STDIM; dir++)
              {
-             for(r=0; r<param->d_space_vol; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+             #ifdef OPENMP_MODE
+             #pragma omp parallel for num_threads(NTHREADS) private(r)
+             #endif
+             for(r=0; r<param->d_space_vol/2; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+
+             #ifdef OPENMP_MODE
+             #pragma omp parallel for num_threads(NTHREADS) private(r)
+             #endif
+             for(r=param->d_space_vol/2; r<param->d_space_vol; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
              }
           }
 
        // overrelaxation
        for(upd_over=0; upd_over<param->d_overrelax; upd_over++)
           {
-          for(r=0; r<param->d_space_vol; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+          #ifdef OPENMP_MODE
+          #pragma omp parallel for num_threads(NTHREADS) private(r)
+          #endif
+          for(r=0; r<param->d_space_vol/2; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+
+          #ifdef OPENMP_MODE
+          #pragma omp parallel for num_threads(NTHREADS) private(r)
+          #endif
+          for(r=param->d_space_vol/2; r<param->d_space_vol; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+
           for(i=1; i<dt; i++)
              {
              for(dir=0; dir<STDIM; dir++)
                 {
-                for(r=0; r<param->d_space_vol; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+                #ifdef OPENMP_MODE
+                #pragma omp parallel for num_threads(NTHREADS) private(r)
+                #endif
+                for(r=0; r<param->d_space_vol/2; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+
+                #ifdef OPENMP_MODE
+                #pragma omp parallel for num_threads(NTHREADS) private(r)
+                #endif
+                for(r=param->d_space_vol/2; r<param->d_space_vol; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
                 }
              }
           }
@@ -176,6 +244,9 @@ void multilevel1(Gauge_Conf * restrict GC,
           {
           for(dir=0; dir<STDIM; dir++)
              {
+             #ifdef OPENMP_MODE
+             #pragma omp parallel for num_threads(NTHREADS) private(r)
+             #endif
              for(r=0; r<param->d_space_vol; r++) unitarize( &(GC->lattice[sisp_and_t_to_si(r, t_start+i, param)][dir]) );
              }
           }
