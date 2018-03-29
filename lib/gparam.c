@@ -60,7 +60,6 @@ void readinput(char *in_file, GParam *param)
     {
     FILE *input;
     char str[STD_STRING_LENGTH], temp_str[STD_STRING_LENGTH];
-    char c;
     double temp_d;
     int temp_i, i;
     int err, end=1;
@@ -94,8 +93,8 @@ void readinput(char *in_file, GParam *param)
              {
              for(i=0; i<STDIM; i++)
                 {
-                err=fscanf(input, "%d%c", &temp_i, &c);
-                if(err!=2)
+                err=fscanf(input, "%d", &temp_i);
+                if(err!=1)
                   {
                   fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                   exit(EXIT_FAILURE);
@@ -106,8 +105,8 @@ void readinput(char *in_file, GParam *param)
 
            else if(strncmp(str, "beta", 4)==0)
                   { 
-                  err=fscanf(input, "%lf%c", &temp_d, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%lf", &temp_d);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -117,8 +116,8 @@ void readinput(char *in_file, GParam *param)
 
            else if(strncmp(str, "sample", 6)==0)
                   { 
-                  err=fscanf(input, "%d%c", &temp_i, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -127,8 +126,8 @@ void readinput(char *in_file, GParam *param)
                   }
            else if(strncmp(str, "thermal", 7)==0)
                   { 
-                  err=fscanf(input, "%d%c", &temp_i, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -137,8 +136,8 @@ void readinput(char *in_file, GParam *param)
                   }
            else if(strncmp(str, "overrelax", 9)==0)
                   { 
-                  err=fscanf(input, "%d%c", &temp_i, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -147,8 +146,8 @@ void readinput(char *in_file, GParam *param)
                   }
            else if(strncmp(str, "measevery", 9)==0)
                   { 
-                  err=fscanf(input, "%d%c", &temp_i, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -158,8 +157,8 @@ void readinput(char *in_file, GParam *param)
 
            else if(strncmp(str, "start", 5)==0)
                   { 
-                  err=fscanf(input, "%d%c", &temp_i, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -168,8 +167,8 @@ void readinput(char *in_file, GParam *param)
                   }
            else if(strncmp(str, "saveconf_back_every", 19)==0)
                   {
-                  err=fscanf(input, "%d%c", &temp_i, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -178,8 +177,8 @@ void readinput(char *in_file, GParam *param)
                   }
            else if(strncmp(str, "saveconf_analysis_every", 23)==0)
                   {
-                  err=fscanf(input, "%d%c", &temp_i, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -189,8 +188,8 @@ void readinput(char *in_file, GParam *param)
 
            else if(strncmp(str, "conf_file", 9)==0)
                   { 
-                  err=fscanf(input, "%s%c", temp_str, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%s", temp_str);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -199,8 +198,8 @@ void readinput(char *in_file, GParam *param)
                   }
            else if(strncmp(str, "data_file", 9)==0)
                   { 
-                  err=fscanf(input, "%s%c", temp_str, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%s", temp_str);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -209,8 +208,8 @@ void readinput(char *in_file, GParam *param)
                   }
            else if(strncmp(str, "log_file", 8)==0)
                   { 
-                  err=fscanf(input, "%s%c", temp_str, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%s", temp_str);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -220,8 +219,8 @@ void readinput(char *in_file, GParam *param)
 
            else if(strncmp(str, "randseed", 8)==0)
                   { 
-                  err=fscanf(input, "%u%c", &temp_ui, &c);
-                  if(err!=2)
+                  err=fscanf(input, "%u", &temp_ui);
+                  if(err!=1)
                     {
                     fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                     exit(EXIT_FAILURE);
@@ -235,15 +234,7 @@ void readinput(char *in_file, GParam *param)
              exit(EXIT_FAILURE);
              }
 
-           // discard eventual comments
-           if(c!='\n')
-             { 
-             do
-               {
-               temp_i=getc(input);
-               }
-             while(temp_i!='\n');
-             }
+           remove_white_line_and_comments(input);
 
            // check if the read line is the last one
            temp_i=getc(input);
