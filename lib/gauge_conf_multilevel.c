@@ -83,29 +83,7 @@ void compute_local_poly(Gauge_Conf const * const restrict GC,
     num_hit=0;
     }
 
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r)
-  #endif
-  for(r=0; r<param->d_space_vol/2; r++)
-     {
-     one(&(loc_poly[r]));
-     for(i=0; i<dt; i++)
-        {
-        multihit(GC,
-                 geo,
-                 param,
-                 sisp_and_t_to_si(r, t_start+i, param),
-                 0,
-                 num_hit,
-                 &matrix);
-        times_equal(&(loc_poly[r]), &matrix);
-        }
-     }
-
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r)
-  #endif
-  for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
+  for(r=0; r<param->d_space_vol; r++)
      {
      one(&(loc_poly[r]));
      for(i=0; i<dt; i++)
@@ -239,7 +217,11 @@ void multilevel1(Gauge_Conf * restrict GC,
           }
 
        // unitarize
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(r)
+       #endif
        for(r=0; r<param->d_space_vol; r++) unitarize( &(GC->lattice[sisp_and_t_to_si(r, t_start, param)][0]) );
+
        for(i=1; i<dt; i++)
           {
           for(dir=0; dir<STDIM; dir++)

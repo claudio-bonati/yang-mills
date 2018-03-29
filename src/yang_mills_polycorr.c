@@ -1,5 +1,5 @@
 #ifndef YM_POLYCORR_C
-#define YM_POLYVORR_C
+#define YM_POLYCORR_C
 
 #include"../include/macro.h"
 
