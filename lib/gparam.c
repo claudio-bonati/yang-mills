@@ -10,6 +10,52 @@
 #include"../include/gparam.h"
 #include"../include/macro.h"
 
+
+// remove from input file white/empty lines and comments
+// comments start with the carachter #
+void remove_white_line_and_comments(FILE *input)
+  {
+  int temp_i;
+
+  temp_i=getc(input);
+  if(temp_i=='\n' || temp_i==' ' || temp_i=='\043')
+    {
+    ungetc(temp_i, input);
+
+    temp_i=getc(input);
+    if(temp_i=='\n' || temp_i==' ') // white line
+      {
+      do
+       {
+       temp_i=getc(input);
+       }
+      while(temp_i=='\n' || temp_i==' ');
+      }
+    ungetc(temp_i, input);
+
+    temp_i=getc(input);
+    if(temp_i=='\043')  // comment, \043 = ascii oct for #
+      {
+      do
+       {
+       temp_i=getc(input);
+       }
+      while(temp_i!='\n');
+      }
+    else
+      {
+      ungetc(temp_i, input);
+      }
+
+    remove_white_line_and_comments(input);
+    }
+  else
+    {
+    ungetc(temp_i, input);
+    }
+  }
+
+
 void readinput(char *in_file, GParam *param)
     {
     FILE *input;
@@ -30,11 +76,13 @@ void readinput(char *in_file, GParam *param)
       {
       while(end==1)   // slide the file
            {
+           remove_white_line_and_comments(input);
+
            err=fscanf(input, "%s", str);
            if(err!=1)
              {
              fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
-             printf("err=%d", err);
+             printf("err=%d\n", err);
              exit(EXIT_FAILURE);
              }
 
@@ -186,7 +234,7 @@ void readinput(char *in_file, GParam *param)
              fprintf(stderr, "Error: unrecognized option %s in the file %s (%s, %d)\n", str, in_file, __FILE__, __LINE__);
              exit(EXIT_FAILURE);
              }
-   
+
            // discard eventual comments
            if(c!='\n')
              { 

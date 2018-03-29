@@ -40,6 +40,7 @@ typedef struct GParam {
 } GParam;
 
 
+void remove_white_line_and_comments(FILE *input);
 void readinput(char *in_file, GParam *param);
 void init_derived_constants(GParam *param);
 void init_data_file(FILE **dataf, GParam const * const param);
