@@ -86,8 +86,9 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = debug_rng$(EXEEXT) debug_su2$(EXEEXT) \
-	debug_sun$(EXEEXT) debug_u1$(EXEEXT) yang_mills_local$(EXEEXT)
+bin_PROGRAMS = conf_check$(EXEEXT) debug_rng$(EXEEXT) \
+	debug_su2$(EXEEXT) debug_sun$(EXEEXT) debug_u1$(EXEEXT) \
+	yang_mills_local$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -105,42 +106,48 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = ./lib/dSFMT.$(OBJEXT)
-am__objects_2 = ./lib/random.$(OBJEXT)
+am__objects_2 = ./lib/endianness.$(OBJEXT)
+am__objects_3 = ./lib/function_pointers.$(OBJEXT)
+am__objects_4 = ./lib/gparam.$(OBJEXT)
+am__objects_5 = ./lib/mymalloc.$(OBJEXT)
+am__objects_6 = ./lib/random.$(OBJEXT)
+am__objects_7 = ./lib/su2.$(OBJEXT) ./lib/su2_upd.$(OBJEXT)
+am__objects_8 = ./lib/sun_aux.$(OBJEXT) ./lib/sun.$(OBJEXT) \
+	./lib/sun_upd.$(OBJEXT)
+am__objects_9 = ./lib/u1.$(OBJEXT) ./lib/u1_upd.$(OBJEXT)
+am_conf_check_OBJECTS = ./src/conf_check.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9)
+conf_check_OBJECTS = $(am_conf_check_OBJECTS)
+conf_check_LDADD = $(LDADD)
 am_debug_rng_OBJECTS = ./src/debug_rng.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2)
+	$(am__objects_6)
 debug_rng_OBJECTS = $(am_debug_rng_OBJECTS)
 debug_rng_LDADD = $(LDADD)
-am__objects_3 = ./lib/endianness.$(OBJEXT)
-am__objects_4 = ./lib/gparam.$(OBJEXT)
-am__objects_5 = ./lib/su2.$(OBJEXT) ./lib/su2_upd.$(OBJEXT)
 am_debug_su2_OBJECTS = ./src/debug_su2.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_3) $(am__objects_4) $(am__objects_2) \
-	$(am__objects_5)
+	$(am__objects_2) $(am__objects_4) $(am__objects_6) \
+	$(am__objects_7)
 debug_su2_OBJECTS = $(am_debug_su2_OBJECTS)
 debug_su2_LDADD = $(LDADD)
-am__objects_6 = ./lib/sun_aux.$(OBJEXT) ./lib/sun.$(OBJEXT) \
-	./lib/sun_upd.$(OBJEXT)
 am_debug_sun_OBJECTS = ./src/debug_sun.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_3) $(am__objects_4) $(am__objects_2) \
-	$(am__objects_5) $(am__objects_6)
+	$(am__objects_2) $(am__objects_4) $(am__objects_6) \
+	$(am__objects_7) $(am__objects_8)
 debug_sun_OBJECTS = $(am_debug_sun_OBJECTS)
 debug_sun_LDADD = $(LDADD)
-am__objects_7 = ./lib/u1.$(OBJEXT) ./lib/u1_upd.$(OBJEXT)
 am_debug_u1_OBJECTS = ./src/debug_u1.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_3) $(am__objects_4) $(am__objects_2) \
-	$(am__objects_7)
+	$(am__objects_2) $(am__objects_4) $(am__objects_6) \
+	$(am__objects_9)
 debug_u1_OBJECTS = $(am_debug_u1_OBJECTS)
 debug_u1_LDADD = $(LDADD)
-am__objects_8 = ./lib/function_pointers.$(OBJEXT)
-am__objects_9 = ./lib/gauge_conf_def.$(OBJEXT) \
+am__objects_10 = ./lib/gauge_conf_def.$(OBJEXT) \
 	./lib/gauge_conf_meas.$(OBJEXT) ./lib/gauge_conf_upd.$(OBJEXT)
-am__objects_10 = ./lib/geometry.$(OBJEXT)
-am__objects_11 = ./lib/mymalloc.$(OBJEXT)
+am__objects_11 = ./lib/geometry.$(OBJEXT)
 am_yang_mills_local_OBJECTS = ./src/yang_mills_local.$(OBJEXT) \
-	$(am__objects_1) $(am__objects_3) $(am__objects_8) \
-	$(am__objects_9) $(am__objects_10) $(am__objects_4) \
-	$(am__objects_11) $(am__objects_2) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7)
+	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
+	$(am__objects_10) $(am__objects_11) $(am__objects_4) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9)
 yang_mills_local_OBJECTS = $(am_yang_mills_local_OBJECTS)
 yang_mills_local_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -171,11 +178,11 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(debug_rng_SOURCES) $(debug_su2_SOURCES) \
-	$(debug_sun_SOURCES) $(debug_u1_SOURCES) \
+SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
+	$(debug_su2_SOURCES) $(debug_sun_SOURCES) $(debug_u1_SOURCES) \
 	$(yang_mills_local_SOURCES)
-DIST_SOURCES = $(debug_rng_SOURCES) $(debug_su2_SOURCES) \
-	$(debug_sun_SOURCES) $(debug_u1_SOURCES) \
+DIST_SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
+	$(debug_su2_SOURCES) $(debug_sun_SOURCES) $(debug_u1_SOURCES) \
 	$(yang_mills_local_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -375,19 +382,16 @@ u1 = ./include/u1.h \
      ./lib/u1.c \
      ./lib/u1_upd.c
 
-yang_mills_local_SOURCES = ./src/yang_mills_local.c \
-                          $(dSFMT)  \
-                          $(endian) \
-                          $(funcpoint) \
-                          $(gauge_conf) \
-                          $(geometry) \
-                          $(gparam) \
-                          ./include/macro.h \
-                          $(mymalloc) \
-                          $(random) \
-                          $(su2) \
-                          $(sun) \
-                          $(u1) 
+conf_check_SOURCES = ./src/conf_check.c \
+                   $(dSFMT) \
+                   $(endian) \
+                   $(funcpoint) \
+                   $(gparam) \
+                   $(mymalloc) \
+                   $(random) \
+                   $(su2) \
+                   $(sun) \
+                   $(u1) 
 
 debug_rng_SOURCES = ./src/debug_rng.c \
                   $(dSFMT) \
@@ -417,6 +421,20 @@ debug_u1_SOURCES = ./src/debug_u1.c \
                   ./include/macro.h \
                   $(random) \
                   $(u1)
+
+yang_mills_local_SOURCES = ./src/yang_mills_local.c \
+                          $(dSFMT)  \
+                          $(endian) \
+                          $(funcpoint) \
+                          $(gauge_conf) \
+                          $(geometry) \
+                          $(gparam) \
+                          ./include/macro.h \
+                          $(mymalloc) \
+                          $(random) \
+                          $(su2) \
+                          $(sun) \
+                          $(u1) 
 
 EXTRA_DIST = ./src/input.in 
 AM_CFLAGS = -std=c99 -O3 -Wall -Wextra -pedantic -Werror -Wconversion @OPENMP_CFLAGS@
@@ -522,7 +540,7 @@ src/$(am__dirstamp):
 src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ./src/$(DEPDIR)
 	@: > src/$(DEPDIR)/$(am__dirstamp)
-./src/debug_rng.$(OBJEXT): src/$(am__dirstamp) \
+./src/conf_check.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 lib/$(am__dirstamp):
 	@$(MKDIR_P) ./lib
@@ -532,49 +550,57 @@ lib/$(DEPDIR)/$(am__dirstamp):
 	@: > lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/dSFMT.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/endianness.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/function_pointers.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/gparam.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/mymalloc.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/random.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/su2.$(OBJEXT): lib/$(am__dirstamp) lib/$(DEPDIR)/$(am__dirstamp)
+./lib/su2_upd.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/sun_aux.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/sun.$(OBJEXT): lib/$(am__dirstamp) lib/$(DEPDIR)/$(am__dirstamp)
+./lib/sun_upd.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/u1.$(OBJEXT): lib/$(am__dirstamp) lib/$(DEPDIR)/$(am__dirstamp)
+./lib/u1_upd.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
+
+conf_check$(EXEEXT): $(conf_check_OBJECTS) $(conf_check_DEPENDENCIES) $(EXTRA_conf_check_DEPENDENCIES) 
+	@rm -f conf_check$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(conf_check_OBJECTS) $(conf_check_LDADD) $(LIBS)
+./src/debug_rng.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 
 debug_rng$(EXEEXT): $(debug_rng_OBJECTS) $(debug_rng_DEPENDENCIES) $(EXTRA_debug_rng_DEPENDENCIES) 
 	@rm -f debug_rng$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_rng_OBJECTS) $(debug_rng_LDADD) $(LIBS)
 ./src/debug_su2.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-./lib/endianness.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
-./lib/gparam.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
-./lib/su2.$(OBJEXT): lib/$(am__dirstamp) lib/$(DEPDIR)/$(am__dirstamp)
-./lib/su2_upd.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
 
 debug_su2$(EXEEXT): $(debug_su2_OBJECTS) $(debug_su2_DEPENDENCIES) $(EXTRA_debug_su2_DEPENDENCIES) 
 	@rm -f debug_su2$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_su2_OBJECTS) $(debug_su2_LDADD) $(LIBS)
 ./src/debug_sun.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-./lib/sun_aux.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
-./lib/sun.$(OBJEXT): lib/$(am__dirstamp) lib/$(DEPDIR)/$(am__dirstamp)
-./lib/sun_upd.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
 
 debug_sun$(EXEEXT): $(debug_sun_OBJECTS) $(debug_sun_DEPENDENCIES) $(EXTRA_debug_sun_DEPENDENCIES) 
 	@rm -f debug_sun$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_sun_OBJECTS) $(debug_sun_LDADD) $(LIBS)
 ./src/debug_u1.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-./lib/u1.$(OBJEXT): lib/$(am__dirstamp) lib/$(DEPDIR)/$(am__dirstamp)
-./lib/u1_upd.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
 
 debug_u1$(EXEEXT): $(debug_u1_OBJECTS) $(debug_u1_DEPENDENCIES) $(EXTRA_debug_u1_DEPENDENCIES) 
 	@rm -f debug_u1$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_u1_OBJECTS) $(debug_u1_LDADD) $(LIBS)
 ./src/yang_mills_local.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-./lib/function_pointers.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/gauge_conf_def.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/gauge_conf_meas.$(OBJEXT): lib/$(am__dirstamp) \
@@ -582,8 +608,6 @@ debug_u1$(EXEEXT): $(debug_u1_OBJECTS) $(debug_u1_DEPENDENCIES) $(EXTRA_debug_u1
 ./lib/gauge_conf_upd.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/geometry.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
-./lib/mymalloc.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 
 yang_mills_local$(EXEEXT): $(yang_mills_local_OBJECTS) $(yang_mills_local_DEPENDENCIES) $(EXTRA_yang_mills_local_DEPENDENCIES) 
@@ -615,6 +639,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/sun_upd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/u1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/u1_upd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/conf_check.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_rng.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_sun.Po@am__quote@

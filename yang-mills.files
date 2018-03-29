@@ -52,3 +52,4 @@ lib/u1_upd.c
 src/debug_u1.c
 include/tens_prod.h
 lib/tens_prod.c
+src/conf_check.c

@@ -1,4 +1,5 @@
-bin_PROGRAMS = debug_rng \
+bin_PROGRAMS = conf_check \
+               debug_rng \
                debug_su2 \
                debug_sun \
                debug_u1 \
@@ -63,19 +64,16 @@ u1 = ./include/u1.h \
      ./lib/u1.c \
      ./lib/u1_upd.c
 
-yang_mills_local_SOURCES=./src/yang_mills_local.c \
-                          $(dSFMT)  \
-                          $(endian) \
-                          $(funcpoint) \
-                          $(gauge_conf) \
-                          $(geometry) \
-                          $(gparam) \
-                          ./include/macro.h \
-                          $(mymalloc) \
-                          $(random) \
-                          $(su2) \
-                          $(sun) \
-                          $(u1) 
+conf_check_SOURCES=./src/conf_check.c \
+                   $(dSFMT) \
+                   $(endian) \
+                   $(funcpoint) \
+                   $(gparam) \
+                   $(mymalloc) \
+                   $(random) \
+                   $(su2) \
+                   $(sun) \
+                   $(u1) 
 
 debug_rng_SOURCES=./src/debug_rng.c \
                   $(dSFMT) \
@@ -105,6 +103,20 @@ debug_u1_SOURCES=./src/debug_u1.c \
                   ./include/macro.h \
                   $(random) \
                   $(u1)
+
+yang_mills_local_SOURCES=./src/yang_mills_local.c \
+                          $(dSFMT)  \
+                          $(endian) \
+                          $(funcpoint) \
+                          $(gauge_conf) \
+                          $(geometry) \
+                          $(gparam) \
+                          ./include/macro.h \
+                          $(mymalloc) \
+                          $(random) \
+                          $(su2) \
+                          $(sun) \
+                          $(u1) 
 
 EXTRA_DIST = ./src/input.in 
 
