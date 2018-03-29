@@ -54,3 +54,4 @@ include/tens_prod.h
 lib/tens_prod.c
 src/conf_check.c
 src/yang_mills_polycorr.c
+lib/gauge_conf_multilevel.c

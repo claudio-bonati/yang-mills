@@ -63,10 +63,10 @@ void real_main(char *in_file)
        {
        update(&GC, &geo, &param);
 
-//       if(count % param.d_measevery ==0 && count >= param.d_thermal)
-//         {
-//         perform_measures_localobs(&GC, &geo, &param, datafilep);
-//         }
+       if(count % param.d_measevery ==0 && count >= param.d_thermal)
+         {
+         perform_measures_polycorr_ml(&GC, &geo, &param, datafilep);
+         }
 
        // save configuration for backup
        if(param.d_saveconf_back_every!=0)

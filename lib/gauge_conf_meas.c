@@ -15,6 +15,7 @@
 #include"../include/function_pointers.h"
 #include"../include/geometry.h"
 #include"../include/gauge_conf.h"
+#include"../include/tens_prod.h"
 
 //#define DEBUG
 
@@ -301,6 +302,34 @@ void perform_measures_localobs(Gauge_Conf const * const restrict GC,
    fprintf(datafilep, "%.12lf %.12lf %.12lf %.12lf\n", plaqs, plaqt, polyre, polyim);
    fflush(datafilep);
    }
+
+
+void perform_measures_polycorr_ml(Gauge_Conf *restrict GC,
+                                  Geometry const * const restrict geo,
+                                  GParam const * const restrict param,
+                                  FILE *datafilep)
+   {
+   double ris;
+   long r;
+
+   multilevel1(GC,
+               geo,
+               param,
+               0,
+               param->d_size[0]);
+
+   ris=0.0;
+   for(r=0; r<param->d_ml_size; r++)
+      {
+      ris+=retr_TensProd(&(GC->ml_polycorr_ris_level1[r]));
+      }
+   ris/=(double)param->d_ml_size;
+
+   fprintf(datafilep, "%.12lf\n", ris);
+   fflush(datafilep);
+   }
+
+
 
 
 #endif

@@ -41,8 +41,9 @@ typedef struct GParam {
   // derived constants
   long d_volume;           // total volume
   double d_inv_vol;        // 1 / tot. volume
-  long d_space_vol;        // spatial component of the total volume
-  double d_inv_space_vol;  // 1 / spatial component of the total volume
+  long d_space_vol;        // spatial component of the volume
+  double d_inv_space_vol;  // 1 / spatial component of the volume
+  long d_ml_size;          // (STDIM-1) * spatial volume
 } GParam;
 
 

@@ -141,16 +141,18 @@ am_debug_u1_OBJECTS = ./src/debug_u1.$(OBJEXT) $(am__objects_1) \
 debug_u1_OBJECTS = $(am_debug_u1_OBJECTS)
 debug_u1_LDADD = $(LDADD)
 am__objects_10 = ./lib/gauge_conf_def.$(OBJEXT) \
-	./lib/gauge_conf_meas.$(OBJEXT) ./lib/gauge_conf_upd.$(OBJEXT)
+	./lib/gauge_conf_meas.$(OBJEXT) \
+	./lib/gauge_conf_multilevel.$(OBJEXT) \
+	./lib/gauge_conf_upd.$(OBJEXT)
 am__objects_11 = ./lib/geometry.$(OBJEXT)
+am__objects_12 = ./lib/tens_prod.$(OBJEXT)
 am_yang_mills_local_OBJECTS = ./src/yang_mills_local.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	$(am__objects_10) $(am__objects_11) $(am__objects_4) \
 	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
-	$(am__objects_8) $(am__objects_9)
+	$(am__objects_8) $(am__objects_12) $(am__objects_9)
 yang_mills_local_OBJECTS = $(am_yang_mills_local_OBJECTS)
 yang_mills_local_LDADD = $(LDADD)
-am__objects_12 = ./lib/tens_prod.$(OBJEXT)
 am_yang_mills_polycorr_OBJECTS = ./src/yang_mills_polycorr.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	$(am__objects_10) $(am__objects_11) $(am__objects_4) \
@@ -355,6 +357,7 @@ funcpoint = ./include/function_pointers.h \
 gauge_conf = ./include/gauge_conf.h \
              ./lib/gauge_conf_def.c \
              ./lib/gauge_conf_meas.c \
+             ./lib/gauge_conf_multilevel.c \
              ./lib/gauge_conf_upd.c 
 
 geometry = ./include/geometry.h \
@@ -442,6 +445,7 @@ yang_mills_local_SOURCES = ./src/yang_mills_local.c \
                           $(random) \
                           $(su2) \
                           $(sun) \
+                          $(tens_prod) \
                           $(u1) 
 
 yang_mills_polycorr_SOURCES = ./src/yang_mills_polycorr.c \
@@ -628,9 +632,13 @@ debug_u1$(EXEEXT): $(debug_u1_OBJECTS) $(debug_u1_DEPENDENCIES) $(EXTRA_debug_u1
 	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/gauge_conf_meas.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/gauge_conf_multilevel.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/gauge_conf_upd.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/geometry.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/tens_prod.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 
 yang_mills_local$(EXEEXT): $(yang_mills_local_OBJECTS) $(yang_mills_local_DEPENDENCIES) $(EXTRA_yang_mills_local_DEPENDENCIES) 
@@ -638,8 +646,6 @@ yang_mills_local$(EXEEXT): $(yang_mills_local_OBJECTS) $(yang_mills_local_DEPEND
 	$(AM_V_CCLD)$(LINK) $(yang_mills_local_OBJECTS) $(yang_mills_local_LDADD) $(LIBS)
 ./src/yang_mills_polycorr.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-./lib/tens_prod.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
 
 yang_mills_polycorr$(EXEEXT): $(yang_mills_polycorr_OBJECTS) $(yang_mills_polycorr_DEPENDENCIES) $(EXTRA_yang_mills_polycorr_DEPENDENCIES) 
 	@rm -f yang_mills_polycorr$(EXEEXT)
@@ -658,6 +664,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/function_pointers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/gauge_conf_def.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/gauge_conf_meas.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/gauge_conf_multilevel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/gauge_conf_upd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/geometry.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/gparam.Po@am__quote@

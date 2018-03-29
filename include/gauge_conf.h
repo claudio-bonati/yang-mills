@@ -49,7 +49,6 @@ void init_gauge_conf_polycorr(Gauge_Conf *GC,
 void end_gauge_conf_polycorr(Gauge_Conf *GC);
 
 
-
 // in gauge_conf_meas.c
 double plaquettep(Gauge_Conf const * const restrict GC,
                   Geometry const * const restrict geo,
@@ -70,6 +69,31 @@ void perform_measures_localobs(Gauge_Conf const * const restrict GC,
                                Geometry const * const restrict geo,
                                GParam const * const restrict param,
                                FILE *datafilep);
+void perform_measures_polycorr_ml(Gauge_Conf * restrict GC,
+                                  Geometry const * const restrict geo,
+                                  GParam const * const restrict param,
+                                  FILE *datafilep);
+
+
+// in gauge_conf_multilevel.c
+void multihit(Gauge_Conf const * const restrict GC,
+              Geometry const * const restrict geo,
+              GParam const * const restrict param,
+              long r,
+              int dir,
+              int num_hit,
+              GAUGE_GROUP *G);
+void compute_local_poly(Gauge_Conf const * const restrict GC,
+                        Geometry const * const restrict geo,
+                        GParam const * const restrict param,
+                        int t_start,
+                        int dt,
+                        GAUGE_GROUP *loc_poly);
+void multilevel1(Gauge_Conf * restrict GC,
+                 Geometry const * const restrict geo,
+                 GParam const * const restrict param,
+                 int t_start,
+                 int dt);
 
 
 // in gauge_conf_upd.c

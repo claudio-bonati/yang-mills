@@ -364,13 +364,13 @@ void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const
 void init_gauge_conf_polycorr(Gauge_Conf *GC,
                               GParam const * const param)
   {
-  GC->ml_polycorr_ris_level1 = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * (STDIM-1) *sizeof(TensProd));
+  GC->ml_polycorr_ris_level1 = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_ml_size *sizeof(TensProd));
   if(GC->ml_polycorr_ris_level1==NULL)
     {
     fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  GC->ml_polycorr_tmp_level1 = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * (STDIM-1) * sizeof(TensProd));
+  GC->ml_polycorr_tmp_level1 = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_ml_size * (STDIM-1) * sizeof(TensProd));
   if(GC->ml_polycorr_tmp_level1==NULL)
     {
     fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);

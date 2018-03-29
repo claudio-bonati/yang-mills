@@ -30,6 +30,7 @@ funcpoint = ./include/function_pointers.h \
 gauge_conf = ./include/gauge_conf.h \
              ./lib/gauge_conf_def.c \
              ./lib/gauge_conf_meas.c \
+             ./lib/gauge_conf_multilevel.c \
              ./lib/gauge_conf_upd.c 
 
 geometry = ./include/geometry.h \
@@ -117,6 +118,7 @@ yang_mills_local_SOURCES=./src/yang_mills_local.c \
                           $(random) \
                           $(su2) \
                           $(sun) \
+                          $(tens_prod) \
                           $(u1) 
 
 yang_mills_polycorr_SOURCES=./src/yang_mills_polycorr.c \
