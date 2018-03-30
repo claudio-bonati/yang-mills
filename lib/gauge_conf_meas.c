@@ -407,8 +407,8 @@ void optimize_level1(Gauge_Conf *restrict GC,
    time(&time2);
    diff_sec = difftime(time2, time1);
    fprintf(datafilep, "%d  %.6g  (time:%g)\n", param->d_up_level1,
-                                              poly_std * param->d_up_level1,
-                                              diff_sec);
+                                               poly_std * param->d_up_level1,
+                                               diff_sec);
 
    fflush(datafilep);
 
