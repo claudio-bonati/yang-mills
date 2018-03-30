@@ -146,6 +146,15 @@ int main (int argc, char **argv)
         printf("\n\tusing OpenMP with %d threads\n", NTHREADS);
       #endif
 
+      #ifdef OPT_MULTIHIT
+        printf("\tcompiled for multihit optimization\n");
+      #endif
+
+      #ifdef OPT_LEVEL1
+        printf("\tcompiled for single level optimization\n");
+      #endif
+
+
       printf("\n");
 
       #ifdef __INTEL_COMPILER

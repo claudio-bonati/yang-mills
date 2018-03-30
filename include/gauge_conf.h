@@ -69,6 +69,15 @@ void perform_measures_localobs(Gauge_Conf const * const restrict GC,
                                Geometry const * const restrict geo,
                                GParam const * const restrict param,
                                FILE *datafilep);
+
+void optimize_multihit(Gauge_Conf *restrict GC,
+                       Geometry const * const restrict geo,
+                       GParam const * const restrict param,
+                       FILE *datafilep);
+void optimize_level1(Gauge_Conf *restrict GC,
+                     Geometry const * const restrict geo,
+                     GParam const * const restrict param,
+                     FILE *datafilep);
 void perform_measures_polycorr_ml(Gauge_Conf * restrict GC,
                                   Geometry const * const restrict geo,
                                   GParam const * const restrict param,
