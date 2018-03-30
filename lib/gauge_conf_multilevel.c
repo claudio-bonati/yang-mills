@@ -74,7 +74,7 @@ void compute_local_poly(Gauge_Conf const * const restrict GC,
 
   GAUGE_GROUP matrix;
 
-  if(param->d_dist_poly>1)
+  if(param->d_dist_poly>1 && param->d_size[1]-param->d_dist_poly>1)
     {
     num_hit=param->d_multihit;
     }

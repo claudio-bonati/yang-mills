@@ -37,6 +37,16 @@ void real_main(char *in_file)
     // read input file
     readinput(in_file, &param);
 
+    int tmp=param.d_size[1];
+    for(count=2; count<STDIM; count++)
+       {
+       if(tmp!= param.d_size[count])
+         {
+         fprintf(stderr, "When using yang_mills_polycorr all the spatial sizes have to be of equal length.\n");
+         exit(EXIT_FAILURE);
+         }
+       }
+
     // initialize random generator
     initrand(param.d_randseed);
 
