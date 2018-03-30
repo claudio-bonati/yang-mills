@@ -377,7 +377,7 @@ void optimize_level1(Gauge_Conf *restrict GC,
 
    poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_ml_size * sizeof(double));
 
-   fprintf(datafilep, "Multilevel optimization for single level (level 1 used): ");
+   fprintf(datafilep, "Multilevel optimization for level1 of the multithit: ");
    fprintf(datafilep, "the smaller the 'ris' value, the better the update\n");
    fprintf(datafilep, "updates  ris\n");
 
