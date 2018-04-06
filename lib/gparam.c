@@ -196,25 +196,31 @@ void readinput(char *in_file, GParam *param)
                     }
                   param->d_multihit=temp_i;
                   }
-           else if(strncmp(str, "ml_step1", 8)==0)
+           else if(strncmp(str, "ml_step", 7)==0)
                   {
-                  err=fscanf(input, "%d", &temp_i);
-                  if(err!=1)
-                    {
-                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
-                    exit(EXIT_FAILURE);
-                    }
-                  param->d_ml_step1=temp_i;
+                  for(i=0; i<NLEVELS; i++)
+                     {
+                     err=fscanf(input, "%d", &temp_i);
+                     if(err!=1)
+                       {
+                       fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                       exit(EXIT_FAILURE);
+                       }
+                     param->d_ml_step[i]=temp_i;
+                     }
                   }
-           else if(strncmp(str, "up_level1", 9)==0)
+           else if(strncmp(str, "ml_upd", 6)==0)
                   {
-                  err=fscanf(input, "%d", &temp_i);
-                  if(err!=1)
-                    {
-                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
-                    exit(EXIT_FAILURE);
-                    }
-                  param->d_up_level1=temp_i;
+                  for(i=0; i<NLEVELS; i++)
+                     {
+                     err=fscanf(input, "%d", &temp_i);
+                     if(err!=1)
+                       {
+                       fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                       exit(EXIT_FAILURE);
+                       }
+                     param->d_ml_upd[i]=temp_i;
+                     }
                   }
            else if(strncmp(str, "dist_poly", 9)==0)
                   {
@@ -292,13 +298,27 @@ void readinput(char *in_file, GParam *param)
       fclose(input);
 
       // VARIOUS CHECKS
+      if(param->d_size[0] % param->d_ml_step[0] || param->d_size[0] <= param->d_ml_step[0])
+        {
+        fprintf(stderr, "Error: size[0] has to be divisible by ml_step[0] and larger than it (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
+      for(i=1; i<NLEVELS; i++)
+         {
+         if(param->d_ml_step[i-1] % param->d_ml_step[i] || param->d_ml_step[i-1] <= param->d_ml_step[i])
+           {
+           fprintf(stderr, "Error: ml_step[%d] has to be divisible by ml_step[%d] and larger than it (%s, %d)\n", i-1, i, __FILE__, __LINE__);
+           exit(EXIT_FAILURE);
+           }
+         }
+
       #ifdef OPENMP_MODE
       for(i=0; i<STDIM; i++)
          {
          temp_i = param->d_size[i] % 2;
          if(temp_i!=0)
            {
-           fprintf(stderr, "ERROR: size[%d] is not even.\n", i);
+           fprintf(stderr, "Error: size[%d] is not even.\n", i);
            fprintf(stderr, "When using OpenMP all the sides of the lattice have to be even! (%s, %d)\n", __FILE__, __LINE__);
            exit(EXIT_FAILURE);
            }
@@ -431,7 +451,7 @@ void print_parameters_local(GParam const * const param, time_t time_start, time_
 
 
 // print simulation parameters
-void print_parameters_polycorr(GParam const * const param, time_t time_start, time_t time_end)
+void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_end)
     {
     FILE *fp;
     int i;
@@ -471,8 +491,19 @@ void print_parameters_polycorr(GParam const * const param, time_t time_start, ti
     fprintf(fp, "\n");
 
     fprintf(fp, "multihit:   %d\n", param->d_multihit);
-    fprintf(fp, "ml_step1:   %d\n", param->d_ml_step1);
-    fprintf(fp, "up_level1:  %d\n", param->d_up_level1);
+    fprintf(fp, "levels for multileves: %d\n", NLEVELS);
+    fprintf(fp, "multilevel steps: ");
+    for(i=0; i<NLEVELS; i++)
+       {
+       fprintf(fp, "%d ", param->d_ml_step[i]);
+       }
+    fprintf(fp, "\n");
+    fprintf(fp, "updates for levels: ");
+    for(i=0; i<NLEVELS; i++)
+       {
+       fprintf(fp, "%d ", param->d_ml_upd[i]);
+       }
+    fprintf(fp, "\n");
     fprintf(fp, "dist_poly:  %d\n", param->d_dist_poly);
     fprintf(fp, "\n");
 

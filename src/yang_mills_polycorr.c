@@ -144,6 +144,7 @@ int main (int argc, char **argv)
       printf("Compilation details:\n");
       printf("\tN_c (number of colors): %d\n", NCOLOR);
       printf("\tST_dim (space-time dimensionality): %d\n", STDIM);
+      printf("\tNum_levels (number of levels): %d\n", NLEVELS);
       printf("\n");
       printf("\tINT_ALIGN: %s\n", QUOTEME(INT_ALIGN));
       printf("\tDOUBLE_ALIGN: %s\n", QUOTEME(DOUBLE_ALIGN));
@@ -160,7 +161,7 @@ int main (int argc, char **argv)
         printf("\tcompiled for multihit optimization\n");
       #endif
 
-      #ifdef OPT_LEVEL1
+      #ifdef OPT_MULTILEVEL
         printf("\tcompiled for single level optimization\n");
       #endif
 

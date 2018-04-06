@@ -630,6 +630,7 @@ CRYPTO_COMPILATION_FALSE
 CRYPTO_COMPILATION_TRUE
 ST_dim
 Num_threads
+Num_levels
 N_c
 OPENMP_CFLAGS
 EGREP
@@ -735,6 +736,7 @@ LIBS
 CPPFLAGS
 CPP
 N_c
+Num_levels
 Num_threads
 ST_dim'
 
@@ -1370,6 +1372,7 @@ Some influential environment variables:
               you have headers in a nonstandard directory <include dir>
   CPP         C preprocessor
   N_c         the number of colors (default 2)
+  Num_levels  the number of levels in multilevel (default 1)
   Num_threads number of threads to be used in OpenMP (default 1)
   ST_dim      spacetime dimensionality (default 4)
 
@@ -4708,6 +4711,8 @@ fi
 
 
 
+
+
 ### DEFINE & CO
 if test x${has_malloch} = xyes; then
 
@@ -4750,6 +4755,30 @@ else
 
 cat >>confdefs.h <<_ACEOF
 #define NCOLOR ${N_c}
+_ACEOF
+
+fi
+
+if test x${Num_levels} = x; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:
+   *****
+   No chosen value for Num_levels: using the default Num_levels=1
+   *****
+   " >&5
+$as_echo "$as_me: WARNING:
+   *****
+   No chosen value for Num_levels: using the default Num_levels=1
+   *****
+   " >&2;}
+
+cat >>confdefs.h <<_ACEOF
+#define NLEVELS 1
+_ACEOF
+
+else
+
+cat >>confdefs.h <<_ACEOF
+#define NLEVELS ${Num_levels}
 _ACEOF
 
 fi

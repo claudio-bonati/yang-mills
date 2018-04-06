@@ -55,25 +55,17 @@ void plaquette(Gauge_Conf const * const restrict GC,
    {
    long r;
    int i, j;
-   int aux_t, aux_s; // used to count the number of temporal and spatial plaquettes
    double ps, pt;
 
    ps=0.0;
    pt=0.0;
 
-   aux_t=1;
-   aux_s=1;
-
    for(r=0; r<(param->d_volume); r++)
       {
-      aux_t=0;
-      aux_s=0;
-
       i=0;
       for(j=1; j<STDIM; j++)
          {
          pt+=plaquettep(GC, geo, r, i, j);
-         aux_t++;
          }
      
       for(i=1; i<STDIM; i++)
@@ -81,20 +73,22 @@ void plaquette(Gauge_Conf const * const restrict GC,
          for(j=i+1; j<STDIM; j++)
             {
             ps+=plaquettep(GC, geo, r, i, j);
-            aux_s++;
             }
          }
       }
 
-   #if STDIM > 2
+   if(STDIM>2)
+     {
      ps*=param->d_inv_vol;
-     ps/=((double) aux_s);
-   #else
+     ps/=((double) STDIM*(STDIM-1)/2-(STDIM-1));
+     }
+   else
+     {
      ps=0.0;
-   #endif
+     }
 
    pt*=param->d_inv_vol;
-   pt/=((double) aux_t);
+   pt/=((double) STDIM-1);
 
    *plaqs=ps;
    *plaqt=pt;
@@ -351,7 +345,7 @@ void optimize_multihit(Gauge_Conf *restrict GC,
         {
         poly_std+=(poly_average-poly_array[r])*(poly_average-poly_array[r]);
         }
-     poly_std/=(double)(param->d_space_vol-1);
+     poly_std/=(double)(param->d_space_vol*param->d_space_vol);
 
      time(&time2);
      diff_sec = difftime(time2, time1);
@@ -364,16 +358,16 @@ void optimize_multihit(Gauge_Conf *restrict GC,
   }
 
 
-// to optimize level1 of the multilevel
-void optimize_level1(Gauge_Conf *restrict GC,
-                     Geometry const * const restrict geo,
-                     GParam const * const restrict param,
-                     FILE *datafilep)
+// to optimize the multilevel
+void optimize_multilevel(Gauge_Conf *restrict GC,
+                         Geometry const * const restrict geo,
+                         GParam const * const restrict param,
+                         FILE *datafilep)
    {
+   int i;
    long r;
-   double poly_std, poly_average, diff_sec;
+   double poly_std, poly_average;
    double *poly_array;
-   time_t time1, time2;
 
    poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double));
 
@@ -381,18 +375,17 @@ void optimize_level1(Gauge_Conf *restrict GC,
    fprintf(datafilep, "the smaller the 'ris' value, the better the update\n");
    fprintf(datafilep, "updates  ris\n");
 
-   time(&time1);
-   multilevel1(GC,
-               geo,
-               param,
-               0,
-               param->d_size[0]);
+   multilevel(GC,
+              geo,
+              param,
+              0,
+              param->d_size[0]);
 
    // polyakov loop correlator
    poly_average=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris_level1[r]));
+      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
       poly_average+=poly_array[r];
       }
    poly_average/=(double) param->d_space_vol;
@@ -404,11 +397,17 @@ void optimize_level1(Gauge_Conf *restrict GC,
       }
    poly_std/=(double)(param->d_space_vol*param->d_space_vol);
 
-   time(&time2);
-   diff_sec = difftime(time2, time1);
-   fprintf(datafilep, "%d  %.6g  (time:%g)\n", param->d_up_level1,
-                                               poly_std * param->d_up_level1,
-                                               diff_sec);
+   for(i=0; i<NLEVELS; i++)
+      {
+      poly_std*=(double) param->d_ml_upd[i];
+      }
+
+   fprintf(datafilep, "%.6g ", poly_std);
+   for(i=0; i<NLEVELS; i++)
+      {
+      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
+      }
+   fprintf(datafilep, "\n");
 
    fflush(datafilep);
 
@@ -422,20 +421,20 @@ void perform_measures_polycorr_ml(Gauge_Conf *restrict GC,
                                   FILE *datafilep)
    {
    #ifndef OPT_MULTIHIT
-   #ifndef OPT_LEVEL1
+   #ifndef OPT_MULTILEVEL
      double ris;
      long r;
 
-     multilevel1(GC,
-                 geo,
-                 param,
-                 0,
-                 param->d_size[0]);
+     multilevel(GC,
+                geo,
+                param,
+                0,
+                param->d_size[0]);
 
      ris=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
-        ris+=retr_TensProd(&(GC->ml_polycorr_ris_level1[r]));
+        ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
         }
      ris/=(double)param->d_space_vol;
 
@@ -448,8 +447,8 @@ void perform_measures_polycorr_ml(Gauge_Conf *restrict GC,
      optimize_multihit(GC, geo, param, datafilep);
    #endif
 
-   #ifdef OPT_LEVEL1
-     optimize_level1(GC, geo, param, datafilep);
+   #ifdef OPT_MULTILEVEL
+     optimize_multilevel(GC, geo, param, datafilep);
    #endif
    }
 

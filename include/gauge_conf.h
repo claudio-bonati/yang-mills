@@ -18,8 +18,8 @@ typedef struct Gauge_Conf {
   GAUGE_GROUP **lattice;
 
   // for computing the polyakov loop correlator with multilevel
-  TensProd *ml_polycorr_ris_level1;
-  TensProd *ml_polycorr_tmp_level1;
+  TensProd **ml_polycorr_ris;
+  TensProd **ml_polycorr_tmp;
 
   } Gauge_Conf;
 
@@ -74,10 +74,10 @@ void optimize_multihit(Gauge_Conf *restrict GC,
                        Geometry const * const restrict geo,
                        GParam const * const restrict param,
                        FILE *datafilep);
-void optimize_level1(Gauge_Conf *restrict GC,
-                     Geometry const * const restrict geo,
-                     GParam const * const restrict param,
-                     FILE *datafilep);
+void optimize_multilevel(Gauge_Conf *restrict GC,
+                         Geometry const * const restrict geo,
+                         GParam const * const restrict param,
+                         FILE *datafilep);
 void perform_measures_polycorr_ml(Gauge_Conf * restrict GC,
                                   Geometry const * const restrict geo,
                                   GParam const * const restrict param,
@@ -98,11 +98,11 @@ void compute_local_poly(Gauge_Conf const * const restrict GC,
                         int t_start,
                         int dt,
                         GAUGE_GROUP *loc_poly);
-void multilevel1(Gauge_Conf * restrict GC,
-                 Geometry const * const restrict geo,
-                 GParam const * const restrict param,
-                 int t_start,
-                 int dt);
+void multilevel(Gauge_Conf * restrict GC,
+                Geometry const * const restrict geo,
+                GParam const * const restrict param,
+                int t_start,
+                int dt);
 
 
 // in gauge_conf_upd.c

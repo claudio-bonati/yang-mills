@@ -26,8 +26,8 @@ typedef struct GParam {
 
   // for multilevel
   int d_multihit;
-  int d_ml_step1;
-  int d_up_level1;
+  int d_ml_step[NLEVELS];
+  int d_ml_upd[NLEVELS];
   int d_dist_poly;
 
   // output file names
@@ -51,6 +51,6 @@ void readinput(char *in_file, GParam *param);
 void init_derived_constants(GParam *param);
 void init_data_file(FILE **dataf, GParam const * const param);
 void print_parameters_local(GParam const * const param, time_t time_start, time_t time_end);
-void print_parameters_polycorr(GParam const * const param, time_t time_start, time_t time_end);
+void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_end);
 
 #endif

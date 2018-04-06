@@ -60,6 +60,9 @@
 /* Number of colors */
 #undef NCOLOR
 
+/* Number of levels */
+#undef NLEVELS
+
 /* Number of threads to be used in OpenMP */
 #undef NTHREADS
 

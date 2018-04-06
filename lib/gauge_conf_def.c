@@ -364,25 +364,59 @@ void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const
 void init_gauge_conf_polycorr(Gauge_Conf *GC,
                               GParam const * const param)
   {
-  GC->ml_polycorr_ris_level1 = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd));
-  if(GC->ml_polycorr_ris_level1==NULL)
+  int i;
+
+  GC->ml_polycorr_ris = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd *));
+  if(GC->ml_polycorr_ris==NULL)
     {
     fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  GC->ml_polycorr_tmp_level1 = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(TensProd));
-  if(GC->ml_polycorr_tmp_level1==NULL)
+  else
+    {
+    for(i=0; i<NLEVELS; i++)
+       {
+       GC->ml_polycorr_ris[i] = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd));
+       if(GC->ml_polycorr_ris[i]==NULL)
+         {
+         fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       }
+    }
+
+  GC->ml_polycorr_tmp = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd *));
+  if(GC->ml_polycorr_tmp==NULL)
     {
     fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(i=0; i<NLEVELS; i++)
+       {
+       GC->ml_polycorr_tmp[i] = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd));
+       if(GC->ml_polycorr_tmp[i]==NULL)
+         {
+         fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       }
     }
   }
 
 
 void end_gauge_conf_polycorr(Gauge_Conf *GC)
   {
-  free(GC->ml_polycorr_ris_level1);
-  free(GC->ml_polycorr_tmp_level1);
+  int i;
+
+  for(i=0; i<NLEVELS; i++)
+     {
+     free(GC->ml_polycorr_ris[i]);
+     free(GC->ml_polycorr_tmp[i]);
+     }
+  free(GC->ml_polycorr_ris);
+  free(GC->ml_polycorr_tmp);
   }
 
 

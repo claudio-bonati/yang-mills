@@ -83,7 +83,29 @@ void compute_local_poly(Gauge_Conf const * const restrict GC,
     num_hit=0;
     }
 
-  for(r=0; r<param->d_space_vol; r++)
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(r, i, matrix)
+  #endif
+  for(r=0; r<param->d_space_vol/2; r++)
+     {
+     one(&(loc_poly[r]));
+     for(i=0; i<dt; i++)
+        {
+        multihit(GC,
+                 geo,
+                 param,
+                 sisp_and_t_to_si(r, t_start+i, param),
+                 0,
+                 num_hit,
+                 &matrix);
+        times_equal(&(loc_poly[r]), &matrix);
+        }
+     }
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(r, i, matrix)
+  #endif
+  for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
      {
      one(&(loc_poly[r]));
      for(i=0; i<dt; i++)
@@ -101,62 +123,77 @@ void compute_local_poly(Gauge_Conf const * const restrict GC,
   }
 
 
-// multilevel with just level 1
-void multilevel1(Gauge_Conf * restrict GC,
-                 Geometry const * const restrict geo,
-                 GParam const * const restrict param,
-                 int t_start,
-                 int dt)
+// multilevel
+void multilevel(Gauge_Conf * restrict GC,
+                Geometry const * const restrict geo,
+                GParam const * const restrict param,
+                int t_start,
+                int dt)
   {
-  const double inv_upd_level1= 1.0/(double) param->d_up_level1;
+  int level=-2; // initialized just to avoid warnings
 
-  // LEVEL0 (maybe not used), do not average
-  if(dt > param->d_ml_step1)
+  // determine the level to be used
+  if(dt>param->d_ml_step[0])
+    {
+    level=-1;
+    }
+  else
+    {
+    int tmp;
+    for(tmp=0; tmp<NLEVELS; tmp++)
+       {
+       if(param->d_ml_step[tmp]==dt)
+         {
+         level=tmp;
+         tmp=NLEVELS+10;
+         }
+       }
+    #ifdef DEBUG
+    if(tmp==NLEVELS)
+      {
+      fprintf(stderr, "Error in the determination of the level in the multilevels (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+    #endif
+    }
+
+  // LEVEL -1, do not average
+  if(level==-1)
     {
     int i;
     long int r;
 
-    // initialyze ml_polycorr_ris_level1 to 1
+    // initialyze ml_polycorr_ris[0] to 1
     for(r=0; r<param->d_space_vol; r++)
        {
-       one_TensProd(&(GC->ml_polycorr_ris_level1[r]));
+       one_TensProd(&(GC->ml_polycorr_ris[0][r]));
        }
 
     // call lower levels
-    for(i=0; i<(param->d_size[0])/(param->d_ml_step1); i++)
+    for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
        {
-       multilevel1(GC,
-                   geo,
-                   param,
-                   t_start+i*param->d_ml_step1,
-                   param->d_ml_step1);
+       multilevel(GC,
+                  geo,
+                  param,
+                  t_start+i*param->d_ml_step[0],
+                  param->d_ml_step[0]);
        }
-    }
+    } // end of the outermost level
 
-  // LEVEL1
-  if(dt == param->d_ml_step1)
+  else if(level==NLEVELS-1) // INNERMOST LEVEL
     {
     int i, dir, upd, upd_over;
     TensProd TP;
     long int r, r1, r2;
 
-    // initialyze ml_polycorr_ris_level1 to 1 in case it is needed
-    if(param->d_ml_step1==param->d_size[0])
-      {
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         one_TensProd(&(GC->ml_polycorr_ris_level1[r]));
-         }
-      }
-
-    // initialize ml_polycorr_tmp_level1 to 0
+    // initialize ml_polycorr_tmp[level] to 0
     for(r=0; r<param->d_space_vol; r++)
        {
-       zero_TensProd(&(GC->ml_polycorr_tmp_level1[r]));
+       zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
        }
 
     // perform the update
-    for(upd=0; upd< param->d_up_level1; upd++)
+    for(upd=0; upd< param->d_ml_upd[level]; upd++)
        {
        // heatbath
        #ifdef OPENMP_MODE
@@ -168,7 +205,6 @@ void multilevel1(Gauge_Conf * restrict GC,
        #pragma omp parallel for num_threads(NTHREADS) private(r)
        #endif
        for(r=param->d_space_vol/2; r<param->d_space_vol; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
-
 
        for(i=1; i<dt; i++)
           {
@@ -244,7 +280,7 @@ void multilevel1(Gauge_Conf * restrict GC,
                           loc_poly);
 
        // compute the tensor products
-       // and update ml_polycorr_tmp_level2
+       // and update ml_polycorr_tmp[level]
        for(r=0; r<param->d_space_vol; r++)
           {
           int t_tmp, dir=1;
@@ -254,27 +290,151 @@ void multilevel1(Gauge_Conf * restrict GC,
           si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
 
           TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
-          plus_equal_TensProd(&(GC->ml_polycorr_tmp_level1[r]), &TP);
+          plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &TP);
           }
 
        free(loc_poly);
        } // end of update
 
-    // normalize tmp_level1
+    // normalize polycorr_tmp
     for(r=0; r<param->d_space_vol; r++)
        {
-       times_equal_real_TensProd(&(GC->ml_polycorr_tmp_level1[r]), inv_upd_level1);
+       times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/param->d_ml_upd[level]);
        }
 
-    // update ml_ris_level1
+    // update polycorr_ris
     for(r=0; r<param->d_space_vol; r++)
        {
-       times_equal_TensProd(&(GC->ml_polycorr_ris_level1[r]), &(GC->ml_polycorr_tmp_level1[r]));
+       times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
        }
-    } // end of level 1
-  }
+    } // end of innermost level
 
+  else // NOT THE INNERMOST NOT THE OUTERMOST LEVEL
+    {
+    int i, dir, upd, upd_over;
+    long int r;
 
+    // initialyze ml_polycorr_ris[level+1] to 1
+    for(r=0; r<param->d_space_vol; r++)
+       {
+       one_TensProd(&(GC->ml_polycorr_ris[level+1][r]));
+       }
+
+    // initialize ml_polycorr_tmp[level] to 0
+    for(r=0; r<param->d_space_vol; r++)
+       {
+       zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
+       }
+
+    // perform the update
+    for(upd=0; upd< param->d_ml_upd[level]; upd++)
+       {
+       // heatbath
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(r)
+       #endif
+       for(r=0; r<param->d_space_vol/2; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(r)
+       #endif
+       for(r=param->d_space_vol/2; r<param->d_space_vol; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+
+       for(i=1; i<dt; i++)
+          {
+          for(dir=0; dir<STDIM; dir++)
+             {
+             #ifdef OPENMP_MODE
+             #pragma omp parallel for num_threads(NTHREADS) private(r)
+             #endif
+             for(r=0; r<param->d_space_vol/2; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+
+             #ifdef OPENMP_MODE
+             #pragma omp parallel for num_threads(NTHREADS) private(r)
+             #endif
+             for(r=param->d_space_vol/2; r<param->d_space_vol; r++) heatbath_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+             }
+          }
+
+       // overrelaxation
+       for(upd_over=0; upd_over<param->d_overrelax; upd_over++)
+          {
+          #ifdef OPENMP_MODE
+          #pragma omp parallel for num_threads(NTHREADS) private(r)
+          #endif
+          for(r=0; r<param->d_space_vol/2; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+
+          #ifdef OPENMP_MODE
+          #pragma omp parallel for num_threads(NTHREADS) private(r)
+          #endif
+          for(r=param->d_space_vol/2; r<param->d_space_vol; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+
+          for(i=1; i<dt; i++)
+             {
+             for(dir=0; dir<STDIM; dir++)
+                {
+                #ifdef OPENMP_MODE
+                #pragma omp parallel for num_threads(NTHREADS) private(r)
+                #endif
+                for(r=0; r<param->d_space_vol/2; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+
+                #ifdef OPENMP_MODE
+                #pragma omp parallel for num_threads(NTHREADS) private(r)
+                #endif
+                for(r=param->d_space_vol/2; r<param->d_space_vol; r++) overrelaxation_w(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+                }
+             }
+          }
+
+       // unitarize
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(r)
+       #endif
+       for(r=0; r<param->d_space_vol; r++) unitarize( &(GC->lattice[sisp_and_t_to_si(r, t_start, param)][0]) );
+
+       for(i=1; i<dt; i++)
+          {
+          for(dir=0; dir<STDIM; dir++)
+             {
+             #ifdef OPENMP_MODE
+             #pragma omp parallel for num_threads(NTHREADS) private(r)
+             #endif
+             for(r=0; r<param->d_space_vol; r++) unitarize( &(GC->lattice[sisp_and_t_to_si(r, t_start+i, param)][dir]) );
+             }
+          }
+
+       // call higher levels
+       for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
+          {
+          multilevel(GC,
+                     geo,
+                     param,
+                     t_start+i*param->d_ml_step[level+1],
+                     param->d_ml_step[level+1]);
+          }
+
+       // update polycorr_tmp[level] with polycorr_ris[level+1]
+       for(r=0; r<param->d_space_vol; r++)
+          {
+          plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &(GC->ml_polycorr_ris[level+1][r]));
+          }
+
+       } // end of update
+
+    // normalize polycorr_tmp[level]
+    for(r=0; r<param->d_space_vol; r++)
+       {
+       times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/param->d_ml_upd[level]);
+       }
+
+    // update polycorr_ris[level]
+    for(r=0; r<param->d_space_vol; r++)
+       {
+       times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
+       }
+    } // end of the not innermost not outermost level
+
+  } // end of the multilevel
 
 
 #endif
