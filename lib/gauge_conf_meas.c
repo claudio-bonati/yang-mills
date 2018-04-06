@@ -375,7 +375,7 @@ void optimize_level1(Gauge_Conf *restrict GC,
    double *poly_array;
    time_t time1, time2;
 
-   poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_ml_size * sizeof(double));
+   poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double));
 
    fprintf(datafilep, "Multilevel optimization for level1 of the multithit: ");
    fprintf(datafilep, "the smaller the 'ris' value, the better the update\n");
@@ -390,19 +390,19 @@ void optimize_level1(Gauge_Conf *restrict GC,
 
    // polyakov loop correlator
    poly_average=0.0;
-   for(r=0; r<param->d_ml_size; r++)
+   for(r=0; r<param->d_space_vol; r++)
       {
       poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris_level1[r]));
       poly_average+=poly_array[r];
       }
-   poly_average/=(double) param->d_ml_size;
+   poly_average/=(double) param->d_space_vol;
 
    poly_std=0.0;
-   for(r=0; r<param->d_ml_size; r++)
+   for(r=0; r<param->d_space_vol; r++)
       {
       poly_std+=(poly_average-poly_array[r])*(poly_average-poly_array[r]);
       }
-   poly_std/=(double)(param->d_ml_size-1);
+   poly_std/=(double)(param->d_space_vol*param->d_space_vol);
 
    time(&time2);
    diff_sec = difftime(time2, time1);
@@ -433,11 +433,11 @@ void perform_measures_polycorr_ml(Gauge_Conf *restrict GC,
                  param->d_size[0]);
 
      ris=0.0;
-     for(r=0; r<param->d_ml_size; r++)
+     for(r=0; r<param->d_space_vol; r++)
         {
         ris+=retr_TensProd(&(GC->ml_polycorr_ris_level1[r]));
         }
-     ris/=(double)param->d_ml_size;
+     ris/=(double)param->d_space_vol;
 
      fprintf(datafilep, "%.12lf\n", ris);
      fflush(datafilep);

@@ -117,7 +117,7 @@ void multilevel1(Gauge_Conf * restrict GC,
     long int r;
 
     // initialyze ml_polycorr_ris_level1 to 1
-    for(r=0; r<param->d_ml_size; r++)
+    for(r=0; r<param->d_space_vol; r++)
        {
        one_TensProd(&(GC->ml_polycorr_ris_level1[r]));
        }
@@ -143,14 +143,14 @@ void multilevel1(Gauge_Conf * restrict GC,
     // initialyze ml_polycorr_ris_level1 to 1 in case it is needed
     if(param->d_ml_step1==param->d_size[0])
       {
-      for(r=0; r<param->d_ml_size; r++)
+      for(r=0; r<param->d_space_vol; r++)
          {
          one_TensProd(&(GC->ml_polycorr_ris_level1[r]));
          }
       }
 
     // initialize ml_polycorr_tmp_level1 to 0
-    for(r=0; r<param->d_ml_size; r++)
+    for(r=0; r<param->d_space_vol; r++)
        {
        zero_TensProd(&(GC->ml_polycorr_tmp_level1[r]));
        }
@@ -247,30 +247,27 @@ void multilevel1(Gauge_Conf * restrict GC,
        // and update ml_polycorr_tmp_level2
        for(r=0; r<param->d_space_vol; r++)
           {
-          int t_tmp, dir;
+          int t_tmp, dir=1;
 
-          for(dir=1; dir<STDIM; dir++)
-             {
-             r1=sisp_and_t_to_si(r, 0, param);
-             for(i=0; i<param->d_dist_poly; i++) r1=nnp(geo, r1, dir);
-             si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
+          r1=sisp_and_t_to_si(r, 0, param);
+          for(i=0; i<param->d_dist_poly; i++) r1=nnp(geo, r1, dir);
+          si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
 
-             TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
-             plus_equal_TensProd(&(GC->ml_polycorr_tmp_level1[r+(dir-1)*param->d_space_vol]), &TP);
-             }
+          TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
+          plus_equal_TensProd(&(GC->ml_polycorr_tmp_level1[r]), &TP);
           }
 
        free(loc_poly);
        } // end of update
 
     // normalize tmp_level1
-    for(r=0; r<param->d_ml_size; r++)
+    for(r=0; r<param->d_space_vol; r++)
        {
        times_equal_real_TensProd(&(GC->ml_polycorr_tmp_level1[r]), inv_upd_level1);
        }
 
     // update ml_ris_level1
-    for(r=0; r<param->d_ml_size; r++)
+    for(r=0; r<param->d_space_vol; r++)
        {
        times_equal_TensProd(&(GC->ml_polycorr_ris_level1[r]), &(GC->ml_polycorr_tmp_level1[r]));
        }

@@ -329,8 +329,6 @@ void init_derived_constants(GParam *param)
      }
   param->d_inv_vol=1.0/((double) param->d_volume);
   param->d_inv_space_vol=1.0/((double) param->d_space_vol);
-
-  param->d_ml_size=(STDIM-1)*param->d_space_vol;
   }
 
 
