@@ -309,16 +309,11 @@ void multilevel(Gauge_Conf * restrict GC,
        }
     } // end of innermost level
 
+  #if NLEVELS>1
   else // NOT THE INNERMOST NOT THE OUTERMOST LEVEL
     {
     int i, dir, upd, upd_over;
     long int r;
-
-    // initialyze ml_polycorr_ris[level+1] to 1
-    for(r=0; r<param->d_space_vol; r++)
-       {
-       one_TensProd(&(GC->ml_polycorr_ris[level+1][r]));
-       }
 
     // initialize ml_polycorr_tmp[level] to 0
     for(r=0; r<param->d_space_vol; r++)
@@ -403,6 +398,12 @@ void multilevel(Gauge_Conf * restrict GC,
              }
           }
 
+       // initialyze ml_polycorr_ris[level+1] to 1
+       for(r=0; r<param->d_space_vol; r++)
+          {
+          one_TensProd(&(GC->ml_polycorr_ris[level+1][r]));
+          }
+
        // call higher levels
        for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
           {
@@ -433,7 +434,7 @@ void multilevel(Gauge_Conf * restrict GC,
        times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
        }
     } // end of the not innermost not outermost level
-
+  #endif
   } // end of the multilevel
 
 

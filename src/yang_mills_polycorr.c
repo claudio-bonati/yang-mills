@@ -162,7 +162,7 @@ int main (int argc, char **argv)
       #endif
 
       #ifdef OPT_MULTILEVEL
-        printf("\tcompiled for single level optimization\n");
+        printf("\tcompiled for multilevel optimization\n");
       #endif
 
 

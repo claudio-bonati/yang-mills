@@ -438,7 +438,7 @@ void perform_measures_polycorr_ml(Gauge_Conf *restrict GC,
         }
      ris/=(double)param->d_space_vol;
 
-     fprintf(datafilep, "%.12lf\n", ris);
+     fprintf(datafilep, "%.12g\n", ris);
      fflush(datafilep);
    #endif
    #endif
