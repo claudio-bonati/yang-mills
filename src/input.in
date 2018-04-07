@@ -13,7 +13,7 @@ saveconf_analysis_every 5  # if 0 does not save, else save backup configurations
 
 #for multilevel
 multihit  10  # number of multihit step
-ml_step   4   # timeslices for multilevel (from largest to smallest)
+ml_step   2   # timeslices for multilevel (from largest to smallest)
 ml_upd    10  # number of updates for various levels
 dist_poly 2   # distance between the polyakov loop 
 
