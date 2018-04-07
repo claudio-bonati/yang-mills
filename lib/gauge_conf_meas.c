@@ -279,7 +279,6 @@ void topcharge_cooling(Gauge_Conf const * const GC,
 
 */
 
-
 void perform_measures_localobs(Gauge_Conf const * const restrict GC,
                                Geometry const * const restrict geo,
                                GParam const * const restrict param,
@@ -297,9 +296,9 @@ void perform_measures_localobs(Gauge_Conf const * const restrict GC,
 
 
 // to optimize the number of hits to be used in multilevel
-void optimize_multihit(Gauge_Conf *restrict GC,
-                       Geometry const * const restrict geo,
-                       GParam const * const restrict param,
+void optimize_multihit(Gauge_Conf *GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
                        FILE *datafilep)
   {
   const int max_hit=10;
@@ -360,9 +359,9 @@ void optimize_multihit(Gauge_Conf *restrict GC,
 
 
 // to optimize the multilevel
-void optimize_multilevel(Gauge_Conf *restrict GC,
-                         Geometry const * const restrict geo,
-                         GParam const * const restrict param,
+void optimize_multilevel(Gauge_Conf *GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
                          FILE *datafilep)
    {
    int i;
@@ -416,9 +415,9 @@ void optimize_multilevel(Gauge_Conf *restrict GC,
    }
 
 
-void perform_measures_polycorr_ml(Gauge_Conf *restrict GC,
-                                  Geometry const * const restrict geo,
-                                  GParam const * const restrict param,
+void perform_measures_polycorr_ml(Gauge_Conf *GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
                                   FILE *datafilep)
    {
    #ifndef OPT_MULTIHIT
@@ -452,8 +451,6 @@ void perform_measures_polycorr_ml(Gauge_Conf *restrict GC,
      optimize_multilevel(GC, geo, param, datafilep);
    #endif
    }
-
-
 
 
 #endif

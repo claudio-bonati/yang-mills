@@ -70,40 +70,40 @@ void perform_measures_localobs(Gauge_Conf const * const restrict GC,
                                GParam const * const restrict param,
                                FILE *datafilep);
 
-void optimize_multihit(Gauge_Conf *restrict GC,
-                       Geometry const * const restrict geo,
-                       GParam const * const restrict param,
+void optimize_multihit(Gauge_Conf *GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
                        FILE *datafilep);
-void optimize_multilevel(Gauge_Conf *restrict GC,
-                         Geometry const * const restrict geo,
-                         GParam const * const restrict param,
+void optimize_multilevel(Gauge_Conf *GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
                          FILE *datafilep);
-void perform_measures_polycorr_ml(Gauge_Conf * restrict GC,
-                                  Geometry const * const restrict geo,
-                                  GParam const * const restrict param,
+void perform_measures_polycorr_ml(Gauge_Conf * GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
                                   FILE *datafilep);
 
 
 // in gauge_conf_multilevel.c
-void multihit(Gauge_Conf const * const restrict GC,
-              Geometry const * const restrict geo,
-              GParam const * const restrict param,
+void multihit(Gauge_Conf const * const GC,
+              Geometry const * const geo,
+              GParam const * const param,
               long r,
               int dir,
               int num_hit,
               GAUGE_GROUP *G);
-void compute_local_poly(Gauge_Conf const * const restrict GC,
-                        Geometry const * const restrict geo,
-                        GParam const * const restrict param,
+void compute_local_poly(Gauge_Conf const * const GC,
+                        Geometry const * const geo,
+                        GParam const * const param,
                         int t_start,
                         int dt,
                         GAUGE_GROUP *loc_poly);
-void slice_single_update(Gauge_Conf * GC,
+void slice_single_update(Gauge_Conf *GC,
                          Geometry const * const geo,
                          GParam const * const param,
                          int t_start,
                          int dt);
-void multilevel(Gauge_Conf * GC,
+void multilevel(Gauge_Conf *GC,
                 Geometry const * const geo,
                 GParam const * const param,
                 int t_start,
@@ -111,23 +111,23 @@ void multilevel(Gauge_Conf * GC,
 
 
 // in gauge_conf_upd.c
-void calcstaples_w(Gauge_Conf const * const restrict GC,
-                   Geometry const * const restrict geo,
-                   long r,
-                   int i,
-                   GAUGE_GROUP * restrict M);
+void calcstaples(Gauge_Conf const * const restrict GC,
+                 Geometry const * const restrict geo,
+                 long r,
+                 int i,
+                 GAUGE_GROUP * restrict M);
 void heatbath(Gauge_Conf * restrict GC,
-                Geometry const * const restrict geo,
-                GParam const * const restrict param,
-                long r,
-                int i);
-void overrelaxation(Gauge_Conf * restrict GC,
-                      Geometry const * const restrict geo,
-                      GParam const * const restrict param,
-                      long r,
-                      int i);
-void update(Gauge_Conf * restrict GC,
               Geometry const * const restrict geo,
-              GParam const * const restrict param);
+              GParam const * const restrict param,
+              long r,
+              int i);
+void overrelaxation(Gauge_Conf * restrict GC,
+                    Geometry const * const restrict geo,
+                    GParam const * const restrict param,
+                    long r,
+                    int i);
+void update(Gauge_Conf * restrict GC,
+            Geometry const * const restrict geo,
+            GParam const * const restrict param);
 
 #endif

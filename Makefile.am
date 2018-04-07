@@ -139,6 +139,6 @@ yang_mills_polycorr_SOURCES=./src/yang_mills_polycorr.c \
 
 EXTRA_DIST = ./src/input.in 
 
-AM_CFLAGS = -std=c99 -O3 -Wall -Wextra -pedantic -Werror -Wconversion @OPENMP_CFLAGS@
+AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -pedantic -Werror -Wconversion @OPENMP_CFLAGS@
 
 CLEANFILES = dati*.dat log*.dat dati*.log conf*.dat* 

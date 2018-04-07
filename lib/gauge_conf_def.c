@@ -16,6 +16,7 @@
 #include"../include/geometry.h"
 #include"../include/gauge_conf.h"
 #include"../include/mymalloc.h"
+#include"../include/tens_prod.h"
 
 void init_gauge_conf(Gauge_Conf *GC, GParam const * const param)
   {

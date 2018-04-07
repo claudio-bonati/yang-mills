@@ -15,9 +15,9 @@
 #include"../include/mymalloc.h"
 #include"../include/tens_prod.h"
 
-void multihit(Gauge_Conf const * const restrict GC,
-              Geometry const * const restrict geo,
-              GParam const * const restrict param,
+void multihit(Gauge_Conf const * const GC,
+              Geometry const * const geo,
+              GParam const * const param,
               long r,
               int dir,
               int num_hit,
@@ -31,7 +31,7 @@ void multihit(Gauge_Conf const * const restrict GC,
 
     zero(G);
     equal(&partial, &(GC->lattice[r][dir]));
-    calcstaples_w(GC, geo, r, dir, &staple);
+    calcstaples(GC, geo, r, dir, &staple);
 
     for(i=0; i<num_hit; i++)
        {
@@ -62,9 +62,9 @@ void multihit(Gauge_Conf const * const restrict GC,
 
 
 // compute polyakov loop on a single slice
-void compute_local_poly(Gauge_Conf const * const restrict GC,
-                        Geometry const * const restrict geo,
-                        GParam const * const restrict param,
+void compute_local_poly(Gauge_Conf const * const GC,
+                        Geometry const * const geo,
+                        GParam const * const param,
                         int t_start,
                         int dt,
                         GAUGE_GROUP *loc_poly)
@@ -217,9 +217,7 @@ void multilevel(Gauge_Conf * GC,
                 int dt)
   {
   int i, upd;
-  TensProd TP;
-  long int r, r1, r2;
-
+  long int r;
   int level;
 
   level=-2;
@@ -250,6 +248,9 @@ void multilevel(Gauge_Conf * GC,
     {
     case -1 :     // LEVEL -1, do not average
       // initialyze ml_polycorr_ris[0] to 1
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
       for(r=0; r<param->d_space_vol; r++)
          {
          one_TensProd(&(GC->ml_polycorr_ris[0][r]));
@@ -269,6 +270,9 @@ void multilevel(Gauge_Conf * GC,
 
     case NLEVELS-1 : // INNERMOST LEVEL
       // initialize ml_polycorr_tmp[level] to 0
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
       for(r=0; r<param->d_space_vol; r++)
          {
          zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
@@ -295,8 +299,13 @@ void multilevel(Gauge_Conf * GC,
 
          // compute the tensor products
          // and update ml_polycorr_tmp[level]
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #endif
          for(r=0; r<param->d_space_vol; r++)
             {
+            TensProd TP;
+            long r1, r2;
             int t_tmp, dir=1;
 
             r1=sisp_and_t_to_si(r, 0, param);
@@ -311,12 +320,18 @@ void multilevel(Gauge_Conf * GC,
         } // end of update
 
       // normalize polycorr_tmp
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
       for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
          }
 
       // update polycorr_ris
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
       for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
@@ -333,6 +348,9 @@ void multilevel(Gauge_Conf * GC,
         }
 
       // initialize ml_polycorr_tmp[level] to 0
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
       for(r=0; r<param->d_space_vol; r++)
          {
          zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
@@ -348,6 +366,9 @@ void multilevel(Gauge_Conf * GC,
                              dt);
 
          // initialyze ml_polycorr_ris[level+1] to 1
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #endif
          for(r=0; r<param->d_space_vol; r++)
             {
             one_TensProd(&(GC->ml_polycorr_ris[level+1][r]));
@@ -364,6 +385,9 @@ void multilevel(Gauge_Conf * GC,
             }
 
          // update polycorr_tmp[level] with polycorr_ris[level+1]
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #endif
          for(r=0; r<param->d_space_vol; r++)
             {
             plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &(GC->ml_polycorr_ris[level+1][r]));
@@ -372,12 +396,18 @@ void multilevel(Gauge_Conf * GC,
          } // end of update
 
       // normalize polycorr_tmp[level]
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
       for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
          }
 
       // update polycorr_ris[level]
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
       for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
@@ -387,7 +417,7 @@ void multilevel(Gauge_Conf * GC,
 
     } // end of switch
 
-  } // end of the multilevel
+  } // end of multilevel
 
 
 #endif
