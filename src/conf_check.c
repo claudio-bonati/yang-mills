@@ -142,7 +142,7 @@ void computehash(char *infile, int dim, long volume, char *hash)
     #else
       // just to avoid compile time warnings
       (void) infile;
-      (void) dim
+      (void) dim;
       (void) volume;
       *hash='0';
     #endif
