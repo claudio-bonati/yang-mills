@@ -437,7 +437,7 @@ void perform_measures_polycorr_ml(Gauge_Conf *restrict GC,
         {
         ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
         }
-     ris/=(double)param->d_space_vol;
+     ris*=param->d_inv_space_vol;
 
      fprintf(datafilep, "%.12g\n", ris);
      fflush(datafilep);

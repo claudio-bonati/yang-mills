@@ -216,8 +216,13 @@ void multilevel(Gauge_Conf * GC,
                 int t_start,
                 int dt)
   {
-  int level=-2; // initialized just to avoid warnings
+  int i, upd;
+  TensProd TP;
+  long int r, r1, r2;
 
+  int level;
+
+  level=-2;
   // determine the level to be used
   if(dt>param->d_ml_step[0])
     {
@@ -234,161 +239,154 @@ void multilevel(Gauge_Conf * GC,
          tmp=NLEVELS+10;
          }
        }
-    if(tmp==NLEVELS)
+    if(level==-2)
       {
       fprintf(stderr, "Error in the determination of the level in the multilevel (%s, %d)\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
       }
     }
 
-  // LEVEL -1, do not average
-  if(level == -1)
+  switch(level)
     {
-    int i;
-    long int r;
+    case -1 :     // LEVEL -1, do not average
+      // initialyze ml_polycorr_ris[0] to 1
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         one_TensProd(&(GC->ml_polycorr_ris[0][r]));
+         }
 
-    // initialyze ml_polycorr_ris[0] to 1
-    for(r=0; r<param->d_space_vol; r++)
-       {
-       one_TensProd(&(GC->ml_polycorr_ris[0][r]));
-       }
+      // call lower levels
+      for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
+         {
+         multilevel(GC,
+                    geo,
+                    param,
+                    t_start+i*param->d_ml_step[0],
+                    param->d_ml_step[0]);
+         }
+      break;
+      // end of the outermost level
 
-    // call lower levels
-    for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
-       {
-       multilevel(GC,
-                  geo,
-                  param,
-                  t_start+i*param->d_ml_step[0],
-                  param->d_ml_step[0]);
-       }
-    } // end of the outermost level
+    case NLEVELS-1 : // INNERMOST LEVEL
+      // initialize ml_polycorr_tmp[level] to 0
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
+         }
 
-  else if(level == NLEVELS-1) // INNERMOST LEVEL
-    {
-    int i, upd;
-    TensProd TP;
-    long int r, r1, r2;
+      // perform the update
+      for(upd=0; upd< param->d_ml_upd[level]; upd++)
+         {
+         slice_single_update(GC,
+                             geo,
+                             param,
+                             t_start,
+                             dt);
 
-    // initialize ml_polycorr_tmp[level] to 0
-    for(r=0; r<param->d_space_vol; r++)
-       {
-       zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
-       }
+         // compute Polyakov loop restricted to the slice
+         GAUGE_GROUP *loc_poly = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(GAUGE_GROUP));
 
-    // perform the update
-    for(upd=0; upd< param->d_ml_upd[level]; upd++)
-       {
-       slice_single_update(GC,
-                           geo,
-                           param,
-                           t_start,
-                           dt);
+         compute_local_poly(GC,
+                            geo,
+                            param,
+                            t_start,
+                            dt,
+                            loc_poly);
 
-       // compute Polyakov loop restricted to the slice
-       GAUGE_GROUP *loc_poly = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(GAUGE_GROUP));
+         // compute the tensor products
+         // and update ml_polycorr_tmp[level]
+         for(r=0; r<param->d_space_vol; r++)
+            {
+            int t_tmp, dir=1;
 
-       compute_local_poly(GC,
-                          geo,
-                          param,
-                          t_start,
-                          dt,
-                          loc_poly);
+            r1=sisp_and_t_to_si(r, 0, param);
+            for(i=0; i<param->d_dist_poly; i++) r1=nnp(geo, r1, dir);
+            si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
 
-       // compute the tensor products
-       // and update ml_polycorr_tmp[level]
-       for(r=0; r<param->d_space_vol; r++)
-          {
-          int t_tmp, dir=1;
+           TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
+           plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &TP);
+           }
 
-          r1=sisp_and_t_to_si(r, 0, param);
-          for(i=0; i<param->d_dist_poly; i++) r1=nnp(geo, r1, dir);
-          si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
+        free(loc_poly);
+        } // end of update
 
-          TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
-          plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &TP);
-          }
+      // normalize polycorr_tmp
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
+         }
 
-       free(loc_poly);
-       } // end of update
+      // update polycorr_ris
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
+         }
 
-    // normalize polycorr_tmp
-    for(r=0; r<param->d_space_vol; r++)
-       {
-       times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
-       }
+      break;
+      // end of innermost level
 
-    // update polycorr_ris
-    for(r=0; r<param->d_space_vol; r++)
-       {
-       times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
-       }
-    } // end of innermost level
+    default:  // NOT THE INNERMOST NOT THE OUTERMOST LEVEL
+      if(level==-1 || level==NLEVELS-1)
+        {
+        fprintf(stderr, "Error in the multilevel (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
 
-  #if NLEVELS>1
-  else // NOT THE INNERMOST NOT THE OUTERMOST LEVEL
-    {
-    if(level==-1 || level==NLEVELS-1)
-      {
-      fprintf(stderr, "Error in the multilevel (%s, %d)\n", __FILE__, __LINE__);
-      exit(EXIT_FAILURE);
-      }
+      // initialize ml_polycorr_tmp[level] to 0
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
+         }
 
-    int i, upd;
-    long int r;
+      // perform the update
+      for(upd=0; upd< param->d_ml_upd[level]; upd++)
+         {
+         slice_single_update(GC,
+                             geo,
+                             param,
+                             t_start,
+                             dt);
 
-    // initialize ml_polycorr_tmp[level] to 0
-    for(r=0; r<param->d_space_vol; r++)
-       {
-       zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
-       }
+         // initialyze ml_polycorr_ris[level+1] to 1
+         for(r=0; r<param->d_space_vol; r++)
+            {
+            one_TensProd(&(GC->ml_polycorr_ris[level+1][r]));
+            }
 
-    // perform the update
-    for(upd=0; upd< param->d_ml_upd[level]; upd++)
-       {
-       slice_single_update(GC,
-                           geo,
-                           param,
-                           t_start,
-                           dt);
+         // call higher levels
+         for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
+            {
+            multilevel(GC,
+                       geo,
+                       param,
+                       t_start+i*param->d_ml_step[level+1],
+                       param->d_ml_step[level+1]);
+            }
 
-       // initialyze ml_polycorr_ris[level+1] to 1
-       for(r=0; r<param->d_space_vol; r++)
-          {
-          one_TensProd(&(GC->ml_polycorr_ris[level+1][r]));
-          }
+         // update polycorr_tmp[level] with polycorr_ris[level+1]
+         for(r=0; r<param->d_space_vol; r++)
+            {
+            plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &(GC->ml_polycorr_ris[level+1][r]));
+            }
 
-       // call higher levels
-       for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
-          {
-          multilevel(GC,
-                     geo,
-                     param,
-                     t_start+i*param->d_ml_step[level+1],
-                     param->d_ml_step[level+1]);
-          }
+         } // end of update
 
-       // update polycorr_tmp[level] with polycorr_ris[level+1]
-       for(r=0; r<param->d_space_vol; r++)
-          {
-          plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &(GC->ml_polycorr_ris[level+1][r]));
-          }
+      // normalize polycorr_tmp[level]
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
+         }
 
-       } // end of update
+      // update polycorr_ris[level]
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
+         }
+      break;
+      // end of the not innermost not outermost level
 
-    // normalize polycorr_tmp[level]
-    for(r=0; r<param->d_space_vol; r++)
-       {
-       times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
-       }
+    } // end of switch
 
-    // update polycorr_ris[level]
-    for(r=0; r<param->d_space_vol; r++)
-       {
-       times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
-       }
-    } // end of the not innermost not outermost level
-  #endif
   } // end of the multilevel
 
 

@@ -233,7 +233,7 @@ void times_TensProd(TensProd * restrict A,
            {
            for(l=0; l<NCOLOR; l++)
               {
-              sum=0.0;
+              sum=0.0+0.0*I;
               for(a=0; a<NCOLOR; a++)
                  {
                  for(b=0; b<NCOLOR; b++)
@@ -262,7 +262,7 @@ void times_equal_TensProd(TensProd * restrict A, TensProd const * restrict B)
     #endif
   #endif
 
-  TensProd tmp __attribute__((aligned(DOUBLE_ALIGN)));;
+  TensProd tmp __attribute__((aligned(DOUBLE_ALIGN)));
 
   equal_TensProd(&tmp, A);
   times_TensProd(A, &tmp, B);
