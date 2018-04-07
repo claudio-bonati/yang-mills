@@ -11,8 +11,6 @@
 #include"../include/macro.h"
 #include"../include/mymalloc.h"
 
-//#define DEBUG
-
 void init_indexing_lexeo(void)
   {
   cart_to_si = &cart_to_lexeo;

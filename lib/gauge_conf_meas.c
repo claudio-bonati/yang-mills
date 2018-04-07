@@ -338,14 +338,15 @@ void optimize_multihit(Gauge_Conf *restrict GC,
         poly_array[r]=retr(&matrix);
         poly_average+=poly_array[r];
         }
-     poly_average/= (double)param->d_space_vol;
+     poly_average*=param->d_inv_space_vol;
 
      poly_std=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
         poly_std+=(poly_average-poly_array[r])*(poly_average-poly_array[r]);
         }
-     poly_std/=(double)(param->d_space_vol*param->d_space_vol);
+     poly_std*=param->d_inv_space_vol;
+     poly_std*=param->d_inv_space_vol;
 
      time(&time2);
      diff_sec = difftime(time2, time1);
@@ -372,8 +373,7 @@ void optimize_multilevel(Gauge_Conf *restrict GC,
    poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double));
 
    fprintf(datafilep, "Multilevel optimization for level1 of the multithit: ");
-   fprintf(datafilep, "the smaller the 'ris' value, the better the update\n");
-   fprintf(datafilep, "updates  ris\n");
+   fprintf(datafilep, "the smaller the value the better the update\n");
 
    multilevel(GC,
               geo,
@@ -388,14 +388,15 @@ void optimize_multilevel(Gauge_Conf *restrict GC,
       poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
       poly_average+=poly_array[r];
       }
-   poly_average/=(double) param->d_space_vol;
+   poly_average*=param->d_inv_space_vol;
 
    poly_std=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
       poly_std+=(poly_average-poly_array[r])*(poly_average-poly_array[r]);
       }
-   poly_std/=(double)(param->d_space_vol*param->d_space_vol);
+   poly_std*=param->d_inv_space_vol;
+   poly_std*=param->d_inv_space_vol;
 
    for(i=0; i<NLEVELS; i++)
       {

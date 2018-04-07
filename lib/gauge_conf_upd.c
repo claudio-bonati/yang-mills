@@ -14,8 +14,6 @@
 #include"../include/gparam.h"
 #include"../include/random.h"
 
-//#define DEBUG
-
 // compute the staple in position r, direction i and save it in M
 void calcstaples_w(Gauge_Conf const * const restrict GC,
                    Geometry const * const restrict geo,
@@ -83,7 +81,7 @@ void calcstaples_w(Gauge_Conf const * const restrict GC,
 
 
 // perform an update with heatbath
-void heatbath_w(Gauge_Conf * restrict GC,
+void heatbath(Gauge_Conf * restrict GC,
                 Geometry const * const restrict geo,
                 GParam const * const restrict param,
                 long r,
@@ -110,7 +108,7 @@ void heatbath_w(Gauge_Conf * restrict GC,
 
 
 // perform an update with overrelaxation
-void overrelaxation_w(Gauge_Conf * restrict GC,
+void overrelaxation(Gauge_Conf * restrict GC,
                       Geometry const * const restrict geo,
                       GParam const * const restrict param,
                       long r,
@@ -247,7 +245,7 @@ void update(Gauge_Conf * restrict GC,
       #endif 
       for(r=0; r<(param->d_volume)/2; r++)
          {
-         heatbath_w(GC, geo, param, r, dir);
+         heatbath(GC, geo, param, r, dir);
          }
 
       #ifdef OPENMP_MODE
@@ -255,7 +253,7 @@ void update(Gauge_Conf * restrict GC,
       #endif 
       for(r=(param->d_volume)/2; r<(param->d_volume); r++)
          {
-         heatbath_w(GC, geo, param, r, dir);
+         heatbath(GC, geo, param, r, dir);
          } 
       }
 
@@ -269,7 +267,7 @@ void update(Gauge_Conf * restrict GC,
          #endif 
          for(r=0; r<(param->d_volume)/2; r++)
             {
-            overrelaxation_w(GC, geo, param, r, dir);
+            overrelaxation(GC, geo, param, r, dir);
             }
 
          #ifdef OPENMP_MODE
@@ -277,7 +275,7 @@ void update(Gauge_Conf * restrict GC,
          #endif 
          for(r=(param->d_volume)/2; r<(param->d_volume); r++)
             {
-            overrelaxation_w(GC, geo, param, r, dir);
+            overrelaxation(GC, geo, param, r, dir);
             }
          }
       }

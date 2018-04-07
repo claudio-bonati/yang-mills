@@ -98,9 +98,14 @@ void compute_local_poly(Gauge_Conf const * const restrict GC,
                         int t_start,
                         int dt,
                         GAUGE_GROUP *loc_poly);
-void multilevel(Gauge_Conf * restrict GC,
-                Geometry const * const restrict geo,
-                GParam const * const restrict param,
+void slice_single_update(Gauge_Conf * GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         int t_start,
+                         int dt);
+void multilevel(Gauge_Conf * GC,
+                Geometry const * const geo,
+                GParam const * const param,
                 int t_start,
                 int dt);
 
@@ -111,12 +116,12 @@ void calcstaples_w(Gauge_Conf const * const restrict GC,
                    long r,
                    int i,
                    GAUGE_GROUP * restrict M);
-void heatbath_w(Gauge_Conf * restrict GC,
+void heatbath(Gauge_Conf * restrict GC,
                 Geometry const * const restrict geo,
                 GParam const * const restrict param,
                 long r,
                 int i);
-void overrelaxation_w(Gauge_Conf * restrict GC,
+void overrelaxation(Gauge_Conf * restrict GC,
                       Geometry const * const restrict geo,
                       GParam const * const restrict param,
                       long r,
