@@ -363,7 +363,8 @@ random = ./include/myrngparam.h \
          ./include/random.h \
          ./lib/random.c 
 
-su2 = ./include/su2.h \
+su2 = ./include/aligncheck.h \
+      ./include/su2.h \
       ./include/su2_upd.h \
       ./lib/su2.c \
       ./lib/su2_upd.c 
