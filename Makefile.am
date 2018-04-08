@@ -52,17 +52,20 @@ su2 = ./include/aligncheck.h \
       ./lib/su2.c \
       ./lib/su2_upd.c 
 
-sun = ./include/sun_aux.h \
+sun = ./include/aligncheck.h \
+      ./include/sun_aux.h \
       ./include/sun.h \
       ./include/sun_upd.h \
       ./lib/sun_aux.c \
       ./lib/sun.c \
       ./lib/sun_upd.c 
 
-tens_prod = ./include/tens_prod.h \
+tens_prod = ./include/aligncheck.h \
+            ./include/tens_prod.h \
             ./lib/tens_prod.c
 
-u1 = ./include/u1.h \
+u1 = ./include/aligncheck.h \
+     ./include/u1.h \
      ./include/u1_upd.h \
      ./lib/u1.c \
      ./lib/u1_upd.c

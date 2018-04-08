@@ -6,6 +6,7 @@
 #include<stdlib.h>
 #include<string.h>
 
+#include"../include/aligncheck.h"
 #include"../include/endianness.h"
 #include"../include/macro.h"
 #include"../include/tens_prod.h"
@@ -70,13 +71,20 @@ void equal_TensProd(TensProd * restrict A, TensProd const * restrict B)
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -101,11 +109,17 @@ void equal_TensProd(TensProd * restrict A, TensProd const * restrict B)
 // A*=r real
 void times_equal_real_TensProd(TensProd * restrict A, double r)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -130,11 +144,17 @@ void times_equal_real_TensProd(TensProd * restrict A, double r)
 // A*=r complex
 void times_equal_comples_TensProd(TensProd * restrict A, double complex r)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -167,13 +187,20 @@ void plus_equal_TensProd(TensProd * restrict A, TensProd const * restrict B)
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -208,15 +235,23 @@ void times_TensProd(TensProd * restrict A,
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
-     __assume_aligned(C, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+       __assume_aligned(C, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -252,13 +287,20 @@ void times_TensProd(TensProd * restrict A,
 // A*=B
 void times_equal_TensProd(TensProd * restrict A, TensProd const * restrict B)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -271,11 +313,17 @@ void times_equal_TensProd(TensProd * restrict A, TensProd const * restrict B)
 
 double retr_TensProd(TensProd const * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -300,11 +348,17 @@ double retr_TensProd(TensProd const * restrict A)
 
 double imtr_TensProd(TensProd const * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 

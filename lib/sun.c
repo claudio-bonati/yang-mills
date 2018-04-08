@@ -7,6 +7,7 @@
 #include<stdlib.h>
 #include<string.h>
 
+#include"../include/aligncheck.h"
 #include"../include/endianness.h"
 #include"../include/macro.h"
 #include"../include/random.h"
@@ -14,16 +15,20 @@
 #include"../include/sun_upd.h"
 #include"../include/tens_prod.h"
 
-//#define DEBUG
-
 // A=1
 void one_SuN(SuN * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -44,11 +49,17 @@ void one_SuN(SuN * restrict A)
 // A=0
 void zero_SuN(SuN * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -72,13 +83,20 @@ void equal_SuN(SuN * restrict A, SuN const * restrict B)
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -102,13 +120,20 @@ void equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -135,13 +160,20 @@ void plus_equal_SuN(SuN * restrict A, SuN const * restrict B)
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -165,13 +197,20 @@ void plus_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -198,11 +237,18 @@ void minus_equal_SuN(SuN * restrict A, SuN const * restrict B)
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -226,11 +272,18 @@ void minus_equal_times_real_SuN(SuN * restrict A, SuN const * restrict B, double
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -254,11 +307,18 @@ void minus_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -287,15 +347,23 @@ void lin_comb_SuN(SuN * restrict A,
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
-     __assume_aligned(C, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+       __assume_aligned(C, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -321,15 +389,23 @@ void lin_comb_dag1_SuN(SuN * restrict A,
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
-     __assume_aligned(C, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+       __assume_aligned(C, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -358,15 +434,23 @@ void lin_comb_dag2_SuN(SuN * restrict A,
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
-     __assume_aligned(C, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+       __assume_aligned(C, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -395,15 +479,23 @@ void lin_comb_dag12_SuN(SuN * restrict A,
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
-     __assume_aligned(C, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+       __assume_aligned(C, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -422,11 +514,17 @@ void lin_comb_dag12_SuN(SuN * restrict A,
 // A*=r
 void times_equal_real_SuN(SuN * restrict A, double r)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -442,11 +540,17 @@ void times_equal_real_SuN(SuN * restrict A, double r)
 // A*=r
 void times_equal_complex_SuN(SuN * restrict A, double complex r)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -470,13 +574,20 @@ void times_equal_SuN(SuN * restrict A, SuN const * restrict B)
    }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -515,13 +626,20 @@ void times_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
    }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -560,15 +678,23 @@ void times_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restrict C)
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
-     __assume_aligned(C, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+       __assume_aligned(C, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -601,15 +727,23 @@ void times_dag1_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restri
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
-     __assume_aligned(C, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+       __assume_aligned(C, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -642,15 +776,23 @@ void times_dag2_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restri
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
-     __assume_aligned(C, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+       __assume_aligned(C, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -683,15 +825,23 @@ void times_dag12_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restr
     }
   #endif
 
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-  C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(B, DOUBLE_ALIGN);
-     __assume_aligned(C, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
+    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(B, DOUBLE_ALIGN);
+       __assume_aligned(C, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -717,11 +867,17 @@ void times_dag12_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restr
 // generated a la Cabibbo Marinari with N(N-1)/2 SU(2) random matrices
 void rand_matrix_SuN(SuN * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -772,11 +928,17 @@ void rand_matrix_SuN(SuN * restrict A)
 // random components in the base T_i such that Tr(T_iT_j)=delta_{ij}
 void rand_algebra_gauss_matrix_SuN(SuN * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -834,11 +996,17 @@ void rand_algebra_gauss_matrix_SuN(SuN * restrict A)
 // l2 norm of the matrix
 double norm_SuN(SuN const * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -858,11 +1026,17 @@ double norm_SuN(SuN const * restrict A)
 // real part of the trace /N
 double retr_SuN(SuN const * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -883,11 +1057,17 @@ double retr_SuN(SuN const * restrict A)
 // imaginary part of the trace /N
 double imtr_SuN(SuN const * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -909,13 +1089,20 @@ double imtr_SuN(SuN const * restrict A)
 //   from Numerical Recipes in C, pag 46
 void LU_SuN(SuN const * restrict A, SuN * restrict ris, int * restrict sign)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  ris  = __builtin_assume_aligned(ris, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
-     __assume_aligned(ris, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)ris, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    ris  = __builtin_assume_aligned(ris, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+       __assume_aligned(ris, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -996,11 +1183,17 @@ void LU_SuN(SuN const * restrict A, SuN * restrict ris, int * restrict sign)
 // determinant
 complex double det_SuN(SuN const * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -1044,11 +1237,17 @@ complex double det_SuN(SuN const * restrict A)
 // gives 0 if the matrix is in SU(N) and 1 otherwise
 int scheck_SuN(SuN const * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -1086,11 +1285,17 @@ int scheck_SuN(SuN const * restrict A)
 // sunitarize
 void unitarize_SuN(SuN * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -1128,11 +1333,17 @@ void unitarize_SuN(SuN * restrict A)
 // eponential of the traceless antihermitian part
 void taexp_SuN(SuN * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -1186,11 +1397,17 @@ void taexp_SuN(SuN * restrict A)
 // takes the traceless antihermitian part
 void ta_SuN(SuN * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -1223,11 +1440,17 @@ void ta_SuN(SuN * restrict A)
 // return 0 if matrix is traceless antihermitian, 1 otherwise
 int ta_check_SuN(const SuN * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -1260,11 +1483,17 @@ int ta_check_SuN(const SuN * restrict A)
 // exponential of a TA matrix
 void exp_of_ta_SuN(SuN * restrict A)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(A, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
@@ -1522,15 +1751,23 @@ void read_from_binary_file_bigen_SuN(FILE *fp, SuN *A)
 
 void TensProd_init_SuN(TensProd * restrict TP, SuN const * restrict A1, SuN const * restrict A2)
   {
-  #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-  TP = __builtin_assume_aligned(TP, DOUBLE_ALIGN);
-  A1 = __builtin_assume_aligned(A1, DOUBLE_ALIGN);
-  A2 = __builtin_assume_aligned(A2, DOUBLE_ALIGN);
-  #else
-    #ifdef __INTEL_COMPILER
-     __assume_aligned(TP, DOUBLE_ALIGN);
-     __assume_aligned(A1, DOUBLE_ALIGN);
-     __assume_aligned(A2, DOUBLE_ALIGN);
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)TP, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)A1, DOUBLE_ALIGN, __FILE__, __LINE__);
+      is_aligned((void *)A2, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    TP = __builtin_assume_aligned(TP, DOUBLE_ALIGN);
+    A1 = __builtin_assume_aligned(A1, DOUBLE_ALIGN);
+    A2 = __builtin_assume_aligned(A2, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(TP, DOUBLE_ALIGN);
+       __assume_aligned(A1, DOUBLE_ALIGN);
+       __assume_aligned(A2, DOUBLE_ALIGN);
+      #endif
     #endif
   #endif
 
