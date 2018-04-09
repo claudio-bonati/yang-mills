@@ -374,7 +374,7 @@ void optimize_multilevel(Gauge_Conf *GC,
    fprintf(datafilep, "Multilevel optimization for level1 of the multithit: ");
    fprintf(datafilep, "the smaller the value the better the update\n");
 
-   multilevel(GC,
+   multilevel_pot_QbarQ(GC,
               geo,
               param,
               0,
@@ -415,7 +415,7 @@ void optimize_multilevel(Gauge_Conf *GC,
    }
 
 
-void perform_measures_polycorr_ml(Gauge_Conf *GC,
+void perform_measures_pot_QbarQ(Gauge_Conf *GC,
                                   Geometry const * const geo,
                                   GParam const * const param,
                                   FILE *datafilep)
@@ -425,7 +425,7 @@ void perform_measures_polycorr_ml(Gauge_Conf *GC,
      double ris;
      long r;
 
-     multilevel(GC,
+     multilevel_pot_QbarQ(GC,
                 geo,
                 param,
                 0,

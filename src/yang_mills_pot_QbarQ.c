@@ -75,7 +75,7 @@ void real_main(char *in_file)
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {
-         perform_measures_polycorr_ml(&GC, &geo, &param, datafilep);
+         perform_measures_pot_QbarQ(&GC, &geo, &param, datafilep);
          }
 
        // save configuration for backup

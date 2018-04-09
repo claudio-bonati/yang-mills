@@ -31,7 +31,7 @@ void multihit(Gauge_Conf const * const GC,
 
     zero(G);
     equal(&partial, &(GC->lattice[r][dir]));
-    calcstaples(GC, geo, r, dir, &staple);
+    calcstaples_wilson(GC, geo, r, dir, &staple);
 
     for(i=0; i<num_hit; i++)
        {
@@ -210,7 +210,7 @@ void slice_single_update(Gauge_Conf * GC,
 
 
 // multilevel
-void multilevel(Gauge_Conf * GC,
+void multilevel_pot_QbarQ(Gauge_Conf * GC,
                 Geometry const * const geo,
                 GParam const * const param,
                 int t_start,
@@ -259,7 +259,7 @@ void multilevel(Gauge_Conf * GC,
       // call lower levels
       for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
          {
-         multilevel(GC,
+         multilevel_pot_QbarQ(GC,
                     geo,
                     param,
                     t_start+i*param->d_ml_step[0],
@@ -377,7 +377,7 @@ void multilevel(Gauge_Conf * GC,
          // call higher levels
          for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
             {
-            multilevel(GC,
+            multilevel_pot_QbarQ(GC,
                        geo,
                        param,
                        t_start+i*param->d_ml_step[level+1],

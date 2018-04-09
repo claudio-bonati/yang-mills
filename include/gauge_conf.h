@@ -78,10 +78,10 @@ void optimize_multilevel(Gauge_Conf *GC,
                          Geometry const * const geo,
                          GParam const * const param,
                          FILE *datafilep);
-void perform_measures_polycorr_ml(Gauge_Conf * GC,
-                                  Geometry const * const geo,
-                                  GParam const * const param,
-                                  FILE *datafilep);
+void perform_measures_pot_QbarQ(Gauge_Conf * GC,
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                FILE *datafilep);
 
 
 // in gauge_conf_multilevel.c
@@ -103,19 +103,19 @@ void slice_single_update(Gauge_Conf *GC,
                          GParam const * const param,
                          int t_start,
                          int dt);
-void multilevel(Gauge_Conf *GC,
-                Geometry const * const geo,
-                GParam const * const param,
-                int t_start,
-                int dt);
+void multilevel_pot_QbarQ(Gauge_Conf *GC,
+                          Geometry const * const geo,
+                          GParam const * const param,
+                          int t_start,
+                          int dt);
 
 
 // in gauge_conf_upd.c
-void calcstaples(Gauge_Conf const * const restrict GC,
-                 Geometry const * const restrict geo,
-                 long r,
-                 int i,
-                 GAUGE_GROUP * restrict M);
+void calcstaples_wilson(Gauge_Conf const * const restrict GC,
+                        Geometry const * const restrict geo,
+                        long r,
+                        int i,
+                        GAUGE_GROUP * restrict M);
 void heatbath(Gauge_Conf * restrict GC,
               Geometry const * const restrict geo,
               GParam const * const restrict param,

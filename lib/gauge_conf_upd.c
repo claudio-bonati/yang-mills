@@ -15,7 +15,7 @@
 #include"../include/random.h"
 
 // compute the staple in position r, direction i and save it in M
-void calcstaples(Gauge_Conf const * const restrict GC,
+void calcstaples_wilson(Gauge_Conf const * const restrict GC,
                    Geometry const * const restrict geo,
                    long r,
                    int i,
@@ -102,7 +102,7 @@ void heatbath(Gauge_Conf * restrict GC,
 
    GAUGE_GROUP stap;
 
-   calcstaples(GC, geo, r, i, &stap);
+   calcstaples_wilson(GC, geo, r, i, &stap);
    single_heatbath(&(GC->lattice[r][i]), &stap, param);
    }
 
@@ -130,7 +130,7 @@ void overrelaxation(Gauge_Conf * restrict GC,
 
    GAUGE_GROUP stap;
 
-   calcstaples(GC, geo, r, i, &stap);
+   calcstaples_wilson(GC, geo, r, i, &stap);
    single_overrelaxation(&(GC->lattice[r][i]), &stap);
    }
 
