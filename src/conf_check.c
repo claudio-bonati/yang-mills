@@ -88,7 +88,7 @@ void computehash(char *infile, int dim, long volume, char *hash)
       GAUGE_GROUP link;
       FILE *fp;
       long r;
-      int j, k;
+      int j;
 
       MD5_CTX mdContext;
       unsigned char c[MD5_DIGEST_LENGTH];
@@ -117,14 +117,14 @@ void computehash(char *infile, int dim, long volume, char *hash)
               {
               read_from_binary_file_bigen(fp, &link);
               #if NCOLOR==1
-                MD5_Update(&mdContext, &(matrix.comp), sizeof(double complex));
+                MD5_Update(&mdContext, &(link.comp), sizeof(double complex));
               #elif NCOLOR==2
-                for(k=0; k<4; k++)
+                for(int k=0; k<4; k++)
                    {
                    MD5_Update(&mdContext, &(link.comp[k]), sizeof(double));
                    }
               #else
-                for(k=0; k<NCOLOR*NCOLOR; k++)
+                for(int k=0; k<NCOLOR*NCOLOR; k++)
                    {
                    MD5_Update(&mdContext, &(link.comp[k]), sizeof(double complex));
                    }
