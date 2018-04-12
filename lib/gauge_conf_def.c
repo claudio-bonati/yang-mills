@@ -370,7 +370,7 @@ void init_gauge_conf_polycorr(Gauge_Conf *GC,
   GC->ml_polycorr_ris = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd *));
   if(GC->ml_polycorr_ris==NULL)
     {
-    fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);
+    fprintf(stderr, "Problems in allocating ml_polycorr_ris (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   else
@@ -380,7 +380,7 @@ void init_gauge_conf_polycorr(Gauge_Conf *GC,
        GC->ml_polycorr_ris[i] = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd));
        if(GC->ml_polycorr_ris[i]==NULL)
          {
-         fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);
+         fprintf(stderr, "Problems in allocating ml_polycorr_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
        }
@@ -389,7 +389,7 @@ void init_gauge_conf_polycorr(Gauge_Conf *GC,
   GC->ml_polycorr_tmp = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd *));
   if(GC->ml_polycorr_tmp==NULL)
     {
-    fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);
+    fprintf(stderr, "Problems in allocating ml_polycorr_tmp (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   else
@@ -399,7 +399,7 @@ void init_gauge_conf_polycorr(Gauge_Conf *GC,
        GC->ml_polycorr_tmp[i] = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd));
        if(GC->ml_polycorr_tmp[i]==NULL)
          {
-         fprintf(stderr, "Problems in allocating multilevel! (%s, %d)\n", __FILE__, __LINE__);
+         fprintf(stderr, "Problems in allocating ml_polycorr_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
        }
