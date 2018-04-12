@@ -69,15 +69,14 @@ void perform_measures_localobs(Gauge_Conf const * const restrict GC,
                                Geometry const * const restrict geo,
                                GParam const * const restrict param,
                                FILE *datafilep);
-
 void optimize_multihit(Gauge_Conf *GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        FILE *datafilep);
-void optimize_multilevel(Gauge_Conf *GC,
-                         Geometry const * const geo,
-                         GParam const * const param,
-                         FILE *datafilep);
+void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
+                                  FILE *datafilep);
 void perform_measures_pot_QbarQ(Gauge_Conf * GC,
                                 Geometry const * const geo,
                                 GParam const * const param,

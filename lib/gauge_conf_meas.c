@@ -359,10 +359,10 @@ void optimize_multihit(Gauge_Conf *GC,
 
 
 // to optimize the multilevel
-void optimize_multilevel(Gauge_Conf *GC,
-                         Geometry const * const geo,
-                         GParam const * const param,
-                         FILE *datafilep)
+void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
+                                  FILE *datafilep)
    {
    int i;
    long r;
@@ -448,7 +448,7 @@ void perform_measures_pot_QbarQ(Gauge_Conf *GC,
    #endif
 
    #ifdef OPT_MULTILEVEL
-     optimize_multilevel(GC, geo, param, datafilep);
+     optimize_multilevel_potQbarQ(GC, geo, param, datafilep);
    #endif
    }
 
