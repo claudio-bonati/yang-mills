@@ -302,7 +302,7 @@ void optimize_multihit(Gauge_Conf *GC,
                        GParam const * const param,
                        FILE *datafilep)
   {
-  const int max_hit=20;
+  const int max_hit=50;
   const int dir=1;
 
   int i, mh, t_tmp;
