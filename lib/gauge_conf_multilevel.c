@@ -38,21 +38,9 @@ void multihit(Gauge_Conf const * const GC,
        single_heatbath(&partial, &staple, param);
        plus_equal(G, &partial);
 
-       single_overrelaxation(&partial, &staple);
-       plus_equal(G, &partial);
-
-       single_overrelaxation(&partial, &staple);
-       plus_equal(G, &partial);
-
-       single_overrelaxation(&partial, &staple);
-       plus_equal(G, &partial);
-
-       single_overrelaxation(&partial, &staple);
-       plus_equal(G, &partial);
-
        unitarize(&partial);
        }
-    times_equal_real(G, 0.2*inv_num_hit);
+    times_equal_real(G, inv_num_hit);
     }
   else
     {

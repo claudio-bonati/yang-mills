@@ -5,6 +5,9 @@
 
 #include<malloc.h>
 #include<math.h>
+#ifdef OPENMP_MODE
+  #include<omp.h>
+#endif
 #include<stdio.h>
 #include<stdlib.h>
 
@@ -14,8 +17,6 @@
 #include"../include/gauge_conf.h"
 #include"../include/mymalloc.h"
 #include"../include/tens_prod.h"
-
-//#define DEBUG
 
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
 double plaquettep(Gauge_Conf const * const restrict GC,
@@ -301,10 +302,11 @@ void optimize_multihit(Gauge_Conf *GC,
                        GParam const * const param,
                        FILE *datafilep)
   {
-  const int max_hit=10;
+  const int max_hit=20;
+  const int dir=1;
 
-  int i, mh;
-  long r;
+  int i, mh, t_tmp;
+  long r, r1, r2;
   double poly_std, poly_average, diff_sec;
   double *poly_array;
   time_t time1, time2;
@@ -319,8 +321,11 @@ void optimize_multihit(Gauge_Conf *GC,
      {
      time(&time1);
 
-     poly_average=0.0;
-     for(r=0; r<param->d_space_vol; r++)
+     // polyakov loop computation
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r, i, matrix, tmp)
+     #endif
+     for(r=0; r<param->d_space_vol/2; r++)
         {
         one(&matrix);
         for(i=0; i<param->d_size[0]; i++)
@@ -335,20 +340,60 @@ void optimize_multihit(Gauge_Conf *GC,
            times_equal(&matrix, &tmp);
            }
         poly_array[r]=retr(&matrix);
-        poly_average+=poly_array[r];
+        }
+
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r, i, matrix, tmp)
+     #endif
+     for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
+        {
+        one(&matrix);
+        for(i=0; i<param->d_size[0]; i++)
+           {
+           multihit(GC,
+                    geo,
+                    param,
+                    sisp_and_t_to_si(r, i, param),
+                    0,
+                    mh,
+                    &tmp);
+           times_equal(&matrix, &tmp);
+           }
+        poly_array[r]=retr(&matrix);
+        }
+
+     // average correlator computation
+     poly_average=0.0;
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        r1=sisp_and_t_to_si(r, 0, param);
+        for(i=0; i<param->d_dist_poly; i++)
+           {
+           r1=nnp(geo, r1, dir);
+           }
+        si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
+        poly_average+=poly_array[r]*poly_array[r2];
         }
      poly_average*=param->d_inv_space_vol;
 
+     // std computation
      poly_std=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
-        poly_std+=(poly_average-poly_array[r])*(poly_average-poly_array[r]);
+        r1=sisp_and_t_to_si(r, 0, param);
+        for(i=0; i<param->d_dist_poly; i++)
+           {
+           r1=nnp(geo, r1, dir);
+           }
+        si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
+        poly_std += (poly_array[r]*poly_array[r2]-poly_average)*(poly_array[r]*poly_array[r2]-poly_average);
         }
      poly_std*=param->d_inv_space_vol;
      poly_std*=param->d_inv_space_vol;
 
      time(&time2);
      diff_sec = difftime(time2, time1);
+
      fprintf(datafilep, "%d  %.6g  (time:%g)\n", mh, poly_std*mh, diff_sec);
 
      fflush(datafilep);
