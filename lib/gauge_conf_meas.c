@@ -375,10 +375,10 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
    fprintf(datafilep, "the smaller the value the better the update\n");
 
    multilevel_pot_QbarQ(GC,
-              geo,
-              param,
-              0,
-              param->d_size[0]);
+                        geo,
+                        param,
+                        0,
+                        param->d_size[0]);
 
    // polyakov loop correlator
    poly_average=0.0;
@@ -415,10 +415,11 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
    }
 
 
+// perform the computation of the polyakov loop correlator with the multilevel algorithm
 void perform_measures_pot_QbarQ(Gauge_Conf *GC,
-                                  Geometry const * const geo,
-                                  GParam const * const param,
-                                  FILE *datafilep)
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                FILE *datafilep)
    {
    #ifndef OPT_MULTIHIT
    #ifndef OPT_MULTILEVEL
@@ -451,6 +452,27 @@ void perform_measures_pot_QbarQ(Gauge_Conf *GC,
      optimize_multilevel_potQbarQ(GC, geo, param, datafilep);
    #endif
    }
+
+
+// print the value of the polyakov loop correlator that has been computed by multilevel
+void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
+                                     GParam const * const param,
+                                     FILE *datafilep)
+   {
+   double ris;
+   long r;
+
+   ris=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      }
+   ris*=param->d_inv_space_vol;
+
+   fprintf(datafilep, "%.12g\n", ris);
+   fflush(datafilep);
+   }
+
 
 
 #endif

@@ -28,12 +28,14 @@ typedef struct GParam {
   int d_multihit;
   int d_ml_step[NLEVELS];
   int d_ml_upd[NLEVELS];
+  int d_ml_level0_repeat;
   int d_dist_poly;
 
   // output file names
   char d_conf_file[STD_STRING_LENGTH];
   char d_data_file[STD_STRING_LENGTH];
   char d_log_file[STD_STRING_LENGTH];
+  char d_ml_file[STD_STRING_LENGTH];
 
   // random seed
   unsigned int d_randseed;

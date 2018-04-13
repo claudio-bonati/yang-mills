@@ -12,14 +12,16 @@ saveconf_back_every     5  # if 0 does not save, else save backup configurations
 saveconf_analysis_every 5  # if 0 does not save, else save backup configurations every ... updates
 
 #for multilevel
-multihit  10  # number of multihit step
-ml_step   2   # timeslices for multilevel (from largest to smallest)
-ml_upd    10  # number of updates for various levels
-dist_poly 2   # distance between the polyakov loop 
+multihit         10  # number of multihit step
+ml_step          2   # timeslices for multilevel (from largest to smallest)
+ml_upd           10  # number of updates for various levels
+ml_level0_repeat 1   # number of times level0 is repeated in long sim.
+dist_poly        2   # distance between the polyakov loop 
 
 #output files
 conf_file  conf.dat
 data_file  dati.dat
 log_file   log.dat
+ml_file    ml.dat
 
 randseed 0    #(0=time)

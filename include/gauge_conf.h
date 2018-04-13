@@ -44,10 +44,21 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC1,
 void compute_md5sum(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                     Gauge_Conf const * const GC,
                     GParam const * const param);
+
 void init_gauge_conf_polycorr(Gauge_Conf *GC,
                               GParam const * const param);
 void end_gauge_conf_polycorr(Gauge_Conf *GC);
-
+void save_polycorr_on_file(Gauge_Conf const * const GC,
+                           GParam const * const param,
+                           int tstart,
+                           int iteration);
+void read_polycorr_from_file(Gauge_Conf const * const GC,
+                             GParam const * const param,
+                             int *tstart,
+                             int *iteration);
+void compute_md5sum_polycorr(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
+                             Gauge_Conf const * const GC,
+                             GParam const * const param);
 
 // in gauge_conf_meas.c
 double plaquettep(Gauge_Conf const * const restrict GC,
@@ -81,6 +92,9 @@ void perform_measures_pot_QbarQ(Gauge_Conf * GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
                                 FILE *datafilep);
+void perform_measures_pot_QbarQ_long(Gauge_Conf * GC,
+                                     GParam const * const param,
+                                     FILE *datafilep);
 
 
 // in gauge_conf_multilevel.c
@@ -107,6 +121,12 @@ void multilevel_pot_QbarQ(Gauge_Conf *GC,
                           GParam const * const param,
                           int t_start,
                           int dt);
+void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
+                               Geometry const * const geo,
+                               GParam const * const param,
+                               int t_start,
+                               int dt,
+                               int iteration);
 
 
 // in gauge_conf_upd.c

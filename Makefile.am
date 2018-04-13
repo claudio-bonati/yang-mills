@@ -4,7 +4,8 @@ bin_PROGRAMS = conf_check \
                debug_sun \
                debug_u1 \
                yang_mills_local \
-               yang_mills_pot_QbarQ
+               yang_mills_pot_QbarQ \
+               yang_mills_pot_QbarQ_long
 
 dSFMT = ./include/dSFMT-common.h \
         ./include/dSFMT.h \
@@ -140,8 +141,23 @@ yang_mills_pot_QbarQ_SOURCES=./src/yang_mills_pot_QbarQ.c \
                              $(tens_prod) \
                              $(u1) 
 
+yang_mills_pot_QbarQ_long_SOURCES=./src/yang_mills_pot_QbarQ_long.c \
+                                  $(dSFMT)  \
+                                  $(endian) \
+                                  $(funcpoint) \
+                                  $(gauge_conf) \
+                                  $(geometry) \
+                                  $(gparam) \
+                                  ./include/macro.h \
+                                  $(mymalloc) \
+                                  $(random) \
+                                  $(su2) \
+                                  $(sun) \
+                                  $(tens_prod) \
+                                  $(u1) 
+
 EXTRA_DIST = ./src/input.in 
 
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -pedantic -Werror -Wconversion @OPENMP_CFLAGS@
 
-CLEANFILES = dati*.dat log*.dat dati*.log conf*.dat* 
+CLEANFILES = dati*.dat log*.dat dati*.log conf*.dat* ml*.dat 
