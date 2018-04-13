@@ -54,5 +54,6 @@ void init_derived_constants(GParam *param);
 void init_data_file(FILE **dataf, GParam const * const param);
 void print_parameters_local(GParam const * const param, time_t time_start, time_t time_end);
 void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_end);
+void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t time_end);
 
 #endif

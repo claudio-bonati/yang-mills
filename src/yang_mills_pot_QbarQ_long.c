@@ -145,7 +145,7 @@ void real_main(char *in_file)
       }
 
     // print simulation details
-    print_parameters_polycorr(&param, time1, time2);
+    print_parameters_polycorr_long(&param, time1, time2);
 
     // free gauge configuration
     end_gauge_conf(&GC, &param);
