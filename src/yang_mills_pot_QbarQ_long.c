@@ -160,6 +160,49 @@ void real_main(char *in_file)
     }
 
 
+void print_template_input(void)
+  {
+  FILE *fp;
+
+  fp=fopen("template_input.in", "w");
+
+  if(fp==NULL)
+    {
+    fprintf(stderr, "Error in opening the file template_input.in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    fprintf(fp, "size 4 4 4 4\n");
+    fprintf(fp,"\n");
+    fprintf(fp, "beta 5.705\n");
+    fprintf(fp,"\n");
+    fprintf(fp, "sample    10\n");
+    fprintf(fp, "thermal   0\n");
+    fprintf(fp, "overrelax 5\n");
+    fprintf(fp, "measevery 1\n");
+    fprintf(fp,"\n");
+    fprintf(fp, "start                   0  # 0=ordered  1=random  2=from saved configuration\n");
+    fprintf(fp,"\n");
+    fprintf(fp, "#for multilevel\n");
+    fprintf(fp, "multihit         10  # number of multihit step\n");
+    fprintf(fp, "ml_step          2   # timeslices for multilevel (from largest to smallest)\n");
+    fprintf(fp, "ml_upd           10  # number of updates for various levels\n");
+    fprintf(fp, "ml_level0_repeat 1   # number of times level0 is repeated in long sim.\n");
+    fprintf(fp, "dist_poly        2   # distance between the polyakov loop\n");
+    fprintf(fp,"\n");
+    fprintf(fp, "#output files\n");
+    fprintf(fp, "conf_file  conf.dat\n");
+    fprintf(fp, "data_file  dati.dat\n");
+    fprintf(fp, "log_file   log.dat\n");
+    fprintf(fp, "ml_file    ml.dat\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "randseed 0    #(0=time)\n");
+    fclose(fp);
+    }
+  }
+
+
 int main (int argc, char **argv)
     {
     char in_file[50];
@@ -194,7 +237,6 @@ int main (int argc, char **argv)
         printf("\tcompiled for multilevel optimization\n");
       #endif
 
-
       printf("\n");
 
       #ifdef __INTEL_COMPILER
@@ -205,6 +247,8 @@ int main (int argc, char **argv)
         printf("\tcompiled with gcc version: %d.%d.%d\n",
                 __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
       #endif
+
+      print_template_input();
 
       return EXIT_SUCCESS;
       }

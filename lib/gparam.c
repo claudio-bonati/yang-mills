@@ -64,7 +64,13 @@ void readinput(char *in_file, GParam *param)
     int temp_i, i;
     int err, end=1;
     unsigned int temp_ui;
-    
+
+    // this is to avoin unnecessary checks in case the multilevel is not used
+    for(i=0; i<NLEVELS; i++)
+       {
+       param->d_ml_step[i]=0;
+       }
+
     input=fopen(in_file, "r");  // open the input file
     if(input==NULL)
       {
@@ -318,19 +324,22 @@ void readinput(char *in_file, GParam *param)
       fclose(input);
 
       // VARIOUS CHECKS
-      if(param->d_size[0] % param->d_ml_step[0] || param->d_size[0] <= param->d_ml_step[0])
+      if(param->d_ml_step[0]!=0)
         {
-        fprintf(stderr, "Error: size[0] has to be divisible by ml_step[0] and larger than it (%s, %d)\n", __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
-        }
-      for(i=1; i<NLEVELS; i++)
-         {
-         if(param->d_ml_step[i-1] % param->d_ml_step[i] || param->d_ml_step[i-1] <= param->d_ml_step[i])
+        if(param->d_size[0] % param->d_ml_step[0] || param->d_size[0] <= param->d_ml_step[0])
+          {
+          fprintf(stderr, "Error: size[0] has to be divisible by ml_step[0] and larger than it (%s, %d)\n", __FILE__, __LINE__);
+          exit(EXIT_FAILURE);
+          }
+        for(i=1; i<NLEVELS; i++)
            {
-           fprintf(stderr, "Error: ml_step[%d] has to be divisible by ml_step[%d] and larger than it (%s, %d)\n", i-1, i, __FILE__, __LINE__);
-           exit(EXIT_FAILURE);
+           if(param->d_ml_step[i-1] % param->d_ml_step[i] || param->d_ml_step[i-1] <= param->d_ml_step[i])
+             {
+             fprintf(stderr, "Error: ml_step[%d] has to be divisible by ml_step[%d] and larger than it (%s, %d)\n", i-1, i, __FILE__, __LINE__);
+             exit(EXIT_FAILURE);
+             }
            }
-         }
+        }
 
       #ifdef OPENMP_MODE
       for(i=0; i<STDIM; i++)
