@@ -519,5 +519,47 @@ void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
    }
 
 
+// perform the computation of the polyakov loop correlator with the multilevel algorithm
+void perform_measures_string_QbarQ(Gauge_Conf *GC,
+                                   Geometry const * const geo,
+                                   GParam const * const param,
+                                   FILE *datafilep)
+   {
+   int i;
+   const int numplaqs=(STDIM*(STDIM-1))/2;
+   double ris;
+   long r;
+
+   (void) geo;
+   multilevel_string_QbarQ(GC,
+                           geo,
+                           param,
+                           0,
+                           param->d_size[0]);
+
+   ris=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      }
+   ris*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g ", ris);
+
+   for(i=0; i<numplaqs; i++)
+      {
+      ris=0.0;
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         ris+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
+         }
+      ris*=param->d_inv_space_vol;
+      fprintf(datafilep, "%.12g ", ris);
+      }
+   fprintf(datafilep, "\n");
+
+   fflush(datafilep);
+   }
+
+
 
 #endif

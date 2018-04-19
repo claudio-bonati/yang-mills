@@ -363,7 +363,7 @@ void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const
 
 
 // allocate the ml_polycorr arrays
-void init_gauge_conf_polycorr(Gauge_Conf *GC,
+void init_polycorr(Gauge_Conf *GC,
                               GParam const * const param)
   {
   int i;
@@ -409,7 +409,7 @@ void init_gauge_conf_polycorr(Gauge_Conf *GC,
 
 
 // free the ml_polycorr arrays
-void end_gauge_conf_polycorr(Gauge_Conf *GC)
+void end_polycorr(Gauge_Conf *GC)
   {
   int i;
 
@@ -618,6 +618,97 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
   #endif
   }
 
+
+// allocate the ml_polycorr arrays
+void init_polycorr_and_polyplaq(Gauge_Conf *GC,
+                                GParam const * const param)
+  {
+  const unsigned long numplaq=(STDIM*(STDIM-1))/2;
+  int i;
+  long r;
+
+  init_polycorr(GC, param);
+
+  GC->ml_polyplaq_ris = (TensProd ***) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd **));
+  if(GC->ml_polyplaq_ris==NULL)
+    {
+    fprintf(stderr, "Problems in allocating ml_polyplaq_ris (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(i=0; i<NLEVELS; i++)
+       {
+       GC->ml_polyplaq_ris[i] = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd *));
+       if(GC->ml_polyplaq_ris[i]==NULL)
+         {
+         fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       for(r=0; r<param->d_space_vol; r++)
+          {
+          GC->ml_polyplaq_ris[i][r] = (TensProd *) mymalloc(DOUBLE_ALIGN, numplaq *sizeof(TensProd));
+          if(GC->ml_polyplaq_ris[i][r]==NULL)
+            {
+            fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d][%ld] (%s, %d)\n", i, r, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
+          }
+       }
+    }
+
+  GC->ml_polyplaq_tmp = (TensProd ***) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd **));
+  if(GC->ml_polyplaq_tmp==NULL)
+    {
+    fprintf(stderr, "Problems in allocating ml_polyplaq_tmp (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(i=0; i<NLEVELS; i++)
+       {
+       GC->ml_polyplaq_tmp[i] = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd *));
+       if(GC->ml_polyplaq_tmp[i]==NULL)
+         {
+         fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       for(r=0; r<param->d_space_vol; r++)
+          {
+          GC->ml_polyplaq_tmp[i][r] = (TensProd *) mymalloc(DOUBLE_ALIGN, numplaq *sizeof(TensProd));
+          if(GC->ml_polyplaq_tmp[i][r]==NULL)
+            {
+            fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d][%ld] (%s, %d)\n", i, r, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
+          }
+       }
+    }
+  }
+
+
+// free the ml_polycorr arrays
+void end_polycorr_and_polyplaq(Gauge_Conf *GC,
+                               GParam const * const param)
+  {
+  int i;
+  long r;
+
+  end_polycorr(GC);
+
+  for(i=0; i<NLEVELS; i++)
+     {
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        free(GC->ml_polyplaq_ris[i][r]);
+        free(GC->ml_polyplaq_tmp[i][r]);
+        }
+     free(GC->ml_polyplaq_ris[i]);
+     free(GC->ml_polyplaq_tmp[i]);
+     }
+  free(GC->ml_polyplaq_ris);
+  free(GC->ml_polyplaq_tmp);
+  }
 
 
 #endif

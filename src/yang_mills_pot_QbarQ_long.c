@@ -1,5 +1,5 @@
-#ifndef YM_POLYCORR_LONG_C
-#define YM_POLYCORR_LONG_C
+#ifndef YM_POT_QBARQ_LONG_C
+#define YM_POT_QBARQ_LONG_C
 
 #include"../include/macro.h"
 
@@ -63,7 +63,7 @@ void real_main(char *in_file)
     init_gauge_conf(&GC, &param);
 
     // initialize ml_polycorr arrays
-    init_gauge_conf_polycorr(&GC, &param);
+    init_polycorr(&GC, &param);
 
     // montecarlo starts
     time(&time1);
@@ -151,7 +151,7 @@ void real_main(char *in_file)
     end_gauge_conf(&GC, &param);
 
     // free ml_polycorr
-    end_gauge_conf_polycorr(&GC);
+    end_polycorr(&GC);
 
     // free geometry
     free_geometry(&geo, &param);

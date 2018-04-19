@@ -4,6 +4,6 @@ nell'input size tempo x1 x2 ...
 
 roba che comincia con # e' un commento nell'imput file
 
-i loop di Polyakov sono separati nella direzione 1
+i loop di Polyakov sono separati nella direzione 1 e la direzione trasversale per il tubo e' la 2
 
 il livello 0 del multilevel e' quello che corrisponde allo step piu' grande

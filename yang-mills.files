@@ -57,3 +57,4 @@ src/yang_mills_pot_QbarQ.c
 lib/gauge_conf_multilevel.c
 include/aligncheck.h
 src/yang_mills_pot_QbarQ_long.c
+src/yang_mills_string_QbarQ.c

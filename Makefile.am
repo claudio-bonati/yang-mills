@@ -5,7 +5,8 @@ bin_PROGRAMS = conf_check \
                debug_u1 \
                yang_mills_local \
                yang_mills_pot_QbarQ \
-               yang_mills_pot_QbarQ_long
+               yang_mills_pot_QbarQ_long \
+               yang_mills_string_QbarQ
 
 dSFMT = ./include/dSFMT-common.h \
         ./include/dSFMT.h \
@@ -155,6 +156,21 @@ yang_mills_pot_QbarQ_long_SOURCES=./src/yang_mills_pot_QbarQ_long.c \
                                   $(sun) \
                                   $(tens_prod) \
                                   $(u1) 
+
+yang_mills_string_QbarQ_SOURCES=./src/yang_mills_string_QbarQ.c \
+                                $(dSFMT)  \
+                                $(endian) \
+                                $(funcpoint) \
+                                $(gauge_conf) \
+                                $(geometry) \
+                                $(gparam) \
+                                ./include/macro.h \
+                                $(mymalloc) \
+                                $(random) \
+                                $(su2) \
+                                $(sun) \
+                                $(tens_prod) \
+                                $(u1) 
 
 EXTRA_DIST = ./src/input.in 
 

@@ -21,6 +21,10 @@ typedef struct Gauge_Conf {
   TensProd **ml_polycorr_ris;
   TensProd **ml_polycorr_tmp;
 
+  // for the disconnected correlator for string width
+  TensProd ***ml_polyplaq_ris;
+  TensProd ***ml_polyplaq_tmp;
+
   } Gauge_Conf;
 
 
@@ -45,9 +49,9 @@ void compute_md5sum(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                     Gauge_Conf const * const GC,
                     GParam const * const param);
 
-void init_gauge_conf_polycorr(Gauge_Conf *GC,
-                              GParam const * const param);
-void end_gauge_conf_polycorr(Gauge_Conf *GC);
+void init_polycorr(Gauge_Conf *GC,
+                   GParam const * const param);
+void end_polycorr(Gauge_Conf *GC);
 void save_polycorr_on_file(Gauge_Conf const * const GC,
                            GParam const * const param,
                            int tstart,
@@ -59,6 +63,11 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
 void compute_md5sum_polycorr(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                              Gauge_Conf const * const GC,
                              GParam const * const param);
+
+void init_polycorr_and_polyplaq(Gauge_Conf *GC,
+                                GParam const * const param);
+void end_polycorr_and_polyplaq(Gauge_Conf *GC,
+                               GParam const * const param);
 
 // in gauge_conf_meas.c
 double plaquettep(Gauge_Conf const * const restrict GC,
@@ -95,6 +104,10 @@ void perform_measures_pot_QbarQ(Gauge_Conf * GC,
 void perform_measures_pot_QbarQ_long(Gauge_Conf * GC,
                                      GParam const * const param,
                                      FILE *datafilep);
+void perform_measures_string_QbarQ(Gauge_Conf *GC,
+                                   Geometry const * const geo,
+                                   GParam const * const param,
+                                   FILE *datafilep);
 
 
 // in gauge_conf_multilevel.c
@@ -127,6 +140,15 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
                                int t_start,
                                int dt,
                                int iteration);
+void compute_slice0_plaq(Gauge_Conf const * const GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         double **plaq);
+void multilevel_string_QbarQ(Gauge_Conf * GC,
+                             Geometry const * const geo,
+                             GParam const * const param,
+                             int t_start,
+                             int dt);
 
 
 // in gauge_conf_upd.c

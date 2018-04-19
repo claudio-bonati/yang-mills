@@ -30,6 +30,7 @@ typedef struct GParam {
   int d_ml_upd[NLEVELS];
   int d_ml_level0_repeat;
   int d_dist_poly;
+  int d_trasv_dist;
 
   // output file names
   char d_conf_file[STD_STRING_LENGTH];
@@ -55,5 +56,6 @@ void init_data_file(FILE **dataf, GParam const * const param);
 void print_parameters_local(GParam const * const param, time_t time_start, time_t time_end);
 void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_end);
 void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t time_end);
+void print_parameters_string(GParam * param, time_t time_start, time_t time_end);
 
 #endif

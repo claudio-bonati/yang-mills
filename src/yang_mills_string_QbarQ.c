@@ -1,5 +1,5 @@
-#ifndef YM_POT_QBARQ_C
-#define YM_POT_QBARQ_C
+#ifndef YM_STRING_QBARQ_C
+#define YM_STRING_QBARQ_C
 
 #include"../include/macro.h"
 
@@ -63,7 +63,7 @@ void real_main(char *in_file)
     init_gauge_conf(&GC, &param);
 
     // initialize ml_polycorr arrays
-    init_polycorr(&GC, &param);
+    init_polycorr_and_polyplaq(&GC, &param);
 
     // montecarlo
     time(&time1);
@@ -74,7 +74,7 @@ void real_main(char *in_file)
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {
-         perform_measures_pot_QbarQ(&GC, &geo, &param, datafilep);
+         perform_measures_string_QbarQ(&GC, &geo, &param, datafilep);
          }
 
        // save configuration for backup
@@ -103,13 +103,13 @@ void real_main(char *in_file)
       }
 
     // print simulation details
-    print_parameters_polycorr(&param, time1, time2);
+    print_parameters_string(&param, time1, time2);
 
     // free gauge configuration
     end_gauge_conf(&GC, &param);
 
     // free ml_polycorr
-    end_polycorr(&GC);
+    end_polycorr_and_polyplaq(&GC, &param);
 
     // free geometry
     free_geometry(&geo, &param);
@@ -148,6 +148,7 @@ void print_template_input(void)
     fprintf(fp, "ml_step          2   # timeslices for multilevel (from largest to smallest)\n");
     fprintf(fp, "ml_upd           10  # number of updates for various levels\n");
     fprintf(fp, "dist_poly        2   # distance between the polyakov loop\n");
+    fprintf(fp, "transv_dist      2   # transverse distance from the polyakov correlator\n");
     fprintf(fp,"\n");
     fprintf(fp, "#output files\n");
     fprintf(fp, "conf_file  conf.dat\n");
@@ -186,14 +187,6 @@ int main (int argc, char **argv)
         printf("\n\tusing OpenMP with %d threads\n", NTHREADS);
       #endif
 
-      #ifdef OPT_MULTIHIT
-        printf("\tcompiled for multihit optimization\n");
-      #endif
-
-      #ifdef OPT_MULTILEVEL
-        printf("\tcompiled for multilevel optimization\n");
-      #endif
-
       printf("\n");
 
       #ifdef __INTEL_COMPILER
@@ -227,3 +220,4 @@ int main (int argc, char **argv)
     }
 
 #endif
+
