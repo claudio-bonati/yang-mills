@@ -187,6 +187,10 @@ int main (int argc, char **argv)
         printf("\n\tusing OpenMP with %d threads\n", NTHREADS);
       #endif
 
+      #ifdef OPT_MULTILEVEL
+        printf("\tcompiled for multilevel optimization\n");
+      #endif
+
       printf("\n");
 
       #ifdef __INTEL_COMPILER

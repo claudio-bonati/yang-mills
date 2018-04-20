@@ -75,6 +75,13 @@ double plaquettep(Gauge_Conf const * const restrict GC,
                   long r,
                   int i,
                   int j);
+double plaquettep_with_multihit(Gauge_Conf const * const restrict GC,
+                                Geometry const * const restrict geo,
+                                GParam const * const restrict param,
+                                long r,
+                                int i,
+                                int j,
+                                int nhit);
 void plaquette(Gauge_Conf const * const restrict GC,
                Geometry const * const restrict geo,
                GParam const * const restrict param,
@@ -89,7 +96,7 @@ void perform_measures_localobs(Gauge_Conf const * const restrict GC,
                                Geometry const * const restrict geo,
                                GParam const * const restrict param,
                                FILE *datafilep);
-void optimize_multihit(Gauge_Conf *GC,
+void optimize_multihit_polycorr(Gauge_Conf *GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        FILE *datafilep);
@@ -102,6 +109,10 @@ void perform_measures_pot_QbarQ(Gauge_Conf * GC,
                                 GParam const * const param,
                                 FILE *datafilep);
 void perform_measures_pot_QbarQ_long(Gauge_Conf * GC,
+                                     GParam const * const param,
+                                     FILE *datafilep);
+void optimize_multilevel_stringQbarQ(Gauge_Conf *GC,
+                                     Geometry const * const geo,
                                      GParam const * const param,
                                      FILE *datafilep);
 void perform_measures_string_QbarQ(Gauge_Conf *GC,
@@ -140,7 +151,7 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
                                int t_start,
                                int dt,
                                int iteration);
-void compute_slice0_plaq(Gauge_Conf const * const GC,
+void compute_plaq_on_slice1(Gauge_Conf const * const GC,
                          Geometry const * const geo,
                          GParam const * const param,
                          double **plaq);

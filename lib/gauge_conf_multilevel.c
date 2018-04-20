@@ -567,11 +567,11 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
   } // end of multilevel
 
 
-// compute plaquettes in the slice 0
-void compute_slice0_plaq(Gauge_Conf const * const GC,
-                         Geometry const * const geo,
-                         GParam const * const param,
-                         double **plaq)
+// compute plaquettes on the t=1 time slice
+void compute_plaq_on_slice1(Gauge_Conf const * const GC,
+                            Geometry const * const geo,
+                            GParam const * const param,
+                            double **plaq)
   {
   int i, j, tmp;
   long r, r4;
@@ -582,12 +582,12 @@ void compute_slice0_plaq(Gauge_Conf const * const GC,
   for(r=0; r<param->d_space_vol; r++)
      {
      tmp=0;
-     r4=sisp_and_t_to_si(r, 0, param),
+     r4=sisp_and_t_to_si(r, 1, param); // t=1
 
      i=0;
      for(j=1; j<STDIM; j++)
         {
-        plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
+        plaq[r][tmp]=plaquettep_with_multihit(GC, geo, param, r4, i, j, param->d_multihit);
         tmp++;
         }
 
@@ -595,10 +595,24 @@ void compute_slice0_plaq(Gauge_Conf const * const GC,
         {
         for(j=i+1; j<STDIM; j++)
            {
-           plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
+           if(param->d_ml_step[NLEVELS-1]!=1)
+             {
+             plaq[r][tmp]=plaquettep_with_multihit(GC, geo, param, r4, i, j, param->d_multihit);
+             }
+           else
+             {
+             plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
+             }
            tmp++;
            }
         }
+     #ifdef DEBUG
+     if(tmp!=STDIM*(STDIM-1)/2)
+       {
+       fprintf(stderr, "Error in computation of the plaquettes in multilevel (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     #endif
      }
   }
 
@@ -705,9 +719,9 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
                             dt,
                             loc_poly);
 
-         if(t_start==0)
+         if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
            {
-           compute_slice0_plaq(GC, geo, param, loc_plaq);
+           compute_plaq_on_slice1(GC, geo, param, loc_plaq);
            }
 
          // compute the tensor products
@@ -729,7 +743,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
 
             plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &TP);
 
-            if(t_start==0)
+            if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
               {
               r1=sisp_and_t_to_si(r, 0, param);
               for(i=0; i<param->d_dist_poly/2; i++) r1=nnp(geo, r1, 1);

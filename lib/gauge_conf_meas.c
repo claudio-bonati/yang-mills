@@ -18,6 +18,7 @@
 #include"../include/mymalloc.h"
 #include"../include/tens_prod.h"
 
+
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
 double plaquettep(Gauge_Conf const * const restrict GC,
                   Geometry const * const restrict geo,
@@ -39,6 +40,38 @@ double plaquettep(Gauge_Conf const * const restrict GC,
 //
 
    equal(&matrix, &(GC->lattice[nnp(geo, r, j)][i]));
+   times_equal_dag(&matrix, &(GC->lattice[nnp(geo, r, i)][j]));
+   times_equal_dag(&matrix, &(GC->lattice[r][i]));
+   times_equal(&matrix, &(GC->lattice[r][j]));
+
+   return retr(&matrix);
+   }
+
+
+// computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
+// using also multihit
+double plaquettep_with_multihit(Gauge_Conf const * const restrict GC,
+                                Geometry const * const restrict geo,
+                                GParam const * const restrict param,
+                                long r,
+                                int i,
+                                int j,
+                                int nhit)
+   {
+   GAUGE_GROUP matrix;
+
+//
+//       ^ i
+//       |   (2)
+//       +---<---+
+//       |       |
+//   (3) V       ^ (1)
+//       |       |
+//       +--->---+---> j
+//       r   (4)
+//
+
+   multihit(GC, geo, param, nnp(geo, r, j), i, nhit, &matrix);
    times_equal_dag(&matrix, &(GC->lattice[nnp(geo, r, i)][j]));
    times_equal_dag(&matrix, &(GC->lattice[r][i]));
    times_equal(&matrix, &(GC->lattice[r][j]));
@@ -297,10 +330,10 @@ void perform_measures_localobs(Gauge_Conf const * const restrict GC,
 
 
 // to optimize the number of hits to be used in multilevel
-void optimize_multihit(Gauge_Conf *GC,
-                       Geometry const * const geo,
-                       GParam const * const param,
-                       FILE *datafilep)
+void optimize_multihit_polycorr(Gauge_Conf *GC,
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                FILE *datafilep)
   {
   const int max_hit=50;
   const int dir=1;
@@ -490,7 +523,7 @@ void perform_measures_pot_QbarQ(Gauge_Conf *GC,
    #endif
 
    #ifdef OPT_MULTIHIT
-     optimize_multihit(GC, geo, param, datafilep);
+     optimize_multihit_polycorr(GC, geo, param, datafilep);
    #endif
 
    #ifdef OPT_MULTILEVEL
@@ -519,45 +552,107 @@ void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
    }
 
 
+// to optimize the multilevel for stringwidth
+void optimize_multilevel_stringQbarQ(Gauge_Conf *GC,
+                                     Geometry const * const geo,
+                                     GParam const * const param,
+                                     FILE *datafilep)
+   {
+   int i;
+   long r;
+   double poly_std, poly_average;
+   double *poly_array;
+
+   poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double));
+
+   fprintf(datafilep, "Multilevel optimization for level1 of the multithit: ");
+   fprintf(datafilep, "the smaller the value the better the update\n");
+
+   multilevel_pot_QbarQ(GC,
+                        geo,
+                        param,
+                        0,
+                        param->d_size[0]);
+
+   // polyakov loop correlator
+   poly_average=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      poly_array[r]-=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][0]));
+
+      poly_average+=poly_array[r];
+      }
+   poly_average*=param->d_inv_space_vol;
+
+   poly_std=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_std+=(poly_average-poly_array[r])*(poly_average-poly_array[r]);
+      }
+   poly_std*=param->d_inv_space_vol;
+   poly_std*=param->d_inv_space_vol;
+
+   for(i=0; i<NLEVELS; i++)
+      {
+      poly_std*=(double) param->d_ml_upd[i];
+      }
+
+   fprintf(datafilep, "%.6g ", poly_std);
+   for(i=0; i<NLEVELS; i++)
+      {
+      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
+      }
+   fprintf(datafilep, "\n");
+
+   fflush(datafilep);
+
+   free(poly_array);
+   }
+
+
 // perform the computation of the polyakov loop correlator with the multilevel algorithm
 void perform_measures_string_QbarQ(Gauge_Conf *GC,
                                    Geometry const * const geo,
                                    GParam const * const param,
                                    FILE *datafilep)
    {
-   int i;
-   const int numplaqs=(STDIM*(STDIM-1))/2;
-   double ris;
-   long r;
+   #ifdef OPT_MULTILEVEL
+     optimize_multilevel_stringQbarQ(GC, geo, param, datafilep);
+   #else
+     int i;
+     const int numplaqs=(STDIM*(STDIM-1))/2;
+     double ris;
+     long r;
 
-   (void) geo;
-   multilevel_string_QbarQ(GC,
-                           geo,
-                           param,
-                           0,
-                           param->d_size[0]);
+     multilevel_string_QbarQ(GC,
+                             geo,
+                             param,
+                             0,
+                             param->d_size[0]);
 
-   ris=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
-      }
-   ris*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g ", ris);
+     ris=0.0;
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+        }
+     ris*=param->d_inv_space_vol;
+     fprintf(datafilep, "%.12g ", ris);
 
-   for(i=0; i<numplaqs; i++)
-      {
-      ris=0.0;
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         ris+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
-         }
-      ris*=param->d_inv_space_vol;
-      fprintf(datafilep, "%.12g ", ris);
-      }
-   fprintf(datafilep, "\n");
+     for(i=0; i<numplaqs; i++)
+        {
+        ris=0.0;
+        for(r=0; r<param->d_space_vol; r++)
+           {
+           ris+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
+           }
+        ris*=param->d_inv_space_vol;
+        fprintf(datafilep, "%.12g ", ris);
+        }
+     fprintf(datafilep, "\n");
 
-   fflush(datafilep);
+     fflush(datafilep);
+   #endif
    }
 
 
