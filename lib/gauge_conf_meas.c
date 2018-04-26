@@ -449,7 +449,7 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
 
    poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double));
 
-   fprintf(datafilep, "Multilevel optimization for level1 of the multithit: ");
+   fprintf(datafilep, "Multilevel optimization: ");
    fprintf(datafilep, "the smaller the value the better the update\n");
 
    multilevel_pot_QbarQ(GC,
@@ -565,7 +565,7 @@ void optimize_multilevel_stringQbarQ(Gauge_Conf *GC,
 
    poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double));
 
-   fprintf(datafilep, "Multilevel optimization for level1 of the multithit: ");
+   fprintf(datafilep, "Multilevel optimization: ");
    fprintf(datafilep, "the smaller the value the better the update\n");
 
    multilevel_pot_QbarQ(GC,
