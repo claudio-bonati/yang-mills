@@ -573,21 +573,23 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
                             GParam const * const param,
                             double **plaq)
   {
-  int i, j, tmp;
-  long r, r4;
+  long r;
 
   #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r, r4, i, j, tmp)
+  #pragma omp parallel for num_threads(NTHREADS) private(r)
   #endif
   for(r=0; r<param->d_space_vol; r++)
      {
+     int i, j, tmp;
+     long r4;
+
      tmp=0;
      r4=sisp_and_t_to_si(r, 1, param); // t=1
 
      i=0;
      for(j=1; j<STDIM; j++)
         {
-        plaq[r][tmp]=plaquettep_with_multihit(GC, geo, param, r4, i, j, param->d_multihit);
+        plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
         tmp++;
         }
 
@@ -595,14 +597,7 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
         {
         for(j=i+1; j<STDIM; j++)
            {
-           if(param->d_ml_step[NLEVELS-1]!=1)
-             {
-             plaq[r][tmp]=plaquettep_with_multihit(GC, geo, param, r4, i, j, param->d_multihit);
-             }
-           else
-             {
-             plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
-             }
+           plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
            tmp++;
            }
         }
@@ -617,7 +612,7 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
   }
 
 
-// multilevel for polyakov QbarQ correlator
+// multilevel for polyakov string width of QbarQ
 void multilevel_string_QbarQ(Gauge_Conf * GC,
                              Geometry const * const geo,
                              GParam const * const param,
@@ -658,7 +653,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
     case -1 :     // LEVEL -1, do not average
       // initialyze ml_polycorr_ris[0] and ml_polyplaq_ris[0] to 1
       #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #pragma omp parallel for num_threads(NTHREADS) private(r, i)
       #endif
       for(r=0; r<param->d_space_vol; r++)
          {
@@ -706,6 +701,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
 
          // compute Polyakov loop and plaquettes restricted to the slice
          GAUGE_GROUP *loc_poly = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(GAUGE_GROUP));
+
          double **loc_plaq=(double**) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double*));
          for(r=0; r<param->d_space_vol; r++)
             {

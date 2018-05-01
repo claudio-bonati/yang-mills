@@ -48,38 +48,6 @@ double plaquettep(Gauge_Conf const * const restrict GC,
    }
 
 
-// computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
-// using also multihit
-double plaquettep_with_multihit(Gauge_Conf const * const restrict GC,
-                                Geometry const * const restrict geo,
-                                GParam const * const restrict param,
-                                long r,
-                                int i,
-                                int j,
-                                int nhit)
-   {
-   GAUGE_GROUP matrix;
-
-//
-//       ^ i
-//       |   (2)
-//       +---<---+
-//       |       |
-//   (3) V       ^ (1)
-//       |       |
-//       +--->---+---> j
-//       r   (4)
-//
-
-   multihit(GC, geo, param, nnp(geo, r, j), i, nhit, &matrix);
-   times_equal_dag(&matrix, &(GC->lattice[nnp(geo, r, i)][j]));
-   times_equal_dag(&matrix, &(GC->lattice[r][i]));
-   times_equal(&matrix, &(GC->lattice[r][j]));
-
-   return retr(&matrix);
-   }
-
-
 // compute the mean plaquettes (spatial, temporal)
 void plaquette(Gauge_Conf const * const restrict GC,
                Geometry const * const restrict geo,

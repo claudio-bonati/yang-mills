@@ -75,13 +75,6 @@ double plaquettep(Gauge_Conf const * const restrict GC,
                   long r,
                   int i,
                   int j);
-double plaquettep_with_multihit(Gauge_Conf const * const restrict GC,
-                                Geometry const * const restrict geo,
-                                GParam const * const restrict param,
-                                long r,
-                                int i,
-                                int j,
-                                int nhit);
 void plaquette(Gauge_Conf const * const restrict GC,
                Geometry const * const restrict geo,
                GParam const * const restrict param,
