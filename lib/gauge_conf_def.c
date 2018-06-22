@@ -195,7 +195,7 @@ void end_gauge_conf(Gauge_Conf *GC, GParam const * const param)
 
 
 // save a configuration in ILDG-like format
-void save_on_file_with_name(Gauge_Conf const * const GC,
+void write_conf_on_file_with_name(Gauge_Conf const * const GC,
                             GParam const * const param,
                             char const * const namefile)
   {
@@ -250,13 +250,13 @@ void save_on_file_with_name(Gauge_Conf const * const GC,
   }
 
 
-void save_on_file(Gauge_Conf const * const GC, GParam const * const param)
+void write_conf_on_file(Gauge_Conf const * const GC, GParam const * const param)
   {
-  save_on_file_with_name(GC, param, param->d_conf_file);
+  write_conf_on_file_with_name(GC, param, param->d_conf_file);
   }
 
 
-void save_on_file_back(Gauge_Conf const * const GC, GParam const * const param)
+void write_conf_on_file_back(Gauge_Conf const * const GC, GParam const * const param)
   {
   char name[STD_STRING_LENGTH], aux[STD_STRING_LENGTH];
   static int counter=0;
@@ -272,7 +272,7 @@ void save_on_file_back(Gauge_Conf const * const GC, GParam const * const param)
     }
   strcat(name, aux);
 
-  save_on_file_with_name(GC, param, name);
+  write_conf_on_file_with_name(GC, param, name);
 
   counter=1-counter;
   }
@@ -424,7 +424,7 @@ void end_polycorr(Gauge_Conf *GC)
 
 
 // save ml_polycorr[0] arrays on file
-void save_polycorr_on_file(Gauge_Conf const * const GC,
+void write_polycorr_on_file(Gauge_Conf const * const GC,
                            GParam const * const param,
                            int tstart,
                            int iteration)

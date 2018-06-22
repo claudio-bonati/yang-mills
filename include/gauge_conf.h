@@ -35,12 +35,12 @@ void read_gauge_conf(Gauge_Conf *GC,
                      GParam const * const param);
 void end_gauge_conf(Gauge_Conf *GC,
                     GParam const * const param);
-void save_on_file_with_name(Gauge_Conf const * const GC,
-                            GParam const * const param,
-                            char const * const namefile);
-void save_on_file(Gauge_Conf const * const GC,
-                  GParam const * const param);
-void save_on_file_back(Gauge_Conf const * const GC,
+void write_conf_on_file_with_name(Gauge_Conf const * const GC,
+                                  GParam const * const param,
+                                  char const * const namefile);
+void write_conf_on_file(Gauge_Conf const * const GC,
+                        GParam const * const param);
+void write_conf_on_file_back(Gauge_Conf const * const GC,
                        GParam const * const param);
 void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC1,
                                      Gauge_Conf const * const GC2,
@@ -52,10 +52,10 @@ void compute_md5sum(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
 void init_polycorr(Gauge_Conf *GC,
                    GParam const * const param);
 void end_polycorr(Gauge_Conf *GC);
-void save_polycorr_on_file(Gauge_Conf const * const GC,
-                           GParam const * const param,
-                           int tstart,
-                           int iteration);
+void write_polycorr_on_file(Gauge_Conf const * const GC,
+                            GParam const * const param,
+                            int tstart,
+                            int iteration);
 void read_polycorr_from_file(Gauge_Conf const * const GC,
                              GParam const * const param,
                              int *tstart,

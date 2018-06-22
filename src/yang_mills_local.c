@@ -71,10 +71,10 @@ void real_main(char *in_file)
          if(count % param.d_saveconf_back_every == 0 )
            {
            // simple
-           save_on_file(&GC, &param);
+           write_conf_on_file(&GC, &param);
 
            // backup copy
-           save_on_file_back(&GC, &param);
+           write_conf_on_file_back(&GC, &param);
            }
          }
 
@@ -86,7 +86,7 @@ void real_main(char *in_file)
            strcpy(name, param.d_conf_file);
            sprintf(aux, "%ld", GC.update_index);
            strcat(name, aux);
-           save_on_file_with_name(&GC, &param, name);
+           write_conf_on_file_with_name(&GC, &param, name);
            }
          }
        }
@@ -99,7 +99,7 @@ void real_main(char *in_file)
     // save configuration
     if(param.d_saveconf_back_every!=0)
       {
-      save_on_file(&GC, &param);
+      write_conf_on_file(&GC, &param);
       }
 
     // print simulation details

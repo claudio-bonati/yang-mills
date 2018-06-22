@@ -75,12 +75,12 @@ void real_main(char *in_file)
          }
 
       // save configuration
-      save_on_file(&GC, &param);
+      write_conf_on_file(&GC, &param);
       // backup copy
-      save_on_file_back(&GC, &param);
+      write_conf_on_file_back(&GC, &param);
 
       // save ml polycorr arrays
-      save_polycorr_on_file(&GC, &param, 0, 0);
+      write_polycorr_on_file(&GC, &param, 0, 0);
       }
     else // CONTINUATION OF PREVIOUS SIMULATION
       {
@@ -97,12 +97,12 @@ void real_main(char *in_file)
            }
 
         // save configuration
-        save_on_file(&GC, &param);
+        write_conf_on_file(&GC, &param);
         // backup copy
-        save_on_file_back(&GC, &param);
+        write_conf_on_file_back(&GC, &param);
 
         // save multilevel stuff
-        save_polycorr_on_file(&GC, &param, 0, 0);
+        write_polycorr_on_file(&GC, &param, 0, 0);
         }
       else // tstart>=0, perform multilevel
         {
@@ -129,7 +129,7 @@ void real_main(char *in_file)
           }
 
         // save multilevel stuff
-        save_polycorr_on_file(&GC, &param, tstart, iteration);
+        write_polycorr_on_file(&GC, &param, tstart, iteration);
         }
       }
     time(&time2);
@@ -141,7 +141,7 @@ void real_main(char *in_file)
     // save configuration
     if(param.d_saveconf_back_every!=0)
       {
-      save_on_file(&GC, &param);
+      write_conf_on_file(&GC, &param);
       }
 
     // print simulation details
