@@ -175,10 +175,6 @@ int main (int argc, char **argv)
       printf("\tINT_ALIGN: %s\n", QUOTEME(INT_ALIGN));
       printf("\tDOUBLE_ALIGN: %s\n", QUOTEME(DOUBLE_ALIGN));
 
-      #ifdef DEBUG
-        printf("\n\tDEBUG mode\n");
-      #endif
-
       return EXIT_SUCCESS;
       }
     else
