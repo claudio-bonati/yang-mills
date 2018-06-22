@@ -237,6 +237,14 @@ void update(Gauge_Conf * restrict GC,
    long r;
    int j, dir;
 
+   #ifdef OPENMP_MODE
+   if(geo->indexing_type!=0)
+     {
+     fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
    // heatbath
    for(dir=0; dir<STDIM; dir++)
       {

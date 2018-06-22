@@ -5,9 +5,6 @@
 
 #include<malloc.h>
 #include<math.h>
-#ifdef OPENMP_MODE
-  #include<omp.h>
-#endif
 #include<stdio.h>
 #include<stdlib.h>
 
@@ -323,30 +320,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
      time(&time1);
 
      // polyakov loop computation
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r, i, matrix, tmp)
-     #endif
-     for(r=0; r<param->d_space_vol/2; r++)
-        {
-        one(&matrix);
-        for(i=0; i<param->d_size[0]; i++)
-           {
-           multihit(GC,
-                    geo,
-                    param,
-                    sisp_and_t_to_si(r, i, param),
-                    0,
-                    mh,
-                    &tmp);
-           times_equal(&matrix, &tmp);
-           }
-        poly_array[r]=retr(&matrix);
-        }
-
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r, i, matrix, tmp)
-     #endif
-     for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
+     for(r=0; r<param->d_space_vol; r++)
         {
         one(&matrix);
         for(i=0; i<param->d_size[0]; i++)

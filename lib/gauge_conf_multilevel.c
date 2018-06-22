@@ -74,26 +74,7 @@ void compute_local_poly(Gauge_Conf const * const GC,
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(r, i, matrix)
   #endif
-  for(r=0; r<param->d_space_vol/2; r++)
-     {
-     one(&(loc_poly[r]));
-     for(i=0; i<dt; i++)
-        {
-        multihit(GC,
-                 geo,
-                 param,
-                 sisp_and_t_to_si(r, t_start+i, param),
-                 0,
-                 num_hit,
-                 &matrix);
-        times_equal(&(loc_poly[r]), &matrix);
-        }
-     }
-
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r, i, matrix)
-  #endif
-  for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
+  for(r=0; r<param->d_space_vol; r++)
      {
      one(&(loc_poly[r]));
      for(i=0; i<dt; i++)
@@ -120,6 +101,14 @@ void slice_single_update(Gauge_Conf * GC,
   {
   long r;
   int i, dir, upd_over;
+
+  #ifdef OPENMP_MODE
+  if(geo->indexing_type!=0)
+    {
+    fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
 
   // heatbath
   #ifdef OPENMP_MODE
