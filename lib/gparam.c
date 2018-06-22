@@ -18,7 +18,7 @@ void remove_white_line_and_comments(FILE *input)
   int temp_i;
 
   temp_i=getc(input);
-  if(temp_i=='\n' || temp_i==' ' || temp_i=='\043')
+  if(temp_i=='\n' || temp_i==' ' || temp_i=='\043') // scan for white lines and comments
     {
     ungetc(temp_i, input);
 
@@ -65,7 +65,7 @@ void readinput(char *in_file, GParam *param)
     int err, end=1;
     unsigned int temp_ui;
 
-    // this is to avoin unnecessary checks in case the multilevel is not used
+    // this is to avoid unnecessary checks in case the multilevel is not used
     for(i=0; i<NLEVELS; i++)
        {
        param->d_ml_step[i]=0;
@@ -90,10 +90,6 @@ void readinput(char *in_file, GParam *param)
              printf("err=%d\n", err);
              exit(EXIT_FAILURE);
              }
-
-           // if there is match, copy the value and the next carachter,
-           // to check if it is \n or if there are some comments
-           // see at the end of the "else if"
 
            if(strncmp(str, "size", 4)==0)
              {
