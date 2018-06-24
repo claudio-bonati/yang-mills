@@ -31,6 +31,14 @@ void init_geometry(Geometry *geo, GParam const * const param)
   long r, rm, rp;
   int cartcoord[STDIM];
 
+  #ifdef DEBUG
+  if(param->d_stdim>STDIM)
+    {
+    fprintf(stderr, "param->d_stdim too large: %d > %s (%s, %d)\n", param->d_stdim, QUOTEME(STDIM), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
   // allocate memory
   geo->d_nnp = (long **) mymalloc(INT_ALIGN, (unsigned long) param->d_volume * sizeof(long *));
   if(geo->d_nnp==NULL)
@@ -46,13 +54,13 @@ void init_geometry(Geometry *geo, GParam const * const param)
     }
   for(r=0; r<(param->d_volume); r++)
      {
-     geo->d_nnp[r] = (long *) mymalloc(INT_ALIGN, STDIM * sizeof(long));
+     geo->d_nnp[r] = (long *) mymalloc(INT_ALIGN, (unsigned long int) param->d_stdim * sizeof(long));
      if(geo->d_nnp[r]==NULL)
        {
        fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
        exit(EXIT_FAILURE);
        }
-     geo->d_nnm[r] = (long *) mymalloc(INT_ALIGN, STDIM * sizeof(long));
+     geo->d_nnm[r] = (long *) mymalloc(INT_ALIGN, (unsigned long int) param->d_stdim * sizeof(long));
      if(geo->d_nnm[r]==NULL)
        {
        fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
@@ -65,7 +73,7 @@ void init_geometry(Geometry *geo, GParam const * const param)
      {
      si_to_cart(cartcoord, r, param);
 
-     for(i=0; i<STDIM; i++)
+     for(i=0; i<param->d_stdim; i++)
         {
         value=cartcoord[i];
 
@@ -129,6 +137,15 @@ void test_geometry(Geometry const * const geo, GParam const * const param)
   long si, ris_test, si_bis, sisp;
   int dir, cart[STDIM], cartsp[STDIM-1], t;
 
+  #ifdef DEBUG
+  if(param->d_stdim>STDIM)
+    {
+    fprintf(stderr, "param->d_stdim too large: %d > %s (%s, %d)\n", param->d_stdim, QUOTEME(STDIM), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+
   // test of lex_to_cart <-> cart_to_lex
   for(si=0; si < param->d_volume; si++)
      {
@@ -158,7 +175,7 @@ void test_geometry(Geometry const * const geo, GParam const * const param)
   // test of nnp <-> nnm
   for(si=0; si < param->d_volume; si++)
      {
-     for(dir=0; dir<STDIM; dir++)
+     for(dir=0; dir<param->d_stdim; dir++)
         {
         si_bis=nnp(geo, si, dir);
         ris_test=nnm(geo, si_bis, dir);
@@ -223,14 +240,14 @@ long cart_to_lex(int const * const cartcoord, GParam const * const param)
 
   ris=0;
   aux=1;
-  for(i=STDIM-1; i>=0; i--)
+  for(i=param->d_stdim-1; i>=0; i--)
      {
      ris+=cartcoord[i]*aux;
      aux*=param->d_size[i];
      }
 
-  // ris=cartcoord[STDIM-1] + param->d_size[STDIM-1]*cartcoord[STDIM-2] + ---- +
-  //     + param->d_size[STDIM-1]*..*param->d_size[1]*cartcoord[0]
+  // ris=cartcoord[dim-1] + param->d_size[dim-1]*cartcoord[dim-2] + ---- +
+  //     + param->d_size[dim-1]*..*param->d_size[1]*cartcoord[0]
   // with this convention time is the slowest coordinate
 
   return ris;
@@ -243,13 +260,21 @@ void lex_to_cart(int *cartcoord, long lex, GParam const * const param)
   int i;
   long aux[STDIM];
 
+  #ifdef DEBUG
+  if(param->d_stdim>STDIM)
+    {
+    fprintf(stderr, "param->d_stdim too large: %d > %s (%s, %d)\n", param->d_stdim, QUOTEME(STDIM), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
   aux[0]=param->d_space_vol; // param->d_space_vol = param->d_volume / param->d_size[0]
-  for(i=1; i<STDIM; i++)
+  for(i=1; i<param->d_stdim; i++)
      {
      aux[i]=aux[i-1]/(param->d_size[i]);
      }
 
-  for(i=0; i<STDIM; i++)
+  for(i=0; i<param->d_stdim; i++)
      {
      cartcoord[i]=(int) (lex/aux[i]);
      lex-=aux[i]*cartcoord[i];
@@ -334,6 +359,14 @@ long lex_to_lexeo(long lex, GParam const * const param)
   {
   int cartcoord[STDIM];
 
+  #ifdef DEBUG
+  if(param->d_stdim>STDIM)
+    {
+    fprintf(stderr, "param->d_stdim too large: %d > %s (%s, %d)\n", param->d_stdim, QUOTEME(STDIM), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
   lex_to_cart(cartcoord, lex, param);
 
   return cart_to_lexeo(cartcoord, param);
@@ -354,20 +387,21 @@ long lexeo_to_lex(long lexeo, GParam const * const param)
 // spatial cartesian coordinates -> spatial lexicographic index
 long cartsp_to_lexsp(int const * const ccsp, GParam const * const param)
   {
-  // remembrer that ccsp has length STDIM-2
+  // the index for the spatial cartesian coord. goes from 0 to STDIM-2
+  // hence ccsp[STDIM-1]
   int i;
   long ris, aux;
 
   ris=0;
   aux=1;
-  for(i=STDIM-2; i>=0; i--)
+  for(i=param->d_stdim-2; i>=0; i--)
      {
      ris+=ccsp[i]*aux;
      aux*=param->d_size[i+1];
      }
 
-  // ris=ccsp[STDIM-2] + param->d_size[STDIM-1]*ccsp[STDIM-3] + ---- +
-  //     + param->d_size[STDIM-1]*..*param->d_size[2]*ccsp[0]
+  // ris=ccsp[dim-2] + param->d_size[dim-1]*ccsp[dim-3] + ---- +
+  //     + param->d_size[dim-1]*..*param->d_size[2]*ccsp[0]
 
   return ris;
   }
@@ -379,13 +413,21 @@ void lexsp_to_cartsp(int *ccsp, long lexsp, GParam const * const param)
   int i;
   long aux[STDIM];
 
+  #ifdef DEBUG
+  if(param->d_stdim>STDIM)
+    {
+    fprintf(stderr, "param->d_stdim too large: %d > %s (%s, %d)\n", param->d_stdim, QUOTEME(STDIM), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
   aux[0]=param->d_space_vol;
-  for(i=1; i<STDIM; i++)
+  for(i=1; i<param->d_stdim; i++)
      {
      aux[i]=aux[i-1]/(param->d_size[i]);
      }
 
-  for(i=0; i<STDIM-1; i++)
+  for(i=0; i<param->d_stdim-1; i++)
      {
      ccsp[i]=(int) (lexsp/aux[i+1]);
      lexsp-=aux[i+1]*ccsp[i];
@@ -402,7 +444,7 @@ long cartsp_to_lexeosp(int const * const ccsp, GParam const * const param)
   lexsp=cartsp_to_lexsp(ccsp, param);
 
   eo=0;
-  for(i=0; i<STDIM-1; i++)
+  for(i=0; i<param->d_stdim-1; i++)
      {
      eo+=ccsp[i];
      }
@@ -437,7 +479,7 @@ void lexeosp_to_cartsp(int *ccsp, long lexeosp, GParam const * const param)
     lexsp_to_cartsp(ccsp, lexsp, param);
 
     eo=0;
-    for(i=0; i<STDIM-1; i++)
+    for(i=0; i<param->d_stdim-1; i++)
        {
        eo+=ccsp[i];
        }
@@ -468,11 +510,19 @@ void lexeosp_to_cartsp(int *ccsp, long lexeosp, GParam const * const param)
 // spatial lexicographic index -> spatial lexicographic eo index
 long lexsp_to_lexeosp(long lexsp, GParam const * const param)
   {
-  int ccsop[STDIM];
+  int ccsp[STDIM];
 
-  lexsp_to_cartsp(ccsop, lexsp, param);
+  #ifdef DEBUG
+  if(param->d_stdim>STDIM)
+    {
+    fprintf(stderr, "param->d_stdim too large: %d > %s (%s, %d)\n", param->d_stdim, QUOTEME(STDIM), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
 
-  return cartsp_to_lexeosp(ccsop, param);
+  lexsp_to_cartsp(ccsp, lexsp, param);
+
+  return cartsp_to_lexeosp(ccsp, param);
   }
 
 
@@ -480,6 +530,14 @@ long lexsp_to_lexeosp(long lexsp, GParam const * const param)
 long lexeosp_to_lexsp(long lexeosp, GParam const * const param)
   {
   int ccsp[STDIM];
+
+  #ifdef DEBUG
+  if(param->d_stdim>STDIM)
+    {
+    fprintf(stderr, "param->d_stdim too large: %d > %s (%s, %d)\n", param->d_stdim, QUOTEME(STDIM), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
 
   lexeosp_to_cartsp(ccsp, lexeosp, param);
 
@@ -491,6 +549,14 @@ long lexeosp_to_lexsp(long lexeosp, GParam const * const param)
 long lexeosp_and_t_to_lexeo(long lexeosp, int t, GParam const * const param)
   {
   int cc[STDIM];
+
+  #ifdef DEBUG
+  if(param->d_stdim>STDIM)
+    {
+    fprintf(stderr, "param->d_stdim too large: %d > %s (%s, %d)\n", param->d_stdim, QUOTEME(STDIM), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
 
   lexeosp_to_cartsp(cc+1, lexeosp, param);
   cc[0]=t;
@@ -504,11 +570,19 @@ void lexeo_to_lexeosp_and_t(long *lexeosp, int *t, long lexeo, GParam const * co
   {
   int i, cc[STDIM], ccsp[STDIM-1];
 
+  #ifdef DEBUG
+  if(param->d_stdim>STDIM)
+    {
+    fprintf(stderr, "param->d_stdim too large: %d > %s (%s, %d)\n", param->d_stdim, QUOTEME(STDIM), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
   lexeo_to_cart(cc, lexeo, param);
 
   *t=cc[0];
 
-  for(i=0; i<STDIM-1; i++)
+  for(i=0; i<param->d_stdim-1; i++)
      {
      ccsp[i]=cc[i+1];
      }

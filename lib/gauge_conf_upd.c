@@ -16,20 +16,34 @@
 
 // compute the staple in position r, direction i and save it in M
 void calcstaples_wilson(Gauge_Conf const * const restrict GC,
-                   Geometry const * const restrict geo,
-                   long r,
-                   int i,
-                   GAUGE_GROUP * restrict M)
+                        Geometry const * const restrict geo,
+                        GParam const * const restrict param,
+                        long r,
+                        int i,
+                        GAUGE_GROUP * restrict M)
    {
    int j, l;
    long k;
    GAUGE_GROUP link1, link2, link3, link12, stap;
 
+   #ifdef DEBUG
+   if(r >= param->d_volume)
+     {
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   if(i >= param->d_stdim)
+     {
+     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
    zero(M); // M=0
 
-   for(l=i+1; l<i+STDIM; l++)
+   for(l=i+1; l< i + param->d_stdim; l++)
       {
-      j = (l % STDIM);
+      j = (l % param->d_stdim);
 
 //
 //       i ^
@@ -88,21 +102,21 @@ void heatbath(Gauge_Conf * restrict GC,
                 int i)
    {
    #ifdef DEBUG
-   if(r > param->d_volume)
+   if(r >= param->d_volume)
      {
-     fprintf(stderr, "r too large: %ld > %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
-   if(i > STDIM)
+   if(i >= param->d_stdim)
      {
-     fprintf(stderr, "i too large: i=%d > %s (%s, %d)\n", i, QUOTEME(STDIM), __FILE__, __LINE__);
+     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
    #endif
 
    GAUGE_GROUP stap;
 
-   calcstaples_wilson(GC, geo, r, i, &stap);
+   calcstaples_wilson(GC, geo, param, r, i, &stap);
    single_heatbath(&(GC->lattice[r][i]), &stap, param);
    }
 
@@ -115,14 +129,14 @@ void overrelaxation(Gauge_Conf * restrict GC,
                       int i)
    {
    #ifdef DEBUG
-   if(r > param->d_volume)
+   if(r >= param->d_volume)
      {
-     fprintf(stderr, "r too large: %ld > %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
-   if(i > STDIM)
+   if(i >= param->d_stdim)
      {
-     fprintf(stderr, "i too large: i=%d > %s (%s, %d)\n", i, QUOTEME(STDIM), __FILE__, __LINE__);
+     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
    #endif
@@ -130,21 +144,42 @@ void overrelaxation(Gauge_Conf * restrict GC,
 
    GAUGE_GROUP stap;
 
-   calcstaples_wilson(GC, geo, r, i, &stap);
+   calcstaples_wilson(GC, geo, param, r, i, &stap);
    single_overrelaxation(&(GC->lattice[r][i]), &stap);
    }
 
 
-/*
+
 // compute the four-leaf clover in position r, in the plane i,j and save it in M
-void quadrifoglio(Gauge_Conf const * const GC,
-                  long r,
-                  int j,
-                  int i,
-                  GAUGE_GROUP *M)
+void clover(Gauge_Conf const * const restrict GC,
+            Geometry const * const restrict geo,
+            GParam const * const restrict param,
+            long r,
+            int j,
+            int i,
+            GAUGE_GROUP *M)
    {
    GAUGE_GROUP aux; 
    long k, p;
+
+   if(param->d_stdim!=4)
+     {
+     fprintf(stderr, "Wrong number of dimension! (%d instead of 4) (%s, %d)\n", param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   #ifdef DEBUG
+   if(r >= param->d_volume)
+     {
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   if(j >= param->d_stdim || i >= param->d_stdim)
+     {
+     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
 
    zero(M);
 
@@ -170,38 +205,39 @@ void quadrifoglio(Gauge_Conf const * const GC,
 //
    // avanti-avanti
    equal(&aux, &(GC->lattice[r][j]) );                               // 1
-   times_equal(&aux, &(GC->lattice[nnp(GC->geo, r, j)][i]) );        // 2
-   times_equal_dag(&aux, &(GC->lattice[nnp(GC->geo, r, i)][j]) );    // 3
+   times_equal(&aux, &(GC->lattice[nnp(geo, r, j)][i]) );        // 2
+   times_equal_dag(&aux, &(GC->lattice[nnp(geo, r, i)][j]) );    // 3
    times_equal_dag(&aux, &(GC->lattice[r][i]) );                     // 4
    plus_equal(M, &aux);
  
-   k=nnm(GC->geo, r, i);
+   k=nnm(geo, r, i);
 
    // avanti-indietro
    equal_dag(&aux, &(GC->lattice[k][i]) );                       // 5
    times_equal(&aux, &(GC->lattice[k][j]) );                     // 6
-   times_equal(&aux, &(GC->lattice[nnp(GC->geo, k, j)][i]) );    // 7
+   times_equal(&aux, &(GC->lattice[nnp(geo, k, j)][i]) );    // 7
    times_equal_dag(&aux, &(GC->lattice[r][j]) );                 // 8
    plus_equal(M, &aux);
 
-   p=nnm(GC->geo, r, j);
+   p=nnm(geo, r, j);
 
    // indietro-indietro
    equal_dag(&aux, &(GC->lattice[p][j]) );                           // 9
-   times_equal_dag(&aux, &(GC->lattice[nnm(GC->geo, k, j)][i]) );    // 10
-   times_equal(&aux, &(GC->lattice[nnm(GC->geo, k, j)][j]) );        // 11
+   times_equal_dag(&aux, &(GC->lattice[nnm(geo, k, j)][i]) );    // 10
+   times_equal(&aux, &(GC->lattice[nnm(geo, k, j)][j]) );        // 11
    times_equal(&aux, &(GC->lattice[k][i]) );                         // 12
    plus_equal(M, &aux);
 
    // indietro-avanti
    equal(&aux, &(GC->lattice[r][i]) );                                // 13
-   times_equal_dag(&aux, &(GC->lattice[nnp(GC->geo, p, i)][j]) );     // 14
+   times_equal_dag(&aux, &(GC->lattice[nnp(geo, p, i)][j]) );     // 14
    times_equal_dag(&aux, &(GC->lattice[p][i]) );                      // 15
    times_equal(&aux, &(GC->lattice[p][j]) );                          // 16
    plus_equal(M, &aux);
    }
 
 
+/*
 // compute the antisymmetric part of the four-leaf clover in position r, in the plane i,j and
 // save it in  GC->quadri (------IMPORTANT------: i>j)
 void compute_quadri(Gauge_Conf  *GC,
@@ -246,7 +282,7 @@ void update(Gauge_Conf * restrict GC,
    #endif
 
    // heatbath
-   for(dir=0; dir<STDIM; dir++)
+   for(dir=0; dir<param->d_stdim; dir++)
       {
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -266,7 +302,7 @@ void update(Gauge_Conf * restrict GC,
       }
 
    // overrelax
-   for(dir=0; dir<STDIM; dir++)
+   for(dir=0; dir<param->d_stdim; dir++)
       {
       for(j=0; j<param->d_overrelax; j++)
          {
@@ -294,7 +330,7 @@ void update(Gauge_Conf * restrict GC,
    #endif 
    for(r=0; r<(param->d_volume); r++)
       {
-      for(dir=0; dir<STDIM; dir++)
+      for(dir=0; dir<param->d_stdim; dir++)
          {
          unitarize(&(GC->lattice[r][dir]));
          } 

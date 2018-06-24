@@ -85,6 +85,9 @@ void polyakov(Gauge_Conf const * const restrict GC,
               GParam const * const restrict param,
               double *repoly,
               double *impoly);
+double topcharge(Gauge_Conf const * const restrict GC,
+                 Geometry const * const restrict geo,
+                 GParam const * const restrict param);
 void perform_measures_localobs(Gauge_Conf const * const restrict GC,
                                Geometry const * const restrict geo,
                                GParam const * const restrict param,
@@ -158,6 +161,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
 // in gauge_conf_upd.c
 void calcstaples_wilson(Gauge_Conf const * const restrict GC,
                         Geometry const * const restrict geo,
+                        GParam const * const restrict gparam,
                         long r,
                         int i,
                         GAUGE_GROUP * restrict M);
@@ -171,6 +175,13 @@ void overrelaxation(Gauge_Conf * restrict GC,
                     GParam const * const restrict param,
                     long r,
                     int i);
+void clover(Gauge_Conf const * const restrict GC,
+            Geometry const * const restrict geo,
+            GParam const * const restrict param,
+            long r,
+            int j,
+            int i,
+            GAUGE_GROUP *M);
 void update(Gauge_Conf * restrict GC,
             Geometry const * const restrict geo,
             GParam const * const restrict param);

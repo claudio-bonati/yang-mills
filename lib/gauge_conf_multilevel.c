@@ -31,7 +31,7 @@ void multihit(Gauge_Conf const * const GC,
 
     zero(G);
     equal(&partial, &(GC->lattice[r][dir]));
-    calcstaples_wilson(GC, geo, r, dir, &staple);
+    calcstaples_wilson(GC, geo, param, r, dir, &staple);
 
     for(i=0; i<num_hit; i++)
        {
@@ -123,7 +123,7 @@ void slice_single_update(Gauge_Conf * GC,
 
   for(i=1; i<dt; i++)
      {
-     for(dir=0; dir<STDIM; dir++)
+     for(dir=0; dir<param->d_stdim; dir++)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -152,7 +152,7 @@ void slice_single_update(Gauge_Conf * GC,
 
      for(i=1; i<dt; i++)
         {
-        for(dir=0; dir<STDIM; dir++)
+        for(dir=0; dir<param->d_stdim; dir++)
            {
            #ifdef OPENMP_MODE
            #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -175,7 +175,7 @@ void slice_single_update(Gauge_Conf * GC,
 
   for(i=1; i<dt; i++)
      {
-     for(dir=0; dir<STDIM; dir++)
+     for(dir=0; dir<param->d_stdim; dir++)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -576,22 +576,22 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
      r4=sisp_and_t_to_si(r, 1, param); // t=1
 
      i=0;
-     for(j=1; j<STDIM; j++)
+     for(j=1; j<param->d_stdim; j++)
         {
         plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
         tmp++;
         }
 
-     for(i=1; i<STDIM; i++)
+     for(i=1; i<param->d_stdim; i++)
         {
-        for(j=i+1; j<STDIM; j++)
+        for(j=i+1; j<param->d_stdim; j++)
            {
            plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
            tmp++;
            }
         }
      #ifdef DEBUG
-     if(tmp!=STDIM*(STDIM-1)/2)
+     if(tmp!=param->d_stdim*(param->d_stdim-1)/2)
        {
        fprintf(stderr, "Error in computation of the plaquettes in multilevel (%s, %d)\n", __FILE__, __LINE__);
        exit(EXIT_FAILURE);
@@ -608,7 +608,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
                              int t_start,
                              int dt)
   {
-  const int numplaqs=(STDIM*(STDIM-1))/2;
+  const int numplaqs=(param->d_stdim*(param->d_stdim-1))/2;
   int i, upd;
   long int r;
   int level;

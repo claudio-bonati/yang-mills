@@ -31,7 +31,7 @@ void init_gauge_conf(Gauge_Conf *GC, GParam const * const param)
     }
   for(r=0; r<(param->d_volume); r++)
      {
-     GC->lattice[r] = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, STDIM * sizeof(GAUGE_GROUP));
+     GC->lattice[r] = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (long unsigned int) param->d_stdim * sizeof(GAUGE_GROUP));
      if(GC->lattice[r]==NULL)
        {
        fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
@@ -49,7 +49,7 @@ void init_gauge_conf(Gauge_Conf *GC, GParam const * const param)
 
     for(r=0; r<(param->d_volume); r++)
        {
-       for(j=0; j<STDIM; j++)
+       for(j=0; j<param->d_stdim; j++)
           {
           rand_matrix(&aux2);
           times_equal_real(&aux2, 0.001);
@@ -67,7 +67,7 @@ void init_gauge_conf(Gauge_Conf *GC, GParam const * const param)
 
     for(r=0; r<(param->d_volume); r++)
        {
-       for(j=0; j<STDIM; j++)
+       for(j=0; j<param->d_stdim; j++)
           {
           rand_matrix(&aux1);
           equal(&(GC->lattice[r][j]), &aux1);
@@ -110,14 +110,14 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
       fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_conf_file, __FILE__, __LINE__);
       exit(EXIT_FAILURE);
       }
-    if(dimension != STDIM)
+    if(dimension != param->d_stdim)
       {
-      fprintf(stderr, "The space time dimension of the configuration (%d) does not coincide with the one of the input file (%s)\n",
-              dimension, QUOTEME(STDIM));
+      fprintf(stderr, "The space time dimension of the configuration (%d) does not coincide with the one of the global parameter (%d)\n",
+              dimension, param->d_stdim);
       exit(EXIT_FAILURE);
       }
 
-    for(i=0; i<STDIM; i++)
+    for(i=0; i<param->d_stdim; i++)
        {
        err=fscanf(fp, "%d", &tmp_i);
        if(err!=1)
@@ -127,7 +127,7 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
          }
        if(tmp_i != param->d_size[i])
          {
-         fprintf(stderr, "The size of the configuration lattice does not coincide with the one of the configuration file\n");
+         fprintf(stderr, "The size of the configuration lattice does not coincide with the one of the global parameter\n");
          exit(EXIT_FAILURE);
          }
        }
@@ -160,7 +160,7 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
     for(lex=0; lex<param->d_volume; lex++)
        {
        si=lex_to_si(lex, param);
-       for(mu=0; mu<STDIM; mu++)
+       for(mu=0; mu<param->d_stdim; mu++)
           {
           read_from_binary_file_bigen(fp, &matrix);
 
@@ -220,8 +220,8 @@ void write_conf_on_file_with_name(Gauge_Conf const * const GC,
     }
   else
     {
-    fprintf(fp, "%s ", QUOTEME(STDIM));
-    for(i=0; i<STDIM; i++)
+    fprintf(fp, "%d ", param->d_stdim);
+    for(i=0; i<param->d_stdim; i++)
        {
        fprintf(fp, "%d ", param->d_size[i]);
        }
@@ -240,7 +240,7 @@ void write_conf_on_file_with_name(Gauge_Conf const * const GC,
     for(lex=0; lex<param->d_volume; lex++)
        {
        si=lex_to_si(lex, param);
-       for(mu=0; mu<STDIM; mu++)
+       for(mu=0; mu<param->d_stdim; mu++)
           {
           print_on_binary_file_bigen(fp, &(GC->lattice[si][mu]) );
           }
@@ -293,7 +293,7 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
     }
   for(r=0; r<(param->d_volume); r++)
      {
-     GC->lattice[r] = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, STDIM * sizeof(GAUGE_GROUP));
+     GC->lattice[r] = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (unsigned long int) param->d_stdim * sizeof(GAUGE_GROUP));
      if(GC->lattice[r]==NULL)
        {
        fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
@@ -304,7 +304,7 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
   // initialize GC
   for(r=0; r<(param->d_volume); r++)
      {
-     for(mu=0; mu<STDIM; mu++)
+     for(mu=0; mu<param->d_stdim; mu++)
         {
         equal(&(GC->lattice[r][mu]), &(GC2->lattice[r][mu]) );
         }
@@ -328,7 +328,7 @@ void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const
     for(lex=0; lex<param->d_volume; lex++)
        {
        si=lex_to_si(lex, param);
-       for(mu=0; mu<STDIM; mu++)
+       for(mu=0; mu<param->d_stdim; mu++)
           {
           equal(&matrix, &(GC->lattice[si][mu]));
 
@@ -623,7 +623,7 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
 void init_polycorr_and_polyplaq(Gauge_Conf *GC,
                                 GParam const * const param)
   {
-  const unsigned long numplaq=(STDIM*(STDIM-1))/2;
+  const unsigned long numplaq=(unsigned long) (param->d_stdim*(param->d_stdim-1))/2;
   int i;
   long r;
 

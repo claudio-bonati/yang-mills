@@ -8,6 +8,7 @@
 
 typedef struct GParam {
   // lattice dimensions
+  int d_stdim; // initialized to STDIM in readinput;
   int d_size[STDIM];
 
   // simulation parameters

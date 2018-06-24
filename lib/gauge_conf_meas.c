@@ -62,24 +62,24 @@ void plaquette(Gauge_Conf const * const restrict GC,
    for(r=0; r<(param->d_volume); r++)
       {
       i=0;
-      for(j=1; j<STDIM; j++)
+      for(j=1; j<param->d_stdim; j++)
          {
          pt+=plaquettep(GC, geo, r, i, j);
          }
      
-      for(i=1; i<STDIM; i++)
+      for(i=1; i<param->d_stdim; i++)
          {
-         for(j=i+1; j<STDIM; j++)
+         for(j=i+1; j<param->d_stdim; j++)
             {
             ps+=plaquettep(GC, geo, r, i, j);
             }
          }
       }
 
-   if(STDIM>2)
+   if(param->d_stdim>2)
      {
      ps*=param->d_inv_vol;
-     ps/=((double) STDIM*(STDIM-1)/2-(STDIM-1));
+     ps/=((double) param->d_stdim*(param->d_stdim-1)/2-(param->d_stdim-1));
      }
    else
      {
@@ -87,7 +87,7 @@ void plaquette(Gauge_Conf const * const restrict GC,
      }
 
    pt*=param->d_inv_vol;
-   pt/=((double) STDIM-1);
+   pt/=((double) param->d_stdim-1);
 
    *plaqs=ps;
    *plaqt=pt;
@@ -129,16 +129,22 @@ void polyakov(Gauge_Conf const * const restrict GC,
    }
 
 
-/*
 // compute the topological charge
-double topcharge(Gauge_Conf const * const GC,
-                 GParam const * const param)
+double topcharge(Gauge_Conf const * const restrict GC,
+                 Geometry const * const restrict geo,
+                 GParam const * const restrict param)
    {
    GAUGE_GROUP aux1, aux2, aux3;
    double ris, real1, real2, loc_charge; 
    const double chnorm=1.0/(128.0*PI*PI);
    long r;
    int i, dir[4][4], sign;
+
+   if(param->d_stdim!=4)
+     {
+     fprintf(stderr, "Wrong number of dimension! (%d instead of 4) (%s, %d)\n", param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
 
    dir[1][1] = 1;
    dir[1][2] = 1;
@@ -165,8 +171,8 @@ double topcharge(Gauge_Conf const * const GC,
 
       for(i=1; i<4; i++)
          {
-         quadrifoglio(GC, r, dir[1][i], dir[2][i], &aux1);
-         quadrifoglio(GC, r, dir[3][i], dir[0][i], &aux2);
+         clover(GC, geo, param, r, dir[1][i], dir[2][i], &aux1);
+         clover(GC, geo, param, r, dir[3][i], dir[0][i], &aux2);
 
          times_dag2(&aux3, &aux2, &aux1); // aux3=aux2*(aux1^{dag})
          real1=retr(&aux3)*NCOLOR;
@@ -183,53 +189,7 @@ double topcharge(Gauge_Conf const * const GC,
    return ris;
    }
 
-
-// compute the topological charge density at point "r"
-double topchargedens(Gauge_Conf const * const GC,
-                     long r)
-   {
-   GAUGE_GROUP aux1, aux2, aux3;
-   double real1, real2, loc_charge; 
-   const double chnorm=1.0/(128.0*PI*PI);
-   int dir[4][4], sign, i;
-
-   dir[1][1] = 1;
-   dir[1][2] = 1;
-   dir[1][3] = 1;
-
-   dir[2][1] = 2;
-   dir[2][2] = 3;
-   dir[2][3] = 0;
-
-   dir[3][1] = 3;
-   dir[3][2] = 2;
-   dir[3][3] = 2;
-
-   dir[0][1] = 0;
-   dir[0][2] = 0;
-   dir[0][3] = 3;
-
-   sign=1;
-   loc_charge=0.0;
-
-   for(i=1; i<4; i++)
-      {
-      quadrifoglio(GC, r, dir[1][i], dir[2][i], &aux1);
-      quadrifoglio(GC, r, dir[3][i], dir[0][i], &aux2);
- 
-         times_dag2(&aux3, &aux2, &aux1); // aux3=aux2*(aux1^{dag})
-         real1=retr(&aux3)*NCOLOR;
-
-         times(&aux3, &aux2, &aux1); // aux3=aux2*aux1
-         real2=retr(&aux3)*NCOLOR;
-        
-      loc_charge+=((double) sign*(real1-real2));
-      sign=-sign;
-      }
-   return (loc_charge*chnorm); 
-   }
-
-
+/*
 
 // compute GParam::d_nummeas values of the topological charge after some cooling
 // in the cooling procedure the action at theta=0 is minimized
@@ -563,7 +523,7 @@ void perform_measures_string_QbarQ(Gauge_Conf *GC,
      optimize_multilevel_stringQbarQ(GC, geo, param, datafilep);
    #else
      int i;
-     const int numplaqs=(STDIM*(STDIM-1))/2;
+     const int numplaqs=(param->d_stdim*(param->d_stdim-1))/2;
      double ris;
      long r;
 
