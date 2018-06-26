@@ -139,7 +139,10 @@ void print_template_input(void)
     fprintf(fp,"\n");
     fprintf(fp, "start                   0  # 0=ordered  1=random  2=from saved configuration\n");
     fprintf(fp, "saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates\n");
-    fprintf(fp, "saveconf_analysis_every 5  # if 0 does not save, else save backup configurations every ... updates\n");
+    fprintf(fp, "saveconf_analysis_every 5  # if 0 does not save, else save configurations for analysis every ... updates\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "coolsteps  3     # number of cooling steps to be used\n");
+    fprintf(fp, "coolrepeat 5     # number of times 'coolsteps' are repeated\n");
     fprintf(fp,"\n");
     fprintf(fp, "#output files\n");
     fprintf(fp, "conf_file  conf.dat\n");

@@ -25,6 +25,10 @@ typedef struct GParam {
   int d_saveconf_back_every;
   int d_saveconf_analysis_every;
 
+  // for cooling in measures
+  int d_coolsteps;
+  int d_coolrepeat;
+
   // for multilevel
   int d_multihit;
   int d_ml_step[NLEVELS];

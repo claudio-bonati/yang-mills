@@ -9,7 +9,11 @@ measevery 1
 
 start                   0  # 0=ordered  1=random  2=from saved configuration
 saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates
-saveconf_analysis_every 5  # if 0 does not save, else save backup configurations every ... updates
+saveconf_analysis_every 5  # if 0 does not save, else save configurations for analysis every ... updates
+
+#for cooling measures
+coolsteps  3     # number of cooling steps to be used
+coolrepeat 5     # number of times "coolsteps" are repeated
 
 #for multilevel
 multihit         10  # number of multihit step

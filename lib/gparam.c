@@ -190,6 +190,27 @@ void readinput(char *in_file, GParam *param)
                   param->d_saveconf_analysis_every=temp_i;
                   }
 
+           else if(strncmp(str, "coolsteps", 9)==0)
+                  {
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_coolsteps=temp_i;
+                  }
+           else if(strncmp(str, "coolrepeat", 10)==0)
+                  {
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_coolrepeat=temp_i;
+                  }
+
            else if(strncmp(str, "multihit", 8)==0)
                   {
                   err=fscanf(input, "%d", &temp_i);
@@ -465,6 +486,10 @@ void print_parameters_local(GParam const * const param, time_t time_start, time_
     fprintf(fp, "start:                   %d\n", param->d_start);
     fprintf(fp, "saveconf_back_every:     %d\n", param->d_saveconf_back_every);
     fprintf(fp, "saveconf_analysis_every: %d\n", param->d_saveconf_analysis_every);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "coolsteps:      %d\n", param->d_coolsteps);
+    fprintf(fp, "coolrepeat:     %d\n", param->d_coolrepeat);
     fprintf(fp, "\n");
 
     fprintf(fp, "randseed: %u\n", param->d_randseed);

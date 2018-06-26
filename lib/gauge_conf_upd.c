@@ -267,8 +267,8 @@ void compute_quadri(Gauge_Conf  *GC,
 
 // perform a complete update
 void update(Gauge_Conf * restrict GC,
-              Geometry const * const restrict geo,
-              GParam const * const restrict param)
+            Geometry const * const restrict geo,
+            GParam const * const restrict param)
    {
    long r;
    int j, dir;
@@ -339,19 +339,28 @@ void update(Gauge_Conf * restrict GC,
    GC->update_index++;
    }
 
-/*
+
 // perform n cooling steps minimizing the action at theta=0
 void cooling(Gauge_Conf *GC,
+             Geometry const * const geo,
              GParam const * const param,
              int n)
    {
    long r;
    int i, k;
 
+   #ifdef OPENMP_MODE
+   if(geo->indexing_type!=0)
+     {
+     fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
    for(k=0; k<n; k++)
       {
       // cooling
-      for(i=0; i<4; i++)
+      for(i=0; i<param->d_stdim; i++)
          {
          #ifdef OPENMP_MODE
          #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -359,7 +368,7 @@ void cooling(Gauge_Conf *GC,
          for(r=0; r<(param->d_volume)/2; r++)
             {
             GAUGE_GROUP staple;
-            calcstaples_notopo(GC, r, i, &staple);
+            calcstaples_wilson(GC, geo, param, r, i, &staple);
             cool(&(GC->lattice[r][i]), &staple);  
             }
 
@@ -369,8 +378,8 @@ void cooling(Gauge_Conf *GC,
          for(r=(param->d_volume)/2; r<(param->d_volume); r++)
             {
             GAUGE_GROUP staple;
-            calcstaples_notopo(GC, r, i, &staple);
-            cool(&(GC->lattice[r][i]), &staple);  
+            calcstaples_wilson(GC, geo, param, r, i, &staple);
+            cool(&(GC->lattice[r][i]), &staple);
             }
          }
       }
@@ -381,12 +390,12 @@ void cooling(Gauge_Conf *GC,
    #endif 
    for(r=0; r<(param->d_volume); r++)
       {
-      for(i=0; i<4; i++)
+      for(i=0; i<param->d_stdim; i++)
          {
          unitarize(&(GC->lattice[r][i]));
          } 
       }
    }
-*/
+
 
 #endif

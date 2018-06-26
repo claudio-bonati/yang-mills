@@ -185,5 +185,8 @@ void clover(Gauge_Conf const * const restrict GC,
 void update(Gauge_Conf * restrict GC,
             Geometry const * const restrict geo,
             GParam const * const restrict param);
-
+void cooling(Gauge_Conf *GC,
+             Geometry const * const geo,
+             GParam const * const param,
+             int n);
 #endif

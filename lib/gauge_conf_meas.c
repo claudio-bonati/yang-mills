@@ -189,16 +189,16 @@ double topcharge(Gauge_Conf const * const restrict GC,
    return ris;
    }
 
-/*
 
 // compute GParam::d_nummeas values of the topological charge after some cooling
 // in the cooling procedure the action at theta=0 is minimized
 void topcharge_cooling(Gauge_Conf const * const GC,
+                       Geometry const * const geo,
                        GParam const * const param,
                        double *charge,
                        double *meanplaq)
    {
-   if(param->d_cooling>0)  // if using cooling
+   if(param->d_coolsteps>0)  // if using cooling
      {  
      Gauge_Conf helperconf; 
      double ris, plaqs, plaqt;
@@ -207,14 +207,14 @@ void topcharge_cooling(Gauge_Conf const * const GC,
      init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
      // helperconf is a copy of the configuration
   
-     for(iter=0; iter<(param->d_nummeas); iter++)
+     for(iter=0; iter<(param->d_coolrepeat); iter++)
         {
-        cooling(&helperconf, param, param->d_cooling);
+        cooling(&helperconf, geo, param, param->d_coolsteps);
 
-        ris=topcharge(&helperconf, param);
+        ris=topcharge(&helperconf, geo, param);
         charge[iter]=ris;
 
-        plaquette(&helperconf, param, &plaqs, &plaqt);
+        plaquette(&helperconf, geo, param, &plaqs, &plaqt);
         meanplaq[iter]=0.5*(plaqs+plaqt);
         }
 
@@ -225,10 +225,10 @@ void topcharge_cooling(Gauge_Conf const * const GC,
      double ris, plaqs, plaqt; 
      int iter;
 
-     ris=topcharge(GC, param);
-     plaquette(GC, param, &plaqs, &plaqt);
+     ris=topcharge(GC, geo, param);
+     plaquette(GC, geo, param, &plaqs, &plaqt);
   
-     for(iter=0; iter<(param->d_nummeas); iter++)
+     for(iter=0; iter<(param->d_coolrepeat); iter++)
         {
         charge[iter]=ris;
         meanplaq[iter]=0.5*(plaqs+plaqt);
@@ -236,21 +236,35 @@ void topcharge_cooling(Gauge_Conf const * const GC,
      } 
    }
 
-*/
 
 void perform_measures_localobs(Gauge_Conf const * const restrict GC,
                                Geometry const * const restrict geo,
                                GParam const * const restrict param,
                                FILE *datafilep)
    {
-   double plaqs, plaqt, polyre, polyim;
+   int i;
+   double plaqs, plaqt, polyre, polyim, *charge, *meanplaq, charge_nocooling;
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
+   charge_nocooling=topcharge(GC, geo, param);
 
+   fprintf(datafilep, "%.12lf %.12lf %.12lf %.12lf %.12lf ", plaqs, plaqt, polyre, polyim, charge_nocooling);
 
-   fprintf(datafilep, "%.12lf %.12lf %.12lf %.12lf\n", plaqs, plaqt, polyre, polyim);
+   charge   = (double *) memalign(DOUBLE_ALIGN, (unsigned long) param->d_coolrepeat * sizeof(double));
+   meanplaq = (double *) memalign(DOUBLE_ALIGN, (unsigned long) param->d_coolrepeat * sizeof(double));
+
+   topcharge_cooling(GC, geo, param, charge, meanplaq);
+   for(i=0; i<param->d_coolrepeat; i++)
+      {
+      fprintf(datafilep, "%.12f %.12f ", charge[i], meanplaq[i]);
+      }
+   fprintf(datafilep, "\n");
+
    fflush(datafilep);
+
+   free(charge);
+   free(meanplaq);
    }
 
 
