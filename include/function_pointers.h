@@ -73,6 +73,7 @@ double (*retr)(GAUGE_GROUP const * restrict A);
 double (*imtr)(GAUGE_GROUP const * restrict A);
 
 void (*unitarize)(GAUGE_GROUP * restrict A);
+void (*ta)(GAUGE_GROUP * restrict A);
 void (*taexp)(GAUGE_GROUP * restrict A);
 
 void (*print_on_screen)(GAUGE_GROUP const * const A);

@@ -40,6 +40,7 @@ void init_function_pointers(void)
   retr = &retr_U1;
   imtr = &imtr_U1;
   unitarize = &unitarize_U1;
+  ta = &ta_U1;
   taexp = &taexp_U1;
   print_on_screen = &print_on_screen_U1;
   print_on_file   = &print_on_file_U1;
@@ -78,6 +79,7 @@ void init_function_pointers(void)
   retr = &retr_Su2;
   imtr = &imtr_Su2;
   unitarize = &unitarize_Su2;
+  ta = &ta_Su2;
   taexp = &taexp_Su2;
   print_on_screen = &print_on_screen_Su2;
   print_on_file   = &print_on_file_Su2;
@@ -116,6 +118,7 @@ void init_function_pointers(void)
   retr = &retr_SuN;
   imtr = &imtr_SuN;
   unitarize = &unitarize_SuN;
+  ta = &ta_SuN;
   taexp = &taexp_SuN;
   print_on_screen = &print_on_screen_SuN;
   print_on_file   = &print_on_file_SuN;

@@ -211,6 +211,17 @@ void readinput(char *in_file, GParam *param)
                   param->d_coolrepeat=temp_i;
                   }
 
+           else if(strncmp(str, "gfstep", 6)==0)
+                  {
+                  err=fscanf(input, "%lf", &temp_d);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_gfstep=temp_d;
+                  }
+
            else if(strncmp(str, "multihit", 8)==0)
                   {
                   err=fscanf(input, "%d", &temp_i);
@@ -520,9 +531,9 @@ void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_en
     double diff_sec;
 
     fp=fopen(param->d_log_file, "w");
-    fprintf(fp, "+--------------------------------------------+\n");
-    fprintf(fp, "| Simulation details for yang_mills_polycorr |\n");
-    fprintf(fp, "+--------------------------------------------+\n\n");
+    fprintf(fp, "+---------------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_pot_QbarQ |\n");
+    fprintf(fp, "+---------------------------------------------+\n\n");
 
     #ifdef OPENMP_MODE
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
@@ -596,9 +607,9 @@ void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t ti
     double diff_sec;
 
     fp=fopen(param->d_log_file, "w");
-    fprintf(fp, "+--------------------------------------------+\n");
-    fprintf(fp, "| Simulation details for yang_mills_polycorr |\n");
-    fprintf(fp, "+--------------------------------------------+\n\n");
+    fprintf(fp, "+--------------------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_pot_QbarQ_long |\n");
+    fprintf(fp, "+--------------------------------------------------+\n\n");
 
     #ifdef OPENMP_MODE
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
@@ -665,16 +676,16 @@ void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t ti
 
 
 // print simulation parameters
-void print_parameters_string(GParam * param, time_t time_start, time_t time_end)
+void print_parameters_tube_disc(GParam * param, time_t time_start, time_t time_end)
     {
     FILE *fp;
     int i;
     double diff_sec;
 
     fp=fopen(param->d_log_file, "w");
-    fprintf(fp, "+--------------------------------------------+\n");
-    fprintf(fp, "| Simulation details for yang_mills_polycorr |\n");
-    fprintf(fp, "+--------------------------------------------+\n\n");
+    fprintf(fp, "+---------------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_tube_disc |\n");
+    fprintf(fp, "+---------------------------------------------+\n\n");
 
     #ifdef OPENMP_MODE
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
@@ -719,6 +730,55 @@ void print_parameters_string(GParam * param, time_t time_start, time_t time_end)
     fprintf(fp, "\n");
     fprintf(fp, "dist_poly:   %d\n", param->d_dist_poly);
     fprintf(fp, "transv_dist: %d\n", param->d_trasv_dist);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "randseed: %u\n", param->d_randseed);
+    fprintf(fp, "\n");
+
+    diff_sec = difftime(time_end, time_start);
+    fprintf(fp, "Simulation time: %.3lf seconds\n", diff_sec );
+    fprintf(fp, "\n");
+
+    if(endian()==0)
+      {
+      fprintf(fp, "Little endian machine\n\n");
+      }
+    else
+      {
+      fprintf(fp, "Big endian machine\n\n");
+      }
+
+    fclose(fp);
+    }
+
+
+// print simulation parameters
+void print_parameters_t0(GParam * param, time_t time_start, time_t time_end)
+    {
+    FILE *fp;
+    int i;
+    double diff_sec;
+
+    fp=fopen(param->d_log_file, "w");
+    fprintf(fp, "+--------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_t0 |\n");
+    fprintf(fp, "+--------------------------------------+\n\n");
+
+    #ifdef OPENMP_MODE
+     fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
+    #endif
+
+    fprintf(fp, "number of colors: %d\n", NCOLOR);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", param->d_stdim);
+
+    fprintf(fp, "lattice: %d", param->d_size[0]);
+    for(i=1; i<param->d_stdim; i++)
+       {
+       fprintf(fp, "x%d", param->d_size[i]);
+       }
+    fprintf(fp, "\n\n");
+
+    fprintf(fp, "gfstep:    %lf\n", param->d_gfstep);
     fprintf(fp, "\n");
 
     fprintf(fp, "randseed: %u\n", param->d_randseed);

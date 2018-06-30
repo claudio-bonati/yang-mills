@@ -25,6 +25,19 @@ double plaquettep(Gauge_Conf const * const GC,
    {
    GAUGE_GROUP matrix;
 
+   #ifdef DEBUG
+   if(r >= param->d_volume)
+     {
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   if(j >= param->d_stdim || i >= param->d_stdim)
+     {
+     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
 //
 //       ^ i
 //       |   (2)
@@ -42,6 +55,89 @@ double plaquettep(Gauge_Conf const * const GC,
    times_equal(&matrix, &(GC->lattice[r][j]));
 
    return retr(&matrix);
+   }
+
+
+// compute the four-leaf clover in position r, in the plane i,j and save it in M
+void clover(Gauge_Conf const * const restrict GC,
+            Geometry const * const geo,
+            GParam const * const param,
+            long r,
+            int j,
+            int i,
+            GAUGE_GROUP * restrict M)
+   {
+   GAUGE_GROUP aux;
+   long k, p;
+
+   #ifdef DEBUG
+   if(r >= param->d_volume)
+     {
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   if(j >= param->d_stdim || i >= param->d_stdim)
+     {
+     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #else
+   (void) param;
+   #endif
+
+   zero(M);
+
+//
+//                   i ^
+//                     |
+//             (14)    |     (3)
+//         +-----<-----++-----<-----+
+//         |           ||           |
+//         |           ||           |
+//   (15)  V      (13) ^V (4)       ^ (2)
+//         |           ||           |
+//         |   (16)    || r   (1)   |
+//    p    +----->-----++----->-----+------>   j
+//         +-----<-----++-----<-----+
+//         |    (9)    ||   (8)     |
+//         |           ||           |
+//    (10) V      (12) ^V (5)       ^ (7)
+//         |           ||           |
+//         |           ||           |
+//         +------>----++----->-----+
+//              (11)   k      (6)
+//
+   // avanti-avanti
+   equal(&aux, &(GC->lattice[r][j]) );                               // 1
+   times_equal(&aux, &(GC->lattice[nnp(geo, r, j)][i]) );        // 2
+   times_equal_dag(&aux, &(GC->lattice[nnp(geo, r, i)][j]) );    // 3
+   times_equal_dag(&aux, &(GC->lattice[r][i]) );                     // 4
+   plus_equal(M, &aux);
+
+   k=nnm(geo, r, i);
+
+   // avanti-indietro
+   equal_dag(&aux, &(GC->lattice[k][i]) );                       // 5
+   times_equal(&aux, &(GC->lattice[k][j]) );                     // 6
+   times_equal(&aux, &(GC->lattice[nnp(geo, k, j)][i]) );    // 7
+   times_equal_dag(&aux, &(GC->lattice[r][j]) );                 // 8
+   plus_equal(M, &aux);
+
+   p=nnm(geo, r, j);
+
+   // indietro-indietro
+   equal_dag(&aux, &(GC->lattice[p][j]) );                           // 9
+   times_equal_dag(&aux, &(GC->lattice[nnm(geo, k, j)][i]) );    // 10
+   times_equal(&aux, &(GC->lattice[nnm(geo, k, j)][j]) );        // 11
+   times_equal(&aux, &(GC->lattice[k][i]) );                         // 12
+   plus_equal(M, &aux);
+
+   // indietro-avanti
+   equal(&aux, &(GC->lattice[r][i]) );                                // 13
+   times_equal_dag(&aux, &(GC->lattice[nnp(geo, p, i)][j]) );     // 14
+   times_equal_dag(&aux, &(GC->lattice[p][i]) );                      // 15
+   times_equal(&aux, &(GC->lattice[p][j]) );                          // 16
+   plus_equal(M, &aux);
    }
 
 
@@ -93,6 +189,40 @@ void plaquette(Gauge_Conf const * const GC,
    *plaqt=pt;
    }
 
+
+// compute the clover discretization of
+// 1/2 Tr(F_{\mu\nu}F_{\mu\nu})
+void clover_disc_energy(Gauge_Conf const * const GC,
+                        Geometry const * const geo,
+                        GParam const * const param,
+                        double *energy)
+  {
+  long r;
+  int i, j;
+  double ris;
+  GAUGE_GROUP aux1, aux2;
+
+  ris=0;
+  for(r=0; r<param->d_volume; r++)
+     {
+     for(i=0; i<param->d_stdim; i++)
+        {
+        for(j=i+1; j<param->d_stdim; j++)
+           {
+           clover(GC, geo, param, r, i, j, &aux1);
+
+           equal_dag(&aux2, &aux1);
+           minus_equal(&aux1, &aux2);
+
+           equal(&aux2, &aux1);
+           times_equal(&aux1, &aux2);
+
+           ris+=-NCOLOR*retr(&aux1)/64.0/2.0;
+           }
+        }
+     }
+  *energy=ris*param->d_inv_vol;
+  }
 
 // compute the mean Polyakov loop (the trace of)
 void polyakov(Gauge_Conf const * const GC,
@@ -469,10 +599,10 @@ void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
 
 
 // to optimize the multilevel for stringwidth
-void optimize_multilevel_stringQbarQ(Gauge_Conf *GC,
-                                     Geometry const * const geo,
-                                     GParam const * const param,
-                                     FILE *datafilep)
+void optimize_multilevel_tube_disc(Gauge_Conf *GC,
+                                   Geometry const * const geo,
+                                   GParam const * const param,
+                                   FILE *datafilep)
    {
    int i;
    long r;
@@ -528,13 +658,13 @@ void optimize_multilevel_stringQbarQ(Gauge_Conf *GC,
 
 
 // perform the computation of the polyakov loop correlator with the multilevel algorithm
-void perform_measures_string_QbarQ(Gauge_Conf *GC,
+void perform_measures_tube_disc(Gauge_Conf *GC,
                                    Geometry const * const geo,
                                    GParam const * const param,
                                    FILE *datafilep)
    {
    #ifdef OPT_MULTILEVEL
-     optimize_multilevel_stringQbarQ(GC, geo, param, datafilep);
+     optimize_multilevel_tube_disc(GC, geo, param, datafilep);
    #else
      int i;
      const int numplaqs=(param->d_stdim*(param->d_stdim-1))/2;

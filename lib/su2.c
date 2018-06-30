@@ -949,6 +949,28 @@ void unitarize_Su2(Su2 * restrict A)
   A->comp[3]*=p;
   }
 
+
+// traceless antihermitian part
+void ta_Su2(Su2 * restrict A)
+  {
+  #ifdef MEMALIGN_MODE
+    #ifdef DEBUG
+      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
+    #endif
+
+    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
+    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
+    #else
+      #ifdef __INTEL_COMPILER
+       __assume_aligned(A, DOUBLE_ALIGN);
+      #endif
+    #endif
+  #endif
+
+  A->comp[0]=0;
+  }
+
+
 // exponential of the traceless antihermitian part
 void taexp_Su2(Su2 * restrict A)
   {

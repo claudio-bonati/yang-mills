@@ -29,6 +29,9 @@ typedef struct GParam {
   int d_coolsteps;
   int d_coolrepeat;
 
+  // for gradient-flow evolution
+  double d_gfstep;
+
   // for multilevel
   int d_multihit;
   int d_ml_step[NLEVELS];
@@ -61,6 +64,7 @@ void init_data_file(FILE **dataf, GParam const * const param);
 void print_parameters_local(GParam const * const param, time_t time_start, time_t time_end);
 void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_end);
 void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t time_end);
-void print_parameters_string(GParam * param, time_t time_start, time_t time_end);
+void print_parameters_tube_disc(GParam * param, time_t time_start, time_t time_end);
+void print_parameters_t0(GParam * param, time_t time_start, time_t time_end);
 
 #endif

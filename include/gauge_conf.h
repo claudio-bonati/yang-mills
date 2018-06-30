@@ -75,11 +75,22 @@ double plaquettep(Gauge_Conf const * const GC,
                   long r,
                   int i,
                   int j);
+void clover(Gauge_Conf const * const restrict GC,
+            Geometry const * const restrict geo,
+            GParam const * const restrict param,
+            long r,
+            int j,
+            int i,
+            GAUGE_GROUP *M);
 void plaquette(Gauge_Conf const * const GC,
                Geometry const * const geo,
                GParam const * const param,
                double *plaqs,
                double *plaqt);
+void clover_disc_energy(Gauge_Conf const * const GC,
+                        Geometry const * const geo,
+                        GParam const * const param,
+                        double *energy);
 void polyakov(Gauge_Conf const * const GC,
               Geometry const * const geo,
               GParam const * const param,
@@ -107,11 +118,11 @@ void perform_measures_pot_QbarQ(Gauge_Conf * GC,
 void perform_measures_pot_QbarQ_long(Gauge_Conf * GC,
                                      GParam const * const param,
                                      FILE *datafilep);
-void optimize_multilevel_stringQbarQ(Gauge_Conf *GC,
+void optimize_multilevel_tube_disc(Gauge_Conf *GC,
                                      Geometry const * const geo,
                                      GParam const * const param,
                                      FILE *datafilep);
-void perform_measures_string_QbarQ(Gauge_Conf *GC,
+void perform_measures_tube_disc(Gauge_Conf *GC,
                                    Geometry const * const geo,
                                    GParam const * const param,
                                    FILE *datafilep);
@@ -175,13 +186,6 @@ void overrelaxation(Gauge_Conf * restrict GC,
                     GParam const * const restrict param,
                     long r,
                     int i);
-void clover(Gauge_Conf const * const restrict GC,
-            Geometry const * const restrict geo,
-            GParam const * const restrict param,
-            long r,
-            int j,
-            int i,
-            GAUGE_GROUP *M);
 void update(Gauge_Conf * restrict GC,
             Geometry const * const restrict geo,
             GParam const * const restrict param);

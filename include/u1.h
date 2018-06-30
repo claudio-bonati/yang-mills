@@ -64,6 +64,7 @@ double retr_U1(U1 const * restrict A);
 double imtr_U1(U1 const * restrict A);
 
 void unitarize_U1(U1 * restrict A);
+void ta_U1(U1 * restrict A);
 void taexp_U1(U1 * restrict A);
 
 void print_on_screen_U1(U1 const * const A);

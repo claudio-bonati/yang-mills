@@ -1,5 +1,5 @@
-#ifndef YM_STRING_QBARQ_C
-#define YM_STRING_QBARQ_C
+#ifndef YM_LOCAL_C
+#define YM_LOCAL_C
 
 #include"../include/macro.h"
 
@@ -20,11 +20,14 @@
 
 void real_main(char *in_file)
     {
-    Gauge_Conf GC;
+    Gauge_Conf GC, help1, help2;
     Geometry geo;
     GParam param;
 
-    int count;
+    long count1, count2;
+    const long max_count=1000;
+    double gftime, energy;
+
     FILE *datafilep;
     time_t time1, time2;
 
@@ -36,15 +39,8 @@ void real_main(char *in_file)
     // read input file
     readinput(in_file, &param);
 
-    int tmp=param.d_size[1];
-    for(count=2; count<param.d_stdim; count++)
-       {
-       if(tmp!= param.d_size[count])
-         {
-         fprintf(stderr, "When using yang_mills_pot_QbarQ all the spatial sizes have to be of equal length.\n");
-         exit(EXIT_FAILURE);
-         }
-       }
+    // this code has to start from saved conf.
+    param.d_start=2;
 
     // initialize random generator
     initrand(param.d_randseed);
@@ -59,57 +55,48 @@ void real_main(char *in_file)
     init_indexing_lexeo(&geo);
     init_geometry(&geo, &param);
 
-    // initialize gauge configuration
+    // initialize gauge configurations
     init_gauge_conf(&GC, &param);
+    init_gauge_conf_from_gauge_conf(&help1, &GC, &param);
+    init_gauge_conf_from_gauge_conf(&help2, &GC, &param);
 
-    // initialize ml_polycorr arrays
-    init_polycorr_and_polyplaq(&GC, &param);
-
-    // montecarlo
     time(&time1);
-    // count starts from 1 to avoid problems using %
-    for(count=1; count < param.d_sample + 1; count++)
-       {
-       update(&GC, &geo, &param);
-
-       if(count % param.d_measevery ==0 && count >= param.d_thermal)
+    gftime=0.0;
+    count1=0;
+    while(count1<max_count)
          {
-         perform_measures_string_QbarQ(&GC, &geo, &param, datafilep);
-         }
+         for(count2=0; count2<20; count2++)
+            {
+            gradflow_RKstep(&GC, &help1, &help2, &geo, &param, param.d_gfstep);
+            gftime+=param.d_gfstep;
+            }
 
-       // save configuration for backup
-       if(param.d_saveconf_back_every!=0)
-         {
-         if(count % param.d_saveconf_back_every == 0 )
+         clover_disc_energy(&GC, &geo, &param, &energy);
+         printf("%lf  %lf\n", energy, energy*gftime*gftime);
+         fflush(stdout);
+         count1++;
+         if(energy*gftime*gftime>0.35)
            {
-           // simple
-           write_conf_on_file(&GC, &param);
-
-           // backup copy
-           write_conf_on_file_back(&GC, &param);
+           count1+=(max_count+10);
            }
          }
-       }
+    if(count1==max_count)
+      {
+      fprintf(stderr, "max_count reached in (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
     time(&time2);
-    // montecarlo end
 
     // close data file
     fclose(datafilep);
 
-    // save configuration
-    if(param.d_saveconf_back_every!=0)
-      {
-      write_conf_on_file(&GC, &param);
-      }
-
     // print simulation details
-    print_parameters_string(&param, time1, time2);
+    print_parameters_t0(&param, time1, time2);
 
-    // free gauge configuration
+    // free gauge configurations
     end_gauge_conf(&GC, &param);
-
-    // free ml_polycorr
-    end_polycorr_and_polyplaq(&GC, &param);
+    end_gauge_conf(&help1, &param);
+    end_gauge_conf(&help2, &param);
 
     // free geometry
     free_geometry(&geo, &param);
@@ -133,23 +120,9 @@ void print_template_input(void)
     {
     fprintf(fp, "size 4 4 4 4\n");
     fprintf(fp,"\n");
-    fprintf(fp, "beta 5.705\n");
-    fprintf(fp,"\n");
-    fprintf(fp, "sample    10\n");
-    fprintf(fp, "thermal   0\n");
-    fprintf(fp, "overrelax 5\n");
-    fprintf(fp, "measevery 1\n");
-    fprintf(fp,"\n");
-    fprintf(fp, "start                   0  # 0=ordered  1=random  2=from saved configuration\n");
-    fprintf(fp, "saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates\n");
-    fprintf(fp,"\n");
-    fprintf(fp, "#for multilevel\n");
-    fprintf(fp, "multihit         10  # number of multihit step\n");
-    fprintf(fp, "ml_step          2   # timeslices for multilevel (from largest to smallest)\n");
-    fprintf(fp, "ml_upd           10  # number of updates for various levels\n");
-    fprintf(fp, "dist_poly        2   # distance between the polyakov loop\n");
-    fprintf(fp, "transv_dist      2   # transverse distance from the polyakov correlator\n");
-    fprintf(fp,"\n");
+    fprintf(fp, "#for gradient flow evolution\n");
+    fprintf(fp, "gfstep   0.01    # integration step for gradient flow\n");
+    fprintf(fp, "\n");
     fprintf(fp, "#output files\n");
     fprintf(fp, "conf_file  conf.dat\n");
     fprintf(fp, "data_file  dati.dat\n");
@@ -187,10 +160,6 @@ int main (int argc, char **argv)
         printf("\n\tusing OpenMP with %d threads\n", NTHREADS);
       #endif
 
-      #ifdef OPT_MULTILEVEL
-        printf("\tcompiled for multilevel optimization\n");
-      #endif
-
       printf("\n");
 
       #ifdef __INTEL_COMPILER
@@ -203,6 +172,7 @@ int main (int argc, char **argv)
       #endif
 
       print_template_input();
+
 
       return EXIT_SUCCESS;
       }

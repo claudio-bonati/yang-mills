@@ -148,95 +148,6 @@ void overrelaxation(Gauge_Conf *GC,
    single_overrelaxation(&(GC->lattice[r][i]), &stap);
    }
 
-
-
-// compute the four-leaf clover in position r, in the plane i,j and save it in M
-void clover(Gauge_Conf const * const restrict GC,
-            Geometry const * const geo,
-            GParam const * const param,
-            long r,
-            int j,
-            int i,
-            GAUGE_GROUP * restrict M)
-   {
-   GAUGE_GROUP aux; 
-   long k, p;
-
-   if(param->d_stdim!=4)
-     {
-     fprintf(stderr, "Wrong number of dimension! (%d instead of 4) (%s, %d)\n", param->d_stdim, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-
-   #ifdef DEBUG
-   if(r >= param->d_volume)
-     {
-     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   if(j >= param->d_stdim || i >= param->d_stdim)
-     {
-     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #endif
-
-   zero(M);
-
-//
-//                   i ^
-//                     |
-//             (14)    |     (3)
-//         +-----<-----++-----<-----+
-//         |           ||           |
-//         |           ||           |
-//   (15)  V      (13) ^V (4)       ^ (2)
-//         |           ||           |
-//         |   (16)    || r   (1)   |
-//    p    +----->-----++----->-----+------>   j
-//         +-----<-----++-----<-----+
-//         |    (9)    ||   (8)     |
-//         |           ||           |
-//    (10) V      (12) ^V (5)       ^ (7)
-//         |           ||           |
-//         |           ||           |
-//         +------>----++----->-----+
-//              (11)   k      (6)
-//
-   // avanti-avanti
-   equal(&aux, &(GC->lattice[r][j]) );                               // 1
-   times_equal(&aux, &(GC->lattice[nnp(geo, r, j)][i]) );        // 2
-   times_equal_dag(&aux, &(GC->lattice[nnp(geo, r, i)][j]) );    // 3
-   times_equal_dag(&aux, &(GC->lattice[r][i]) );                     // 4
-   plus_equal(M, &aux);
- 
-   k=nnm(geo, r, i);
-
-   // avanti-indietro
-   equal_dag(&aux, &(GC->lattice[k][i]) );                       // 5
-   times_equal(&aux, &(GC->lattice[k][j]) );                     // 6
-   times_equal(&aux, &(GC->lattice[nnp(geo, k, j)][i]) );    // 7
-   times_equal_dag(&aux, &(GC->lattice[r][j]) );                 // 8
-   plus_equal(M, &aux);
-
-   p=nnm(geo, r, j);
-
-   // indietro-indietro
-   equal_dag(&aux, &(GC->lattice[p][j]) );                           // 9
-   times_equal_dag(&aux, &(GC->lattice[nnm(geo, k, j)][i]) );    // 10
-   times_equal(&aux, &(GC->lattice[nnm(geo, k, j)][j]) );        // 11
-   times_equal(&aux, &(GC->lattice[k][i]) );                         // 12
-   plus_equal(M, &aux);
-
-   // indietro-avanti
-   equal(&aux, &(GC->lattice[r][i]) );                                // 13
-   times_equal_dag(&aux, &(GC->lattice[nnp(geo, p, i)][j]) );     // 14
-   times_equal_dag(&aux, &(GC->lattice[p][i]) );                      // 15
-   times_equal(&aux, &(GC->lattice[p][j]) );                          // 16
-   plus_equal(M, &aux);
-   }
-
-
 /*
 // compute the antisymmetric part of the four-leaf clover in position r, in the plane i,j and
 // save it in  GC->quadri (------IMPORTANT------: i>j)
@@ -417,6 +328,20 @@ void gradflow_RKstep(Gauge_Conf *GC,
      exit(EXIT_FAILURE);
      }
    #endif
+
+   // initialize
+   for(dir=0; dir<param->d_stdim; dir++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NThreads) private(r)
+      #endif
+      for(r=0; r<param->d_volume; r++)
+         {
+         equal(&(helper1->lattice[r][dir]), &(GC->lattice[r][dir]));
+         equal(&(helper2->lattice[r][dir]), &(GC->lattice[r][dir]));
+         }
+      }
+
 
    for(dir=0; dir<param->d_stdim; dir++)
       {

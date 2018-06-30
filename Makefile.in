@@ -79,8 +79,8 @@ POST_UNINSTALL = :
 bin_PROGRAMS = conf_check$(EXEEXT) debug_rng$(EXEEXT) \
 	debug_su2$(EXEEXT) debug_sun$(EXEEXT) debug_u1$(EXEEXT) \
 	yang_mills_local$(EXEEXT) yang_mills_pot_QbarQ$(EXEEXT) \
-	yang_mills_pot_QbarQ_long$(EXEEXT) \
-	yang_mills_string_QbarQ$(EXEEXT)
+	yang_mills_pot_QbarQ_long$(EXEEXT) yang_mills_t0$(EXEEXT) \
+	yang_mills_tube_disc$(EXEEXT)
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -165,15 +165,21 @@ am_yang_mills_pot_QbarQ_long_OBJECTS =  \
 yang_mills_pot_QbarQ_long_OBJECTS =  \
 	$(am_yang_mills_pot_QbarQ_long_OBJECTS)
 yang_mills_pot_QbarQ_long_LDADD = $(LDADD)
-am_yang_mills_string_QbarQ_OBJECTS =  \
-	./src/yang_mills_string_QbarQ.$(OBJEXT) $(am__objects_1) \
+am_yang_mills_t0_OBJECTS = ./src/yang_mills_t0.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
+	$(am__objects_10) $(am__objects_11) $(am__objects_4) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_12) $(am__objects_9)
+yang_mills_t0_OBJECTS = $(am_yang_mills_t0_OBJECTS)
+yang_mills_t0_LDADD = $(LDADD)
+am_yang_mills_tube_disc_OBJECTS =  \
+	./src/yang_mills_tube_disc.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_10) \
 	$(am__objects_11) $(am__objects_4) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
 	$(am__objects_12) $(am__objects_9)
-yang_mills_string_QbarQ_OBJECTS =  \
-	$(am_yang_mills_string_QbarQ_OBJECTS)
-yang_mills_string_QbarQ_LDADD = $(LDADD)
+yang_mills_tube_disc_OBJECTS = $(am_yang_mills_tube_disc_OBJECTS)
+yang_mills_tube_disc_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -205,13 +211,13 @@ am__v_CCLD_1 =
 SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_sun_SOURCES) $(debug_u1_SOURCES) \
 	$(yang_mills_local_SOURCES) $(yang_mills_pot_QbarQ_SOURCES) \
-	$(yang_mills_pot_QbarQ_long_SOURCES) \
-	$(yang_mills_string_QbarQ_SOURCES)
+	$(yang_mills_pot_QbarQ_long_SOURCES) $(yang_mills_t0_SOURCES) \
+	$(yang_mills_tube_disc_SOURCES)
 DIST_SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_sun_SOURCES) $(debug_u1_SOURCES) \
 	$(yang_mills_local_SOURCES) $(yang_mills_pot_QbarQ_SOURCES) \
-	$(yang_mills_pot_QbarQ_long_SOURCES) \
-	$(yang_mills_string_QbarQ_SOURCES)
+	$(yang_mills_pot_QbarQ_long_SOURCES) $(yang_mills_t0_SOURCES) \
+	$(yang_mills_tube_disc_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -497,20 +503,35 @@ yang_mills_pot_QbarQ_long_SOURCES = ./src/yang_mills_pot_QbarQ_long.c \
                                   $(tens_prod) \
                                   $(u1) 
 
-yang_mills_string_QbarQ_SOURCES = ./src/yang_mills_string_QbarQ.c \
-                                $(dSFMT)  \
-                                $(endian) \
-                                $(funcpoint) \
-                                $(gauge_conf) \
-                                $(geometry) \
-                                $(gparam) \
-                                ./include/macro.h \
-                                $(mymalloc) \
-                                $(random) \
-                                $(su2) \
-                                $(sun) \
-                                $(tens_prod) \
-                                $(u1) 
+yang_mills_t0_SOURCES = ./src/yang_mills_t0.c \
+                       $(dSFMT)  \
+                       $(endian) \
+                       $(funcpoint) \
+                       $(gauge_conf) \
+                       $(geometry) \
+                       $(gparam) \
+                       ./include/macro.h \
+                       $(mymalloc) \
+                       $(random) \
+                       $(su2) \
+                       $(sun) \
+                       $(tens_prod) \
+                       $(u1) 
+
+yang_mills_tube_disc_SOURCES = ./src/yang_mills_tube_disc.c \
+                             $(dSFMT)  \
+                             $(endian) \
+                             $(funcpoint) \
+                             $(gauge_conf) \
+                             $(geometry) \
+                             $(gparam) \
+                             ./include/macro.h \
+                             $(mymalloc) \
+                             $(random) \
+                             $(su2) \
+                             $(sun) \
+                             $(tens_prod) \
+                             $(u1) 
 
 EXTRA_DIST = ./src/input.in 
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -pedantic -Werror -Wconversion @OPENMP_CFLAGS@
@@ -706,12 +727,18 @@ yang_mills_pot_QbarQ$(EXEEXT): $(yang_mills_pot_QbarQ_OBJECTS) $(yang_mills_pot_
 yang_mills_pot_QbarQ_long$(EXEEXT): $(yang_mills_pot_QbarQ_long_OBJECTS) $(yang_mills_pot_QbarQ_long_DEPENDENCIES) $(EXTRA_yang_mills_pot_QbarQ_long_DEPENDENCIES) 
 	@rm -f yang_mills_pot_QbarQ_long$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(yang_mills_pot_QbarQ_long_OBJECTS) $(yang_mills_pot_QbarQ_long_LDADD) $(LIBS)
-./src/yang_mills_string_QbarQ.$(OBJEXT): src/$(am__dirstamp) \
+./src/yang_mills_t0.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
-yang_mills_string_QbarQ$(EXEEXT): $(yang_mills_string_QbarQ_OBJECTS) $(yang_mills_string_QbarQ_DEPENDENCIES) $(EXTRA_yang_mills_string_QbarQ_DEPENDENCIES) 
-	@rm -f yang_mills_string_QbarQ$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(yang_mills_string_QbarQ_OBJECTS) $(yang_mills_string_QbarQ_LDADD) $(LIBS)
+yang_mills_t0$(EXEEXT): $(yang_mills_t0_OBJECTS) $(yang_mills_t0_DEPENDENCIES) $(EXTRA_yang_mills_t0_DEPENDENCIES) 
+	@rm -f yang_mills_t0$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(yang_mills_t0_OBJECTS) $(yang_mills_t0_LDADD) $(LIBS)
+./src/yang_mills_tube_disc.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+yang_mills_tube_disc$(EXEEXT): $(yang_mills_tube_disc_OBJECTS) $(yang_mills_tube_disc_DEPENDENCIES) $(EXTRA_yang_mills_tube_disc_DEPENDENCIES) 
+	@rm -f yang_mills_tube_disc$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(yang_mills_tube_disc_OBJECTS) $(yang_mills_tube_disc_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -748,7 +775,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_local.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_pot_QbarQ.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_pot_QbarQ_long.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_string_QbarQ.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_t0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tube_disc.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

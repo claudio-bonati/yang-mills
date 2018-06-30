@@ -15,6 +15,9 @@ saveconf_analysis_every 5  # if 0 does not save, else save configurations for an
 coolsteps  3     # number of cooling steps to be used
 coolrepeat 5     # number of times "coolsteps" are repeated
 
+#for gradient flow evolution
+gfstep   0.01    # integration step for gradient flow
+
 #for multilevel
 multihit         10  # number of multihit step
 ml_step          2   # timeslices for multilevel (from largest to smallest)

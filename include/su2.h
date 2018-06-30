@@ -70,6 +70,7 @@ double retr_Su2(Su2 const * restrict A);
 double imtr_Su2(Su2 const * restrict A);
 
 void unitarize_Su2(Su2 * restrict A);
+void ta_Su2(Su2 * restrict A);
 void taexp_Su2(Su2 * restrict A);
 
 void print_on_screen_Su2(Su2 const * const A);
