@@ -26,7 +26,7 @@ void real_main(char *in_file)
 
     long count1, count2;
     const long max_count=1000;
-    double gftime, energy;
+    double gftime, energy, tch;
 
     FILE *datafilep;
     time_t time1, time2;
@@ -72,7 +72,8 @@ void real_main(char *in_file)
             }
 
          clover_disc_energy(&GC, &geo, &param, &energy);
-         printf("%lf  %lf\n", energy, energy*gftime*gftime);
+         tch=topcharge(&GC, &geo, &param);
+         printf("%lf  %lf  %lf  %lf\n", gftime, energy, energy*gftime*gftime, tch);
          fflush(stdout);
          count1++;
          if(energy*gftime*gftime>0.35)
