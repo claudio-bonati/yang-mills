@@ -25,8 +25,8 @@ void real_main(char *in_file)
     GParam param;
 
     long count;
-    const long max_count=1000;
-    double gftime, energy_clover, energy_plaq, plaqs, plaqt, tch;
+    const long max_count=10000;
+    double gftime, energy_clover, tch;
 
     FILE *datafilep;
     time_t time1, time2;
@@ -69,28 +69,27 @@ void real_main(char *in_file)
          gftime+=param.d_gfstep;
 
          clover_disc_energy(&GC, &geo, &param, &energy_clover);
-         plaquette(&GC, &geo, &param, &plaqs, &plaqt);
-         energy_plaq=2.0*NCOLOR*(1.0-0.5*(plaqs+plaqt)*NCOLOR*(NCOLOR-1)/2.0);
          tch=topcharge(&GC, &geo, &param);
 
-         fprintf(datafilep, "%lf  %lf  %lf  %lf  %lf  %lf\n", gftime,
-                                                              energy_clover,
-                                                              energy_clover*gftime*gftime,
-                                                              energy_plaq,
-                                                              energy_plaq*gftime*gftime,
-                                                              tch);
+         fprintf(datafilep, "%.13lf  %.13lf  %.13lf  %.13lf\n", gftime,
+                                                                energy_clover,
+                                                                energy_clover*gftime*gftime,
+                                                                tch);
+         fflush(datafilep);
+
          count++;
-         if(energy_plaq*gftime*gftime>0.35 && energy_clover*gftime*gftime>0.35)
+         if(energy_clover*gftime*gftime>0.35)
            {
            count+=(max_count+10);
            }
          }
+    time(&time2);
+
     if(count==max_count)
       {
       fprintf(stderr, "max_count reached in (%s, %d)\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
       }
-    time(&time2);
 
     // close data file
     fclose(datafilep);

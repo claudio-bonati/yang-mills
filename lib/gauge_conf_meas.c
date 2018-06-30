@@ -202,7 +202,7 @@ void clover_disc_energy(Gauge_Conf const * const GC,
   double ris;
   GAUGE_GROUP aux1, aux2;
 
-  ris=0;
+  ris=0.0;
   for(r=0; r<param->d_volume; r++)
      {
      for(i=0; i<param->d_stdim; i++)
@@ -217,12 +217,13 @@ void clover_disc_energy(Gauge_Conf const * const GC,
            equal(&aux2, &aux1);
            times_equal(&aux1, &aux2);
 
-           ris+=-NCOLOR*retr(&aux1)/64.0/2.0;
+           ris+=-NCOLOR*retr(&aux1)/64.0;
            }
         }
      }
   *energy=ris*param->d_inv_vol;
   }
+
 
 // compute the mean Polyakov loop (the trace of)
 void polyakov(Gauge_Conf const * const GC,
