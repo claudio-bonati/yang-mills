@@ -1180,16 +1180,18 @@ void TensProd_init_Su2(TensProd * restrict TP, Su2 const * restrict A1, Su2 cons
   double complex aux1[4] __attribute__((aligned(DOUBLE_ALIGN)));
   double complex aux2[4] __attribute__((aligned(DOUBLE_ALIGN)));
 
-  // reconstruct the complex form of the matrices
-  aux1[m(0,0)] = A1->comp[0]+I*A1->comp[3];
-  aux1[m(0,1)] = A1->comp[2]+I*A1->comp[1];
-  aux1[m(1,0)] =-A1->comp[2]+I*A1->comp[1];
-  aux1[m(1,1)] = A1->comp[0]-I*A1->comp[3];
+  #define m2(X,Y) ((X)*2 + (Y))
 
-  aux2[m(0,0)] = A2->comp[0]+I*A2->comp[3];
-  aux2[m(0,1)] = A2->comp[2]+I*A2->comp[1];
-  aux2[m(1,0)] =-A2->comp[2]+I*A2->comp[1];
-  aux2[m(1,1)] = A2->comp[0]-I*A2->comp[3];
+  // reconstruct the complex form of the matrices
+  aux1[m2(0,0)] = A1->comp[0]+I*A1->comp[3];
+  aux1[m2(0,1)] = A1->comp[2]+I*A1->comp[1];
+  aux1[m2(1,0)] =-A1->comp[2]+I*A1->comp[1];
+  aux1[m2(1,1)] = A1->comp[0]-I*A1->comp[3];
+
+  aux2[m2(0,0)] = A2->comp[0]+I*A2->comp[3];
+  aux2[m2(0,1)] = A2->comp[2]+I*A2->comp[1];
+  aux2[m2(1,0)] =-A2->comp[2]+I*A2->comp[1];
+  aux2[m2(1,1)] = A2->comp[0]-I*A2->comp[3];
 
   for(i=0; i<2; i++)
      {
@@ -1199,11 +1201,13 @@ void TensProd_init_Su2(TensProd * restrict TP, Su2 const * restrict A1, Su2 cons
            {
            for(l=0; l<2; l++)
               {
-              TP->comp[i][j][k][l]=conj(aux1[m(i,j)])*aux2[m(k,l)];
+              TP->comp[i][j][k][l]=conj(aux1[m2(i,j)])*aux2[m2(k,l)];
               }
            }
         }
      }
+
+  #undef m2
   }
 
 
