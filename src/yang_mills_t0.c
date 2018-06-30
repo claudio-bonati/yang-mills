@@ -24,9 +24,9 @@ void real_main(char *in_file)
     Geometry geo;
     GParam param;
 
-    long count1, count2;
+    long count;
     const long max_count=1000;
-    double gftime, energy, tch;
+    double gftime, energy_clover, energy_plaq, plaqs, plaqt, tch;
 
     FILE *datafilep;
     time_t time1, time2;
@@ -46,7 +46,7 @@ void real_main(char *in_file)
     initrand(param.d_randseed);
 
     // open data_file
-    init_data_file(&datafilep, &param);
+    datafilep=fopen(param.d_data_file, "w");
 
     // initialize function_pointers
     init_function_pointers();
@@ -62,26 +62,30 @@ void real_main(char *in_file)
 
     time(&time1);
     gftime=0.0;
-    count1=0;
-    while(count1<max_count)
+    count=0;
+    while(count<max_count)
          {
-         for(count2=0; count2<20; count2++)
-            {
-            gradflow_RKstep(&GC, &help1, &help2, &geo, &param, param.d_gfstep);
-            gftime+=param.d_gfstep;
-            }
+         gradflow_RKstep(&GC, &help1, &help2, &geo, &param, param.d_gfstep);
+         gftime+=param.d_gfstep;
 
-         clover_disc_energy(&GC, &geo, &param, &energy);
+         clover_disc_energy(&GC, &geo, &param, &energy_clover);
+         plaquette(&GC, &geo, &param, &plaqs, &plaqt);
+         energy_plaq=2.0*NCOLOR*(1.0-0.5*(plaqs+plaqt)*NCOLOR*(NCOLOR-1)/2.0);
          tch=topcharge(&GC, &geo, &param);
-         printf("%lf  %lf  %lf  %lf\n", gftime, energy, energy*gftime*gftime, tch);
-         fflush(stdout);
-         count1++;
-         if(energy*gftime*gftime>0.35)
+
+         fprintf(datafilep, "%lf  %lf  %lf  %lf  %lf  %lf\n", gftime,
+                                                              energy_clover,
+                                                              energy_clover*gftime*gftime,
+                                                              energy_plaq,
+                                                              energy_plaq*gftime*gftime,
+                                                              tch);
+         count++;
+         if(energy_plaq*gftime*gftime>0.35 && energy_clover*gftime*gftime>0.35)
            {
-           count1+=(max_count+10);
+           count+=(max_count+10);
            }
          }
-    if(count1==max_count)
+    if(count==max_count)
       {
       fprintf(stderr, "max_count reached in (%s, %d)\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
