@@ -333,7 +333,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
    for(dir=0; dir<param->d_stdim; dir++)
       {
       #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NThreads) private(r)
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
       for(r=0; r<param->d_volume; r++)
          {
@@ -346,7 +346,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
    for(dir=0; dir<param->d_stdim; dir++)
       {
       #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NThreads) private(r)
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
       for(r=0; r<param->d_volume; r++)
          {
@@ -367,7 +367,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
    for(dir=0; dir<param->d_stdim; dir++)
       {
       #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NThreads) private(r)
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
       for(r=0; r<param->d_volume; r++)
          {
@@ -389,7 +389,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
    for(dir=0; dir<param->d_stdim; dir++)
       {
       #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NThreads) private(r)
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
       for(r=0; r<param->d_volume; r++)
          {
@@ -407,7 +407,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
 
    // final unitarization
    #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NThreads) private(r)
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
    #endif
    for(r=0; r<(param->d_volume); r++)
       {
@@ -450,7 +450,7 @@ void ape_smearing(Gauge_Conf *GC,
         for(dir=0; dir<param->d_stdim; dir++)
            {
            #ifdef OPENMP_MODE
-           #pragma omp parallel for num_threads(NThreads) private(r)
+           #pragma omp parallel for num_threads(NTHREADS) private(r)
            #endif
            for(r=0; r<param->d_volume; r++)
               {
@@ -471,7 +471,7 @@ void ape_smearing(Gauge_Conf *GC,
         for(dir=0; dir<param->d_stdim; dir++)
            {
            #ifdef OPENMP_MODE
-           #pragma omp parallel for num_threads(NThreads) private(r)
+           #pragma omp parallel for num_threads(NTHREADS) private(r)
            #endif
            for(r=0; r<param->d_volume; r++)
               {
@@ -494,7 +494,7 @@ void ape_smearing(Gauge_Conf *GC,
      for(dir=0; dir<param->d_stdim; dir++)
         {
         #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NThreads) private(r)
+        #pragma omp parallel for num_threads(NTHREADS) private(r)
         #endif
         for(r=0; r<param->d_volume; r++)
            {
