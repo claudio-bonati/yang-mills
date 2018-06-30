@@ -17,8 +17,8 @@
 
 
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
-double plaquettep(Gauge_Conf const * const restrict GC,
-                  Geometry const * const restrict geo,
+double plaquettep(Gauge_Conf const * const GC,
+                  Geometry const * const geo,
                   long r,
                   int i,
                   int j)
@@ -46,9 +46,9 @@ double plaquettep(Gauge_Conf const * const restrict GC,
 
 
 // compute the mean plaquettes (spatial, temporal)
-void plaquette(Gauge_Conf const * const restrict GC,
-               Geometry const * const restrict geo,
-               GParam const * const restrict param,
+void plaquette(Gauge_Conf const * const GC,
+               Geometry const * const geo,
+               GParam const * const param,
                double *plaqs,
                double *plaqt)
    {
@@ -95,9 +95,9 @@ void plaquette(Gauge_Conf const * const restrict GC,
 
 
 // compute the mean Polyakov loop (the trace of)
-void polyakov(Gauge_Conf const * const restrict GC,
-              Geometry const * const restrict geo,
-              GParam const * const restrict param,
+void polyakov(Gauge_Conf const * const GC,
+              Geometry const * const geo,
+              GParam const * const param,
               double *repoly,
               double *impoly)
    {
@@ -130,9 +130,9 @@ void polyakov(Gauge_Conf const * const restrict GC,
 
 
 // compute the topological charge
-double topcharge(Gauge_Conf const * const restrict GC,
-                 Geometry const * const restrict geo,
-                 GParam const * const restrict param)
+double topcharge(Gauge_Conf const * const GC,
+                 Geometry const * const geo,
+                 GParam const * const param)
    {
    GAUGE_GROUP aux1, aux2, aux3;
    double ris, real1, real2, loc_charge; 
@@ -237,9 +237,9 @@ void topcharge_cooling(Gauge_Conf const * const GC,
    }
 
 
-void perform_measures_localobs(Gauge_Conf const * const restrict GC,
-                               Geometry const * const restrict geo,
-                               GParam const * const restrict param,
+void perform_measures_localobs(Gauge_Conf const * const GC,
+                               Geometry const * const geo,
+                               GParam const * const param,
                                FILE *datafilep)
    {
    int i;

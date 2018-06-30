@@ -16,8 +16,8 @@
 
 // compute the staple in position r, direction i and save it in M
 void calcstaples_wilson(Gauge_Conf const * const restrict GC,
-                        Geometry const * const restrict geo,
-                        GParam const * const restrict param,
+                        Geometry const * const geo,
+                        GParam const * const param,
                         long r,
                         int i,
                         GAUGE_GROUP * restrict M)
@@ -95,9 +95,9 @@ void calcstaples_wilson(Gauge_Conf const * const restrict GC,
 
 
 // perform an update with heatbath
-void heatbath(Gauge_Conf * restrict GC,
-                Geometry const * const restrict geo,
-                GParam const * const restrict param,
+void heatbath(Gauge_Conf *GC,
+                Geometry const * const geo,
+                GParam const * const param,
                 long r,
                 int i)
    {
@@ -122,9 +122,9 @@ void heatbath(Gauge_Conf * restrict GC,
 
 
 // perform an update with overrelaxation
-void overrelaxation(Gauge_Conf * restrict GC,
-                      Geometry const * const restrict geo,
-                      GParam const * const restrict param,
+void overrelaxation(Gauge_Conf *GC,
+                      Geometry const * const geo,
+                      GParam const * const param,
                       long r,
                       int i)
    {
@@ -152,12 +152,12 @@ void overrelaxation(Gauge_Conf * restrict GC,
 
 // compute the four-leaf clover in position r, in the plane i,j and save it in M
 void clover(Gauge_Conf const * const restrict GC,
-            Geometry const * const restrict geo,
-            GParam const * const restrict param,
+            Geometry const * const geo,
+            GParam const * const param,
             long r,
             int j,
             int i,
-            GAUGE_GROUP *M)
+            GAUGE_GROUP * restrict M)
    {
    GAUGE_GROUP aux; 
    long k, p;
@@ -266,9 +266,9 @@ void compute_quadri(Gauge_Conf  *GC,
 */
 
 // perform a complete update
-void update(Gauge_Conf * restrict GC,
-            Geometry const * const restrict geo,
-            GParam const * const restrict param)
+void update(Gauge_Conf * GC,
+            Geometry const * const geo,
+            GParam const * const param)
    {
    long r;
    int j, dir;
@@ -396,6 +396,192 @@ void cooling(Gauge_Conf *GC,
          } 
       }
    }
+
+
+// perform a single step of the Runge Kutta integrator for the Wilson flow
+// as described in Luscher arXiv:1006.4518 app. C
+void gradflow_RKstep(Gauge_Conf *GC,
+                     Gauge_Conf *helper1,
+                     Gauge_Conf *helper2,
+                     Geometry const * const geo,
+                     GParam const *const param,
+                     double dt)
+   {
+   long r;
+   int dir;
+
+   #ifdef OPENMP_MODE
+   if(geo->indexing_type!=0)
+     {
+     fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
+   for(dir=0; dir<param->d_stdim; dir++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NThreads) private(r)
+      #endif
+      for(r=0; r<param->d_volume; r++)
+         {
+         GAUGE_GROUP staple, aux, link;
+
+         calcstaples_wilson(helper1, geo, param, r, dir, &staple);
+         equal(&link, &(helper1->lattice[r][dir]));
+         times(&aux, &link, &staple);                // aux=link*staple
+         times_equal_real(&aux, -dt/4.0);
+         equal(&(helper2->lattice[r][dir]), &aux);    // helper2=aux
+         taexp(&aux);
+         times(&(GC->lattice[r][dir]), &aux, &link); // GC=aux*link
+         }
+      }
+
+   // now helper1=W_0, helper2=(1/4)Z_0 and GC=W_1
+
+   for(dir=0; dir<param->d_stdim; dir++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NThreads) private(r)
+      #endif
+      for(r=0; r<param->d_volume; r++)
+         {
+         GAUGE_GROUP staple, aux, link;
+
+         calcstaples_wilson(GC, geo, param, r, dir, &staple);
+         equal(&link, &(GC->lattice[r][dir]));
+         times(&aux, &link, &staple);               // aux=link*staple
+         times_equal_real(&aux, -dt*8.0/9.0);
+         minus_equal_times_real(&aux, &(helper2->lattice[r][dir]), 17.0/9.0); // 1/4 was in Z_0
+         equal(&(helper2->lattice[r][dir]), &aux);
+         taexp(&aux);
+         times(&(helper1->lattice[r][dir]), &aux, &link); // helper1=aux*link
+         }
+      }
+
+   // now helper1=W_2, helper2=(8/9)Z_1-(17/36)Z_0 and GC=W_1
+
+   for(dir=0; dir<param->d_stdim; dir++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NThreads) private(r)
+      #endif
+      for(r=0; r<param->d_volume; r++)
+         {
+         GAUGE_GROUP staple, aux, link;
+
+         calcstaples_wilson(helper1, geo, param, r, dir, &staple);
+         equal(&link, &(helper1->lattice[r][dir]));
+         times(&aux, &link, &staple);                   // aux=link*staple
+         times_equal_real(&aux, -dt*3.0/4.0);
+         minus_equal(&aux, &(helper2->lattice[r][dir])); // aux=(3/4)Z_2-(8/9)Z_1+(17/36)Z_0
+         taexp(&aux);
+         times(&(GC->lattice[r][dir]), &aux, &link);    // GC=aux*link
+         }
+      }
+
+   // final unitarization
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NThreads) private(r)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      int i;
+      for(i=0; i<param->d_stdim; i++)
+         {
+         unitarize(&(GC->lattice[r][i]));
+         }
+      }
+   }
+
+
+
+// n step of ape smearing with parameter alpha
+// new=Proj[old + alpha *staple ]
+void ape_smearing(Gauge_Conf *GC,
+                  Geometry const * const geo,
+                  GParam const *const param,
+                  double alpha,
+                  int n)
+   {
+   Gauge_Conf helper1;
+   long r;
+   int dir, count;
+
+   #ifdef OPENMP_MODE
+   if(geo->indexing_type!=0)
+     {
+     fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
+   init_gauge_conf_from_gauge_conf(&helper1, GC, param); //helper1=GC
+
+   for(count=0; count<n; count++)
+      {
+      if(count%2==0) // smear(helper1)->GC
+        {
+        for(dir=0; dir<param->d_stdim; dir++)
+           {
+           #ifdef OPENMP_MODE
+           #pragma omp parallel for num_threads(NThreads) private(r)
+           #endif
+           for(r=0; r<param->d_volume; r++)
+              {
+              GAUGE_GROUP staple, link;
+
+              calcstaples_wilson(&helper1, geo, param, r, dir, &staple);
+              equal(&link, &(helper1.lattice[r][dir]));
+              times_equal_real(&link, 1-alpha);
+              times_equal_real(&staple, alpha/6.0);
+              plus_equal_dag(&link, &staple);
+              unitarize(&link);
+              equal(&(GC->lattice[r][dir]), &link);
+              }
+           }
+        }
+      else // smear(GC)->helper1
+        {
+        for(dir=0; dir<param->d_stdim; dir++)
+           {
+           #ifdef OPENMP_MODE
+           #pragma omp parallel for num_threads(NThreads) private(r)
+           #endif
+           for(r=0; r<param->d_volume; r++)
+              {
+              GAUGE_GROUP staple, link;
+
+              calcstaples_wilson(GC, geo, param, r, dir, &staple);
+              equal(&link, &(GC->lattice[r][dir]));
+              times_equal_real(&link, 1-alpha);
+              times_equal_real(&staple, alpha/6.0);
+              plus_equal_dag(&link, &staple);
+              unitarize(&link);
+              equal(&(helper1.lattice[r][dir]), &link);
+              }
+           }
+        }
+      }
+
+   if(n>0 && n%2==0) // GC=helper1
+     {
+     for(dir=0; dir<param->d_stdim; dir++)
+        {
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NThreads) private(r)
+        #endif
+        for(r=0; r<param->d_volume; r++)
+           {
+           equal(&(GC->lattice[r][dir]), &(helper1.lattice[r][dir]));
+           }
+        }
+     }
+
+   end_gauge_conf(&helper1, param);
+   }
+
+
 
 
 #endif

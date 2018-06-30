@@ -70,27 +70,27 @@ void end_polycorr_and_polyplaq(Gauge_Conf *GC,
                                GParam const * const param);
 
 // in gauge_conf_meas.c
-double plaquettep(Gauge_Conf const * const restrict GC,
-                  Geometry const * const restrict geo,
+double plaquettep(Gauge_Conf const * const GC,
+                  Geometry const * const geo,
                   long r,
                   int i,
                   int j);
-void plaquette(Gauge_Conf const * const restrict GC,
-               Geometry const * const restrict geo,
-               GParam const * const restrict param,
+void plaquette(Gauge_Conf const * const GC,
+               Geometry const * const geo,
+               GParam const * const param,
                double *plaqs,
                double *plaqt);
-void polyakov(Gauge_Conf const * const restrict GC,
-              Geometry const * const restrict geo,
-              GParam const * const restrict param,
+void polyakov(Gauge_Conf const * const GC,
+              Geometry const * const geo,
+              GParam const * const param,
               double *repoly,
               double *impoly);
-double topcharge(Gauge_Conf const * const restrict GC,
-                 Geometry const * const restrict geo,
-                 GParam const * const restrict param);
-void perform_measures_localobs(Gauge_Conf const * const restrict GC,
-                               Geometry const * const restrict geo,
-                               GParam const * const restrict param,
+double topcharge(Gauge_Conf const * const GC,
+                 Geometry const * const geo,
+                 GParam const * const param);
+void perform_measures_localobs(Gauge_Conf const * const GC,
+                               Geometry const * const geo,
+                               GParam const * const param,
                                FILE *datafilep);
 void optimize_multihit_polycorr(Gauge_Conf *GC,
                        Geometry const * const geo,
@@ -189,4 +189,16 @@ void cooling(Gauge_Conf *GC,
              Geometry const * const geo,
              GParam const * const param,
              int n);
+void gradflow_RKstep(Gauge_Conf *GC,
+                     Gauge_Conf *helper1,
+                     Gauge_Conf *helper2,
+                     Geometry const * const geo,
+                     GParam const *const param,
+                     double dt);
+void ape_smearing(Gauge_Conf *GC,
+                  Geometry const * const geo,
+                  GParam const *const param,
+                  double alpha,
+                  int n);
+
 #endif
