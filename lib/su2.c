@@ -18,20 +18,6 @@
 
 void init_Su2(Su2 * restrict A, double vec[4])
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]=vec[0];
   A->comp[1]=vec[1];
   A->comp[2]=vec[2];
@@ -42,20 +28,6 @@ void init_Su2(Su2 * restrict A, double vec[4])
 // A=1
 void one_Su2(Su2 * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]=1.0;
   A->comp[1]=0.0;
   A->comp[2]=0.0;
@@ -66,20 +38,6 @@ void one_Su2(Su2 * restrict A)
 // A=0
 void zero_Su2(Su2 * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]=0.0;
   A->comp[1]=0.0;
   A->comp[2]=0.0;
@@ -96,23 +54,6 @@ void equal_Su2(Su2 * restrict A, Su2 const * restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   A->comp[0]=B->comp[0];
@@ -133,23 +74,6 @@ void equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]= B->comp[0];
   A->comp[1]=-B->comp[1];
   A->comp[2]=-B->comp[2];
@@ -166,23 +90,6 @@ void plus_equal_Su2(Su2 * restrict A, Su2 const * restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   A->comp[0]+=B->comp[0];
@@ -203,23 +110,6 @@ void plus_equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]+=B->comp[0];
   A->comp[1]-=B->comp[1];
   A->comp[2]-=B->comp[2];
@@ -236,23 +126,6 @@ void minus_equal_Su2(Su2 * restrict A, Su2 const * restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   A->comp[0]-=B->comp[0];
@@ -273,23 +146,6 @@ void minus_equal_times_real_Su2(Su2 * restrict A, Su2 const * restrict B, double
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]-=(r*B->comp[0]);
   A->comp[1]-=(r*B->comp[1]);
   A->comp[2]-=(r*B->comp[2]);
@@ -306,23 +162,6 @@ void minus_equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   A->comp[0]-=B->comp[0];
@@ -345,26 +184,6 @@ void lin_comb_Su2(Su2 * restrict A,
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]= b*B->comp[0] + c*C->comp[0];
   A->comp[1]= b*B->comp[1] + c*C->comp[1];
   A->comp[2]= b*B->comp[2] + c*C->comp[2];
@@ -383,26 +202,6 @@ void lin_comb_dag1_Su2(Su2 * restrict A,
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   A->comp[0]=  b*B->comp[0] + c*C->comp[0];
@@ -425,26 +224,6 @@ void lin_comb_dag2_Su2(Su2 * restrict A,
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]= b*B->comp[0] + c*C->comp[0];
   A->comp[1]= b*B->comp[1] - c*C->comp[1];
   A->comp[2]= b*B->comp[2] - c*C->comp[2];
@@ -465,26 +244,6 @@ void lin_comb_dag12_Su2(Su2 * restrict A,
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]=  b*B->comp[0] + c*C->comp[0];
   A->comp[1]= -b*B->comp[1] - c*C->comp[1];
   A->comp[2]= -b*B->comp[2] - c*C->comp[2];
@@ -495,19 +254,6 @@ void lin_comb_dag12_Su2(Su2 * restrict A,
 // A*=r
 void times_equal_real_Su2(Su2 * restrict A, double r)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
 
   A->comp[0]*=r;
   A->comp[1]*=r;
@@ -525,23 +271,6 @@ void times_equal_Su2(Su2 * restrict A, Su2 const * restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   register double a0, a1, a2, a3;
@@ -569,23 +298,6 @@ void times_equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   register double a0, a1, a2, a3;
 
   a0=A->comp[0];
@@ -611,26 +323,6 @@ void times_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restrict C)
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]= B->comp[0]*C->comp[0] - B->comp[1]*C->comp[1] - B->comp[2]*C->comp[2] - B->comp[3]*C->comp[3];
   A->comp[1]= B->comp[0]*C->comp[1] + B->comp[1]*C->comp[0] - B->comp[2]*C->comp[3] + B->comp[3]*C->comp[2];
   A->comp[2]= B->comp[0]*C->comp[2] + B->comp[2]*C->comp[0] + B->comp[1]*C->comp[3] - B->comp[3]*C->comp[1];
@@ -647,26 +339,6 @@ void times_dag1_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restri
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   A->comp[0]= B->comp[0]*C->comp[0] + B->comp[1]*C->comp[1] + B->comp[2]*C->comp[2] + B->comp[3]*C->comp[3];
@@ -687,26 +359,6 @@ void times_dag2_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restri
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]=  B->comp[0]*C->comp[0] + B->comp[1]*C->comp[1] + B->comp[2]*C->comp[2] + B->comp[3]*C->comp[3];
   A->comp[1]= -B->comp[0]*C->comp[1] + B->comp[1]*C->comp[0] + B->comp[2]*C->comp[3] - B->comp[3]*C->comp[2];
   A->comp[2]= -B->comp[0]*C->comp[2] + B->comp[2]*C->comp[0] - B->comp[1]*C->comp[3] + B->comp[3]*C->comp[1];
@@ -725,26 +377,6 @@ void times_dag12_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restr
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]=  B->comp[0]*C->comp[0] - B->comp[1]*C->comp[1] - B->comp[2]*C->comp[2] - B->comp[3]*C->comp[3];
   A->comp[1]= -B->comp[0]*C->comp[1] - B->comp[1]*C->comp[0] - B->comp[2]*C->comp[3] + B->comp[3]*C->comp[2];
   A->comp[2]= -B->comp[0]*C->comp[2] - B->comp[2]*C->comp[0] + B->comp[1]*C->comp[3] - B->comp[3]*C->comp[1];
@@ -755,20 +387,6 @@ void times_dag12_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restr
 // random SU(2) matrix
 void rand_matrix_Su2(Su2 * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   double p0, p1, p2, p3, p;
 
   p=2.0;
@@ -796,20 +414,6 @@ void rand_matrix_Su2(Su2 * restrict A)
 // random SU(2) matrix with p0 given (used in the update)
 void rand_matrix_p0_Su2(double p0, Su2 * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   register double p1, p2, p3, p;
 
   p=2.0;
@@ -838,20 +442,6 @@ void rand_matrix_p0_Su2(double p0, Su2 * restrict A)
 // sqrt of the determinant
 double sqrtdet_Su2(Su2 const * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   return sqrt(A->comp[0]*A->comp[0] + A->comp[1]*A->comp[1]
              + A->comp[2]*A->comp[2] + A->comp[3]*A->comp[3]);
   }
@@ -860,20 +450,6 @@ double sqrtdet_Su2(Su2 const * restrict A)
 // l2 norm of the matrix
 double norm_Su2(Su2 const * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   return sqrtdet_Su2(A);
   }
 
@@ -881,20 +457,6 @@ double norm_Su2(Su2 const * restrict A)
 // real part of the trace /2
 double retr_Su2(Su2 const * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   return A->comp[0];
   }
 
@@ -902,20 +464,6 @@ double retr_Su2(Su2 const * restrict A)
 // imaginary part of the trace /2
 double imtr_Su2(Su2 const * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   (void) A; // to suppress compilation warning of unused variable
   return 0.0;
   }
@@ -924,20 +472,6 @@ double imtr_Su2(Su2 const * restrict A)
 // unitarize the matrix
 void unitarize_Su2(Su2 * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   double p;
 
   p=A->comp[0]*A->comp[0] + A->comp[1]*A->comp[1] + A->comp[2]*A->comp[2] + A->comp[3]*A->comp[3];
@@ -953,20 +487,6 @@ void unitarize_Su2(Su2 * restrict A)
 // traceless antihermitian part
 void ta_Su2(Su2 * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   A->comp[0]=0;
   }
 
@@ -974,20 +494,6 @@ void ta_Su2(Su2 * restrict A)
 // exponential of the traceless antihermitian part
 void taexp_Su2(Su2 * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   double v1, v2, v3, norm, s;
 
   // comp[0] is neglected since we consider the ta part
@@ -1156,26 +662,6 @@ void read_from_binary_file_bigen_Su2(FILE *fp, Su2 *A)
 
 void TensProd_init_Su2(TensProd * restrict TP, Su2 const * restrict A1, Su2 const * restrict A2)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)TP, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)A1, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)A2, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    TP = __builtin_assume_aligned(TP, DOUBLE_ALIGN);
-    A1 = __builtin_assume_aligned(A1, DOUBLE_ALIGN);
-    A2 = __builtin_assume_aligned(A2, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(TP, DOUBLE_ALIGN);
-       __assume_aligned(A1, DOUBLE_ALIGN);
-       __assume_aligned(A2, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j, k, l;
   double complex aux1[4] __attribute__((aligned(DOUBLE_ALIGN)));
   double complex aux2[4] __attribute__((aligned(DOUBLE_ALIGN)));
@@ -1209,8 +695,6 @@ void TensProd_init_Su2(TensProd * restrict TP, Su2 const * restrict A1, Su2 cons
 
   #undef m2
   }
-
-
 
 
 #endif

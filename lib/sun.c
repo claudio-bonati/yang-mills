@@ -18,20 +18,6 @@
 // A=1
 void one_SuN(SuN * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -49,20 +35,6 @@ void one_SuN(SuN * restrict A)
 // A=0
 void zero_SuN(SuN * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -83,23 +55,6 @@ void equal_SuN(SuN * restrict A, SuN const * restrict B)
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -118,23 +73,6 @@ void equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   int i, j;
@@ -160,23 +98,6 @@ void plus_equal_SuN(SuN * restrict A, SuN const * restrict B)
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -195,23 +116,6 @@ void plus_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   int i, j;
@@ -237,21 +141,6 @@ void minus_equal_SuN(SuN * restrict A, SuN const * restrict B)
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -272,21 +161,6 @@ void minus_equal_times_real_SuN(SuN * restrict A, SuN const * restrict B, double
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -305,21 +179,6 @@ void minus_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   int i, j;
@@ -347,26 +206,6 @@ void lin_comb_SuN(SuN * restrict A,
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -387,26 +226,6 @@ void lin_comb_dag1_SuN(SuN * restrict A,
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   int i, j;
@@ -434,26 +253,6 @@ void lin_comb_dag2_SuN(SuN * restrict A,
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j;
 
   for(i=0; i<NCOLOR; i++)
@@ -479,26 +278,6 @@ void lin_comb_dag12_SuN(SuN * restrict A,
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j;
 
   for(i=0; i<NCOLOR; i++)
@@ -514,20 +293,6 @@ void lin_comb_dag12_SuN(SuN * restrict A,
 // A*=r
 void times_equal_real_SuN(SuN * restrict A, double r)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -540,20 +305,6 @@ void times_equal_real_SuN(SuN * restrict A, double r)
 // A*=r
 void times_equal_complex_SuN(SuN * restrict A, double complex r)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -572,23 +323,6 @@ void times_equal_SuN(SuN * restrict A, SuN const * restrict B)
    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
    exit(EXIT_FAILURE);
    }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   int i, j, k;
@@ -626,23 +360,6 @@ void times_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
    }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j, k;
   double complex aux[NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
   double complex sum;
@@ -678,26 +395,6 @@ void times_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restrict C)
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j, k;
   double complex sum;
 
@@ -725,26 +422,6 @@ void times_dag1_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restri
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #endif
-
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
   #endif
 
   int i, j, k;
@@ -776,26 +453,6 @@ void times_dag2_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restri
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j, k;
   double complex sum;
 
@@ -825,26 +482,6 @@ void times_dag12_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restr
     }
   #endif
 
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)B, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)C, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    B  = __builtin_assume_aligned(B, DOUBLE_ALIGN);
-    C  = __builtin_assume_aligned(C, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(B, DOUBLE_ALIGN);
-       __assume_aligned(C, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j, k;
   double complex sum;
   
@@ -867,20 +504,6 @@ void times_dag12_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restr
 // generated a la Cabibbo Marinari with N(N-1)/2 SU(2) random matrices
 void rand_matrix_SuN(SuN * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j, k;
   double p0, p1, p2, p3, p;
   double complex aux00, aux01, aux10, aux11, temp0, temp1;
@@ -928,20 +551,6 @@ void rand_matrix_SuN(SuN * restrict A)
 // random components in the base T_i such that Tr(T_iT_j)=delta_{ij}
 void rand_algebra_gauss_matrix_SuN(SuN * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   #if NCOLOR==1
     (void) A; // just to avoid warnings
   #else
@@ -996,20 +605,6 @@ void rand_algebra_gauss_matrix_SuN(SuN * restrict A)
 // l2 norm of the matrix
 double norm_SuN(SuN const * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
   double aux, ris;
 
@@ -1026,20 +621,6 @@ double norm_SuN(SuN const * restrict A)
 // real part of the trace /N
 double retr_SuN(SuN const * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
   double ris;
   double complex tr;
@@ -1057,20 +638,6 @@ double retr_SuN(SuN const * restrict A)
 // imaginary part of the trace /N
 double imtr_SuN(SuN const * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i;
   double ris;
   double complex tr;
@@ -1089,23 +656,6 @@ double imtr_SuN(SuN const * restrict A)
 //   from Numerical Recipes in C, pag 46
 void LU_SuN(SuN const * restrict A, SuN * restrict ris, int * restrict sign)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)ris, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    ris  = __builtin_assume_aligned(ris, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-       __assume_aligned(ris, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, imax, j, k;
   double  big, temp;
   double complex sum, dum;
@@ -1183,20 +733,6 @@ void LU_SuN(SuN const * restrict A, SuN * restrict ris, int * restrict sign)
 // determinant
 complex double det_SuN(SuN const * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   #if NCOLOR==3
     complex double ris=0.0+0.0*I;
  
@@ -1237,20 +773,6 @@ complex double det_SuN(SuN const * restrict A)
 // gives 0 if the matrix is in SU(N) and 1 otherwise
 int scheck_SuN(SuN const * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j, k, ris;
   double complex aux;
 
@@ -1285,20 +807,6 @@ int scheck_SuN(SuN const * restrict A)
 // sunitarize
 void unitarize_SuN(SuN * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   const double beta_aux=1.0e+20;
   double check;
   SuN force, guess, guess_old, helper, helper2;
@@ -1333,24 +841,9 @@ void unitarize_SuN(SuN * restrict A)
 // eponential of the traceless antihermitian part
 void taexp_SuN(SuN * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   SuN aux, aux1, uno;
   complex double trace;
-  int i, j;
-  const int maxdeg=5;
+  int i;
 
   equal_SuN(&aux, A);
   equal_dag_SuN(&aux1, A);
@@ -1375,20 +868,23 @@ void taexp_SuN(SuN * restrict A)
   // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
 
   equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/(double)maxdeg);
+  times_equal_real_SuN(A, 1.0/5.0);
   plus_equal_SuN(A, &uno);
 
-  // now A=1+aux/maxdeg
+  times_equal_SuN(A, &aux);
+  times_equal_real_SuN(A, 1.0/4.0);
+  plus_equal_SuN(A, &uno);
 
-  #ifdef __INTEL_COMPILER
-  #pragma nounroll
-  #endif
-  for(j=maxdeg-1; j>0; j--)
-     {
-     times_equal_SuN(A, &aux);
-     times_equal_real_SuN(A, 1.0/(double)j );
-     plus_equal_SuN(A, &uno);
-     }
+  times_equal_SuN(A, &aux);
+  times_equal_real_SuN(A, 1.0/3.0);
+  plus_equal_SuN(A, &uno);
+
+  times_equal_SuN(A, &aux);
+  times_equal_real_SuN(A, 1.0/2.0);
+  plus_equal_SuN(A, &uno);
+
+  times_equal_SuN(A, &aux);
+  plus_equal_SuN(A, &uno);
 
   unitarize_SuN(A);
   }
@@ -1397,20 +893,6 @@ void taexp_SuN(SuN * restrict A)
 // takes the traceless antihermitian part
 void ta_SuN(SuN * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   SuN aux, aux1;
   double complex trace;
   int i;
@@ -1439,20 +921,6 @@ void ta_SuN(SuN * restrict A)
 // return 0 if matrix is traceless antihermitian, 1 otherwise
 int ta_check_SuN(const SuN * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   double complex aux;
   int i, j, ris;
 
@@ -1482,20 +950,6 @@ int ta_check_SuN(const SuN * restrict A)
 // exponential of a TA matrix
 void exp_of_ta_SuN(SuN * restrict A)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)A, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    A  = __builtin_assume_aligned(A, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(A, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   // we use
   // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
 
@@ -1507,28 +961,28 @@ void exp_of_ta_SuN(SuN * restrict A)
     }
   #endif
 
-  const int maxdeg=10;
-  int i, j;
-  SuN aux;
+  SuN aux, uno;
 
+  one_SuN(&uno);
   equal_SuN(&aux, A); // in aux the initial matrix is stored
 
-  times_equal_real_SuN(A, 1./maxdeg);
-  for(i=0; i<NCOLOR; i++)
-     {
-     A->comp[m(i,i)]+=1.0;
-     }
-  // now A=1+aux/maxdeg
+  times_equal_real_SuN(A, 1.0/5.0);
+  plus_equal_SuN(A, &uno);
 
-  for(j=maxdeg-1; j>0; j--)
-     {
-     times_equal_SuN(A, &aux);
-     times_equal_real_SuN(A, 1.0/((double) j) );
-     for(i=0; i<NCOLOR; i++)
-        {
-        A->comp[m(i,i)]+=1.0;
-        }
-     }
+  times_equal_SuN(A, &aux);
+  times_equal_real_SuN(A, 1.0/4.0);
+  plus_equal_SuN(A, &uno);
+
+  times_equal_SuN(A, &aux);
+  times_equal_real_SuN(A, 1.0/3.0);
+  plus_equal_SuN(A, &uno);
+
+  times_equal_SuN(A, &aux);
+  times_equal_real_SuN(A, 1.0/2.0);
+  plus_equal_SuN(A, &uno);
+
+  times_equal_SuN(A, &aux);
+  plus_equal_SuN(A, &uno);
 
   unitarize_SuN(A);
   }
@@ -1750,26 +1204,6 @@ void read_from_binary_file_bigen_SuN(FILE *fp, SuN *A)
 
 void TensProd_init_SuN(TensProd * restrict TP, SuN const * restrict A1, SuN const * restrict A2)
   {
-  #ifdef MEMALIGN_MODE
-    #ifdef DEBUG
-      is_aligned((void *)TP, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)A1, DOUBLE_ALIGN, __FILE__, __LINE__);
-      is_aligned((void *)A2, DOUBLE_ALIGN, __FILE__, __LINE__);
-    #endif
-
-    #if (defined(__GNUC__) && (GCC_VERSION > 40700) ) || defined(__clang__)
-    TP = __builtin_assume_aligned(TP, DOUBLE_ALIGN);
-    A1 = __builtin_assume_aligned(A1, DOUBLE_ALIGN);
-    A2 = __builtin_assume_aligned(A2, DOUBLE_ALIGN);
-    #else
-      #ifdef __INTEL_COMPILER
-       __assume_aligned(TP, DOUBLE_ALIGN);
-       __assume_aligned(A1, DOUBLE_ALIGN);
-       __assume_aligned(A2, DOUBLE_ALIGN);
-      #endif
-    #endif
-  #endif
-
   int i, j, k, l;
 
   for(i=0; i<NCOLOR; i++)
