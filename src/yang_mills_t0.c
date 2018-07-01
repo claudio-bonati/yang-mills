@@ -1,5 +1,5 @@
-#ifndef YM_LOCAL_C
-#define YM_LOCAL_C
+#ifndef YM_T0_C
+#define YM_T0_C
 
 #include"../include/macro.h"
 

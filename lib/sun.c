@@ -1347,10 +1347,10 @@ void taexp_SuN(SuN * restrict A)
     #endif
   #endif
 
-  SuN aux, aux1;
+  SuN aux, aux1, uno;
   complex double trace;
   int i, j;
-  const int maxdeg=10;
+  const int maxdeg=5;
 
   equal_SuN(&aux, A);
   equal_dag_SuN(&aux1, A);
@@ -1368,26 +1368,26 @@ void taexp_SuN(SuN * restrict A)
      aux.comp[m(i,i)]-=trace;
      }
 
+  one_SuN(&uno);
+
   // now aux is the traceless antihermitian part of the initial matrix
   // and we use
   // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
 
   equal_SuN(A, &aux);
   times_equal_real_SuN(A, 1.0/(double)maxdeg);
-  for(i=0; i<NCOLOR; i++)
-     {
-     A->comp[m(i,i)]+=1.0;
-     }
+  plus_equal_SuN(A, &uno);
+
   // now A=1+aux/maxdeg
 
+  #ifdef __INTEL_COMPILER
+  #pragma nounroll
+  #endif
   for(j=maxdeg-1; j>0; j--)
      {
      times_equal_SuN(A, &aux);
      times_equal_real_SuN(A, 1.0/(double)j );
-     for(i=0; i<NCOLOR; i++)
-        {
-        A->comp[m(i,i)]+=1.0;
-        }
+     plus_equal_SuN(A, &uno);
      }
 
   unitarize_SuN(A);
@@ -1411,29 +1411,28 @@ void ta_SuN(SuN * restrict A)
     #endif
   #endif
 
-  SuN M;
-  double complex aux, trace;
-  int i, j;
+  SuN aux, aux1;
+  double complex trace;
+  int i;
 
-  equal_SuN(&M, A);
+  equal_SuN(&aux, A);
+  equal_dag_SuN(&aux1, A);
+  minus_equal_SuN(&aux, &aux1);
+  times_equal_real_SuN(&aux, 0.5); // now aux=(A-A^{dag})/2
 
-  trace=0.0+0.0*I;
-  for(i=0; i<NCOLOR; i++)
+  trace=aux.comp[m(0,0)];
+  for(i=1; i<NCOLOR; i++)
      {
-     for(j=0; j<NCOLOR; j++)
-        {
-        aux=M.comp[m(i,j)]-conj(M.comp[m(j,i)]);
-        aux*=0.5;
-        A->comp[m(i,j)]=aux;
-        }
-     trace+=A->comp[m(i,i)];
+     trace+=aux.comp[m(i,i)];
      }
-  trace/=(double) NCOLOR;
+  trace/=(double)NCOLOR;
 
   for(i=0; i<NCOLOR; i++)
      {
-     A->comp[m(i,i)]-=trace;
+     aux.comp[m(i,i)]-=trace;
      }
+
+  equal_SuN(A, &aux);
   }
 
 
