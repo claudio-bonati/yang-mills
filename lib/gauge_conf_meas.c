@@ -149,14 +149,17 @@ void plaquette(Gauge_Conf const * const GC,
                double *plaqt)
    {
    long r;
-   int i, j;
    double ps, pt;
 
    ps=0.0;
    pt=0.0;
 
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : pt) reduction(+ : ps)
+   #endif
    for(r=0; r<(param->d_volume); r++)
       {
+      int i, j;
       i=0;
       for(j=1; j<param->d_stdim; j++)
          {
@@ -191,36 +194,39 @@ void plaquette(Gauge_Conf const * const GC,
 
 
 // compute the clover discretization of
-// 1/2 Tr(F_{\mu\nu}F_{\mu\nu})
+// sum_{\mu\nu}  Tr(F_{\mu\nu}F_{\mu\nu})/2
 void clover_disc_energy(Gauge_Conf const * const GC,
                         Geometry const * const geo,
                         GParam const * const param,
                         double *energy)
   {
   long r;
-  int i, j;
   double ris;
-  GAUGE_GROUP aux1, aux2;
 
   ris=0.0;
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+  #endif
   for(r=0; r<param->d_volume; r++)
      {
+     int i, j;
+     GAUGE_GROUP aux1, aux2;
+
      for(i=0; i<param->d_stdim; i++)
         {
         for(j=i+1; j<param->d_stdim; j++)
            {
            clover(GC, geo, param, r, i, j, &aux1);
 
-           equal_dag(&aux2, &aux1);
-           minus_equal(&aux1, &aux2);
-
+           ta(&aux1);
            equal(&aux2, &aux1);
            times_equal(&aux1, &aux2);
-
-           ris+=-NCOLOR*retr(&aux1)/64.0;
+           ris+=-NCOLOR*retr(&aux1)/16.0;
            }
         }
      }
+
   *energy=ris*param->d_inv_vol;
   }
 
@@ -232,16 +238,21 @@ void polyakov(Gauge_Conf const * const GC,
               double *repoly,
               double *impoly)
    {
-   long r, rsp;
-   int i;
+   long rsp;
    double rep, imp;
-   GAUGE_GROUP matrix;
 
    rep=0.0;
    imp=0.0;
 
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp)
+   #endif
    for(rsp=0; rsp<param->d_space_vol; rsp++)
       {
+      long r;
+      int i;
+      GAUGE_GROUP matrix;
+
       r=sisp_and_t_to_si(rsp, 0, param);
 
       one(&matrix);
@@ -265,11 +276,8 @@ double topcharge(Gauge_Conf const * const GC,
                  Geometry const * const geo,
                  GParam const * const param)
    {
-   GAUGE_GROUP aux1, aux2, aux3;
-   double ris, real1, real2, loc_charge; 
-   const double chnorm=1.0/(128.0*PI*PI);
+   double ris;
    long r;
-   int i, dir[4][4], sign;
 
    if(param->d_stdim!=4)
      {
@@ -277,25 +285,33 @@ double topcharge(Gauge_Conf const * const GC,
      exit(EXIT_FAILURE);
      }
 
-   dir[1][1] = 1;
-   dir[1][2] = 1;
-   dir[1][3] = 1;
-
-   dir[2][1] = 2;
-   dir[2][2] = 3;
-   dir[2][3] = 0;
-
-   dir[3][1] = 3;
-   dir[3][2] = 2;
-   dir[3][3] = 2;
-
-   dir[0][1] = 0;
-   dir[0][2] = 0;
-   dir[0][3] = 3;
-
    ris=0.0;
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+   #endif
    for(r=0; r<(param->d_volume); r++)
       {
+      GAUGE_GROUP aux1, aux2, aux3;
+      double real1, real2, loc_charge;
+      const double chnorm=1.0/(128.0*PI*PI);
+      int i, dir[4][4], sign;
+
+      dir[1][1] = 1;
+      dir[1][2] = 1;
+      dir[1][3] = 1;
+
+      dir[2][1] = 2;
+      dir[2][2] = 3;
+      dir[2][3] = 0;
+
+      dir[3][1] = 3;
+      dir[3][2] = 2;
+      dir[3][3] = 2;
+
+      dir[0][1] = 0;
+      dir[0][2] = 0;
+      dir[0][3] = 3;
 
       sign=1;
       loc_charge=0.0;

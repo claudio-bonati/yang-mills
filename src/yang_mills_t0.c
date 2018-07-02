@@ -26,7 +26,7 @@ void real_main(char *in_file)
 
     long count;
     const long max_count=10000;
-    double gftime, energy_clover, tch;
+    double gftime, energy_clover, energy_clover_old, tch, ris;
 
     FILE *datafilep;
     time_t time1, time2;
@@ -46,7 +46,7 @@ void real_main(char *in_file)
     initrand(param.d_randseed);
 
     // open data_file
-    datafilep=fopen(param.d_data_file, "w");
+    datafilep=fopen(param.d_data_file, "a");
 
     // initialize function_pointers
     init_function_pointers();
@@ -63,6 +63,7 @@ void real_main(char *in_file)
     time(&time1);
     gftime=0.0;
     count=0;
+    energy_clover_old=0.0;
     while(count<max_count)
          {
          gradflow_RKstep(&GC, &help1, &help2, &geo, &param, param.d_gfstep);
@@ -71,17 +72,21 @@ void real_main(char *in_file)
          clover_disc_energy(&GC, &geo, &param, &energy_clover);
          tch=topcharge(&GC, &geo, &param);
 
-         fprintf(datafilep, "%.13lf  %.13lf  %.13lf  %.13lf\n", gftime,
-                                                                energy_clover,
-                                                                energy_clover*gftime*gftime,
-                                                                tch);
+         fprintf(datafilep, "# %.13lf  %.13lf  %.13lf  %.13lf\n", gftime,
+                                                                  energy_clover,
+                                                                  energy_clover*gftime*gftime,
+                                                                  tch);
+         if(energy_clover*gftime*gftime>0.3)
+           {
+           ris = gftime - param.d_gfstep + (0.3-energy_clover_old*gftime*gftime)*param.d_gfstep/
+                              (energy_clover*gftime*gftime-energy_clover_old*gftime*gftime);
+           fprintf(datafilep, "%.13lf\n\n", ris);
+           count=(max_count+10);
+           }
          fflush(datafilep);
 
          count++;
-         if(energy_clover*gftime*gftime>0.35)
-           {
-           count+=(max_count+10);
-           }
+         energy_clover_old=energy_clover;
          }
     time(&time2);
 
