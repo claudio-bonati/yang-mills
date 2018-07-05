@@ -19,6 +19,7 @@
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
 double plaquettep(Gauge_Conf const * const GC,
                   Geometry const * const geo,
+                  GParam const * const param,
                   long r,
                   int i,
                   int j)
@@ -36,6 +37,8 @@ double plaquettep(Gauge_Conf const * const GC,
      fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
+   #else
+   (void) param; // just to avoid warning at compile time
    #endif
 
 //
@@ -163,14 +166,14 @@ void plaquette(Gauge_Conf const * const GC,
       i=0;
       for(j=1; j<param->d_stdim; j++)
          {
-         pt+=plaquettep(GC, geo, r, i, j);
+         pt+=plaquettep(GC, geo, param, r, i, j);
          }
      
       for(i=1; i<param->d_stdim; i++)
          {
          for(j=i+1; j<param->d_stdim; j++)
             {
-            ps+=plaquettep(GC, geo, r, i, j);
+            ps+=plaquettep(GC, geo, param, r, i, j);
             }
          }
       }

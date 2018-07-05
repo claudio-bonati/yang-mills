@@ -7,8 +7,6 @@
 typedef struct Geometry {
    long **d_nnp;     // d_nnp_loc[r][i] = next neighbour (on the local lattice) in dir.  i of the site r
    long **d_nnm;     // d_nnm_loc[r][i] = next neighbour (on the local lattice) in dir. -i of the site r
-   int indexing_type; // =0 for lexicographic even/odd ordering
-
 } Geometry;
 
 // these are the functions to be used in shwitching between different indices
@@ -20,7 +18,7 @@ long (*sisp_and_t_to_si)(long sisp, int t, GParam const * const param); // singl
 void (*si_to_sisp_and_t)(long *sisp, int *t, long si, GParam const * const param); // single index tot -> single index spatial and time
 
 // general functions
-void init_indexing_lexeo(Geometry * geo); // has to be called before init_geometry
+void init_indexing_lexeo(void); // has to be called before init_geometry
 
 void init_geometry(Geometry * restrict geo, GParam const * const param);
 void free_geometry(Geometry * restrict geo, GParam const * const param);

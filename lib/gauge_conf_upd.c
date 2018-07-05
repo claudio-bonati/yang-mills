@@ -184,14 +184,6 @@ void update(Gauge_Conf * GC,
    long r;
    int j, dir;
 
-   #ifdef OPENMP_MODE
-   if(geo->indexing_type!=0)
-     {
-     fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #endif
-
    // heatbath
    for(dir=0; dir<param->d_stdim; dir++)
       {
@@ -260,14 +252,6 @@ void cooling(Gauge_Conf *GC,
    long r;
    int i, k;
 
-   #ifdef OPENMP_MODE
-   if(geo->indexing_type!=0)
-     {
-     fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #endif
-
    for(k=0; k<n; k++)
       {
       // cooling
@@ -320,14 +304,6 @@ void gradflow_RKstep(Gauge_Conf *GC,
    {
    long r;
    int dir;
-
-   #ifdef OPENMP_MODE
-   if(geo->indexing_type!=0)
-     {
-     fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #endif
 
    // initialize
    for(dir=0; dir<param->d_stdim; dir++)
@@ -432,14 +408,6 @@ void ape_smearing(Gauge_Conf *GC,
    Gauge_Conf helper1;
    long r;
    int dir, count;
-
-   #ifdef OPENMP_MODE
-   if(geo->indexing_type!=0)
-     {
-     fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #endif
 
    init_gauge_conf_from_gauge_conf(&helper1, GC, param); //helper1=GC
 

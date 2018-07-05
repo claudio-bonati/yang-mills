@@ -72,6 +72,7 @@ void end_polycorr_and_polyplaq(Gauge_Conf *GC,
 // in gauge_conf_meas.c
 double plaquettep(Gauge_Conf const * const GC,
                   Geometry const * const geo,
+                  GParam const * const param,
                   long r,
                   int i,
                   int j);

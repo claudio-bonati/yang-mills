@@ -353,12 +353,14 @@ void unitarize_U1(U1 * restrict A)
   A->comp/=p;
   }
 
-// traceless antihermitian part
+// antihermitian part (NO TRACELESS!)
 void ta_U1(U1 * restrict A)
   {
-  (void) A;
-  fprintf(stderr, "For U1 it is not possible to use the function ta (%s, %d)\n", __FILE__, __LINE__);
-  exit(EXIT_FAILURE);
+  double complex aux;
+
+  aux=cimag(A->comp);
+
+  A->comp=aux;
   }
 
 

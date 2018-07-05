@@ -11,7 +11,7 @@
 #include"../include/macro.h"
 #include"../include/mymalloc.h"
 
-void init_indexing_lexeo(Geometry * geo)
+void init_indexing_lexeo(void)
   {
   cart_to_si = &cart_to_lexeo;
   si_to_cart = &lexeo_to_cart;
@@ -19,8 +19,6 @@ void init_indexing_lexeo(Geometry * geo)
   si_to_lex = &lexeo_to_lex;
   sisp_and_t_to_si=&lexeosp_and_t_to_lexeo;
   si_to_sisp_and_t=&lexeo_to_lexeosp_and_t;
-
-  geo->indexing_type=0;
   }
 
 

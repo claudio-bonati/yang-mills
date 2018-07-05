@@ -102,14 +102,6 @@ void slice_single_update(Gauge_Conf * GC,
   long r;
   int i, dir, upd_over;
 
-  #ifdef OPENMP_MODE
-  if(geo->indexing_type!=0)
-    {
-    fprintf(stderr, "Wrong indexing used! (indexing_type=%d) (%s, %d)\n", geo->indexing_type, __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
   // heatbath
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -578,7 +570,7 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
      i=0;
      for(j=1; j<param->d_stdim; j++)
         {
-        plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
+        plaq[r][tmp]=plaquettep(GC, geo, param, r4, i, j);
         tmp++;
         }
 
@@ -586,7 +578,7 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
         {
         for(j=i+1; j<param->d_stdim; j++)
            {
-           plaq[r][tmp]=plaquettep(GC, geo, r4, i, j);
+           plaq[r][tmp]=plaquettep(GC, geo, param, r4, i, j);
            tmp++;
            }
         }
