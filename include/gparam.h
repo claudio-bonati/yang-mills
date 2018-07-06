@@ -13,6 +13,7 @@ typedef struct GParam {
 
   // simulation parameters
   double d_beta;
+  double d_h[NCOLOR]; // parameters for the trace deformation
 
   // simulation details
   int d_sample;
@@ -24,6 +25,9 @@ typedef struct GParam {
   int d_start;
   int d_saveconf_back_every;
   int d_saveconf_analysis_every;
+
+  // for metropolis
+  double d_epsilon_metro;
 
   // for cooling in measures
   int d_coolsteps;
@@ -66,5 +70,6 @@ void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_en
 void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t time_end);
 void print_parameters_tube_disc(GParam * param, time_t time_start, time_t time_end);
 void print_parameters_t0(GParam * param, time_t time_start, time_t time_end);
+void print_parameters_tracedef(GParam const * const param, time_t time_start, time_t time_end, double acc);
 
 #endif

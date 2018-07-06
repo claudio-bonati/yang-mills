@@ -7,7 +7,8 @@ bin_PROGRAMS = conf_check \
                yang_mills_pot_QbarQ \
                yang_mills_pot_QbarQ_long \
                yang_mills_t0 \
-               yang_mills_tube_disc 
+               yang_mills_tube_disc \
+               yang_mills_tracedef 
 
 dSFMT = ./include/dSFMT-common.h \
         ./include/dSFMT.h \
@@ -188,8 +189,20 @@ yang_mills_tube_disc_SOURCES=./src/yang_mills_tube_disc.c \
                              $(tens_prod) \
                              $(u1) 
 
-
-
+yang_mills_tracedef_SOURCES=./src/yang_mills_tracedef.c \
+                            $(dSFMT)  \
+                            $(endian) \
+                            $(funcpoint) \
+                            $(gauge_conf) \
+                            $(geometry) \
+                            $(gparam) \
+                            ./include/macro.h \
+                            $(mymalloc) \
+                            $(random) \
+                            $(su2) \
+                            $(sun) \
+                            $(tens_prod) \
+                            $(u1) 
 
 EXTRA_DIST = ./src/input.in 
 

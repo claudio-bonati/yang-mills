@@ -110,7 +110,6 @@ void single_overrelaxation_Su2(Su2 *link, Su2 const * const staple)
       }
     }
 
-
 // cooling
 void cool_Su2(Su2 *link, Su2 const * const staple)
     {

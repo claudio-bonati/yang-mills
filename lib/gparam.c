@@ -1,6 +1,7 @@
 #ifndef GPARAM_C
 #define GPARAM_C
 
+#include<math.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -71,6 +72,11 @@ void readinput(char *in_file, GParam *param)
        param->d_ml_step[i]=0;
        }
 
+    for(i=0; i<NCOLOR; i++)
+       {
+       param->d_h[i]=0.0;
+       }
+
     param->d_stdim=STDIM;
 
     input=fopen(in_file, "r");  // open the input file
@@ -116,6 +122,19 @@ void readinput(char *in_file, GParam *param)
                     exit(EXIT_FAILURE);
                     }
                   param->d_beta=temp_d;
+                  }
+           else if(strncmp(str, "htracedef", 9)==0)
+                  {
+                  for(i=0; i<(int)floor(NCOLOR/2.0); i++)
+                     {
+                     err=fscanf(input, "%lf", &temp_d);
+                     if(err!=1)
+                       {
+                       fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                       exit(EXIT_FAILURE);
+                       }
+                     param->d_h[i]=temp_d;
+                     }
                   }
 
            else if(strncmp(str, "sample", 6)==0)
@@ -189,6 +208,18 @@ void readinput(char *in_file, GParam *param)
                     }
                   param->d_saveconf_analysis_every=temp_i;
                   }
+
+           else if(strncmp(str, "epsilon_metro", 13)==0)
+                  {
+                  err=fscanf(input, "%lf", &temp_d);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_epsilon_metro=temp_d;
+                  }
+
 
            else if(strncmp(str, "coolsteps", 9)==0)
                   {
@@ -799,6 +830,81 @@ void print_parameters_t0(GParam * param, time_t time_start, time_t time_end)
 
     fclose(fp);
     }
+
+// print simulation parameters for the tracedef case
+void print_parameters_tracedef(GParam const * const param, time_t time_start, time_t time_end, double acc)
+    {
+    FILE *fp;
+    int i;
+    double diff_sec;
+
+    fp=fopen(param->d_log_file, "w");
+    fprintf(fp, "+--------------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_tracedef |\n");
+    fprintf(fp, "+--------------------------------------------+\n\n");
+
+    #ifdef OPENMP_MODE
+     fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
+    #endif
+
+    fprintf(fp, "number of colors: %d\n", NCOLOR);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", param->d_stdim);
+
+    fprintf(fp, "lattice: %d", param->d_size[0]);
+    for(i=1; i<param->d_stdim; i++)
+       {
+       fprintf(fp, "x%d", param->d_size[i]);
+       }
+    fprintf(fp, "\n\n");
+
+    fprintf(fp, "beta: %.10lf\n", param->d_beta);
+    fprintf(fp, "h: %.10lf ", param->d_h[0]);
+    for(i=1; i<(int) floor(NCOLOR/2.0); i++)
+       {
+       fprintf(fp, "%.10lf ", param->d_h[i]);
+       }
+    fprintf(fp, "\n\n");
+
+    fprintf(fp, "sample:    %d\n", param->d_sample);
+    fprintf(fp, "thermal:   %d\n", param->d_thermal);
+    fprintf(fp, "overrelax: %d\n", param->d_overrelax);
+    fprintf(fp, "measevery: %d\n", param->d_measevery);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "start:                   %d\n", param->d_start);
+    fprintf(fp, "saveconf_back_every:     %d\n", param->d_saveconf_back_every);
+    fprintf(fp, "saveconf_analysis_every: %d\n", param->d_saveconf_analysis_every);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "epsilon_metro: %.10lf\n", param->d_epsilon_metro);
+    fprintf(fp, "metropolis acceptance: %.10lf\n", acc);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "coolsteps:      %d\n", param->d_coolsteps);
+    fprintf(fp, "coolrepeat:     %d\n", param->d_coolrepeat);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "randseed: %u\n", param->d_randseed);
+    fprintf(fp, "\n");
+
+    diff_sec = difftime(time_end, time_start);
+    fprintf(fp, "Simulation time: %.3lf seconds\n", diff_sec );
+    fprintf(fp, "\n");
+
+    if(endian()==0)
+      {
+      fprintf(fp, "Little endian machine\n\n");
+      }
+    else
+      {
+      fprintf(fp, "Big endian machine\n\n");
+      }
+
+    fclose(fp);
+    }
+
+
+
 
 
 #endif

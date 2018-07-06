@@ -1,6 +1,7 @@
 size 4 4 4 4 
 
-beta 5.705
+beta       5.705
+htracedef  1.1
 
 sample    10
 thermal   0
@@ -10,6 +11,9 @@ measevery 1
 start                   0  # 0=ordered  1=random  2=from saved configuration
 saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates
 saveconf_analysis_every 5  # if 0 does not save, else save configurations for analysis every ... updates
+
+#for metropolis
+epsilon_metro    0.25  #distance from the identity of the random matrix for metropolis
 
 #for cooling measures
 coolsteps  3     # number of cooling steps to be used
