@@ -119,9 +119,10 @@ void calcstaples_tracedef(Gauge_Conf const * const restrict GC,
 
      one(&aux);
 
-     rnext=nnp(geo, r, 0);
+     rnext=r;
      for(j=1; j<param->d_size[0]; j++)
         {
+        rnext=nnp(geo, rnext, 0);
         times_equal(&aux, &(GC->lattice[rnext][0]));
         }
 
@@ -291,7 +292,7 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
         times_equal(&tmp_matrix, &poly);
         rpart=NCOLOR*retr(&tmp_matrix);
         ipart=NCOLOR*imtr(&tmp_matrix);
-        action_old += param->d_h[i]*(rpart*rpart+ipart*ipart);
+        action_old += param->d_h[j]*(rpart*rpart+ipart*ipart);
         }
      }
 
@@ -323,7 +324,7 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
         times_equal(&tmp_matrix, &poly);
         rpart=NCOLOR*retr(&tmp_matrix);
         ipart=NCOLOR*imtr(&tmp_matrix);
-        action_new += param->d_h[i]*(rpart*rpart+ipart*ipart);
+        action_new += param->d_h[j]*(rpart*rpart+ipart*ipart);
         }
      }
 
