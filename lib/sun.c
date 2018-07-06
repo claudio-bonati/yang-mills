@@ -841,8 +841,10 @@ void unitarize_SuN(SuN *A)
 // eponential of the traceless antihermitian part
 void taexp_SuN(SuN *A)
   {
-  SuN aux, uno;
-  ta_SuN(A);
+  SuN aux, uno, ris;
+
+  equal_SuN(&aux, A);
+  ta_SuN(&aux);
 
   one_SuN(&uno);
 
@@ -850,26 +852,27 @@ void taexp_SuN(SuN *A)
   // and we use
   // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
 
-  equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/5.0);
-  plus_equal_SuN(A, &uno);
+  equal_SuN(&ris, &aux);
+  times_equal_real_SuN(&ris, 0.2);
+  plus_equal_SuN(&ris, &uno);
 
-  times_equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/4.0);
-  plus_equal_SuN(A, &uno);
+  times_equal_SuN(&ris, &aux);
+  times_equal_real_SuN(&ris, 0.25);
+  plus_equal_SuN(&ris, &uno);
 
-  times_equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/3.0);
-  plus_equal_SuN(A, &uno);
+  times_equal_SuN(&ris, &aux);
+  times_equal_real_SuN(&ris, 0.33333333333333333333);
+  plus_equal_SuN(&ris, &uno);
 
-  times_equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/2.0);
-  plus_equal_SuN(A, &uno);
+  times_equal_SuN(&ris, &aux);
+  times_equal_real_SuN(&ris, 0.5);
+  plus_equal_SuN(&ris, &uno);
 
-  times_equal_SuN(A, &aux);
-  plus_equal_SuN(A, &uno);
+  times_equal_SuN(&ris, &aux);
+  plus_equal_SuN(&ris, &uno);
 
-  unitarize_SuN(A);
+  unitarize_SuN(&ris);
+  equal_SuN(A, &ris);
   }
 
 
