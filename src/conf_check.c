@@ -153,7 +153,7 @@ void computehash(char *infile, int dim, long volume, char *hash)
 int main (int argc, char **argv)
     {
     char infile[STD_STRING_LENGTH];
-    int i, dim, *sides;
+    int dim, *sides;
 
     #ifdef HASH_MODE
       long volumel;
@@ -203,7 +203,7 @@ int main (int argc, char **argv)
     #ifdef HASH_MODE
     // total volume
     volumel=1;
-    for(i=0; i<dim; i++)
+    for(int i=0; i<dim; i++)
        {
        volumel*=sides[i];
        }
