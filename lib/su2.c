@@ -16,7 +16,7 @@
 // sigma_j are Pauli matrices, comp[j] are real and \sum_{j=0}^3 comp[j]^2=1
 //
 
-void init_Su2(Su2 * restrict A, double vec[4])
+void init_Su2(Su2 *A, double vec[4])
   {
   A->comp[0]=vec[0];
   A->comp[1]=vec[1];
@@ -26,7 +26,7 @@ void init_Su2(Su2 * restrict A, double vec[4])
   
 
 // A=1
-void one_Su2(Su2 * restrict A)
+void one_Su2(Su2 *A)
   {
   A->comp[0]=1.0;
   A->comp[1]=0.0;
@@ -36,7 +36,7 @@ void one_Su2(Su2 * restrict A)
 
 
 // A=0
-void zero_Su2(Su2 * restrict A)
+void zero_Su2(Su2 *A)
   {
   A->comp[0]=0.0;
   A->comp[1]=0.0;
@@ -46,7 +46,7 @@ void zero_Su2(Su2 * restrict A)
 
 
 // A=B
-void equal_Su2(Su2 * restrict A, Su2 const * restrict B)
+void equal_Su2(Su2 *A, Su2 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -64,7 +64,7 @@ void equal_Su2(Su2 * restrict A, Su2 const * restrict B)
 
 
 // A=B^{dag}
-void equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
+void equal_dag_Su2(Su2 *A, Su2 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -82,7 +82,7 @@ void equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
 
 
 // A+=B
-void plus_equal_Su2(Su2 * restrict A, Su2 const * restrict B)
+void plus_equal_Su2(Su2 *A, Su2 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -100,7 +100,7 @@ void plus_equal_Su2(Su2 * restrict A, Su2 const * restrict B)
 
 
 // A+=B^{dag}
-void plus_equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
+void plus_equal_dag_Su2(Su2 *A, Su2 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -118,7 +118,7 @@ void plus_equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
 
 
 // A-=B
-void minus_equal_Su2(Su2 * restrict A, Su2 const * restrict B)
+void minus_equal_Su2(Su2 *A, Su2 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -136,7 +136,7 @@ void minus_equal_Su2(Su2 * restrict A, Su2 const * restrict B)
 
 
 // A-=(r*B)
-void minus_equal_times_real_Su2(Su2 * restrict A, Su2 const * restrict B, double r)
+void minus_equal_times_real_Su2(Su2 *A, Su2 const * const B, double r)
   {
   #ifdef DEBUG
   if(A==B)
@@ -154,7 +154,7 @@ void minus_equal_times_real_Su2(Su2 * restrict A, Su2 const * restrict B, double
 
 
 // A-=B^{dag}
-void minus_equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
+void minus_equal_dag_Su2(Su2 *A, Su2 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -172,9 +172,9 @@ void minus_equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
 
 
 // A=b*B+c*C
-void lin_comb_Su2(Su2 * restrict A,
-                  double b, Su2 const * restrict B,
-                  double c, Su2 const * restrict C)
+void lin_comb_Su2(Su2 *A,
+                  double b, Su2 const * const B,
+                  double c, Su2 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -192,9 +192,9 @@ void lin_comb_Su2(Su2 * restrict A,
 
 
 // A=b*B^{dag}+c*C
-void lin_comb_dag1_Su2(Su2 * restrict A,
-                       double b, Su2 const * restrict B,
-                       double c, Su2 const * restrict C)
+void lin_comb_dag1_Su2(Su2 *A,
+                       double b, Su2 const * const B,
+                       double c, Su2 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -212,9 +212,9 @@ void lin_comb_dag1_Su2(Su2 * restrict A,
 
 
 // A=b*B+c*C^{dag}
-void lin_comb_dag2_Su2(Su2 * restrict A,
-                       double b, Su2 const * restrict B,
-                       double c, Su2 const * restrict C)
+void lin_comb_dag2_Su2(Su2 *A,
+                       double b, Su2 const * const B,
+                       double c, Su2 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -232,9 +232,9 @@ void lin_comb_dag2_Su2(Su2 * restrict A,
 
 
 // A=b*B^{dag}+c*C^{dag}
-void lin_comb_dag12_Su2(Su2 * restrict A,
-                        double b, Su2 const * restrict B,
-                        double c, Su2 const * restrict C)
+void lin_comb_dag12_Su2(Su2 *A,
+                        double b, Su2 const * const B,
+                        double c, Su2 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -252,7 +252,7 @@ void lin_comb_dag12_Su2(Su2 * restrict A,
 
 
 // A*=r
-void times_equal_real_Su2(Su2 * restrict A, double r)
+void times_equal_real_Su2(Su2 *A, double r)
   {
 
   A->comp[0]*=r;
@@ -263,7 +263,7 @@ void times_equal_real_Su2(Su2 * restrict A, double r)
 
 
 // A*=B
-void times_equal_Su2(Su2 * restrict A, Su2 const * restrict B)
+void times_equal_Su2(Su2 *A, Su2 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -288,7 +288,7 @@ void times_equal_Su2(Su2 * restrict A, Su2 const * restrict B)
 
 
 // A*=B^{dag}
-void times_equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
+void times_equal_dag_Su2(Su2 *A, Su2 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -313,7 +313,7 @@ void times_equal_dag_Su2(Su2 * restrict A, Su2 const * restrict B)
 
 
 // A=B*C
-void times_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restrict C)
+void times_Su2(Su2 *A, Su2 const * const B, Su2 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -331,7 +331,7 @@ void times_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restrict C)
 
 
 // A=B^{dag}*C
-void times_dag1_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restrict C)
+void times_dag1_Su2(Su2 *A, Su2 const * const B, Su2 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -349,7 +349,7 @@ void times_dag1_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restri
 
 
 // A=B*C^{dag}
-void times_dag2_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restrict C)
+void times_dag2_Su2(Su2 *A, Su2 const * const B, Su2 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -367,7 +367,7 @@ void times_dag2_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restri
 
 
 // A=B^{dag}*C^{dag}
-void times_dag12_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restrict C)
+void times_dag12_Su2(Su2 *A, Su2 const * const B, Su2 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -385,7 +385,7 @@ void times_dag12_Su2(Su2 * restrict A, Su2 const * restrict B, Su2 const * restr
 
 
 // random SU(2) matrix
-void rand_matrix_Su2(Su2 * restrict A)
+void rand_matrix_Su2(Su2 *A)
   {
   double p0, p1, p2, p3, p;
 
@@ -412,7 +412,7 @@ void rand_matrix_Su2(Su2 * restrict A)
 
 
 // random SU(2) matrix with p0 given (used in the update)
-void rand_matrix_p0_Su2(double p0, Su2 * restrict A)
+void rand_matrix_p0_Su2(double p0, Su2 *A)
   {
   register double p1, p2, p3, p;
 
@@ -440,7 +440,7 @@ void rand_matrix_p0_Su2(double p0, Su2 * restrict A)
 
 
 // sqrt of the determinant
-double sqrtdet_Su2(Su2 const * restrict A)
+double sqrtdet_Su2(Su2 const * const A)
   {
   return sqrt(A->comp[0]*A->comp[0] + A->comp[1]*A->comp[1]
              + A->comp[2]*A->comp[2] + A->comp[3]*A->comp[3]);
@@ -448,21 +448,21 @@ double sqrtdet_Su2(Su2 const * restrict A)
 
 
 // l2 norm of the matrix
-double norm_Su2(Su2 const * restrict A)
+double norm_Su2(Su2 const * const A)
   {
   return sqrtdet_Su2(A);
   }
 
 
 // real part of the trace /2
-double retr_Su2(Su2 const * restrict A)
+double retr_Su2(Su2 const * const A)
   {
   return A->comp[0];
   }
 
 
 // imaginary part of the trace /2
-double imtr_Su2(Su2 const * restrict A)
+double imtr_Su2(Su2 const * const A)
   {
   (void) A; // to suppress compilation warning of unused variable
   return 0.0;
@@ -470,7 +470,7 @@ double imtr_Su2(Su2 const * restrict A)
 
 
 // unitarize the matrix
-void unitarize_Su2(Su2 * restrict A)
+void unitarize_Su2(Su2 *A)
   {
   double p;
 
@@ -485,14 +485,14 @@ void unitarize_Su2(Su2 * restrict A)
 
 
 // traceless antihermitian part
-void ta_Su2(Su2 * restrict A)
+void ta_Su2(Su2 *A)
   {
   A->comp[0]=0;
   }
 
 
 // exponential of the traceless antihermitian part
-void taexp_Su2(Su2 * restrict A)
+void taexp_Su2(Su2 *A)
   {
   double v1, v2, v3, norm, s;
 
@@ -581,7 +581,7 @@ void print_on_binary_file_swap_Su2(FILE *fp, Su2 const * const A)
 
 
 // print on binary file in big endian format
-void print_on_binary_file_bigen_Su2(FILE *fp, const Su2 * const A)
+void print_on_binary_file_bigen_Su2(FILE *fp, Su2 const * const A)
   {
   if(endian()==0) // little endian machine
     {
@@ -660,7 +660,7 @@ void read_from_binary_file_bigen_Su2(FILE *fp, Su2 *A)
   }
 
 
-void TensProd_init_Su2(TensProd * restrict TP, Su2 const * restrict A1, Su2 const * restrict A2)
+void TensProd_init_Su2(TensProd *TP, Su2 const * const A1, Su2 const * const A2)
   {
   int i, j, k, l;
   double complex aux1[4] __attribute__((aligned(DOUBLE_ALIGN)));

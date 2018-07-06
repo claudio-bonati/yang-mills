@@ -76,9 +76,9 @@ double plaquettep(Gauge_Conf const * const GC,
                   long r,
                   int i,
                   int j);
-void clover(Gauge_Conf const * const restrict GC,
-            Geometry const * const restrict geo,
-            GParam const * const restrict param,
+void clover(Gauge_Conf const * const GC,
+            Geometry const * const geo,
+            GParam const * const param,
             long r,
             int j,
             int i,
@@ -171,26 +171,26 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
 
 
 // in gauge_conf_upd.c
-void calcstaples_wilson(Gauge_Conf const * const restrict GC,
-                        Geometry const * const restrict geo,
-                        GParam const * const restrict gparam,
+void calcstaples_wilson(Gauge_Conf const * const GC,
+                        Geometry const * const geo,
+                        GParam const * const gparam,
                         long r,
                         int i,
-                        GAUGE_GROUP * restrict M);
-void calcstaples_tracedef(Gauge_Conf const * const restrict GC,
+                        GAUGE_GROUP *M);
+void calcstaples_tracedef(Gauge_Conf const * const GC,
                           Geometry const * const geo,
                           GParam const * const param,
                           long r,
                           int i,
-                          GAUGE_GROUP * restrict M);
-void heatbath(Gauge_Conf * restrict GC,
-              Geometry const * const restrict geo,
-              GParam const * const restrict param,
+                          GAUGE_GROUP * M);
+void heatbath(Gauge_Conf * GC,
+              Geometry const * const geo,
+              GParam const * const param,
               long r,
               int i);
-void overrelaxation(Gauge_Conf * restrict GC,
-                    Geometry const * const restrict geo,
-                    GParam const * const restrict param,
+void overrelaxation(Gauge_Conf * GC,
+                    Geometry const * const geo,
+                    GParam const * const param,
                     long r,
                     int i);
 int metropolis(Gauge_Conf *GC,
@@ -203,9 +203,9 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
                              GParam const * const param,
                              long r,
                              int i);
-void update(Gauge_Conf * restrict GC,
-            Geometry const * const restrict geo,
-            GParam const * const restrict param);
+void update(Gauge_Conf * GC,
+            Geometry const * const geo,
+            GParam const * const param);
 void update_with_trace_def(Gauge_Conf * GC,
                            Geometry const * const geo,
                            GParam const * const param,

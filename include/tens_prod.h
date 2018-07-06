@@ -15,20 +15,20 @@ typedef struct TensProd {
 void zero_TensProd(TensProd * A);
 void one_TensProd(TensProd *A);
 
-void equal_TensProd(TensProd * restrict A, TensProd const * restrict B); // A=B
+void equal_TensProd(TensProd *A, TensProd const * const B); // A=B
 
-void times_equal_real_TensProd(TensProd * restrict A, double r); // A*=r
-void times_equal_complex_TensProd(TensProd * restrict A, double complex r); // A*=r
+void times_equal_real_TensProd(TensProd *A, double r); // A*=r
+void times_equal_complex_TensProd(TensProd *A, double complex r); // A*=r
 
-void plus_equal_TensProd(TensProd * restrict A, TensProd const * restrict B); // A+=B
+void plus_equal_TensProd(TensProd *A, TensProd const * const B); // A+=B
 
-void times_TensProd(TensProd * restrict A,
-                    TensProd const * restrict B,
-                    TensProd const * restrict C); // A=B*C
-void times_equal_TensProd(TensProd * restrict A, TensProd const * restrict B); // A*=B
+void times_TensProd(TensProd *A,
+                    TensProd const * const B,
+                    TensProd const * const C); // A=B*C
+void times_equal_TensProd(TensProd *A, TensProd const * const B); // A*=B
 
-double retr_TensProd(TensProd const * restrict A);
-double imtr_TensProd(TensProd const * restrict A);
+double retr_TensProd(TensProd const * const A);
+double imtr_TensProd(TensProd const * const A);
 
 void print_on_screen_TensProd(TensProd const * const A);
 void print_on_file_TensProd(FILE *fp, TensProd const * const A);

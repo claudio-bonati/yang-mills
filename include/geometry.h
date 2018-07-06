@@ -20,8 +20,8 @@ void (*si_to_sisp_and_t)(long *sisp, int *t, long si, GParam const * const param
 // general functions
 void init_indexing_lexeo(void); // has to be called before init_geometry
 
-void init_geometry(Geometry * restrict geo, GParam const * const param);
-void free_geometry(Geometry * restrict geo, GParam const * const param);
+void init_geometry(Geometry *geo, GParam const * const param);
+void free_geometry(Geometry *geo, GParam const * const param);
 
 long nnp(Geometry const * const geo, long r, int i);
 long nnm(Geometry const * const geo, long r, int i);

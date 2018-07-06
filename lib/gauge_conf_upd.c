@@ -15,12 +15,12 @@
 #include"../include/random.h"
 
 // compute the staple in position r, direction i and save it in M
-void calcstaples_wilson(Gauge_Conf const * const restrict GC,
+void calcstaples_wilson(Gauge_Conf const * const GC,
                         Geometry const * const geo,
                         GParam const * const param,
                         long r,
                         int i,
-                        GAUGE_GROUP * restrict M)
+                        GAUGE_GROUP *M)
    {
    int j, l;
    long k;
@@ -96,12 +96,12 @@ void calcstaples_wilson(Gauge_Conf const * const restrict GC,
 
 // compute the staple for the trace deformed theory:
 // in practice a Polyakov loop without a link
-void calcstaples_tracedef(Gauge_Conf const * const restrict GC,
+void calcstaples_tracedef(Gauge_Conf const * const GC,
                           Geometry const * const geo,
                           GParam const * const param,
                           long r,
                           int i,
-                          GAUGE_GROUP * restrict M)
+                          GAUGE_GROUP * M)
    {
    if(i!=0)
      {

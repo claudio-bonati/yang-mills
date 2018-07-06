@@ -13,28 +13,28 @@
 #include"../include/tens_prod.h"
 #include"../include/u1.h"
 
-void init_U1(U1 * restrict A, double complex vec)
+void init_U1(U1 *A, double complex vec)
   {
   A->comp=vec;
   }
 
 
 // A=1
-void one_U1(U1 * restrict A)
+void one_U1(U1 *A)
   {
   A->comp=1.0;
   }
 
 
 // A=0
-void zero_U1(U1 * restrict A)
+void zero_U1(U1 *A)
   {
   A->comp=0.0;
   }
 
 
 // A=B
-void equal_U1(U1 * restrict A, U1 const * restrict B)
+void equal_U1(U1 *A, U1 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -49,7 +49,7 @@ void equal_U1(U1 * restrict A, U1 const * restrict B)
 
 
 // A=B^{dag}
-void equal_dag_U1(U1 * restrict A, U1 const * restrict B)
+void equal_dag_U1(U1 *A, U1 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -64,7 +64,7 @@ void equal_dag_U1(U1 * restrict A, U1 const * restrict B)
 
 
 // A+=B
-void plus_equal_U1(U1 * restrict A, U1 const * restrict B)
+void plus_equal_U1(U1 *A, U1 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -79,7 +79,7 @@ void plus_equal_U1(U1 * restrict A, U1 const * restrict B)
 
 
 // A+=B^{dag}
-void plus_equal_dag_U1(U1 * restrict A, U1 const * restrict B)
+void plus_equal_dag_U1(U1 *A, U1 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -94,7 +94,7 @@ void plus_equal_dag_U1(U1 * restrict A, U1 const * restrict B)
 
 
 // A-=B
-void minus_equal_U1(U1 * restrict A, U1 const * restrict B)
+void minus_equal_U1(U1 *A, U1 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -109,7 +109,7 @@ void minus_equal_U1(U1 * restrict A, U1 const * restrict B)
 
 
 // A-=(r*B)
-void minus_equal_times_real_U1(U1 * restrict A, U1 const * restrict B, double r)
+void minus_equal_times_real_U1(U1 *A, U1 const * const B, double r)
   {
   #ifdef DEBUG
   if(A==B)
@@ -124,7 +124,7 @@ void minus_equal_times_real_U1(U1 * restrict A, U1 const * restrict B, double r)
 
 
 // A-=B^{dag}
-void minus_equal_dag_U1(U1 * restrict A, U1 const * restrict B)
+void minus_equal_dag_U1(U1 *A, U1 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -139,9 +139,9 @@ void minus_equal_dag_U1(U1 * restrict A, U1 const * restrict B)
 
 
 // A=b*B+c*C
-void lin_comb_U1(U1 * restrict A,
-                  double b, U1 const * restrict B,
-                  double c, U1 const * restrict C)
+void lin_comb_U1(U1 *A,
+                  double b, U1 const * const B,
+                  double c, U1 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -156,9 +156,9 @@ void lin_comb_U1(U1 * restrict A,
 
 
 // A=b*B^{dag}+c*C
-void lin_comb_dag1_U1(U1 * restrict A,
-                       double b, U1 const * restrict B,
-                       double c, U1 const * restrict C)
+void lin_comb_dag1_U1(U1 *A,
+                       double b, U1 const * const B,
+                       double c, U1 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -173,9 +173,9 @@ void lin_comb_dag1_U1(U1 * restrict A,
 
 
 // A=b*B+c*C^{dag}
-void lin_comb_dag2_U1(U1 * restrict A,
-                       double b, U1 const * restrict B,
-                       double c, U1 const * restrict C)
+void lin_comb_dag2_U1(U1 *A,
+                       double b, U1 const * const B,
+                       double c, U1 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -190,9 +190,9 @@ void lin_comb_dag2_U1(U1 * restrict A,
 
 
 // A=b*B^{dag}+c*C^{dag}
-void lin_comb_dag12_U1(U1 * restrict A,
-                        double b, U1 const * restrict B,
-                        double c, U1 const * restrict C)
+void lin_comb_dag12_U1(U1 *A,
+                        double b, U1 const * const B,
+                        double c, U1 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -207,14 +207,14 @@ void lin_comb_dag12_U1(U1 * restrict A,
 
 
 // A*=r
-void times_equal_real_U1(U1 * restrict A, double r)
+void times_equal_real_U1(U1 *A, double r)
   {
   A->comp*=r;
   }
 
 
 // A*=B
-void times_equal_U1(U1 * restrict A, U1 const * restrict B)
+void times_equal_U1(U1 *A, U1 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -229,7 +229,7 @@ void times_equal_U1(U1 * restrict A, U1 const * restrict B)
 
 
 // A*=B^{dag}
-void times_equal_dag_U1(U1 * restrict A, U1 const * restrict B)
+void times_equal_dag_U1(U1 *A, U1 const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -244,7 +244,7 @@ void times_equal_dag_U1(U1 * restrict A, U1 const * restrict B)
 
 
 // A=B*C
-void times_U1(U1 * restrict A, U1 const * restrict B, U1 const * restrict C)
+void times_U1(U1 *A, U1 const * const B, U1 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -259,7 +259,7 @@ void times_U1(U1 * restrict A, U1 const * restrict B, U1 const * restrict C)
 
 
 // A=B^{dag}*C
-void times_dag1_U1(U1 * restrict A, U1 const * restrict B, U1 const * restrict C)
+void times_dag1_U1(U1 *A, U1 const * const B, U1 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -274,7 +274,7 @@ void times_dag1_U1(U1 * restrict A, U1 const * restrict B, U1 const * restrict C
 
 
 // A=B*C^{dag}
-void times_dag2_U1(U1 * restrict A, U1 const * restrict B, U1 const * restrict C)
+void times_dag2_U1(U1 *A, U1 const * const B, U1 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -289,7 +289,7 @@ void times_dag2_U1(U1 * restrict A, U1 const * restrict B, U1 const * restrict C
 
 
 // A=B^{dag}*C^{dag}
-void times_dag12_U1(U1 * restrict A, U1 const * restrict B, U1 const * restrict C)
+void times_dag12_U1(U1 *A, U1 const * const B, U1 const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -303,7 +303,7 @@ void times_dag12_U1(U1 * restrict A, U1 const * restrict B, U1 const * restrict 
   }
 
 
-void rand_matrix_U1(U1 * restrict A)
+void rand_matrix_U1(U1 *A)
   {
   double p0, p1, p;
 
@@ -324,28 +324,28 @@ void rand_matrix_U1(U1 * restrict A)
 
 
 // l2 norm of the matrix
-double norm_U1(U1 const * restrict A)
+double norm_U1(U1 const * const A)
   {
   return sqrt(creal(A->comp)*creal(A->comp)+cimag(A->comp)*cimag(A->comp));
   }
 
 
 // real part of the trace
-double retr_U1(U1 const * restrict A)
+double retr_U1(U1 const * const A)
   {
   return creal(A->comp);
   }
 
 
 // imaginary part of the trace
-double imtr_U1(U1 const * restrict A)
+double imtr_U1(U1 const * const A)
   {
   return cimag(A->comp);
   }
 
 
 // unitarize the matrix
-void unitarize_U1(U1 * restrict A)
+void unitarize_U1(U1 *A)
   {
   double p;
 
@@ -354,7 +354,7 @@ void unitarize_U1(U1 * restrict A)
   }
 
 // antihermitian part (NO TRACELESS!)
-void ta_U1(U1 * restrict A)
+void ta_U1(U1 *A)
   {
   double complex aux;
 
@@ -366,7 +366,7 @@ void ta_U1(U1 * restrict A)
 
 
 // exponential of the antihermitian part (NO TRACELESS!)
-void taexp_U1(U1 * restrict A)
+void taexp_U1(U1 *A)
   {
   double angle, c, s;
 
@@ -525,7 +525,7 @@ void read_from_binary_file_bigen_U1(FILE *fp, U1 *A)
   }
 
 
-void TensProd_init_U1(TensProd * restrict TP, U1 const * restrict A1, U1 const * restrict A2)
+void TensProd_init_U1(TensProd *TP, U1 const * const A1, U1 const * const A2)
   {
   TP->comp[0][0][0][0]=conj(A1->comp)*A2->comp;
   }

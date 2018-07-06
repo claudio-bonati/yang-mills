@@ -62,13 +62,13 @@ double plaquettep(Gauge_Conf const * const GC,
 
 
 // compute the four-leaf clover in position r, in the plane i,j and save it in M
-void clover(Gauge_Conf const * const restrict GC,
+void clover(Gauge_Conf const * const GC,
             Geometry const * const geo,
             GParam const * const param,
             long r,
             int j,
             int i,
-            GAUGE_GROUP * restrict M)
+            GAUGE_GROUP *M)
    {
    GAUGE_GROUP aux;
    long k, p;

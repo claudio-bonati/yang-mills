@@ -16,7 +16,7 @@
 #include"../include/tens_prod.h"
 
 // A=1
-void one_SuN(SuN * restrict A)
+void one_SuN(SuN *A)
   {
   int i;
 
@@ -33,7 +33,7 @@ void one_SuN(SuN * restrict A)
 
 
 // A=0
-void zero_SuN(SuN * restrict A)
+void zero_SuN(SuN *A)
   {
   int i;
 
@@ -45,7 +45,7 @@ void zero_SuN(SuN * restrict A)
 
 
 // A=B
-void equal_SuN(SuN * restrict A, SuN const * restrict B)
+void equal_SuN(SuN *A, SuN const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -65,7 +65,7 @@ void equal_SuN(SuN * restrict A, SuN const * restrict B)
 
 
 // A=B^{dag}
-void equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
+void equal_dag_SuN(SuN *A, SuN const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -88,7 +88,7 @@ void equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
 
 
 // A+=B
-void plus_equal_SuN(SuN * restrict A, SuN const * restrict B)
+void plus_equal_SuN(SuN *A, SuN const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -108,7 +108,7 @@ void plus_equal_SuN(SuN * restrict A, SuN const * restrict B)
 
 
 // A+=B^{dag}
-void plus_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
+void plus_equal_dag_SuN(SuN *A, SuN const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -131,7 +131,7 @@ void plus_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
 
 
 // A-=B
-void minus_equal_SuN(SuN * restrict A, SuN const * restrict B)
+void minus_equal_SuN(SuN *A, SuN const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -151,7 +151,7 @@ void minus_equal_SuN(SuN * restrict A, SuN const * restrict B)
 
 
 // A-=(r*B)
-void minus_equal_times_real_SuN(SuN * restrict A, SuN const * restrict B, double r)
+void minus_equal_times_real_SuN(SuN *A, SuN const * const B, double r)
   {
   #ifdef DEBUG
   if(A==B)
@@ -171,7 +171,7 @@ void minus_equal_times_real_SuN(SuN * restrict A, SuN const * restrict B, double
 
 
 // A-=B^{dag}
-void minus_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
+void minus_equal_dag_SuN(SuN *A, SuN const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -194,9 +194,9 @@ void minus_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
 
 
 // A=b*B+c*C
-void lin_comb_SuN(SuN * restrict A,
-                  double b, SuN const * restrict B,
-                  double c, SuN const * restrict C)
+void lin_comb_SuN(SuN *A,
+                  double b, SuN const * const B,
+                  double c, SuN const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -216,9 +216,9 @@ void lin_comb_SuN(SuN * restrict A,
 
 
 // A=b*B^{dag}+c*C
-void lin_comb_dag1_SuN(SuN * restrict A,
-                       double b, SuN const * restrict B,
-                       double c, SuN const * restrict C)
+void lin_comb_dag1_SuN(SuN *A,
+                       double b, SuN const * const B,
+                       double c, SuN const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -241,9 +241,9 @@ void lin_comb_dag1_SuN(SuN * restrict A,
 
 
 // A=b*B+c*C^{dag}
-void lin_comb_dag2_SuN(SuN * restrict A,
-                       double b, SuN const * restrict B,
-                       double c, SuN const * restrict C)
+void lin_comb_dag2_SuN(SuN *A,
+                       double b, SuN const * const B,
+                       double c, SuN const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -266,9 +266,9 @@ void lin_comb_dag2_SuN(SuN * restrict A,
 
 
 // A=b*B^{dag}+c*C^{dag}
-void lin_comb_dag12_SuN(SuN * restrict A,
-                        double b, SuN const * restrict B,
-                        double c, SuN const * restrict C)
+void lin_comb_dag12_SuN(SuN *A,
+                        double b, SuN const * const B,
+                        double c, SuN const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -291,7 +291,7 @@ void lin_comb_dag12_SuN(SuN * restrict A,
 
 
 // A*=r
-void times_equal_real_SuN(SuN * restrict A, double r)
+void times_equal_real_SuN(SuN *A, double r)
   {
   int i;
 
@@ -303,7 +303,7 @@ void times_equal_real_SuN(SuN * restrict A, double r)
 
 
 // A*=r
-void times_equal_complex_SuN(SuN * restrict A, double complex r)
+void times_equal_complex_SuN(SuN *A, double complex r)
   {
   int i;
 
@@ -315,7 +315,7 @@ void times_equal_complex_SuN(SuN * restrict A, double complex r)
 
 
 // A*=B
-void times_equal_SuN(SuN * restrict A, SuN const * restrict B)
+void times_equal_SuN(SuN *A, SuN const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -350,7 +350,7 @@ void times_equal_SuN(SuN * restrict A, SuN const * restrict B)
 
 
 // A*=B^{dag}
-void times_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
+void times_equal_dag_SuN(SuN *A, SuN const * const B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -385,7 +385,7 @@ void times_equal_dag_SuN(SuN * restrict A, SuN const * restrict B)
 
 
 // A=B*C
-void times_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restrict C)
+void times_SuN(SuN *A, SuN const * const B, SuN const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -414,7 +414,7 @@ void times_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restrict C)
 
 
 // A=B^{dag}*C
-void times_dag1_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restrict C)
+void times_dag1_SuN(SuN *A, SuN const * const B, SuN const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -443,7 +443,7 @@ void times_dag1_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restri
 
 
 // A=B*C^{dag}
-void times_dag2_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restrict C)
+void times_dag2_SuN(SuN *A, SuN const * const B, SuN const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -472,7 +472,7 @@ void times_dag2_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restri
 
 
 // A=B^{dag}*C^{dag}
-void times_dag12_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restrict C)
+void times_dag12_SuN(SuN *A, SuN const * const B, SuN const * const C)
   {
   #ifdef DEBUG
   if(A==B || A==C)
@@ -502,7 +502,7 @@ void times_dag12_SuN(SuN * restrict A, SuN const * restrict B, SuN const * restr
 
 // SU(N) random matrix
 // generated a la Cabibbo Marinari with N(N-1)/2 SU(2) random matrices
-void rand_matrix_SuN(SuN * restrict A)
+void rand_matrix_SuN(SuN *A)
   {
   int i, j, k;
   double p0, p1, p2, p3, p;
@@ -549,7 +549,7 @@ void rand_matrix_SuN(SuN * restrict A)
 
 // generate a matrix in the algebra of SuN with gaussian
 // random components in the base T_i such that Tr(T_iT_j)=delta_{ij}
-void rand_algebra_gauss_matrix_SuN(SuN * restrict A)
+void rand_algebra_gauss_matrix_SuN(SuN *A)
   {
   #if NCOLOR==1
     (void) A; // just to avoid warnings
@@ -603,7 +603,7 @@ void rand_algebra_gauss_matrix_SuN(SuN * restrict A)
 
 
 // l2 norm of the matrix
-double norm_SuN(SuN const * restrict A)
+double norm_SuN(SuN const * const A)
   {
   int i;
   double aux, ris;
@@ -619,7 +619,7 @@ double norm_SuN(SuN const * restrict A)
 
 
 // real part of the trace /N
-double retr_SuN(SuN const * restrict A)
+double retr_SuN(SuN const * const A)
   {
   int i;
   double ris;
@@ -636,7 +636,7 @@ double retr_SuN(SuN const * restrict A)
 
 
 // imaginary part of the trace /N
-double imtr_SuN(SuN const * restrict A)
+double imtr_SuN(SuN const * const A)
   {
   int i;
   double ris;
@@ -654,7 +654,7 @@ double imtr_SuN(SuN const * restrict A)
 
 // LU decomposition with partial pivoting
 //   from Numerical Recipes in C, pag 46
-void LU_SuN(SuN const * restrict A, SuN * restrict ris, int * restrict sign)
+void LU_SuN(SuN const * const A, SuN *ris, int *sign)
   {
   int i, imax, j, k;
   double  big, temp;
@@ -731,7 +731,7 @@ void LU_SuN(SuN const * restrict A, SuN * restrict ris, int * restrict sign)
 
 
 // determinant
-complex double det_SuN(SuN const * restrict A)
+complex double det_SuN(SuN const * const A)
   {
   #if NCOLOR==3
     complex double ris=0.0+0.0*I;
@@ -771,7 +771,7 @@ complex double det_SuN(SuN const * restrict A)
 
 
 // gives 0 if the matrix is in SU(N) and 1 otherwise
-int scheck_SuN(SuN const * restrict A)
+int scheck_SuN(SuN const * const A)
   {
   int i, j, k, ris;
   double complex aux;
@@ -805,7 +805,7 @@ int scheck_SuN(SuN const * restrict A)
 
 
 // sunitarize
-void unitarize_SuN(SuN * restrict A)
+void unitarize_SuN(SuN *A)
   {
   const double beta_aux=1.0e+20;
   double check;
@@ -839,27 +839,10 @@ void unitarize_SuN(SuN * restrict A)
 
 
 // eponential of the traceless antihermitian part
-void taexp_SuN(SuN * restrict A)
+void taexp_SuN(SuN *A)
   {
-  SuN aux, aux1, uno;
-  complex double trace;
-  int i;
-
-  equal_SuN(&aux, A);
-  equal_dag_SuN(&aux1, A);
-  minus_equal_SuN(&aux, &aux1);
-  times_equal_real_SuN(&aux, 0.5); // now aux=(A-A^{dag})/2
-
-  trace=aux.comp[m(0,0)];
-  for(i=1; i<NCOLOR; i++)
-     {
-     trace+=aux.comp[m(i,i)];
-     }
-  trace/=(double)NCOLOR;
-  for(i=0; i<NCOLOR; i++)
-     {
-     aux.comp[m(i,i)]-=trace;
-     }
+  SuN aux, uno;
+  ta_SuN(A);
 
   one_SuN(&uno);
 
@@ -891,7 +874,7 @@ void taexp_SuN(SuN * restrict A)
 
 
 // takes the traceless antihermitian part
-void ta_SuN(SuN * restrict A)
+void ta_SuN(SuN *A)
   {
   SuN aux, aux1;
   double complex trace;
@@ -919,7 +902,7 @@ void ta_SuN(SuN * restrict A)
 
 
 // return 0 if matrix is traceless antihermitian, 1 otherwise
-int ta_check_SuN(const SuN * restrict A)
+int ta_check_SuN(const SuN * const A)
   {
   double complex aux;
   int i, j, ris;
@@ -948,7 +931,7 @@ int ta_check_SuN(const SuN * restrict A)
 
 
 // exponential of a TA matrix
-void exp_of_ta_SuN(SuN * restrict A)
+void exp_of_ta_SuN(SuN *A)
   {
   // we use
   // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
@@ -1202,7 +1185,7 @@ void read_from_binary_file_bigen_SuN(FILE *fp, SuN *A)
   }
 
 
-void TensProd_init_SuN(TensProd * restrict TP, SuN const * restrict A1, SuN const * restrict A2)
+void TensProd_init_SuN(TensProd *TP, SuN const * const A1, SuN const * const A2)
   {
   int i, j, k, l;
 
