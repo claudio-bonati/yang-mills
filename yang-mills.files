@@ -17,7 +17,6 @@ include/gauge_conf.h
 include/geometry.h
 include/gparam.h
 include/macro.h
-include/mymalloc.h
 include/myrngparam.h
 include/random.h
 include/su2.h
@@ -33,7 +32,6 @@ lib/gauge_conf_meas.c
 lib/gauge_conf_upd.c
 lib/geometry.c
 lib/gparam.c
-lib/mymalloc.c
 lib/random.c
 lib/su2.c
 lib/su2_upd.c

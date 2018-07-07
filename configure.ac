@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([yang_mills], [0.4.0], [claudio.bonati82@gmail.com])
+AC_INIT([yang_mills], [0.4.1], [claudio.bonati82@gmail.com])
 AM_INIT_AUTOMAKE(subdir-objects)
 AC_CONFIG_SRCDIR([./include/macro.h])
 AC_CONFIG_HEADERS([config.h])
@@ -28,13 +28,6 @@ AC_PROG_CC
 AC_CHECK_HEADERS([complex.h], [], [AC_MSG_ERROR([Required header complex.h not found.])])
 
 AC_CHECK_HEADERS([limits.h], [], [AC_MSG_ERROR([Required header limits.h not found.])])
-
-AC_CHECK_HEADERS([malloc.h], [has_malloch=yes],
-     [AC_MSG_WARN([
-   *****
-   malloc.h not found. It will not be possible to use memalign.
-   *****
-     ])])
 
 AC_CHECK_HEADERS([math.h], [], [AC_MSG_ERROR([Required header math.h not found.])])
 
@@ -104,10 +97,6 @@ AC_ARG_VAR(ST_dim, spacetime dimensionality (default 4))
 
 
 ### DEFINE & CO
-if test x${has_malloch} = xyes; then
-  AC_DEFINE(MEMALIGN_MODE,, [Activate the use of memalign instead of standard c malloc])
-fi
-
 if test x${has_md5}x${has_crypto} = xyesxyes; then
   AC_DEFINE(HASH_MODE,, [Activate the computation of the hash function of the configuration])
 fi

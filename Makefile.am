@@ -43,9 +43,6 @@ geometry = ./include/geometry.h \
 gparam = ./include/gparam.h \
          ./lib/gparam.c
 
-mymalloc = ./include/mymalloc.h \
-           ./lib/mymalloc.c
-
 random = ./include/myrngparam.h \
          ./include/random.h \
          ./lib/random.c 
@@ -79,7 +76,6 @@ conf_check_SOURCES=./src/conf_check.c \
                    $(endian) \
                    $(funcpoint) \
                    $(gparam) \
-                   $(mymalloc) \
                    $(random) \
                    $(su2) \
                    $(sun) \
@@ -122,7 +118,6 @@ yang_mills_local_SOURCES=./src/yang_mills_local.c \
                           $(geometry) \
                           $(gparam) \
                           ./include/macro.h \
-                          $(mymalloc) \
                           $(random) \
                           $(su2) \
                           $(sun) \
@@ -137,7 +132,6 @@ yang_mills_pot_QbarQ_SOURCES=./src/yang_mills_pot_QbarQ.c \
                              $(geometry) \
                              $(gparam) \
                              ./include/macro.h \
-                             $(mymalloc) \
                              $(random) \
                              $(su2) \
                              $(sun) \
@@ -152,7 +146,6 @@ yang_mills_pot_QbarQ_long_SOURCES=./src/yang_mills_pot_QbarQ_long.c \
                                   $(geometry) \
                                   $(gparam) \
                                   ./include/macro.h \
-                                  $(mymalloc) \
                                   $(random) \
                                   $(su2) \
                                   $(sun) \
@@ -167,7 +160,6 @@ yang_mills_t0_SOURCES=./src/yang_mills_t0.c \
                        $(geometry) \
                        $(gparam) \
                        ./include/macro.h \
-                       $(mymalloc) \
                        $(random) \
                        $(su2) \
                        $(sun) \
@@ -182,7 +174,6 @@ yang_mills_tube_disc_SOURCES=./src/yang_mills_tube_disc.c \
                              $(geometry) \
                              $(gparam) \
                              ./include/macro.h \
-                             $(mymalloc) \
                              $(random) \
                              $(su2) \
                              $(sun) \
@@ -197,7 +188,6 @@ yang_mills_tracedef_SOURCES=./src/yang_mills_tracedef.c \
                             $(geometry) \
                             $(gparam) \
                             ./include/macro.h \
-                            $(mymalloc) \
                             $(random) \
                             $(su2) \
                             $(sun) \

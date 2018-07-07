@@ -104,87 +104,86 @@ am__objects_1 = ./lib/dSFMT.$(OBJEXT)
 am__objects_2 = ./lib/endianness.$(OBJEXT)
 am__objects_3 = ./lib/function_pointers.$(OBJEXT)
 am__objects_4 = ./lib/gparam.$(OBJEXT)
-am__objects_5 = ./lib/mymalloc.$(OBJEXT)
-am__objects_6 = ./lib/random.$(OBJEXT)
-am__objects_7 = ./lib/su2.$(OBJEXT) ./lib/su2_upd.$(OBJEXT)
-am__objects_8 = ./lib/sun_aux.$(OBJEXT) ./lib/sun.$(OBJEXT) \
+am__objects_5 = ./lib/random.$(OBJEXT)
+am__objects_6 = ./lib/su2.$(OBJEXT) ./lib/su2_upd.$(OBJEXT)
+am__objects_7 = ./lib/sun_aux.$(OBJEXT) ./lib/sun.$(OBJEXT) \
 	./lib/sun_upd.$(OBJEXT)
-am__objects_9 = ./lib/u1.$(OBJEXT) ./lib/u1_upd.$(OBJEXT)
+am__objects_8 = ./lib/u1.$(OBJEXT) ./lib/u1_upd.$(OBJEXT)
 am_conf_check_OBJECTS = ./src/conf_check.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
 	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
-	$(am__objects_8) $(am__objects_9)
+	$(am__objects_8)
 conf_check_OBJECTS = $(am_conf_check_OBJECTS)
 conf_check_LDADD = $(LDADD)
 am_debug_rng_OBJECTS = ./src/debug_rng.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_6)
+	$(am__objects_5)
 debug_rng_OBJECTS = $(am_debug_rng_OBJECTS)
 debug_rng_LDADD = $(LDADD)
 am_debug_su2_OBJECTS = ./src/debug_su2.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_4) $(am__objects_6) \
-	$(am__objects_7)
+	$(am__objects_2) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6)
 debug_su2_OBJECTS = $(am_debug_su2_OBJECTS)
 debug_su2_LDADD = $(LDADD)
 am_debug_sun_OBJECTS = ./src/debug_sun.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_4) $(am__objects_6) \
-	$(am__objects_7) $(am__objects_8)
+	$(am__objects_2) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7)
 debug_sun_OBJECTS = $(am_debug_sun_OBJECTS)
 debug_sun_LDADD = $(LDADD)
 am_debug_u1_OBJECTS = ./src/debug_u1.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_4) $(am__objects_6) \
-	$(am__objects_9)
+	$(am__objects_2) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_8)
 debug_u1_OBJECTS = $(am_debug_u1_OBJECTS)
 debug_u1_LDADD = $(LDADD)
-am__objects_10 = ./lib/gauge_conf_def.$(OBJEXT) \
+am__objects_9 = ./lib/gauge_conf_def.$(OBJEXT) \
 	./lib/gauge_conf_meas.$(OBJEXT) \
 	./lib/gauge_conf_multilevel.$(OBJEXT) \
 	./lib/gauge_conf_upd.$(OBJEXT)
-am__objects_11 = ./lib/geometry.$(OBJEXT)
-am__objects_12 = ./lib/tens_prod.$(OBJEXT)
+am__objects_10 = ./lib/geometry.$(OBJEXT)
+am__objects_11 = ./lib/tens_prod.$(OBJEXT)
 am_yang_mills_local_OBJECTS = ./src/yang_mills_local.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
-	$(am__objects_10) $(am__objects_11) $(am__objects_4) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_4) \
 	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
-	$(am__objects_8) $(am__objects_12) $(am__objects_9)
+	$(am__objects_11) $(am__objects_8)
 yang_mills_local_OBJECTS = $(am_yang_mills_local_OBJECTS)
 yang_mills_local_LDADD = $(LDADD)
 am_yang_mills_pot_QbarQ_OBJECTS =  \
 	./src/yang_mills_pot_QbarQ.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_10) \
-	$(am__objects_11) $(am__objects_4) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_12) $(am__objects_9)
+	$(am__objects_2) $(am__objects_3) $(am__objects_9) \
+	$(am__objects_10) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7) $(am__objects_11) \
+	$(am__objects_8)
 yang_mills_pot_QbarQ_OBJECTS = $(am_yang_mills_pot_QbarQ_OBJECTS)
 yang_mills_pot_QbarQ_LDADD = $(LDADD)
 am_yang_mills_pot_QbarQ_long_OBJECTS =  \
 	./src/yang_mills_pot_QbarQ_long.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_10) \
-	$(am__objects_11) $(am__objects_4) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_12) $(am__objects_9)
+	$(am__objects_2) $(am__objects_3) $(am__objects_9) \
+	$(am__objects_10) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7) $(am__objects_11) \
+	$(am__objects_8)
 yang_mills_pot_QbarQ_long_OBJECTS =  \
 	$(am_yang_mills_pot_QbarQ_long_OBJECTS)
 yang_mills_pot_QbarQ_long_LDADD = $(LDADD)
 am_yang_mills_t0_OBJECTS = ./src/yang_mills_t0.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
-	$(am__objects_10) $(am__objects_11) $(am__objects_4) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_4) \
 	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
-	$(am__objects_8) $(am__objects_12) $(am__objects_9)
+	$(am__objects_11) $(am__objects_8)
 yang_mills_t0_OBJECTS = $(am_yang_mills_t0_OBJECTS)
 yang_mills_t0_LDADD = $(LDADD)
 am_yang_mills_tracedef_OBJECTS = ./src/yang_mills_tracedef.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
-	$(am__objects_10) $(am__objects_11) $(am__objects_4) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_4) \
 	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
-	$(am__objects_8) $(am__objects_12) $(am__objects_9)
+	$(am__objects_11) $(am__objects_8)
 yang_mills_tracedef_OBJECTS = $(am_yang_mills_tracedef_OBJECTS)
 yang_mills_tracedef_LDADD = $(LDADD)
 am_yang_mills_tube_disc_OBJECTS =  \
 	./src/yang_mills_tube_disc.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_10) \
-	$(am__objects_11) $(am__objects_4) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_12) $(am__objects_9)
+	$(am__objects_2) $(am__objects_3) $(am__objects_9) \
+	$(am__objects_10) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7) $(am__objects_11) \
+	$(am__objects_8)
 yang_mills_tube_disc_OBJECTS = $(am_yang_mills_tube_disc_OBJECTS)
 yang_mills_tube_disc_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -394,9 +393,6 @@ geometry = ./include/geometry.h \
 gparam = ./include/gparam.h \
          ./lib/gparam.c
 
-mymalloc = ./include/mymalloc.h \
-           ./lib/mymalloc.c
-
 random = ./include/myrngparam.h \
          ./include/random.h \
          ./lib/random.c 
@@ -430,7 +426,6 @@ conf_check_SOURCES = ./src/conf_check.c \
                    $(endian) \
                    $(funcpoint) \
                    $(gparam) \
-                   $(mymalloc) \
                    $(random) \
                    $(su2) \
                    $(sun) \
@@ -473,7 +468,6 @@ yang_mills_local_SOURCES = ./src/yang_mills_local.c \
                           $(geometry) \
                           $(gparam) \
                           ./include/macro.h \
-                          $(mymalloc) \
                           $(random) \
                           $(su2) \
                           $(sun) \
@@ -488,7 +482,6 @@ yang_mills_pot_QbarQ_SOURCES = ./src/yang_mills_pot_QbarQ.c \
                              $(geometry) \
                              $(gparam) \
                              ./include/macro.h \
-                             $(mymalloc) \
                              $(random) \
                              $(su2) \
                              $(sun) \
@@ -503,7 +496,6 @@ yang_mills_pot_QbarQ_long_SOURCES = ./src/yang_mills_pot_QbarQ_long.c \
                                   $(geometry) \
                                   $(gparam) \
                                   ./include/macro.h \
-                                  $(mymalloc) \
                                   $(random) \
                                   $(su2) \
                                   $(sun) \
@@ -518,7 +510,6 @@ yang_mills_t0_SOURCES = ./src/yang_mills_t0.c \
                        $(geometry) \
                        $(gparam) \
                        ./include/macro.h \
-                       $(mymalloc) \
                        $(random) \
                        $(su2) \
                        $(sun) \
@@ -533,7 +524,6 @@ yang_mills_tube_disc_SOURCES = ./src/yang_mills_tube_disc.c \
                              $(geometry) \
                              $(gparam) \
                              ./include/macro.h \
-                             $(mymalloc) \
                              $(random) \
                              $(su2) \
                              $(sun) \
@@ -548,7 +538,6 @@ yang_mills_tracedef_SOURCES = ./src/yang_mills_tracedef.c \
                             $(geometry) \
                             $(gparam) \
                             ./include/macro.h \
-                            $(mymalloc) \
                             $(random) \
                             $(su2) \
                             $(sun) \
@@ -676,8 +665,6 @@ lib/$(DEPDIR)/$(am__dirstamp):
 	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/gparam.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
-./lib/mymalloc.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/random.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/su2.$(OBJEXT): lib/$(am__dirstamp) lib/$(DEPDIR)/$(am__dirstamp)
@@ -785,7 +772,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/gauge_conf_upd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/geometry.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/gparam.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/mymalloc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/random.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/su2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/su2_upd.Po@am__quote@

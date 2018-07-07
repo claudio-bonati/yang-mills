@@ -3,7 +3,6 @@
 
 #include"../include/macro.h"
 
-#include<malloc.h>
 #include<math.h>
 #include<stdio.h>
 #include<stdlib.h>
@@ -12,7 +11,6 @@
 #include"../include/function_pointers.h"
 #include"../include/geometry.h"
 #include"../include/gauge_conf.h"
-#include"../include/mymalloc.h"
 #include"../include/tens_prod.h"
 
 
@@ -392,7 +390,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                GParam const * const param,
                                FILE *datafilep)
    {
-   int i;
+   int i, err;
    double plaqs, plaqt, polyre, polyim, *charge, *meanplaq, charge_nocooling;
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
@@ -401,8 +399,18 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
 
    fprintf(datafilep, "%.12lf %.12lf %.12lf %.12lf %.12lf ", plaqs, plaqt, polyre, polyim, charge_nocooling);
 
-   charge   = (double *) memalign(DOUBLE_ALIGN, (unsigned long) param->d_coolrepeat * sizeof(double));
-   meanplaq = (double *) memalign(DOUBLE_ALIGN, (unsigned long) param->d_coolrepeat * sizeof(double));
+   err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
 
    topcharge_cooling(GC, geo, param, charge, meanplaq);
    for(i=0; i<param->d_coolrepeat; i++)
@@ -427,14 +435,19 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
   const int max_hit=50;
   const int dir=1;
 
-  int i, mh, t_tmp;
+  int i, mh, t_tmp, err;
   long r, r1, r2;
   double poly_std, poly_average, diff_sec;
   double *poly_array;
   time_t time1, time2;
   GAUGE_GROUP matrix, tmp;
 
-  poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double));
+  err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
 
   fprintf(datafilep, "Multihit optimization: ");
   fprintf(datafilep, "the smaller the 'ris' value, the best\n");
@@ -508,12 +521,17 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
                                   GParam const * const param,
                                   FILE *datafilep)
    {
-   int i;
+   int i, err;
    long r;
    double poly_std, poly_average;
    double *poly_array;
 
-   poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double));
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
 
    fprintf(datafilep, "Multilevel optimization: ");
    fprintf(datafilep, "the smaller the value the better the update\n");
@@ -624,12 +642,17 @@ void optimize_multilevel_tube_disc(Gauge_Conf *GC,
                                    GParam const * const param,
                                    FILE *datafilep)
    {
-   int i;
+   int i, err;
    long r;
    double poly_std, poly_average;
    double *poly_array;
 
-   poly_array = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double));
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
 
    fprintf(datafilep, "Multilevel optimization: ");
    fprintf(datafilep, "the smaller the value the better the update\n");

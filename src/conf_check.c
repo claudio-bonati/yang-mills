@@ -11,7 +11,6 @@
 #include<string.h>
 
 #include"../include/function_pointers.h"
-#include"../include/mymalloc.h"
 
 // get the spacetime dimension
 void getspacetimedim(char *infile, int *dim)
@@ -153,7 +152,7 @@ void computehash(char *infile, int dim, long volume, char *hash)
 int main (int argc, char **argv)
     {
     char infile[STD_STRING_LENGTH];
-    int dim, *sides;
+    int dim, *sides, error;
 
     #ifdef HASH_MODE
       long volumel;
@@ -195,7 +194,13 @@ int main (int argc, char **argv)
     // get spacetime dim
     getspacetimedim(infile, &dim);
 
-    sides=(int *) mymalloc(INT_ALIGN, (unsigned long) dim *sizeof(int));
+    error=posix_memalign((void**)&sides, (size_t) INT_ALIGN, (size_t) dim*sizeof(int));
+    if(error!=0)
+      {
+      fprintf(stderr, "Problems in allocating a vector! (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+
 
     // get lattice size and initial hash
     getsizeandhash(infile, sides, md5sum_old);

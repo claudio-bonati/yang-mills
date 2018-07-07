@@ -1,15 +1,14 @@
 #ifndef GEOMETRY_C
 #define GEOMETRY_C
 
-#include<malloc.h>
+#include"../include/macro.h"
+
 #include<stdio.h>
 #include<stdlib.h>
 
 #include"../include/function_pointers.h"
 #include"../include/geometry.h"
 #include"../include/gparam.h"
-#include"../include/macro.h"
-#include"../include/mymalloc.h"
 
 void init_indexing_lexeo(void)
   {
@@ -25,7 +24,7 @@ void init_indexing_lexeo(void)
 // initialize geometry
 void init_geometry(Geometry *geo, GParam const * const param)
   {
-  int i, value, valuep, valuem;
+  int i, value, valuep, valuem, err;
   long r, rm, rp;
   int cartcoord[STDIM];
 
@@ -38,28 +37,28 @@ void init_geometry(Geometry *geo, GParam const * const param)
   #endif
 
   // allocate memory
-  geo->d_nnp = (long **) mymalloc(INT_ALIGN, (unsigned long) param->d_volume * sizeof(long *));
-  if(geo->d_nnp==NULL)
+  err=posix_memalign((void**)geo->d_nnp, (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(long *));
+  if(err!=0)
     {
     fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  geo->d_nnm = (long **) mymalloc(INT_ALIGN, (unsigned long) param->d_volume * sizeof(long *));
-  if(geo->d_nnm==NULL)
+  err=posix_memalign((void**)geo->d_nnm, (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(long *));
+  if(err!=0)
     {
     fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   for(r=0; r<(param->d_volume); r++)
      {
-     geo->d_nnp[r] = (long *) mymalloc(INT_ALIGN, (unsigned long int) param->d_stdim * sizeof(long));
-     if(geo->d_nnp[r]==NULL)
+     err=posix_memalign((void**)geo->d_nnp[r], (size_t)INT_ALIGN, (size_t) param->d_stdim * sizeof(long *));
+     if(err!=0)
        {
        fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
        exit(EXIT_FAILURE);
        }
-     geo->d_nnm[r] = (long *) mymalloc(INT_ALIGN, (unsigned long int) param->d_stdim * sizeof(long));
-     if(geo->d_nnm[r]==NULL)
+     err=posix_memalign((void**)geo->d_nnm[r], (size_t)INT_ALIGN, (size_t) param->d_stdim * sizeof(long *));
+     if(err!=0)
        {
        fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
        exit(EXIT_FAILURE);

@@ -3,7 +3,6 @@
 
 #include"../include/macro.h"
 
-#include<malloc.h>
 #ifdef HASH_MODE
   #include<openssl/md5.h>
 #endif
@@ -15,24 +14,24 @@
 #include"../include/gparam.h"
 #include"../include/geometry.h"
 #include"../include/gauge_conf.h"
-#include"../include/mymalloc.h"
 #include"../include/tens_prod.h"
 
 void init_gauge_conf(Gauge_Conf *GC, GParam const * const param)
   {
   long r, j;
+  int err;
 
   // allocate the local lattice
-  GC->lattice = (GAUGE_GROUP **) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_volume * sizeof(GAUGE_GROUP *));
-  if(GC->lattice == NULL)
+  err=posix_memalign((void**) &(GC->lattice), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(GAUGE_GROUP *));
+  if(err!=0)
     {
     fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   for(r=0; r<(param->d_volume); r++)
      {
-     GC->lattice[r] = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (long unsigned int) param->d_stdim * sizeof(GAUGE_GROUP));
-     if(GC->lattice[r]==NULL)
+     err=posix_memalign((void**)&(GC->lattice[r]), (size_t) DOUBLE_ALIGN, (size_t )param->d_stdim * sizeof(GAUGE_GROUP));
+     if(err!=0)
        {
        fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
        exit(EXIT_FAILURE);
@@ -282,19 +281,19 @@ void write_conf_on_file_back(Gauge_Conf const * const GC, GParam const * const p
 void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC2, GParam const * const param) 
   {
   long r;
-  int mu;
+  int mu, err;
 
   // allocate the lattice
-  GC->lattice = (GAUGE_GROUP **) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_volume * sizeof(GAUGE_GROUP *));
-  if(GC->lattice == NULL)
+  err=posix_memalign((void**)GC->lattice, (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(GAUGE_GROUP *));
+  if(err!=0)
     {
     fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   for(r=0; r<(param->d_volume); r++)
      {
-     GC->lattice[r] = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (unsigned long int) param->d_stdim * sizeof(GAUGE_GROUP));
-     if(GC->lattice[r]==NULL)
+     err=posix_memalign((void**)GC->lattice[r], (size_t) DOUBLE_ALIGN, (size_t) param->d_stdim * sizeof(GAUGE_GROUP));
+     if(err!=0)
        {
        fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
        exit(EXIT_FAILURE);
@@ -366,10 +365,10 @@ void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const
 void init_polycorr(Gauge_Conf *GC,
                               GParam const * const param)
   {
-  int i;
+  int i, err;
 
-  GC->ml_polycorr_ris = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd *));
-  if(GC->ml_polycorr_ris==NULL)
+  err=posix_memalign((void**)GC->ml_polycorr_ris, (size_t) DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
+  if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polycorr_ris (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
@@ -378,8 +377,8 @@ void init_polycorr(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       GC->ml_polycorr_ris[i] = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd));
-       if(GC->ml_polycorr_ris[i]==NULL)
+       err=posix_memalign((void**)GC->ml_polycorr_ris[i], (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
+       if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polycorr_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
@@ -387,8 +386,8 @@ void init_polycorr(Gauge_Conf *GC,
        }
     }
 
-  GC->ml_polycorr_tmp = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd *));
-  if(GC->ml_polycorr_tmp==NULL)
+  err=posix_memalign((void**)GC->ml_polycorr_tmp, (size_t) DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
+  if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polycorr_tmp (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
@@ -397,8 +396,8 @@ void init_polycorr(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       GC->ml_polycorr_tmp[i] = (TensProd *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd));
-       if(GC->ml_polycorr_tmp[i]==NULL)
+       err=posix_memalign((void**)GC->ml_polycorr_tmp[i], (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
+       if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polycorr_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
@@ -624,13 +623,13 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
                                 GParam const * const param)
   {
   const unsigned long numplaq=(unsigned long) (param->d_stdim*(param->d_stdim-1))/2;
-  int i;
+  int i, err;
   long r;
 
   init_polycorr(GC, param);
 
-  GC->ml_polyplaq_ris = (TensProd ***) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd **));
-  if(GC->ml_polyplaq_ris==NULL)
+  err=posix_memalign((void**)GC->ml_polyplaq_ris, (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd **));
+  if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polyplaq_ris (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
@@ -639,16 +638,16 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       GC->ml_polyplaq_ris[i] = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd *));
-       if(GC->ml_polyplaq_ris[i]==NULL)
+       err=posix_memalign((void**)GC->ml_polyplaq_ris[i], (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd *));
+       if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
        for(r=0; r<param->d_space_vol; r++)
           {
-          GC->ml_polyplaq_ris[i][r] = (TensProd *) mymalloc(DOUBLE_ALIGN, numplaq *sizeof(TensProd));
-          if(GC->ml_polyplaq_ris[i][r]==NULL)
+          err=posix_memalign((void**)GC->ml_polyplaq_ris[i][r], (size_t)DOUBLE_ALIGN, (size_t) numplaq *sizeof(TensProd));
+          if(err!=0)
             {
             fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d][%ld] (%s, %d)\n", i, r, __FILE__, __LINE__);
             exit(EXIT_FAILURE);
@@ -657,8 +656,8 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
        }
     }
 
-  GC->ml_polyplaq_tmp = (TensProd ***) mymalloc(DOUBLE_ALIGN, (unsigned long) NLEVELS *sizeof(TensProd **));
-  if(GC->ml_polyplaq_tmp==NULL)
+  err=posix_memalign((void**)GC->ml_polyplaq_tmp, (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd **));
+  if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polyplaq_tmp (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
@@ -667,16 +666,16 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       GC->ml_polyplaq_tmp[i] = (TensProd **) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol *sizeof(TensProd *));
-       if(GC->ml_polyplaq_tmp[i]==NULL)
+       err=posix_memalign((void**)GC->ml_polyplaq_tmp[i], (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd *));
+       if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
        for(r=0; r<param->d_space_vol; r++)
           {
-          GC->ml_polyplaq_tmp[i][r] = (TensProd *) mymalloc(DOUBLE_ALIGN, numplaq *sizeof(TensProd));
-          if(GC->ml_polyplaq_tmp[i][r]==NULL)
+          err=posix_memalign((void**)GC->ml_polyplaq_tmp[i][r], (size_t)DOUBLE_ALIGN, (size_t) numplaq *sizeof(TensProd));
+          if(err!=0)
             {
             fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d][%ld] (%s, %d)\n", i, r, __FILE__, __LINE__);
             exit(EXIT_FAILURE);

@@ -12,7 +12,6 @@
 #include"../include/function_pointers.h"
 #include"../include/gauge_conf.h"
 #include"../include/gparam.h"
-#include"../include/mymalloc.h"
 #include"../include/tens_prod.h"
 
 void multihit(Gauge_Conf const * const GC,
@@ -185,7 +184,7 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
                           int t_start,
                           int dt)
   {
-  int i, upd;
+  int i, upd, err;
   long int r;
   int level;
 
@@ -257,7 +256,13 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
                              dt);
 
          // compute Polyakov loop restricted to the slice
-         GAUGE_GROUP *loc_poly = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(GAUGE_GROUP));
+         GAUGE_GROUP *loc_poly;
+         err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
+         if(err!=0)
+           {
+           fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+           exit(EXIT_FAILURE);
+           }
 
          compute_local_poly(GC,
                             geo,
@@ -396,7 +401,7 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
                                int dt,
                                int iteration)
   {
-  int i, upd;
+  int i, upd, err;
   long int r;
   int level;
 
@@ -463,7 +468,13 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
                              dt);
 
          // compute Polyakov loop restricted to the slice
-         GAUGE_GROUP *loc_poly = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(GAUGE_GROUP));
+         GAUGE_GROUP *loc_poly;
+         err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
+         if(err!=0)
+           {
+           fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+           exit(EXIT_FAILURE);
+           }
 
          compute_local_poly(GC,
                             geo,
@@ -601,7 +612,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
                              int dt)
   {
   const int numplaqs=(param->d_stdim*(param->d_stdim-1))/2;
-  int i, upd;
+  int i, upd, err;
   long int r;
   int level;
 
@@ -681,12 +692,30 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
                              dt);
 
          // compute Polyakov loop and plaquettes restricted to the slice
-         GAUGE_GROUP *loc_poly = (GAUGE_GROUP *) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(GAUGE_GROUP));
+         GAUGE_GROUP *loc_poly;
+         err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
+         if(err!=0)
+           {
+           fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+           exit(EXIT_FAILURE);
+           }
 
-         double **loc_plaq=(double**) mymalloc(DOUBLE_ALIGN, (unsigned long) param->d_space_vol * sizeof(double*));
+
+         double **loc_plaq;
+         err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double*));
+         if(err!=0)
+           {
+           fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+           exit(EXIT_FAILURE);
+           }
          for(r=0; r<param->d_space_vol; r++)
             {
-            loc_plaq[r] = (double *) mymalloc(DOUBLE_ALIGN, (unsigned long) numplaqs * sizeof(double) );
+            err=posix_memalign((void**)&loc_plaq[r], (size_t) DOUBLE_ALIGN, (size_t) numplaqs * sizeof(double));
+            if(err!=0)
+              {
+              fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+              exit(EXIT_FAILURE);
+              }
             }
 
          compute_local_poly(GC,
