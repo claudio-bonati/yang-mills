@@ -284,7 +284,7 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
   int mu, err;
 
   // allocate the lattice
-  err=posix_memalign((void**)GC->lattice, (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(GAUGE_GROUP *));
+  err=posix_memalign((void**)&(GC->lattice), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(GAUGE_GROUP *));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
@@ -292,7 +292,7 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
     }
   for(r=0; r<(param->d_volume); r++)
      {
-     err=posix_memalign((void**)GC->lattice[r], (size_t) DOUBLE_ALIGN, (size_t) param->d_stdim * sizeof(GAUGE_GROUP));
+     err=posix_memalign((void**)&(GC->lattice[r]), (size_t) DOUBLE_ALIGN, (size_t) param->d_stdim * sizeof(GAUGE_GROUP));
      if(err!=0)
        {
        fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
@@ -367,7 +367,7 @@ void init_polycorr(Gauge_Conf *GC,
   {
   int i, err;
 
-  err=posix_memalign((void**)GC->ml_polycorr_ris, (size_t) DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
+  err=posix_memalign((void**)&(GC->ml_polycorr_ris), (size_t) DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polycorr_ris (%s, %d)\n", __FILE__, __LINE__);
@@ -377,7 +377,7 @@ void init_polycorr(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)GC->ml_polycorr_ris[i], (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
+       err=posix_memalign((void**)&(GC->ml_polycorr_ris[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polycorr_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
@@ -386,7 +386,7 @@ void init_polycorr(Gauge_Conf *GC,
        }
     }
 
-  err=posix_memalign((void**)GC->ml_polycorr_tmp, (size_t) DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
+  err=posix_memalign((void**)&(GC->ml_polycorr_tmp), (size_t) DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polycorr_tmp (%s, %d)\n", __FILE__, __LINE__);
@@ -396,7 +396,7 @@ void init_polycorr(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)GC->ml_polycorr_tmp[i], (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
+       err=posix_memalign((void**)&(GC->ml_polycorr_tmp[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polycorr_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
@@ -628,7 +628,7 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
 
   init_polycorr(GC, param);
 
-  err=posix_memalign((void**)GC->ml_polyplaq_ris, (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd **));
+  err=posix_memalign((void**)&(GC->ml_polyplaq_ris), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd **));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polyplaq_ris (%s, %d)\n", __FILE__, __LINE__);
@@ -638,7 +638,7 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)GC->ml_polyplaq_ris[i], (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd *));
+       err=posix_memalign((void**)&(GC->ml_polyplaq_ris[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd *));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
@@ -646,7 +646,7 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
          }
        for(r=0; r<param->d_space_vol; r++)
           {
-          err=posix_memalign((void**)GC->ml_polyplaq_ris[i][r], (size_t)DOUBLE_ALIGN, (size_t) numplaq *sizeof(TensProd));
+          err=posix_memalign((void**)&(GC->ml_polyplaq_ris[i][r]), (size_t)DOUBLE_ALIGN, (size_t) numplaq *sizeof(TensProd));
           if(err!=0)
             {
             fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d][%ld] (%s, %d)\n", i, r, __FILE__, __LINE__);
@@ -656,7 +656,7 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
        }
     }
 
-  err=posix_memalign((void**)GC->ml_polyplaq_tmp, (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd **));
+  err=posix_memalign((void**)&(GC->ml_polyplaq_tmp), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd **));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polyplaq_tmp (%s, %d)\n", __FILE__, __LINE__);
@@ -666,7 +666,7 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)GC->ml_polyplaq_tmp[i], (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd *));
+       err=posix_memalign((void**)&(GC->ml_polyplaq_tmp[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd *));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
@@ -674,7 +674,7 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
          }
        for(r=0; r<param->d_space_vol; r++)
           {
-          err=posix_memalign((void**)GC->ml_polyplaq_tmp[i][r], (size_t)DOUBLE_ALIGN, (size_t) numplaq *sizeof(TensProd));
+          err=posix_memalign((void**)&(GC->ml_polyplaq_tmp[i][r]), (size_t)DOUBLE_ALIGN, (size_t) numplaq *sizeof(TensProd));
           if(err!=0)
             {
             fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d][%ld] (%s, %d)\n", i, r, __FILE__, __LINE__);

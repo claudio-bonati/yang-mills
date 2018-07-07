@@ -37,13 +37,13 @@ void init_geometry(Geometry *geo, GParam const * const param)
   #endif
 
   // allocate memory
-  err=posix_memalign((void**)geo->d_nnp, (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(long *));
+  err=posix_memalign((void**)&(geo->d_nnp), (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(long *));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  err=posix_memalign((void**)geo->d_nnm, (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(long *));
+  err=posix_memalign((void**)&(geo->d_nnm), (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(long *));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
@@ -51,13 +51,13 @@ void init_geometry(Geometry *geo, GParam const * const param)
     }
   for(r=0; r<(param->d_volume); r++)
      {
-     err=posix_memalign((void**)geo->d_nnp[r], (size_t)INT_ALIGN, (size_t) param->d_stdim * sizeof(long *));
+     err=posix_memalign((void**)&(geo->d_nnp[r]), (size_t)INT_ALIGN, (size_t) param->d_stdim * sizeof(long));
      if(err!=0)
        {
        fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
        exit(EXIT_FAILURE);
        }
-     err=posix_memalign((void**)geo->d_nnm[r], (size_t)INT_ALIGN, (size_t) param->d_stdim * sizeof(long *));
+     err=posix_memalign((void**)&(geo->d_nnm[r]), (size_t)INT_ALIGN, (size_t) param->d_stdim * sizeof(long));
      if(err!=0)
        {
        fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);

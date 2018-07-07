@@ -710,7 +710,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
            }
          for(r=0; r<param->d_space_vol; r++)
             {
-            err=posix_memalign((void**)&loc_plaq[r], (size_t) DOUBLE_ALIGN, (size_t) numplaqs * sizeof(double));
+            err=posix_memalign((void**)&(loc_plaq[r]), (size_t) DOUBLE_ALIGN, (size_t) numplaqs * sizeof(double));
             if(err!=0)
               {
               fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
