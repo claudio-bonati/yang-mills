@@ -411,6 +411,15 @@ void readinput(char *in_file, GParam *param)
              }
            }
         }
+      for(i=0; i<param->d_stdim; i++)
+         {
+         if(param->d_size[i]<=1)
+           {
+           fprintf(stderr, "Error: all the sizes has to be larger than 1 for heatbat/overrelaxation to be aplied\n");
+           fprintf(stderr, "(need metropolis otherwise) (%s, %d)\n", __FILE__, __LINE__);
+           exit(EXIT_FAILURE);
+           }
+         }
 
       #ifdef OPENMP_MODE
       for(i=0; i<param->d_stdim; i++)
