@@ -16,488 +16,95 @@
 #include"../include/tens_prod.h"
 
 // A=1
-void one_SuN(SuN *A)
-  {
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]=0.0+0.0*I;
-     }
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     A->comp[m(i,i)]=1.0+0.0*I;
-     }
-  }
+void one_SuN(SuN *A);
 
 
 // A=0
-void zero_SuN(SuN *A)
-  {
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]=0.0+0.0*I;
-     }
-  }
+void zero_SuN(SuN *A);
 
 
 // A=B
-void equal_SuN(SuN *A, SuN const * const B)
-  {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]=B->comp[i];
-     }
-  }
+void equal_SuN(SuN *A, SuN const * const B);
 
 
 // A=B^{dag}
-void equal_dag_SuN(SuN *A, SuN const * const B)
-  {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        A->comp[m(i,j)]=conj(B->comp[m(j,i)]);
-        }
-     }
-  }
+void equal_dag_SuN(SuN *A, SuN const * const B);
 
 
 // A+=B
-void plus_equal_SuN(SuN *A, SuN const * const B)
-  {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]+=B->comp[i];
-     }
-  }
+void plus_equal_SuN(SuN *A, SuN const * const B);
 
 
 // A+=B^{dag}
-void plus_equal_dag_SuN(SuN *A, SuN const * const B)
-  {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        A->comp[m(i,j)]+=conj(B->comp[m(j,i)]);
-        }
-     }
-  }
+void plus_equal_dag_SuN(SuN *A, SuN const * const B);
 
 
 // A-=B
-void minus_equal_SuN(SuN *A, SuN const * const B)
-  {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]-=B->comp[i];
-     }
-  }
+void minus_equal_SuN(SuN *A, SuN const * const B);
 
 
 // A-=(r*B)
-void minus_equal_times_real_SuN(SuN *A, SuN const * const B, double r)
-  {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]-=(r*B->comp[i]);
-     }
-  }
+void minus_equal_times_real_SuN(SuN *A, SuN const * const B, double r);
 
 
 // A-=B^{dag}
-void minus_equal_dag_SuN(SuN *A, SuN const * const B)
-  {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        A->comp[m(i,j)]-=conj(B->comp[m(j,i)]);
-        }
-     }
-  }
+void minus_equal_dag_SuN(SuN *A, SuN const * const B);
 
 
 // A=b*B+c*C
 void lin_comb_SuN(SuN *A,
                   double b, SuN const * const B,
-                  double c, SuN const * const C)
-  {
-  #ifdef DEBUG
-  if(A==B || A==C || B==C)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]=b*(B->comp[i])+c*(C->comp[i]);
-     }
-  }
+                  double c, SuN const * const C);
 
 
 // A=b*B^{dag}+c*C
 void lin_comb_dag1_SuN(SuN *A,
                        double b, SuN const * const B,
-                       double c, SuN const * const C)
-  {
-  #ifdef DEBUG
-  if(A==B || A==C || B==C)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        A->comp[m(i,j)]=b*conj(B->comp[m(j,i)])+c*(C->comp[m(i,j)]);
-        }
-     }
-  }
+                       double c, SuN const * const C);
 
 
 // A=b*B+c*C^{dag}
 void lin_comb_dag2_SuN(SuN *A,
                        double b, SuN const * const B,
-                       double c, SuN const * const C)
-  {
-  #ifdef DEBUG
-  if(A==B || A==C || B==C)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        A->comp[m(i,j)]=b*(B->comp[m(i,j)])+c*conj(C->comp[m(j,i)]);
-        }
-     }
-  }
+                       double c, SuN const * const C);
 
 
 // A=b*B^{dag}+c*C^{dag}
 void lin_comb_dag12_SuN(SuN *A,
                         double b, SuN const * const B,
-                        double c, SuN const * const C)
-  {
-  #ifdef DEBUG
-  if(A==B || A==C || B==C)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        A->comp[m(i,j)]=b*conj(B->comp[m(j,i)])+c*conj(C->comp[m(j,i)]);
-        }
-     }
-  }
+                        double c, SuN const * const C);
 
 
 // A*=r
-void times_equal_real_SuN(SuN *A, double r)
-  {
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]*=r;
-     }
-  }
+void times_equal_real_SuN(SuN *A, double r);
 
 
 // A*=r
-void times_equal_complex_SuN(SuN *A, double complex r)
-  {
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]*=r;
-     }
-  }
+void times_equal_complex_SuN(SuN *A, double complex r);
 
 
 // A*=B
-void times_equal_SuN(SuN *A, SuN const * const B)
-  {
-  #ifdef DEBUG
-  if(A==B)
-   {
-   fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-   exit(EXIT_FAILURE);
-   }
-  #endif
-
-  int i, j, k;
-  double complex aux[NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
-  double complex sum;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        aux[j]=A->comp[m(i,j)];
-        }
- 
-     for(j=0; j<NCOLOR; j++)
-        {
-        sum=0.0+0.0*I;
-        for(k=0; k<NCOLOR; k++)
-           {
-           sum+=aux[k]*(B->comp[m(k,j)]);
-           }
-        A->comp[m(i,j)]=sum;
-        }
-     }
-  }
+void times_equal_SuN(SuN *A, SuN const * const B);
 
 
 // A*=B^{dag}
-void times_equal_dag_SuN(SuN *A, SuN const * const B)
-  {
-  #ifdef DEBUG
-  if(A==B)
-   {
-   fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-   exit(EXIT_FAILURE);
-   }
-  #endif
-
-  int i, j, k;
-  double complex aux[NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
-  double complex sum;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        aux[j]=A->comp[m(i,j)];
-        }
-
-     for(j=0; j<NCOLOR; j++)
-        {
-        sum=0.0+0.0*I;
-        for(k=0; k<NCOLOR; k++)
-           {
-           sum+=aux[k]*conj(B->comp[m(j,k)]);
-           }
-        A->comp[m(i,j)]=sum;
-        }
-     }
-  }
+void times_equal_dag_SuN(SuN *A, SuN const * const B);
 
 
 // A=B*C
-void times_SuN(SuN *A, SuN const * const B, SuN const * const C)
-  {
-  #ifdef DEBUG
-  if(A==B || A==C)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j, k;
-  double complex sum;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        sum=0.0+0.0*I;
-        for(k=0; k<NCOLOR; k++)
-           {
-           sum+=(B->comp[m(i,k)])*(C->comp[m(k,j)]);
-           }
-        A->comp[m(i,j)]=sum;
-        }
-     }
-  }
+void times_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
 
 // A=B^{dag}*C
-void times_dag1_SuN(SuN *A, SuN const * const B, SuN const * const C)
-  {
-  #ifdef DEBUG
-  if(A==B || A==C)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j, k;
-  double complex sum;
-  
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        sum=0.0+0.0*I;
-        for(k=0; k<NCOLOR; k++)
-           {
-           sum+=conj(B->comp[m(k,i)])*(C->comp[m(k,j)]);
-           }
-        A->comp[m(i,j)]=sum;
-        }
-     } 
-  }
+void times_dag1_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
 
 // A=B*C^{dag}
-void times_dag2_SuN(SuN *A, SuN const * const B, SuN const * const C)
-  {
-  #ifdef DEBUG
-  if(A==B || A==C)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j, k;
-  double complex sum;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        sum=0.0+0.0*I;
-        for(k=0; k<NCOLOR; k++)
-           {
-           sum+=(B->comp[m(i,k)])*conj(C->comp[m(j,k)]);
-           }
-        A->comp[m(i,j)]=sum;
-        }
-     } 
-  }
+void times_dag2_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
 
 // A=B^{dag}*C^{dag}
-void times_dag12_SuN(SuN *A, SuN const * const B, SuN const * const C)
-  {
-  #ifdef DEBUG
-  if(A==B || A==C)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  int i, j, k;
-  double complex sum;
-  
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        sum=0.0+0.0*I;
-        for(k=0; k<NCOLOR; k++)
-           {
-           sum+=conj(B->comp[m(k,i)])*conj(C->comp[m(j,k)]);
-           }
-        A->comp[m(i,j)]=sum;
-        }
-     } 
-  }
+void times_dag12_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
 
 // SU(N) random matrix
@@ -603,58 +210,20 @@ void rand_algebra_gauss_matrix_SuN(SuN *A)
 
 
 // l2 norm of the matrix
-double norm_SuN(SuN const * const A)
-  {
-  int i;
-  double aux, ris;
-
-  ris=0.0;
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     { 
-     aux=cabs(A->comp[i]);
-     ris+=aux*aux;
-     }
-  return sqrt(ris);
-  }
+double norm_SuN(SuN const * const A);
 
 
 // real part of the trace /N
-double retr_SuN(SuN const * const A)
-  {
-  int i;
-  double ris;
-  double complex tr;
-
-  tr=0.0+0.0*I;
-  for(i=0; i<NCOLOR; i++)
-     {
-     tr+=A->comp[m(i,i)];
-     }
-  ris=creal(tr)/(double)NCOLOR;
-  return ris;
-  }
+double retr_SuN(SuN const * const A);
 
 
 // imaginary part of the trace /N
-double imtr_SuN(SuN const * const A)
-  {
-  int i;
-  double ris;
-  double complex tr;
-
-  tr=0.0+0.0*I;
-  for(i=0; i<NCOLOR; i++)
-     {
-     tr+=A->comp[m(i,i)];
-     }
-  ris=cimag(tr)/(double)NCOLOR;
-  return ris;
-  }
+double imtr_SuN(SuN const * const A);
 
 
 // LU decomposition with partial pivoting
 //   from Numerical Recipes in C, pag 46
-void LU_SuN(SuN const * const A, SuN *ris, int *sign)
+void LU_SuN(SuN const * const restrict A, SuN * restrict ris, int * restrict sign)
   {
   int i, imax, j, k;
   double  big, temp;
@@ -731,47 +300,11 @@ void LU_SuN(SuN const * const A, SuN *ris, int *sign)
 
 
 // determinant
-complex double det_SuN(SuN const * const A)
-  {
-  #if NCOLOR==3
-    complex double ris=0.0+0.0*I;
- 
-    ris+=(A->comp[m(0,0)])*(A->comp[m(1,1)])*(A->comp[m(2,2)]);
-    ris+=(A->comp[m(1,0)])*(A->comp[m(2,1)])*(A->comp[m(0,2)]);
-    ris+=(A->comp[m(2,0)])*(A->comp[m(0,1)])*(A->comp[m(1,2)]);
-    ris-=(A->comp[m(2,0)])*(A->comp[m(1,1)])*(A->comp[m(0,2)]);
-    ris-=(A->comp[m(1,0)])*(A->comp[m(0,1)])*(A->comp[m(2,2)]);
-    ris-=(A->comp[m(0,0)])*(A->comp[m(2,1)])*(A->comp[m(1,2)]);
-
-    return ris;
-  #else
-    int i;
-    double complex ris;
-    SuN lu; 
-
-    LU_SuN(A, &lu, &i); 
-
-    if(i>0)
-      {
-      ris=1.0+0.0*I;
-      }
-    else
-     {
-     ris=-1.0+0.0*I;
-     }
-
-    for(i=0; i<NCOLOR; i++)
-       {
-       ris*=(lu.comp[m(i,i)]);
-       }
-
-    return ris;
-  #endif
-  }
+complex double det_SuN(SuN const * const A);
 
 
 // gives 0 if the matrix is in SU(N) and 1 otherwise
-int scheck_SuN(SuN const * const A)
+int scheck_SuN(SuN const * const restrict A)
   {
   int i, j, k, ris;
   double complex aux;
@@ -805,7 +338,7 @@ int scheck_SuN(SuN const * const A)
 
 
 // sunitarize
-void unitarize_SuN(SuN *A)
+void unitarize_SuN(SuN * restrict A)
   {
   const double beta_aux=1.0e+20;
   double check;
@@ -838,142 +371,23 @@ void unitarize_SuN(SuN *A)
   }
 
 
-// eponential of the traceless antihermitian part
-void taexp_SuN(SuN *A)
-  {
-  SuN aux, uno, ris;
-
-  equal_SuN(&aux, A);
-  ta_SuN(&aux);
-
-  one_SuN(&uno);
-
-  // now aux is the traceless antihermitian part of the initial matrix
-  // and we use
-  // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
-
-  equal_SuN(&ris, &aux);
-  times_equal_real_SuN(&ris, 0.2);
-  plus_equal_SuN(&ris, &uno);
-
-  times_equal_SuN(&ris, &aux);
-  times_equal_real_SuN(&ris, 0.25);
-  plus_equal_SuN(&ris, &uno);
-
-  times_equal_SuN(&ris, &aux);
-  times_equal_real_SuN(&ris, 0.33333333333333333333);
-  plus_equal_SuN(&ris, &uno);
-
-  times_equal_SuN(&ris, &aux);
-  times_equal_real_SuN(&ris, 0.5);
-  plus_equal_SuN(&ris, &uno);
-
-  times_equal_SuN(&ris, &aux);
-  plus_equal_SuN(&ris, &uno);
-
-  unitarize_SuN(&ris);
-  equal_SuN(A, &ris);
-  }
-
-
 // takes the traceless antihermitian part
-void ta_SuN(SuN *A)
-  {
-  SuN aux, aux1;
-  double complex trace;
-  int i;
+void ta_SuN(SuN *A);
 
-  equal_SuN(&aux, A);
-  equal_dag_SuN(&aux1, A);
-  minus_equal_SuN(&aux, &aux1);
-  times_equal_real_SuN(&aux, 0.5); // now aux=(A-A^{dag})/2
 
-  trace=aux.comp[m(0,0)];
-  for(i=1; i<NCOLOR; i++)
-     {
-     trace+=aux.comp[m(i,i)];
-     }
-  trace/=(double)NCOLOR;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     aux.comp[m(i,i)]-=trace;
-     }
-
-  equal_SuN(A, &aux);
-  }
+// eponential of the traceless antihermitian part
+void taexp_SuN(SuN *A);
 
 
 // return 0 if matrix is traceless antihermitian, 1 otherwise
-int ta_check_SuN(const SuN * const A)
-  {
-  double complex aux;
-  int i, j, ris;
-
-  ris=0;
-
-  aux=0.0;
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        aux+=(A->comp[m(i,j)]+conj(A->comp[m(j,i)]));
-        }
-     }
-  if(cabs(aux)>MIN_VALUE) ris=1;
-
-  aux=0.0;
-  for(i=0; i<NCOLOR; i++)
-     {
-     aux+=A->comp[m(i,i)];
-     }
-  if(cabs(aux)>MIN_VALUE) ris=1;
-
-  return ris;
-  }
+int ta_check_SuN(const SuN * const A);
 
 
 // exponential of a TA matrix
-void exp_of_ta_SuN(SuN *A)
-  {
-  // we use
-  // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
-
-  #ifdef DEBUG
-  if(ta_check_SuN(A)!=0)
-    {
-    fprintf(stderr, "Trying to exp. a non TA matrix! (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
-
-  SuN aux, uno;
-
-  one_SuN(&uno);
-  equal_SuN(&aux, A); // in aux the initial matrix is stored
-
-  times_equal_real_SuN(A, 1.0/5.0);
-  plus_equal_SuN(A, &uno);
-
-  times_equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/4.0);
-  plus_equal_SuN(A, &uno);
-
-  times_equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/3.0);
-  plus_equal_SuN(A, &uno);
-
-  times_equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/2.0);
-  plus_equal_SuN(A, &uno);
-
-  times_equal_SuN(A, &aux);
-  plus_equal_SuN(A, &uno);
-
-  unitarize_SuN(A);
-  }
+void exp_of_ta_SuN(SuN *A);
 
 
+// print on screen
 void print_on_screen_SuN(SuN const * const A)
   {
   int i, j;
@@ -989,6 +403,7 @@ void print_on_screen_SuN(SuN const * const A)
   }
 
 
+// print on file
 void print_on_file_SuN(FILE *fp, SuN const * const A)
   {
   int i, j, err;
@@ -1088,6 +503,7 @@ void print_on_binary_file_bigen_SuN(FILE *fp, SuN const * const A)
   }
 
 
+// read from file
 void read_from_file_SuN(FILE *fp, SuN *A)
   {
   int i, j, err;
@@ -1188,24 +604,8 @@ void read_from_binary_file_bigen_SuN(FILE *fp, SuN *A)
   }
 
 
-void TensProd_init_SuN(TensProd *TP, SuN const * const A1, SuN const * const A2)
-  {
-  int i, j, k, l;
-
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=0; j<NCOLOR; j++)
-        {
-        for(k=0; k<NCOLOR; k++)
-           {
-           for(l=0; l<NCOLOR; l++)
-              {
-              TP->comp[i][j][k][l]=conj(A1->comp[m(i,j)])*A2->comp[m(k,l)];
-              }
-           }
-        }
-     }
-  }
+// initialize tensor product
+void TensProd_init_SuN(TensProd *TP, SuN const * const A1, SuN const * const A2);
 
 
 #endif
