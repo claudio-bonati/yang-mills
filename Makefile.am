@@ -198,4 +198,4 @@ EXTRA_DIST = ./src/input.in
 
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -Werror -pedantic -Wconversion @OPENMP_CFLAGS@
 
-CLEANFILES = dati*.dat log*.dat dati*.log conf*.dat* ml*.dat template_input.in 
+CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in 
