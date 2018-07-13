@@ -94,6 +94,92 @@ void calcstaples_wilson(Gauge_Conf const * const GC,
     }
 
 
+// compute the staple in position r, direction i and save it in M
+// for the totally reduced case
+// WARNING: in the totally reduced case the action is NON linear in the links
+// heatbath/overrelaxation can not be used!
+void calcstaples_wilson_totred(Gauge_Conf const * const GC,
+                               Geometry const * const geo,
+                               GParam const * const param,
+                               long r,
+                               int i,
+                               GAUGE_GROUP *M)
+   {
+   int j, l;
+   long k;
+   GAUGE_GROUP link1, link2, link3, link12, stap;
+
+   #ifdef DEBUG
+   if(r >= param->d_volume)
+     {
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   if(i >= param->d_stdim)
+     {
+     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
+   zero(M); // M=0
+
+   for(l=i+1; l< i + param->d_stdim; l++)
+      {
+      j = (l % param->d_stdim);
+
+//
+//       i ^
+//         |   (1)
+//         +----->-----+
+//         |           |
+//         |           |
+//         |           V (2)
+//         |           |
+//         |           |
+//         +-----<-----+-->   j
+//       r     (3)
+//
+
+      equal(&link1, &(GC->lattice[nnp(geo, r, i)][j]));  // link1 = (1)
+      equal(&link2, &(GC->lattice[nnp(geo, r, j)][i]));  // link2 = (2)
+      equal(&link3, &(GC->lattice[r][j]));               // link3 = (3)
+
+      times_dag2(&link12, &link1, &link2);  // link12=link1*link2^{dag}
+      times_dag2(&stap, &link12, &link3);   // stap=link12*stap^{dag}
+
+      plus_equal(M, &stap);
+
+      if(param->d_size[j]>1)
+        {
+//
+//       i ^
+//         |   (1)
+//         |----<------+
+//         |           |
+//         |           |
+//     (2) V           |
+//         |           |
+//         |           |
+//         +------>----+--->j
+//        k     (3)    r
+//
+
+        k=nnm(geo, r, j);
+
+        equal(&link1, &(GC->lattice[nnp(geo, k, i)][j]));  // link1 = (1)
+        equal(&link2, &(GC->lattice[k][i]));               // link2 = (2)
+        equal(&link3, &(GC->lattice[k][j]));               // link3 = (3)
+
+        times_dag12(&link12, &link1, &link2); // link12=link1^{dag}*link2^{dag}
+        times(&stap, &link12, &link3);        // stap=link12*link3
+
+        plus_equal(M, &stap);
+        }
+      }
+    }
+
+
 // compute the staple for the trace deformed theory:
 // in practice a Polyakov loop without a link
 void calcstaples_tracedef(Gauge_Conf const * const GC,
@@ -213,15 +299,16 @@ int metropolis(Gauge_Conf *GC,
 
    calcstaples_wilson(GC, geo, param, r, i, &stap);
 
+   // compute old action
    times(&tmp_matrix, &(GC->lattice[r][i]), &stap);
    action_old=param->d_beta*(1.0-retr(&tmp_matrix));
 
+   // compute the new link
    one(&tmp_matrix);
    rand_matrix(&rnd_matrix);
    times_equal_real(&rnd_matrix, param->d_epsilon_metro);
    plus_equal(&rnd_matrix, &tmp_matrix);
    unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
-
    if(casuale()<0.5)
      {
      times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
@@ -231,6 +318,7 @@ int metropolis(Gauge_Conf *GC,
      times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
      }
 
+   // new action
    times(&tmp_matrix, &new_link, &stap);
    action_new=param->d_beta*(1.0-retr(&tmp_matrix));
 
@@ -274,11 +362,10 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
    double rpart, ipart;
    int j, acc;
 
+   // compute old action
    calcstaples_wilson(GC, geo, param, r, i, &stap_w);
-
    times(&tmp_matrix, &(GC->lattice[r][i]), &stap_w);
    action_old=param->d_beta*(1.0-retr(&tmp_matrix));
-
    if(i==0) // just if we are updating a temporal link
      {
      // "staple" for trace deformation
@@ -311,9 +398,9 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
      times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
      }
 
+   // compute the new action
    times(&tmp_matrix, &new_link, &stap_w);
    action_new=param->d_beta*(1.0-retr(&tmp_matrix));
-
    if(i==0) // just if we are updating a temporal link
      {
      // trace deformation contribution to action_new
@@ -336,6 +423,174 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
    else
      {
      acc=0;
+     }
+
+   return acc;
+   }
+
+
+// perform an update with metropolis
+// return 1 if the proposed update is accepted
+// to be used when the size in some direction is =1 (totally reduced case)
+int metropolis_totred(Gauge_Conf *GC,
+                      Geometry const * const geo,
+                      GParam const * const param,
+                      long r,
+                      int i)
+   {
+   #ifdef DEBUG
+   if(r >= param->d_volume)
+     {
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   if(i >= param->d_stdim)
+     {
+     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
+   GAUGE_GROUP stap, new_link, old_link, tmp_matrix, rnd_matrix;
+   double action_new, action_old;
+   int acc;
+
+   equal(&old_link, &(GC->lattice[r][i]));
+
+   // compute old action
+   calcstaples_wilson_totred(GC, geo, param, r, i, &stap);
+   times(&tmp_matrix, &(GC->lattice[r][i]), &stap);
+   action_old=param->d_beta*(1.0-retr(&tmp_matrix));
+
+   // compute the new link
+   one(&tmp_matrix);
+   rand_matrix(&rnd_matrix);
+   times_equal_real(&rnd_matrix, param->d_epsilon_metro);
+   plus_equal(&rnd_matrix, &tmp_matrix);
+   unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
+   if(casuale()<0.5)
+     {
+     times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+     }
+   else
+     {
+     times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+     }
+   equal(&(GC->lattice[r][i]), &new_link); // the new link is substituted in the configuration!
+
+   // new action
+   // staple has to be computed again because of the total reduction
+   calcstaples_wilson_totred(GC, geo, param, r, i, &stap);
+   times(&tmp_matrix, &(GC->lattice[r][i]), &stap);
+   action_new=param->d_beta*(1.0-retr(&tmp_matrix));
+
+   if(casuale()< exp(action_old-action_new))
+     {
+     acc=1;
+     }
+   else
+     {
+     equal(&(GC->lattice[r][i]), &old_link);
+     acc=0;
+     }
+
+   return acc;
+   }
+
+
+// perform an update with metropolis with trace deformations
+// return 1 if the proposed update is accepted
+// to be used when the size in some direction is =1 (totally reduced case)
+int metropolis_with_tracedef_totred(Gauge_Conf *GC,
+                                    Geometry const * const geo,
+                                    GParam const * const param,
+                                    long r,
+                                    int i)
+   {
+   #ifdef DEBUG
+   if(r >= param->d_volume)
+     {
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   if(i >= param->d_stdim)
+     {
+     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
+   GAUGE_GROUP stap_w, stap_td, old_link, new_link, tmp_matrix, rnd_matrix, poly;
+   double action_new, action_old;
+   double rpart, ipart;
+   int j, acc;
+
+   equal(&old_link, &(GC->lattice[r][i]));
+
+   // compute old action
+   calcstaples_wilson_totred(GC, geo, param, r, i, &stap_w);
+   times(&tmp_matrix, &(GC->lattice[r][i]), &stap_w);
+   action_old=param->d_beta*(1.0-retr(&tmp_matrix));
+   if(i==0) // just if we are updating a temporal link
+     {
+     // "staple" for trace deformation
+     calcstaples_tracedef(GC, geo, param, r, i, &stap_td);
+
+     // trace deformation contribution to action_old
+     times(&poly, &(GC->lattice[r][i]), &stap_td);
+     one(&tmp_matrix);
+     for(j=0; j<(int)floor(NCOLOR/2.0); j++)
+        {
+        times_equal(&tmp_matrix, &poly);
+        rpart=NCOLOR*retr(&tmp_matrix);
+        ipart=NCOLOR*imtr(&tmp_matrix);
+        action_old += param->d_h[j]*(rpart*rpart+ipart*ipart);
+        }
+     }
+
+   // compute the update to be proposed
+   one(&tmp_matrix);
+   rand_matrix(&rnd_matrix);
+   times_equal_real(&rnd_matrix, param->d_epsilon_metro);
+   plus_equal(&rnd_matrix, &tmp_matrix);
+   unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
+   if(casuale()<0.5)
+     {
+     times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+     }
+   else
+     {
+     times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+     }
+   equal(&(GC->lattice[r][i]), &(new_link));
+
+   // new action
+   // staple has to be computed again due to reduction
+   calcstaples_wilson_totred(GC, geo, param, r, i, &stap_w);
+   times(&tmp_matrix, &(GC->lattice[r][i]), &stap_w);
+   action_new=param->d_beta*(1.0-retr(&tmp_matrix));
+   if(i==0) // just if we are updating a temporal link
+     {
+     // trace deformation contribution to action_new
+     times(&poly, &new_link, &stap_td);   //stap_td is not changed by the total reduction
+     one(&tmp_matrix);
+     for(j=0; j<(int)floor(NCOLOR/2.0); j++)
+        {
+        times_equal(&tmp_matrix, &poly);
+        rpart=NCOLOR*retr(&tmp_matrix);
+        ipart=NCOLOR*imtr(&tmp_matrix);
+        action_new += param->d_h[j]*(rpart*rpart+ipart*ipart);
+        }
+     }
+
+   if(casuale()< exp(action_old-action_new))
+     {
+     acc=1;
+     }
+   else
+     {
+     acc=0;
+     equal(&new_link, &(GC->lattice[r][i]));
      }
 
    return acc;
@@ -451,6 +706,35 @@ void update_with_trace_def(Gauge_Conf * GC,
                            Geometry const * const geo,
                            GParam const * const param,
                            double *acc)
+  {
+  int i, ris;
+
+  ris=0;
+  for(i=0; i<param->d_stdim; i++)
+     {
+     if(param->d_size[i]==1)
+       {
+       ris=1;
+       }
+     }
+
+  if(ris==1) // totally reduced case
+    {
+    update_with_trace_def_totred(GC, geo, param, acc);
+    }
+  else
+    {
+    update_with_trace_def_nototred(GC, geo, param, acc);
+    }
+  }
+
+
+// perform a complete update with trace deformation
+// NOT totally reduced case
+void update_with_trace_def_nototred(Gauge_Conf * GC,
+                                    Geometry const * const geo,
+                                    GParam const * const param,
+                                    double *acc)
    {
    long r, a;
    int j, dir, t;
@@ -523,6 +807,78 @@ void update_with_trace_def(Gauge_Conf * GC,
             }
          }
       }
+
+   // final unitarization
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      for(dir=0; dir<param->d_stdim; dir++)
+         {
+         unitarize(&(GC->lattice[r][dir]));
+         }
+      }
+
+   GC->update_index++;
+   }
+
+
+// perform a complete update with trace deformation
+// totally reduced case
+void update_with_trace_def_totred(Gauge_Conf * GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
+                                  double *acc)
+   {
+   long r, a;
+   int dir, t;
+
+   a=0; // number of accepted metropolis updates
+
+   // metropolis on spatial links
+   for(dir=1; dir<param->d_stdim; dir++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<(param->d_volume)/2; r++)
+         {
+         a+=metropolis_totred(GC, geo, param, r, dir);
+         }
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         {
+         a+=metropolis_totred(GC, geo, param, r, dir);
+         }
+      }
+
+   // metropolis on temporal links
+   for(t=0; t<param->d_size[0]; t++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<(param->d_space_vol)/2; r++)
+         {
+         long r4=sisp_and_t_to_si(r, t, param);
+         a+=metropolis_with_tracedef(GC, geo, param, r4, 0);
+         }
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=(param->d_space_vol)/2; r<(param->d_space_vol); r++)
+         {
+         long r4=sisp_and_t_to_si(r, t, param);
+         a+=metropolis_with_tracedef(GC, geo, param, r4, 0);
+         }
+      }
+
+   *acc=((double)a)*param->d_inv_vol/(double)param->d_stdim;
 
    // final unitarization
    #ifdef OPENMP_MODE
