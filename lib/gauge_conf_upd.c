@@ -375,6 +375,15 @@ void update(Gauge_Conf * GC,
             Geometry const * const geo,
             GParam const * const param)
    {
+   for(int i=0; i<param->d_stdim; i++)
+      {
+      if(param->d_size[i]==1)
+        {
+        fprintf(stderr, "Error: this functon can not be used in the completely reduced case (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
+      }
+
    long r;
    int j, dir;
 
