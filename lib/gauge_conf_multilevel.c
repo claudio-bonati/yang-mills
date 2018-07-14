@@ -660,10 +660,10 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
       for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
          {
          multilevel_tube_disc_QbarQ(GC,
-                                 geo,
-                                 param,
-                                 t_start+i*param->d_ml_step[0],
-                                 param->d_ml_step[0]);
+                                    geo,
+                                    param,
+                                    t_start+i*param->d_ml_step[0],
+                                    param->d_ml_step[0]);
          }
       break;
       // end of the outermost level

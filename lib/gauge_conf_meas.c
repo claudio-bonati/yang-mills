@@ -105,8 +105,6 @@ double complex plaquettep_complex(Gauge_Conf const * const GC,
    }
 
 
-
-
 // compute the four-leaf clover in position r, in the plane i,j and save it in M
 void clover(Gauge_Conf const * const GC,
             Geometry const * const geo,
@@ -498,8 +496,6 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
     }
 
   fprintf(datafilep, "Multihit optimization: ");
-  fprintf(datafilep, "the smaller the 'ris' value, the best\n");
-  fprintf(datafilep, "mhit  ris\n");
   for(mh=1; mh<max_hit; mh++)
      {
      time(&time1);
@@ -554,7 +550,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
      time(&time2);
      diff_sec = difftime(time2, time1);
 
-     fprintf(datafilep, "%d  %.6g  (time:%g)\n", mh, poly_std*mh, diff_sec);
+     fprintf(datafilep, "%d  %.6g  %.6g  (time:%g)\n", mh, poly_average*mh, poly_std*mh, diff_sec);
 
      fflush(datafilep);
      }
@@ -609,10 +605,15 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
 
    for(i=0; i<NLEVELS; i++)
       {
+      poly_average*=(double) param->d_ml_upd[i];
+      }
+
+   for(i=0; i<NLEVELS; i++)
+      {
       poly_std*=(double) param->d_ml_upd[i];
       }
 
-   fprintf(datafilep, "%.6g ", poly_std);
+   fprintf(datafilep, "%.6g  %.6g ", poly_average, poly_std);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
@@ -732,10 +733,14 @@ void optimize_multilevel_tube_disc(Gauge_Conf *GC,
 
    for(i=0; i<NLEVELS; i++)
       {
+      poly_average*=(double) param->d_ml_upd[i];
+      }
+   for(i=0; i<NLEVELS; i++)
+      {
       poly_std*=(double) param->d_ml_upd[i];
       }
 
-   fprintf(datafilep, "%.6g ", poly_std);
+   fprintf(datafilep, "%.6g  %.6g  ", poly_average, poly_std);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
@@ -759,7 +764,7 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
    #else
      int i;
      const int numplaqs=(param->d_stdim*(param->d_stdim-1))/2;
-     double ris;
+     double risr, risi;
      long r;
 
      multilevel_tube_disc_QbarQ(GC,
@@ -768,23 +773,30 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
                              0,
                              param->d_size[0]);
 
-     ris=0.0;
+     risr=0.0;
+     risi=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
-        ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+        risr+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+        risi+=imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
         }
-     ris*=param->d_inv_space_vol;
-     fprintf(datafilep, "%.12g ", ris);
+     risr*=param->d_inv_space_vol;
+     risi*=param->d_inv_space_vol;
+     fprintf(datafilep, "%.12g %.12g", risr, risi);
 
      for(i=0; i<numplaqs; i++)
         {
-        ris=0.0;
+        risr=0.0;
+        risi=0.0;
+
         for(r=0; r<param->d_space_vol; r++)
            {
-           ris+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
+           risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
+           risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
            }
-        ris*=param->d_inv_space_vol;
-        fprintf(datafilep, "%.12g ", ris);
+        risr*=param->d_inv_space_vol;
+        risi*=param->d_inv_space_vol;
+        fprintf(datafilep, "%.12g %.12g", risr, risi);
         }
      fprintf(datafilep, "\n");
 
