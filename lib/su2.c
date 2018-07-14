@@ -74,6 +74,9 @@ void lin_comb_dag12_Su2(Su2 *A,
 // A*=r
 void times_equal_real_Su2(Su2 *A, double r);
 
+// A*=r
+void times_equal_complex_Su2(Su2 *A, double complex r);
+
 
 // A*=B
 void times_equal_Su2(Su2 *A, Su2 const * const B);

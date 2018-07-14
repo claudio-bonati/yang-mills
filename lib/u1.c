@@ -82,6 +82,10 @@ void lin_comb_dag12_U1(U1 *A,
 void times_equal_real_U1(U1 *A, double r);
 
 
+// A*=r
+void times_equal_complex_U1(U1 *A, double complex r);
+
+
 // A*=B
 void times_equal_U1(U1 *A, U1 const * const B);
 

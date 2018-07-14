@@ -1,6 +1,7 @@
 #ifndef SU2_H
 #define SU2_H
 
+#include<complex.h>
 #include<math.h>
 #include<stdio.h>
 
@@ -259,6 +260,23 @@ inline void times_equal_real_Su2(Su2 * restrict A, double r)
   A->comp[1]*=r;
   A->comp[2]*=r;
   A->comp[3]*=r;
+  }
+
+
+// A*=r
+inline void times_equal_complex_Su2(Su2 * restrict A, double complex r)
+  {
+  #ifdef DEBUG
+  if(fabs(cimag(r))>MIN_VALUE)
+    {
+    fprintf(stderr, "Trying to multiply SU(2) matrix by a non-real number (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+  A->comp[0]*=creal(r);
+  A->comp[1]*=creal(r);
+  A->comp[2]*=creal(r);
+  A->comp[3]*=creal(r);
   }
 
 

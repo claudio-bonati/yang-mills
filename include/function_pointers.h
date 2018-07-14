@@ -1,6 +1,7 @@
 #ifndef FUNCTION_POINTERS_H
 #define FUNCTION_POINTERS_H
 
+#include<complex.h>
 #include<stdio.h>
 
 #include"macro.h"
@@ -46,6 +47,7 @@ void (*lin_comb_dag12)(GAUGE_GROUP *A,
                        double c, GAUGE_GROUP const * const C); // A=b*B^{dag}+c*C^{dag}
 
 void (*times_equal_real)(GAUGE_GROUP *A, double r); // A*=r
+void (*times_equal_complex)(GAUGE_GROUP *A, double complex r); // A*=r
 
 void (*times_equal)(GAUGE_GROUP *A,
                     GAUGE_GROUP const * const B);     // A*=B

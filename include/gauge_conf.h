@@ -76,6 +76,12 @@ double plaquettep(Gauge_Conf const * const GC,
                   long r,
                   int i,
                   int j);
+double complex plaquettep_complex(Gauge_Conf const * const GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
+                                  long r,
+                                  int i,
+                                  int j);
 void clover(Gauge_Conf const * const GC,
             Geometry const * const geo,
             GParam const * const param,
@@ -160,14 +166,14 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
                                int dt,
                                int iteration);
 void compute_plaq_on_slice1(Gauge_Conf const * const GC,
-                         Geometry const * const geo,
-                         GParam const * const param,
-                         double **plaq);
-void multilevel_string_QbarQ(Gauge_Conf * GC,
-                             Geometry const * const geo,
-                             GParam const * const param,
-                             int t_start,
-                             int dt);
+                            Geometry const * const geo,
+                            GParam const * const param,
+                            double complex **plaq);
+void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                int t_start,
+                                int dt);
 
 
 // in gauge_conf_upd.c

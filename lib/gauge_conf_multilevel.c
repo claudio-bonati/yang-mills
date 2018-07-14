@@ -563,7 +563,7 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
 void compute_plaq_on_slice1(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
-                            double **plaq)
+                            double complex **plaq)
   {
   long r;
 
@@ -581,7 +581,7 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
      i=0;
      for(j=1; j<param->d_stdim; j++)
         {
-        plaq[r][tmp]=plaquettep(GC, geo, param, r4, i, j);
+        plaq[r][tmp]=plaquettep_complex(GC, geo, param, r4, i, j);
         tmp++;
         }
 
@@ -589,7 +589,7 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
         {
         for(j=i+1; j<param->d_stdim; j++)
            {
-           plaq[r][tmp]=plaquettep(GC, geo, param, r4, i, j);
+           plaq[r][tmp]=plaquettep_complex(GC, geo, param, r4, i, j);
            tmp++;
            }
         }
@@ -605,11 +605,11 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
 
 
 // multilevel for polyakov string width of QbarQ
-void multilevel_string_QbarQ(Gauge_Conf * GC,
-                             Geometry const * const geo,
-                             GParam const * const param,
-                             int t_start,
-                             int dt)
+void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                int t_start,
+                                int dt)
   {
   const int numplaqs=(param->d_stdim*(param->d_stdim-1))/2;
   int i, upd, err;
@@ -659,7 +659,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
       // call lower levels
       for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
          {
-         multilevel_string_QbarQ(GC,
+         multilevel_tube_disc_QbarQ(GC,
                                  geo,
                                  param,
                                  t_start+i*param->d_ml_step[0],
@@ -700,9 +700,8 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
            exit(EXIT_FAILURE);
            }
 
-
-         double **loc_plaq;
-         err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double*));
+         double complex **loc_plaq;
+         err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex *));
          if(err!=0)
            {
            fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
@@ -710,7 +709,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
            }
          for(r=0; r<param->d_space_vol; r++)
             {
-            err=posix_memalign((void**)&(loc_plaq[r]), (size_t) DOUBLE_ALIGN, (size_t) numplaqs * sizeof(double));
+            err=posix_memalign((void**)&(loc_plaq[r]), (size_t) DOUBLE_ALIGN, (size_t) numplaqs * sizeof(double complex));
             if(err!=0)
               {
               fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
@@ -759,7 +758,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
               for(i=0; i<numplaqs; i++)
                  {
                  equal_TensProd(&TP2, &TP);
-                 times_equal_real_TensProd(&TP2, loc_plaq[r2][i]);
+                 times_equal_complex_TensProd(&TP2, loc_plaq[r2][i]);
 
                  plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r][i]), &TP2);
                  }
@@ -855,7 +854,7 @@ void multilevel_string_QbarQ(Gauge_Conf * GC,
          // call higher levels
          for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
             {
-            multilevel_string_QbarQ(GC,
+            multilevel_tube_disc_QbarQ(GC,
                                     geo,
                                     param,
                                     t_start+i*param->d_ml_step[level+1],

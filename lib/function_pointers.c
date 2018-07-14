@@ -29,6 +29,7 @@ void init_function_pointers(void)
   lin_comb_dag2  = &lin_comb_dag2_U1;
   lin_comb_dag12 = &lin_comb_dag12_U1;
   times_equal_real = &times_equal_real_U1;
+  times_equal_complex = &times_equal_complex_U1;
   times_equal     = &times_equal_U1;
   times_equal_dag = &times_equal_dag_U1;
   times       = &times_U1;
@@ -68,6 +69,7 @@ void init_function_pointers(void)
   lin_comb_dag2  = &lin_comb_dag2_Su2;
   lin_comb_dag12 = &lin_comb_dag12_Su2;
   times_equal_real = &times_equal_real_Su2;
+  times_equal_complex = &times_equal_complex_Su2;
   times_equal     = &times_equal_Su2;
   times_equal_dag = &times_equal_dag_Su2;
   times       = &times_Su2;
@@ -107,6 +109,7 @@ void init_function_pointers(void)
   lin_comb_dag2  = &lin_comb_dag2_SuN;
   lin_comb_dag12 = &lin_comb_dag12_SuN;
   times_equal_real = &times_equal_real_SuN;
+  times_equal_complex = &times_equal_complex_SuN;
   times_equal     = &times_equal_SuN;
   times_equal_dag = &times_equal_dag_SuN;
   times       = &times_SuN;

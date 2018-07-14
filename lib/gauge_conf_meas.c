@@ -3,6 +3,7 @@
 
 #include"../include/macro.h"
 
+#include<complex.h>
 #include<math.h>
 #include<stdio.h>
 #include<stdlib.h>
@@ -57,6 +58,53 @@ double plaquettep(Gauge_Conf const * const GC,
 
    return retr(&matrix);
    }
+
+
+// computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
+double complex plaquettep_complex(Gauge_Conf const * const GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
+                                  long r,
+                                  int i,
+                                  int j)
+   {
+   GAUGE_GROUP matrix;
+
+   #ifdef DEBUG
+   if(r >= param->d_volume)
+     {
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   if(j >= param->d_stdim || i >= param->d_stdim)
+     {
+     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #else
+   (void) param; // just to avoid warning at compile time
+   #endif
+
+//
+//       ^ i
+//       |   (2)
+//       +---<---+
+//       |       |
+//   (3) V       ^ (1)
+//       |       |
+//       +--->---+---> j
+//       r   (4)
+//
+
+   equal(&matrix, &(GC->lattice[nnp(geo, r, j)][i]));
+   times_equal_dag(&matrix, &(GC->lattice[nnp(geo, r, i)][j]));
+   times_equal_dag(&matrix, &(GC->lattice[r][i]));
+   times_equal(&matrix, &(GC->lattice[r][j]));
+
+   return retr(&matrix)+I*imtr(&matrix);
+   }
+
+
 
 
 // compute the four-leaf clover in position r, in the plane i,j and save it in M
@@ -714,7 +762,7 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
      double ris;
      long r;
 
-     multilevel_string_QbarQ(GC,
+     multilevel_tube_disc_QbarQ(GC,
                              geo,
                              param,
                              0,

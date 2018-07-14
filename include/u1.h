@@ -214,6 +214,13 @@ inline void times_equal_real_U1(U1 * restrict A, double r)
   }
 
 
+// A*=r
+inline void times_equal_complex_U1(U1 * restrict A, double complex r)
+  {
+  A->comp*=r;
+  }
+
+
 // A*=B
 inline void times_equal_U1(U1 * restrict A, U1 const * const restrict B)
   {
