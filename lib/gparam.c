@@ -440,13 +440,14 @@ void init_derived_constants(GParam *param)
      {
      (param->d_volume)*=(param->d_size[i]);
      }
-  param->d_space_vol=1;
 
+  param->d_space_vol=1;
   // direction 0 is time
   for(i=1; i<param->d_stdim; i++)
      {
      (param->d_space_vol)*=(param->d_size[i]);
      }
+
   param->d_inv_vol=1.0/((double) param->d_volume);
   param->d_inv_space_vol=1.0/((double) param->d_space_vol);
   }
