@@ -313,6 +313,53 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
   }
 
 
+// allocate the 4d GC and initialize it with a slice of the 5d GC2
+void init_4d_gauge_conf_from_5d_gauge_conf(Gauge_Conf *GC4d,
+                                           Gauge_Conf const * const GC5d,
+                                           GParam const * const param5d,
+                                           int t)
+  {
+  long r4, r5;
+  int mu, err;
+
+  if(param5d->d_stdim != 5)
+    {
+    fprintf(stderr, "This function work only in 5 dimensions (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+
+  // allocate the lattice
+  err=posix_memalign((void**)&(GC4d->lattice), (size_t) DOUBLE_ALIGN, (size_t) param5d->d_space_vol* sizeof(GAUGE_GROUP *));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  for(r4=0; r4<(param5d->d_space_vol); r4++)
+     {
+     err=posix_memalign((void**)&(GC4d->lattice[r4]), (size_t) DOUBLE_ALIGN, (size_t) 4 * sizeof(GAUGE_GROUP));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     }
+
+  // initialize GC
+  for(r4=0; r4<(param5d->d_space_vol); r4++)
+     {
+     r5=lexeosp_and_t_to_lexeo(r4, t, param5d);
+     for(mu=0; mu<4; mu++)
+        {
+        equal(&(GC4d->lattice[r4][mu]), &(GC5d->lattice[r5][mu+1]) );
+        }
+     }
+
+  GC4d->update_index=GC5d->update_index;
+  }
+
+
+
 // compute the md5sum of the configuration and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
 void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const param)
   {

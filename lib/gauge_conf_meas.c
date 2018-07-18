@@ -436,6 +436,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                GParam const * const param,
                                FILE *datafilep)
    {
+   #if STDIM==4
    int i, err;
    double plaqs, plaqt, polyre, polyim, *charge, *meanplaq, charge_nocooling;
 
@@ -469,6 +470,19 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
 
    free(charge);
    free(meanplaq);
+
+   #else
+
+   double plaqs, plaqt, polyre, polyim;
+
+   plaquette(GC, geo, param, &plaqs, &plaqt);
+   polyakov(GC, geo, param, &polyre, &polyim);
+
+   fprintf(datafilep, "%.12lf %.12lf %.12lf %.12lf ", plaqs, plaqt, polyre, polyim);
+   fprintf(datafilep, "\n");
+   fflush(datafilep);
+
+   #endif
    }
 
 
@@ -804,6 +818,81 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
    #endif
    }
 
+
+void perform_measures_4d_from_5d(Gauge_Conf const * const GC,
+                                 Geometry const * const geo,
+                                 GParam const * const param5d,
+                                 FILE *datafilep)
+   {
+   int err, t, i;
+   double plaqs, plaqt, polyre, polyim, *charge, *meanplaq;
+   GParam param4d;
+   Geometry geo4d;
+   Gauge_Conf GC4d;
+
+   if(param5d->d_stdim!=5)
+     {
+     fprintf(stderr, "This function can be used only in 5 dimensions (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   plaquette(GC, geo, param5d, &plaqs, &plaqt);
+   polyakov(GC, geo, param5d, &polyre, &polyim);
+
+   fprintf(datafilep, "%.12lf %.12lf %.12lf %.12lf ", plaqs, plaqt, polyre, polyim);
+
+   err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param5d->d_coolrepeat * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param5d->d_coolrepeat * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   // initialize param4d
+   param4d.d_stdim=4;
+   #if STDIM==5  // just to avoid compile time warning on index larger than the size of the vector
+   param4d.d_size[0]=param5d->d_size[1];
+   param4d.d_size[1]=param5d->d_size[2];
+   param4d.d_size[2]=param5d->d_size[3];
+   param4d.d_size[3]=param5d->d_size[4];
+   #endif
+   param4d.d_coolsteps=param5d->d_coolsteps;
+   param4d.d_coolrepeat=param5d->d_coolrepeat;
+   init_derived_constants(&param4d);
+
+   // initialize geo4d
+   init_geometry(&geo4d, &param4d);
+
+   for(t=0; t<param5d->d_size[0]; t++)
+      {
+      init_4d_gauge_conf_from_5d_gauge_conf(&GC4d, GC, param5d, t);
+
+      plaquette(&GC4d, &geo4d, &param4d, &plaqs, &plaqt);
+      fprintf(datafilep, "%.12lf %.12lf ", plaqs, plaqt);
+
+      topcharge_cooling(&GC4d, &geo4d, &param4d, charge, meanplaq);
+      for(i=0; i<param5d->d_coolrepeat; i++)
+         {
+         fprintf(datafilep, "%.12f %.12f ", charge[i], meanplaq[i]);
+         }
+
+      end_gauge_conf(&GC4d, &param4d);
+      }
+
+   fprintf(datafilep, "\n");
+   fflush(datafilep);
+
+   free_geometry(&geo4d, &param4d);
+
+   free(charge);
+   free(meanplaq);
+   }
 
 
 #endif

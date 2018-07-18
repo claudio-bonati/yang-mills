@@ -42,9 +42,13 @@ void write_conf_on_file(Gauge_Conf const * const GC,
                         GParam const * const param);
 void write_conf_on_file_back(Gauge_Conf const * const GC,
                        GParam const * const param);
-void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC1,
+void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC,
                                      Gauge_Conf const * const GC2,
                                      GParam const * const param);
+void init_4d_gauge_conf_from_5d_gauge_conf(Gauge_Conf *GC4d,
+                                           Gauge_Conf const * const GC5d,
+                                           GParam const * const param5d,
+                                           int t);
 void compute_md5sum(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                     Gauge_Conf const * const GC,
                     GParam const * const param);
@@ -133,6 +137,10 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
                                    Geometry const * const geo,
                                    GParam const * const param,
                                    FILE *datafilep);
+void perform_measures_4d_from_5d(Gauge_Conf const * const GC,
+                                 Geometry const * const geo,
+                                 GParam const * const param5d,
+                                 FILE *datafilep);
 
 
 // in gauge_conf_multilevel.c
