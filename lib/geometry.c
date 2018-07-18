@@ -131,9 +131,6 @@ long nnm(Geometry const * const geo, long r, int i)
 
 void test_geometry(Geometry const * const geo, GParam const * const param)
   {
-  long si, ris_test, si_bis, sisp;
-  int dir, cart[STDIM], cartsp[STDIM-1], t;
-
   #ifdef DEBUG
   if(param->d_stdim>STDIM)
     {
@@ -142,6 +139,8 @@ void test_geometry(Geometry const * const geo, GParam const * const param)
     }
   #endif
 
+  long si, ris_test, si_bis, sisp;
+  int dir, cart[STDIM], cartsp[STDIM-1], t;
 
   // test of lex_to_cart <-> cart_to_lex
   for(si=0; si < param->d_volume; si++)
@@ -245,17 +244,17 @@ long cart_to_lex(int const * const cartcoord, GParam const * const param)
 
   ris=0;
   aux=1;
-  for(i=param->d_stdim-1; i>=0; i--)
+  for(i=0; i<param->d_stdim; i++)
      {
      ris+=cartcoord[i]*aux;
      aux*=param->d_size[i];
      }
 
-  // ris=cartcoord[dim-1]
-  //     + param->d_size[dim-1]*cartcoord[dim-2]
-  //     + ---- +
-  //     + param->d_size[dim-1]*..*param->d_size[1]*cartcoord[0]
-  // with this convention time (index=0) is the slowest coordinate
+  // ris = cartcoord[0]
+  //      +cartcoord[1]*size[0]
+  //      +cartcoord[2]*size[0]*size[1]
+  //      +...
+  //      +cartcoord[stdim-1]*size[0]*size[1]*...*size[stdim-2]
 
   return ris;
   }
@@ -275,17 +274,18 @@ void lex_to_cart(int *cartcoord, long lex, GParam const * const param)
   int i;
   long aux[STDIM];
 
-  aux[param->d_stdim-1]=1;
-  for(i=param->d_stdim-2; i>=0; i--)
+  aux[0]=1;
+  for(i=1; i<param->d_stdim; i++)
      {
-     aux[i]=aux[i+1]*param->d_size[i+1];
+     aux[i]=aux[i-1]*param->d_size[i-1];
      }
-  // aux[0]=size[stdim-1]*size[stdim-1]*...*size[1]
-  // aux[1]=size[stdim-1]*...*size[2]
-  // ..
-  // aux[stdim-1]=1
+  // aux[0]=1
+  // aux[1]=size[0]
+  // aux[2]=size[0]*size[1]
+  // ...
+  // aux[stdim-1]=size[0]*size[1]*...*size[stdim-2]
 
-  for(i=0; i<param->d_stdim; i++)
+  for(i=param->d_stdim-1; i>=0; i--)
      {
      cartcoord[i]=(int) (lex/aux[i]);
      lex-=aux[i]*cartcoord[i];
@@ -414,21 +414,24 @@ long lexeo_to_lex(long lexeo, GParam const * const param)
 // spatial cartesian coordinates -> spatial lexicographic index
 long cartsp_to_lexsp(int const * const ccsp, GParam const * const param)
   {
-  // the index for the spatial cartesian coord. goes from 0 to STDIM-2
-  // hence ccsp[STDIM-1]
+  // the index for the spatial cartesian coord. goes from 0 to stdim-2 hence ccsp[STDIM-1]
+
   int i;
   long ris, aux;
 
   ris=0;
   aux=1;
-  for(i=param->d_stdim-2; i>=0; i--)
+  for(i=0; i<param->d_stdim-1; i++)
      {
      ris+=ccsp[i]*aux;
      aux*=param->d_size[i+1];
      }
 
-  // ris=ccsp[dim-2] + param->d_size[dim-1]*ccsp[dim-3] + ---- +
-  //     + param->d_size[dim-1]*..*param->d_size[2]*ccsp[0]
+  // ris = ccsp[0]
+  //      +ccsp[1]*size[1]
+  //      +ccsp[2]*size[1]*size[2]
+  //      +...
+  //      +ccsp[stdim-2]*size[1]*size[2]*...*size[stdim-2]
 
   return ris;
   }
@@ -437,6 +440,8 @@ long cartsp_to_lexsp(int const * const ccsp, GParam const * const param)
 // spatial lexicographic index -> spatial cartesian coordinates
 void lexsp_to_cartsp(int *ccsp, long lexsp, GParam const * const param)
   {
+  // the index for the spatial cartesian coord. goes from 0 to stdim-2 hence ccsp[STDIM-1]
+
   #ifdef DEBUG
   if(param->d_stdim>STDIM)
     {
@@ -446,18 +451,23 @@ void lexsp_to_cartsp(int *ccsp, long lexsp, GParam const * const param)
   #endif
 
   int i;
-  long aux[STDIM];
+  long aux[STDIM-1];
 
-  aux[0]=param->d_space_vol;
-  for(i=1; i<param->d_stdim; i++)
+  aux[0]=1;
+  for(i=1; i<param->d_stdim-1; i++)
      {
-     aux[i]=aux[i-1]/(param->d_size[i]);
+     aux[i]=aux[i-1]*param->d_size[i];
      }
+  // aux[0]=1
+  // aux[1]=size[1]
+  // aux[2]=size[1]*size[2]
+  // ...
+  // aux[stdim-2]=size[1]*size[2]*...*size[stdim-2]
 
-  for(i=0; i<param->d_stdim-1; i++)
+  for(i=param->d_stdim-2; i>=0; i--)
      {
-     ccsp[i]=(int) (lexsp/aux[i+1]);
-     lexsp-=aux[i+1]*ccsp[i];
+     ccsp[i]=(int) (lexsp/aux[i]);
+     lexsp-=aux[i]*ccsp[i];
      }
   }
 
