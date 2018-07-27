@@ -874,7 +874,7 @@ void perform_measures_4d_from_5d(Gauge_Conf const * const GC,
       init_4d_gauge_conf_from_5d_gauge_conf(&GC4d, GC, param5d, t);
 
       plaquette(&GC4d, &geo4d, &param4d, &plaqs, &plaqt);
-      fprintf(datafilep, "%.12lf %.12lf ", plaqs, plaqt);
+      fprintf(datafilep, "%.12lf ", 0.5*(plaqs+plaqt));
 
       topcharge_cooling(&GC4d, &geo4d, &param4d, charge, meanplaq);
       for(i=0; i<param5d->d_coolrepeat; i++)
