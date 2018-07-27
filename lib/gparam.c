@@ -220,6 +220,16 @@ void readinput(char *in_file, GParam *param)
                   param->d_epsilon_metro=temp_d;
                   }
 
+           else if(strncmp(str, "aniso_t", 7)==0)
+                  {
+                  err=fscanf(input, "%lf", &temp_d);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_aniso_t=temp_d;
+                  }
 
            else if(strncmp(str, "coolsteps", 9)==0)
                   {
@@ -879,6 +889,73 @@ void print_parameters_tracedef(GParam const * const param, time_t time_start, ti
 
     fprintf(fp, "epsilon_metro: %.10lf\n", param->d_epsilon_metro);
     fprintf(fp, "metropolis acceptance: %.10lf\n", acc);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "coolsteps:      %d\n", param->d_coolsteps);
+    fprintf(fp, "coolrepeat:     %d\n", param->d_coolrepeat);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "randseed: %u\n", param->d_randseed);
+    fprintf(fp, "\n");
+
+    diff_sec = difftime(time_end, time_start);
+    fprintf(fp, "Simulation time: %.3lf seconds\n", diff_sec );
+    fprintf(fp, "\n");
+
+    if(endian()==0)
+      {
+      fprintf(fp, "Little endian machine\n\n");
+      }
+    else
+      {
+      fprintf(fp, "Big endian machine\n\n");
+      }
+
+    fclose(fp);
+    }
+
+
+// print simulation parameters
+void print_parameters_4d_from_5d(GParam const * const param, time_t time_start, time_t time_end)
+    {
+    FILE *fp;
+    int i;
+    double diff_sec;
+
+    fp=fopen(param->d_log_file, "w");
+    fprintf(fp, "+----------------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_4d_from_5d |\n");
+    fprintf(fp, "+----------------------------------------------+\n\n");
+
+    #ifdef OPENMP_MODE
+     fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
+    #endif
+
+    fprintf(fp, "number of colors: %d\n", NCOLOR);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", param->d_stdim);
+
+    fprintf(fp, "lattice: %d", param->d_size[0]);
+    for(i=1; i<param->d_stdim; i++)
+       {
+       fprintf(fp, "x%d", param->d_size[i]);
+       }
+    fprintf(fp, "\n\n");
+
+    fprintf(fp, "beta: %.10lf\n", param->d_beta);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "sample:    %d\n", param->d_sample);
+    fprintf(fp, "thermal:   %d\n", param->d_thermal);
+    fprintf(fp, "overrelax: %d\n", param->d_overrelax);
+    fprintf(fp, "measevery: %d\n", param->d_measevery);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "start:                   %d\n", param->d_start);
+    fprintf(fp, "saveconf_back_every:     %d\n", param->d_saveconf_back_every);
+    fprintf(fp, "saveconf_analysis_every: %d\n", param->d_saveconf_analysis_every);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "aniso_t: %.10lf\n", param->d_aniso_t);
     fprintf(fp, "\n");
 
     fprintf(fp, "coolsteps:      %d\n", param->d_coolsteps);

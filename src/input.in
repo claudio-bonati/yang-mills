@@ -1,7 +1,7 @@
 size 4 4 4 4 
 
 beta       5.705
-htracedef  1.1
+htracedef  1.1 
 
 sample    10
 thermal   0
@@ -14,6 +14,9 @@ saveconf_analysis_every 5  # if 0 does not save, else save configurations for an
 
 #for metropolis
 epsilon_metro    0.25  #distance from the identity of the random matrix for metropolis
+
+#for 4d_from_5d
+aniso_t  1.0     # anisotropy for the temporal direction: for aniso_t=0 temporal slides decouple
 
 #for cooling measures
 coolsteps  3     # number of cooling steps to be used

@@ -203,16 +203,32 @@ void calcstaples_tracedef(Gauge_Conf const * const GC,
                           long r,
                           int i,
                           GAUGE_GROUP * M);
+void calcstaples_wilson_with_aniso_t(Gauge_Conf const * const GC,
+                                     Geometry const * const geo,
+                                     GParam const * const gparam,
+                                     long r,
+                                     int i,
+                                     GAUGE_GROUP *M);
 void heatbath(Gauge_Conf * GC,
               Geometry const * const geo,
               GParam const * const param,
               long r,
               int i);
+void heatbath_with_aniso_t(Gauge_Conf * GC,
+                           Geometry const * const geo,
+                           GParam const * const param,
+                           long r,
+                           int i);
 void overrelaxation(Gauge_Conf * GC,
                     Geometry const * const geo,
                     GParam const * const param,
                     long r,
                     int i);
+void overrelaxation_with_aniso_t(Gauge_Conf * GC,
+                                 Geometry const * const geo,
+                                 GParam const * const param,
+                                 long r,
+                                 int i);
 int metropolis(Gauge_Conf *GC,
                Geometry const * const geo,
                GParam const * const param,
@@ -248,6 +264,9 @@ void update_with_trace_def_totred(Gauge_Conf * GC,
                                   Geometry const * const geo,
                                   GParam const * const param,
                                   double *acc);
+void update_with_aniso_t(Gauge_Conf * GC,
+                         Geometry const * const geo,
+                         GParam const * const param);
 void cooling(Gauge_Conf *GC,
              Geometry const * const geo,
              GParam const * const param,

@@ -65,7 +65,7 @@ void real_main(char *in_file)
     // count starts from 1 to avoid problems using %
     for(count=1; count < param.d_sample + 1; count++)
        {
-       update(&GC, &geo, &param);
+       update_with_aniso_t(&GC, &geo, &param);
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {
@@ -110,7 +110,7 @@ void real_main(char *in_file)
       }
 
     // print simulation details
-    print_parameters_local(&param, time1, time2);
+    print_parameters_4d_from_5d(&param, time1, time2);
 
     // free gauge configuration
     end_gauge_conf(&GC, &param);
@@ -147,6 +147,8 @@ void print_template_input(void)
     fprintf(fp, "start                   0  # 0=ordered  1=random  2=from saved configuration\n");
     fprintf(fp, "saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates\n");
     fprintf(fp, "saveconf_analysis_every 5  # if 0 does not save, else save configurations for analysis every ... updates\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "aniso_t  1.0     # anisotropy for the temporal direction: for aniso_t=0 temporal slides decouple\n");
     fprintf(fp, "\n");
     fprintf(fp, "coolsteps  3     # number of cooling steps to be used\n");
     fprintf(fp, "coolrepeat 5     # number of times 'coolsteps' are repeated\n");
