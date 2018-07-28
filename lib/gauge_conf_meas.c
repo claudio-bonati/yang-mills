@@ -444,7 +444,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
    polyakov(GC, geo, param, &polyre, &polyim);
    charge_nocooling=topcharge(GC, geo, param);
 
-   fprintf(datafilep, "%.12lf %.12lf %.12lf %.12lf %.12lf ", plaqs, plaqt, polyre, polyim, charge_nocooling);
+   fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim, charge_nocooling);
 
    err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
    if(err!=0)
@@ -462,7 +462,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
    topcharge_cooling(GC, geo, param, charge, meanplaq);
    for(i=0; i<param->d_coolrepeat; i++)
       {
-      fprintf(datafilep, "%.12f %.12f ", charge[i], meanplaq[i]);
+      fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
       }
    fprintf(datafilep, "\n");
 
@@ -478,7 +478,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
 
-   fprintf(datafilep, "%.12lf %.12lf %.12lf %.12lf ", plaqs, plaqt, polyre, polyim);
+   fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
    fprintf(datafilep, "\n");
    fflush(datafilep);
 
@@ -564,7 +564,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
      time(&time2);
      diff_sec = difftime(time2, time1);
 
-     fprintf(datafilep, "%d  %.6g  %.6g  (time:%g)\n", mh, poly_average*mh, poly_std*mh, diff_sec);
+     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_average*mh, poly_std*mh, diff_sec);
 
      fflush(datafilep);
      }
@@ -627,7 +627,7 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
       poly_std*=(double) param->d_ml_upd[i];
       }
 
-   fprintf(datafilep, "%.6g  %.6g ", poly_average, poly_std);
+   fprintf(datafilep, "%.12g  %.12g ", poly_average, poly_std);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
@@ -754,7 +754,7 @@ void optimize_multilevel_tube_disc(Gauge_Conf *GC,
       poly_std*=(double) param->d_ml_upd[i];
       }
 
-   fprintf(datafilep, "%.6g  %.6g  ", poly_average, poly_std);
+   fprintf(datafilep, "%.12g  %.12g  ", poly_average, poly_std);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
@@ -839,7 +839,7 @@ void perform_measures_4d_from_5d(Gauge_Conf const * const GC,
    plaquette(GC, geo, param5d, &plaqs, &plaqt);
    polyakov(GC, geo, param5d, &polyre, &polyim);
 
-   fprintf(datafilep, "%.12lf %.12lf %.12lf %.12lf ", plaqs, plaqt, polyre, polyim);
+   fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
 
    err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param5d->d_coolrepeat * sizeof(double));
    if(err!=0)
@@ -874,12 +874,12 @@ void perform_measures_4d_from_5d(Gauge_Conf const * const GC,
       init_4d_gauge_conf_from_5d_gauge_conf(&GC4d, GC, param5d, t);
 
       plaquette(&GC4d, &geo4d, &param4d, &plaqs, &plaqt);
-      fprintf(datafilep, "%.12lf ", 0.5*(plaqs+plaqt));
+      fprintf(datafilep, "%.12g ", 0.5*(plaqs+plaqt));
 
       topcharge_cooling(&GC4d, &geo4d, &param4d, charge, meanplaq);
       for(i=0; i<param5d->d_coolrepeat; i++)
          {
-         fprintf(datafilep, "%.12f %.12f ", charge[i], meanplaq[i]);
+         fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
          }
 
       end_gauge_conf(&GC4d, &param4d);
