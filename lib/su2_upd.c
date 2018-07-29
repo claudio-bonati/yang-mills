@@ -87,6 +87,10 @@ void single_heatbath_Su2(Su2 *link, Su2 const * const staple, GParam const * con
       rand_matrix_p0_Su2(p0, link);
       times_equal_Su2(link, &matrix2);        // link*=matrix2
       }
+    else
+      {
+      rand_matrix_Su2(link);
+      }
     }
 
 
@@ -107,6 +111,10 @@ void single_overrelaxation_Su2(Su2 *link, Su2 const * const staple)
 
       times_dag1_Su2(&matrix1, &matrix2, link);  // matrix1=matrix2*link^{dag}
       times_Su2(link, &matrix1, &matrix2);       // link=matrix1*matrix2
+      }
+    else
+      {
+      rand_matrix_Su2(link);
       }
     }
 

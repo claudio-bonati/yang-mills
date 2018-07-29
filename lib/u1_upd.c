@@ -44,6 +44,10 @@ void single_heatbath_U1(U1 *link, U1 const * const staple, GParam const * const 
 
     link->comp = cos(theta)+sin(theta)*I;
     }
+  else
+    {
+    rand_matrix_U1(link);
+    }
   }
 
 
@@ -63,6 +67,10 @@ void single_overrelaxation_U1(U1 *link, U1 const * const staple)
     times_equal_dag_U1(&newlink, &helper);
 
     equal_U1(link, &newlink);
+    }
+  else
+    {
+    rand_matrix_U1(link);
     }
   }
 

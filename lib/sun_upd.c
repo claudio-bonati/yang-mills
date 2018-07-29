@@ -56,6 +56,24 @@ void single_heatbath_SuN(SuN *link, SuN const * const staple, GParam const * con
                link->comp[m(k,j)]=temp1;
                }
             }
+          else
+            {
+            rand_matrix_Su2(&w);
+
+            fii= w.comp[0] + (w.comp[3])*I;
+            fij= w.comp[2] + (w.comp[1])*I;
+            fji=-w.comp[2] + (w.comp[1])*I;
+            fjj= w.comp[0] - (w.comp[3])*I;
+
+            // link*=final
+            for(k=0; k<NCOLOR; k++)
+               {
+               temp0=link->comp[m(k,i)]*fii + link->comp[m(k,j)]*fji;
+               temp1=link->comp[m(k,i)]*fij + link->comp[m(k,j)]*fjj;
+               link->comp[m(k,i)]=temp0;
+               link->comp[m(k,j)]=temp1;
+               }
+            }
           }
        }
     }
