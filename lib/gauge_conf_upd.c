@@ -217,97 +217,6 @@ void calcstaples_tracedef(Gauge_Conf const * const GC,
    }
 
 
-// compute the staple in position r, direction i and save it in M
-// using aniso_t in the temporal staples
-void calcstaples_wilson_with_aniso_t(Gauge_Conf const * const GC,
-                                     Geometry const * const geo,
-                                     GParam const * const param,
-                                     long r,
-                                     int i,
-                                     GAUGE_GROUP *M)
-   {
-   int j, l;
-   long k;
-   GAUGE_GROUP link1, link2, link3, link12, stap;
-
-   #ifdef DEBUG
-   if(r >= param->d_volume)
-     {
-     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   if(i >= param->d_stdim)
-     {
-     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #endif
-
-   zero(M); // M=0
-
-   for(l=i+1; l< i + param->d_stdim; l++)
-      {
-      j = (l % param->d_stdim);
-
-//
-//       i ^
-//         |   (1)
-//         +----->-----+
-//         |           |
-//         |           |
-//         |           V (2)
-//         |           |
-//         |           |
-//         +-----<-----+-->   j
-//       r     (3)
-//
-
-      equal(&link1, &(GC->lattice[nnp(geo, r, i)][j]));  // link1 = (1)
-      equal(&link2, &(GC->lattice[nnp(geo, r, j)][i]));  // link2 = (2)
-      equal(&link3, &(GC->lattice[r][j]));               // link3 = (3)
-
-      times_dag2(&link12, &link1, &link2);  // link12=link1*link2^{dag}
-      times_dag2(&stap, &link12, &link3);   // stap=link12*stap^{dag}
-
-      if(i==0 || j==0)
-        {
-        times_equal_real(&stap, param->d_aniso_t);
-        }
-
-      plus_equal(M, &stap);
-
-//
-//       i ^
-//         |   (1)
-//         |----<------+
-//         |           |
-//         |           |
-//     (2) V           |
-//         |           |
-//         |           |
-//         +------>----+--->j
-//        k     (3)    r
-//
-
-      k=nnm(geo, r, j);
-
-      equal(&link1, &(GC->lattice[nnp(geo, k, i)][j]));  // link1 = (1)
-      equal(&link2, &(GC->lattice[k][i]));               // link2 = (2)
-      equal(&link3, &(GC->lattice[k][j]));               // link3 = (3)
-
-      times_dag12(&link12, &link1, &link2); // link12=link1^{dag}*link2^{dag}
-      times(&stap, &link12, &link3);        // stap=link12*link3
-
-      if(i==0 || j==0)
-        {
-        times_equal_real(&stap, param->d_aniso_t);
-        }
-
-      plus_equal(M, &stap);
-      }
-    }
-
-
 // perform an update with heatbath
 void heatbath(Gauge_Conf *GC,
               Geometry const * const geo,
@@ -331,34 +240,6 @@ void heatbath(Gauge_Conf *GC,
    GAUGE_GROUP stap;
 
    calcstaples_wilson(GC, geo, param, r, i, &stap);
-   single_heatbath(&(GC->lattice[r][i]), &stap, param);
-   }
-
-
-// perform an update with heatbath
-// using aniso_t
-void heatbath_with_aniso_t(Gauge_Conf *GC,
-                           Geometry const * const geo,
-                           GParam const * const param,
-                           long r,
-                           int i)
-   {
-   #ifdef DEBUG
-   if(r >= param->d_volume)
-     {
-     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   if(i >= param->d_stdim)
-     {
-     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #endif
-
-   GAUGE_GROUP stap;
-
-   calcstaples_wilson_with_aniso_t(GC, geo, param, r, i, &stap);
    single_heatbath(&(GC->lattice[r][i]), &stap, param);
    }
 
@@ -387,35 +268,6 @@ void overrelaxation(Gauge_Conf *GC,
    GAUGE_GROUP stap;
 
    calcstaples_wilson(GC, geo, param, r, i, &stap);
-   single_overrelaxation(&(GC->lattice[r][i]), &stap);
-   }
-
-
-// perform an update with overrelaxation
-// using aniso_t
-void overrelaxation_with_aniso_t(Gauge_Conf *GC,
-                                 Geometry const * const geo,
-                                 GParam const * const param,
-                                 long r,
-                                 int i)
-   {
-   #ifdef DEBUG
-   if(r >= param->d_volume)
-     {
-     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   if(i >= param->d_stdim)
-     {
-     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #endif
-   (void) param; // just to avoid wornings
-
-   GAUGE_GROUP stap;
-
-   calcstaples_wilson_with_aniso_t(GC, geo, param, r, i, &stap);
    single_overrelaxation(&(GC->lattice[r][i]), &stap);
    }
 
@@ -1027,83 +879,6 @@ void update_with_trace_def_totred(Gauge_Conf * GC,
       }
 
    *acc=((double)a)*param->d_inv_vol/(double)param->d_stdim;
-
-   // final unitarization
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
-      for(dir=0; dir<param->d_stdim; dir++)
-         {
-         unitarize(&(GC->lattice[r][dir]));
-         }
-      }
-
-   GC->update_index++;
-   }
-
-
-// perform a complete update
-// using aniso_t
-void update_with_aniso_t(Gauge_Conf * GC,
-                         Geometry const * const geo,
-                         GParam const * const param)
-   {
-   for(int i=0; i<param->d_stdim; i++)
-      {
-      if(param->d_size[i]==1)
-        {
-        fprintf(stderr, "Error: this functon can not be used in the completely reduced case (%s, %d)\n", __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
-        }
-      }
-
-   long r;
-   int j, dir;
-
-   // heatbath
-   for(dir=0; dir<param->d_stdim; dir++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<(param->d_volume)/2; r++)
-         {
-         heatbath_with_aniso_t(GC, geo, param, r, dir);
-         }
-
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
-         {
-         heatbath_with_aniso_t(GC, geo, param, r, dir);
-         }
-      }
-
-   // overrelax
-   for(dir=0; dir<param->d_stdim; dir++)
-      {
-      for(j=0; j<param->d_overrelax; j++)
-         {
-         #ifdef OPENMP_MODE
-         #pragma omp parallel for num_threads(NTHREADS) private(r)
-         #endif
-         for(r=0; r<(param->d_volume)/2; r++)
-            {
-            overrelaxation_with_aniso_t(GC, geo, param, r, dir);
-            }
-
-         #ifdef OPENMP_MODE
-         #pragma omp parallel for num_threads(NTHREADS) private(r)
-         #endif
-         for(r=(param->d_volume)/2; r<(param->d_volume); r++)
-            {
-            overrelaxation_with_aniso_t(GC, geo, param, r, dir);
-            }
-         }
-      }
 
    // final unitarization
    #ifdef OPENMP_MODE

@@ -3,7 +3,6 @@ bin_PROGRAMS = conf_check \
                debug_su2 \
                debug_sun \
                debug_u1 \
-               yang_mills_4d_from_5d \
                yang_mills_local \
                yang_mills_pot_QbarQ \
                yang_mills_pot_QbarQ_long \
@@ -110,20 +109,6 @@ debug_u1_SOURCES=./src/debug_u1.c \
                   ./include/macro.h \
                   $(random) \
                   $(u1)
-
-yang_mills_4d_from_5d_SOURCES=./src/yang_mills_4d_from_5d.c \
-                              $(dSFMT)  \
-                              $(endian) \
-                              $(funcpoint) \
-                              $(gauge_conf) \
-                              $(geometry) \
-                              $(gparam) \
-                              ./include/macro.h \
-                              $(random) \
-                              $(su2) \
-                              $(sun) \
-                              $(tens_prod) \
-                              $(u1) 
 
 yang_mills_local_SOURCES=./src/yang_mills_local.c \
                           $(dSFMT)  \

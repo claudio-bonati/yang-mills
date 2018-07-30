@@ -45,14 +45,9 @@ void write_conf_on_file_back(Gauge_Conf const * const GC,
 void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC,
                                      Gauge_Conf const * const GC2,
                                      GParam const * const param);
-void init_4d_gauge_conf_from_5d_gauge_conf(Gauge_Conf *GC4d,
-                                           Gauge_Conf const * const GC5d,
-                                           GParam const * const param5d,
-                                           int t);
 void compute_md5sum(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                     Gauge_Conf const * const GC,
                     GParam const * const param);
-
 void init_polycorr(Gauge_Conf *GC,
                    GParam const * const param);
 void end_polycorr(Gauge_Conf *GC);
@@ -67,7 +62,6 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
 void compute_md5sum_polycorr(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                              Gauge_Conf const * const GC,
                              GParam const * const param);
-
 void init_polycorr_and_polyplaq(Gauge_Conf *GC,
                                 GParam const * const param);
 void end_polycorr_and_polyplaq(Gauge_Conf *GC,
@@ -137,11 +131,6 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
                                    Geometry const * const geo,
                                    GParam const * const param,
                                    FILE *datafilep);
-void perform_measures_4d_from_5d(Gauge_Conf const * const GC,
-                                 Geometry const * const geo,
-                                 GParam const * const param5d,
-                                 FILE *datafilep);
-
 
 // in gauge_conf_multilevel.c
 void multihit(Gauge_Conf const * const GC,
@@ -203,32 +192,16 @@ void calcstaples_tracedef(Gauge_Conf const * const GC,
                           long r,
                           int i,
                           GAUGE_GROUP * M);
-void calcstaples_wilson_with_aniso_t(Gauge_Conf const * const GC,
-                                     Geometry const * const geo,
-                                     GParam const * const gparam,
-                                     long r,
-                                     int i,
-                                     GAUGE_GROUP *M);
 void heatbath(Gauge_Conf * GC,
               Geometry const * const geo,
               GParam const * const param,
               long r,
               int i);
-void heatbath_with_aniso_t(Gauge_Conf * GC,
-                           Geometry const * const geo,
-                           GParam const * const param,
-                           long r,
-                           int i);
 void overrelaxation(Gauge_Conf * GC,
                     Geometry const * const geo,
                     GParam const * const param,
                     long r,
                     int i);
-void overrelaxation_with_aniso_t(Gauge_Conf * GC,
-                                 Geometry const * const geo,
-                                 GParam const * const param,
-                                 long r,
-                                 int i);
 int metropolis(Gauge_Conf *GC,
                Geometry const * const geo,
                GParam const * const param,
@@ -264,9 +237,6 @@ void update_with_trace_def_totred(Gauge_Conf * GC,
                                   Geometry const * const geo,
                                   GParam const * const param,
                                   double *acc);
-void update_with_aniso_t(Gauge_Conf * GC,
-                         Geometry const * const geo,
-                         GParam const * const param);
 void cooling(Gauge_Conf *GC,
              Geometry const * const geo,
              GParam const * const param,

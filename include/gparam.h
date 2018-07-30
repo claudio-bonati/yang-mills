@@ -29,9 +29,6 @@ typedef struct GParam {
   // for metropolis
   double d_epsilon_metro;
 
-  //for 4d_from_5d
-  double d_aniso_t;
-
   // for cooling in measures
   int d_coolsteps;
   int d_coolrepeat;
@@ -74,6 +71,5 @@ void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t ti
 void print_parameters_tube_disc(GParam * param, time_t time_start, time_t time_end);
 void print_parameters_t0(GParam * param, time_t time_start, time_t time_end);
 void print_parameters_tracedef(GParam const * const param, time_t time_start, time_t time_end, double acc);
-void print_parameters_4d_from_5d(GParam const * const param, time_t time_start, time_t time_end);
 
 #endif
