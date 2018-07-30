@@ -225,7 +225,7 @@ void plaquette(Gauge_Conf const * const GC,
    if(param->d_stdim>2)
      {
      ps*=param->d_inv_vol;
-     ps/=((double) param->d_stdim*(param->d_stdim-1)/2-(param->d_stdim-1));
+     ps/=((double) (param->d_stdim-1)*(param->d_stdim-2)/2);
      }
    else
      {
@@ -409,7 +409,7 @@ void topcharge_cooling(Gauge_Conf const * const GC,
         charge[iter]=ris;
 
         plaquette(&helperconf, geo, param, &plaqs, &plaqt);
-        meanplaq[iter]=0.5*(plaqs+plaqt);
+        meanplaq[iter]=0.5*(plaqs+plaqt); // this is in 4d: 3 spatial and 3 temporal plaquettes
         }
 
      end_gauge_conf(&helperconf, param); 
@@ -874,7 +874,7 @@ void perform_measures_4d_from_5d(Gauge_Conf const * const GC,
       init_4d_gauge_conf_from_5d_gauge_conf(&GC4d, GC, param5d, t);
 
       plaquette(&GC4d, &geo4d, &param4d, &plaqs, &plaqt);
-      fprintf(datafilep, "%.12g ", 0.5*(plaqs+plaqt));
+      fprintf(datafilep, "%.12g ", 0.5*(plaqs+plaqt)); // this is 4d, so 3 spatial plaquettes and 3 temporal plaquettes
 
       topcharge_cooling(&GC4d, &geo4d, &param4d, charge, meanplaq);
       for(i=0; i<param5d->d_coolrepeat; i++)
