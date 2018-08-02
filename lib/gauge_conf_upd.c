@@ -214,37 +214,31 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
 
   sood1[0][1] = 2;
   sood2[0][1] = 3;
-
-  sood1[0][2] = 3;
-  sood2[0][2] = 1;
-
-  sood1[0][3] = 1;
-  sood2[0][3] = 2;
-
   sood1[1][0] = 3;
   sood2[1][0] = 2;
 
-  sood1[1][2] = 0;
-  sood2[1][2] = 3;
-
-  sood1[1][3] = 2;
-  sood2[1][3] = 0;
-
+  sood1[0][2] = 3;
+  sood2[0][2] = 1;
   sood1[2][0] = 1;
   sood2[2][0] = 3;
 
-  sood1[2][1] = 3;
-  sood2[2][1] = 0;
-
-  sood1[2][3] = 0;
-  sood2[2][3] = 1;
-
+  sood1[0][3] = 1;
+  sood2[0][3] = 2;
   sood1[3][0] = 2;
   sood2[3][0] = 1;
 
+  sood1[1][2] = 0;
+  sood2[1][2] = 3;
+  sood1[2][1] = 3;
+  sood2[2][1] = 0;
+
+  sood1[1][3] = 2;
+  sood2[1][3] = 0;
   sood1[3][1] = 0;
   sood2[3][1] = 2;
 
+  sood1[2][3] = 0;
+  sood2[2][3] = 1;
   sood1[3][2] = 1;
   sood2[3][2] = 0;
 
@@ -286,14 +280,14 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
      plus_equal(&topo_stap, &aux);
 
      // clover insertion in (c)
-     times(&aux, &link1, &(GC->clover_array[nnp(geo, nnp(geo, r, i), j)][i0][j0]));  // link1*clover
-     times_equal(&aux, &link2);       // *=link2
-     times_equal(&aux, &link3);       // *=link3
+     times_dag1(&aux, &link1, &(GC->clover_array[nnp(geo, nnp(geo, r, i), j)][i0][j0]));  // link1^{dag}*clover
+     times_equal_dag(&aux, &link2);       // *=link2^{dag}
+     times_equal_dag(&aux, &link3);       // *=link3^{dag}
      plus_equal(&topo_stap, &aux);
 
      // clover insertion in (d)
      times(&aux, &link12, &(GC->clover_array[nnp(geo, r, j)][i0][j0]));  // link1*link2*quadri
-     times_equal(&aux, &link3);          // *=link3
+     times_equal_dag(&aux, &link3);          // *=link3^{dag}
 
      plus_equal(&topo_stap, &aux);
 
@@ -335,8 +329,8 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
      minus_equal(&topo_stap, &aux);
 
      // clover insertion in (d)
-     times(&aux, &link1, &(GC->clover_array[nnp(geo, k, i)][i0][j0]));  // link1*clover
-     times_equal(&aux, &link2);                // *=link2
+     times_dag1(&aux, &link1, &(GC->clover_array[nnp(geo, k, i)][i0][j0]));  // link1^{dag}*clover
+     times_equal_dag(&aux, &link2);            // *=link2^{dag}
      times_equal(&aux, &link3);                // *=link3
 
      minus_equal(&topo_stap, &aux);

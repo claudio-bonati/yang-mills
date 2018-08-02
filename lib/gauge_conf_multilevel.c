@@ -91,6 +91,9 @@ void compute_local_poly(Gauge_Conf const * const GC,
   }
 
 
+// compute the clovers needed to update a slice
+// note that for t=t_start only temporal links are updated, thus
+// we do not need clovers at t=t_start-1, while we do need those at t=t_start+dt
 void slice_compute_clovers(Gauge_Conf const * const GC,
                            Geometry const * const geo,
                            GParam const * const param,
@@ -128,6 +131,39 @@ void slice_compute_clovers(Gauge_Conf const * const GC,
            }
         }
      }
+
+  if(t_start+dt<param->d_size[0])
+    {
+    t=t_start+dt;
+    }
+  else
+    {
+    t=0;
+    }
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(t, r, rs, i, j, aux)
+  #endif
+  for(rs=0; r<param->d_space_vol; rs++)
+     {
+     r=sisp_and_t_to_si(rs, t, param);
+     for(i=0; i<4; i++)
+        {
+        for(j=i+1; j<4; j++)
+           {
+           if(i!=dir && j!=dir)
+             {
+             clover(GC, geo, param, r, i, j, &aux);
+
+             equal(&(GC->clover_array[r][i][j]), &aux);
+             minus_equal_dag(&(GC->clover_array[r][i][j]), &aux);  // clover_array[r][i][j]=aux-aux^{dag}
+
+             equal(&(GC->clover_array[r][j][i]), &(GC->clover_array[r][i][j]));
+             times_equal_real(&(GC->clover_array[r][j][i]), -1.0); // clover_array[r][j][i]=-clover_array[r][i][j]
+             }
+           }
+        }
+     }
   }
 
 
@@ -156,13 +192,14 @@ void slice_single_update(Gauge_Conf * GC,
   #endif
   for(r=param->d_space_vol/2; r<param->d_space_vol; r++) heatbath(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
 
-  for(i=1; i<dt; i++)
+  for(dir=0; dir<param->d_stdim; dir++)
      {
-     for(dir=0; dir<param->d_stdim; dir++)
+     #ifdef THETA_MODE
+       slice_compute_clovers(GC, geo, param, dir, t_start, dt);
+     #endif
+
+     for(i=1; i<dt; i++)
         {
-        #ifdef THETA_MODE
-          slice_compute_clovers(GC, geo, param, dir, t_start+i, 1);
-        #endif
 
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -193,13 +230,14 @@ void slice_single_update(Gauge_Conf * GC,
      #endif
      for(r=param->d_space_vol/2; r<param->d_space_vol; r++) overrelaxation(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
 
-     for(i=1; i<dt; i++)
+     for(dir=0; dir<param->d_stdim; dir++)
         {
-        for(dir=0; dir<param->d_stdim; dir++)
+        #ifdef THETA_MODE
+          slice_compute_clovers(GC, geo, param, dir, t_start, dt);
+        #endif
+
+        for(i=1; i<dt; i++)
            {
-           #ifdef THETA_MODE
-             slice_compute_clovers(GC, geo, param, dir, t_start+i, 1);
-           #endif
 
            #ifdef OPENMP_MODE
            #pragma omp parallel for num_threads(NTHREADS) private(r)

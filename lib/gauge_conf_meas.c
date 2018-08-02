@@ -382,6 +382,10 @@ double topcharge(Gauge_Conf const * const GC,
       ris+=(loc_charge*chnorm);
       }
 
+   double aux=topcharge_aux(GC, geo, param);
+   printf("%g\n", ris-aux);
+   fflush(stdout);
+
    return ris;
    }
 
