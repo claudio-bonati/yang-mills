@@ -280,7 +280,7 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
      plus_equal(&topo_stap, &aux);
 
      // clover insertion in (c)
-     times_dag1(&aux, &link1, &(GC->clover_array[nnp(geo, nnp(geo, r, i), j)][i0][j0]));  // link1^{dag}*clover
+     times(&aux, &link1, &(GC->clover_array[nnp(geo, nnp(geo, r, i), j)][i0][j0]));  // link1*clover
      times_equal_dag(&aux, &link2);       // *=link2^{dag}
      times_equal_dag(&aux, &link3);       // *=link3^{dag}
      plus_equal(&topo_stap, &aux);
@@ -324,8 +324,8 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
      minus_equal(&topo_stap, &aux);
 
      // clover insertion in (c)
-     times(&aux, &link12, &(GC->clover_array[k][i0][j0])); // link1*link2*clover
-     times_equal(&aux, &link3);                      // *=link3
+     times(&aux, &link12, &(GC->clover_array[k][i0][j0])); // link1^{dag}*link2^{dag}*clover
+     times_equal(&aux, &link3);                            // *=link3
      minus_equal(&topo_stap, &aux);
 
      // clover insertion in (d)
