@@ -766,7 +766,7 @@ void end_clover_array(Gauge_Conf *GC,
   int i;
   long r;
 
-  for(r=0; r<param->d_space_vol; r++)
+  for(r=0; r<param->d_volume; r++)
      {
      for(i=0; i<4; i++)
         {
