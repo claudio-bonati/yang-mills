@@ -14,6 +14,7 @@ typedef struct GParam {
   // simulation parameters
   double d_beta;
   double d_h[NCOLOR]; // parameters for the trace deformation
+  double d_theta;
 
   // simulation details
   int d_sample;

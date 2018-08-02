@@ -15,15 +15,16 @@
 typedef struct Gauge_Conf {
   long update_index;
 
-  GAUGE_GROUP **lattice;
+  GAUGE_GROUP **lattice;       // [volume][4]
+  GAUGE_GROUP ***clover_array; // [volume][4][4]
 
   // for computing the polyakov loop correlator with multilevel
-  TensProd **ml_polycorr_ris;
-  TensProd **ml_polycorr_tmp;
+  TensProd **ml_polycorr_ris;    // [NLEVELS][space_vol]
+  TensProd **ml_polycorr_tmp;    // [NLEVELS][space_vol]
 
   // for the disconnected correlator for string width
-  TensProd ***ml_polyplaq_ris;
-  TensProd ***ml_polyplaq_tmp;
+  TensProd ***ml_polyplaq_ris;   // [NLEVELS][space_vol][stdim*(stdim-1)/2]
+  TensProd ***ml_polyplaq_tmp;   // [NLEVELS][space_vol][stdim*(stdim-1)/2]
 
   } Gauge_Conf;
 
@@ -66,6 +67,10 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
                                 GParam const * const param);
 void end_polycorr_and_polyplaq(Gauge_Conf *GC,
                                GParam const * const param);
+void init_clover_array(Gauge_Conf *GC,
+                       GParam const * const param);
+void end_clover_array(Gauge_Conf *GC,
+                      GParam const * const param);
 
 // in gauge_conf_meas.c
 double plaquettep(Gauge_Conf const * const GC,
@@ -84,8 +89,8 @@ void clover(Gauge_Conf const * const GC,
             Geometry const * const geo,
             GParam const * const param,
             long r,
-            int j,
             int i,
+            int j,
             GAUGE_GROUP *M);
 void plaquette(Gauge_Conf const * const GC,
                Geometry const * const geo,
@@ -146,6 +151,12 @@ void compute_local_poly(Gauge_Conf const * const GC,
                         int t_start,
                         int dt,
                         GAUGE_GROUP *loc_poly);
+void slice_compute_clovers(Gauge_Conf const * const GC,
+                           Geometry const * const geo,
+                           GParam const * const param,
+                           int dir,
+                           int t_start,
+                           int dt);
 void slice_single_update(Gauge_Conf *GC,
                          Geometry const * const geo,
                          GParam const * const param,
@@ -180,18 +191,22 @@ void calcstaples_wilson(Gauge_Conf const * const GC,
                         long r,
                         int i,
                         GAUGE_GROUP *M);
-void calcstaples_wilson_totred(Gauge_Conf const * const GC,
-                               Geometry const * const geo,
-                               GParam const * const gparam,
-                               long r,
-                               int i,
-                               GAUGE_GROUP *M);
 void calcstaples_tracedef(Gauge_Conf const * const GC,
                           Geometry const * const geo,
                           GParam const * const param,
                           long r,
                           int i,
                           GAUGE_GROUP * M);
+void compute_clovers(Gauge_Conf const * const GC,
+                     Geometry const * const geo,
+                     GParam const * const param,
+                     int direction);
+void calcstaples_with_topo(Gauge_Conf const * const GC,
+                           Geometry const * const geo,
+                           GParam const * const param,
+                           long r,
+                           int i,
+                           GAUGE_GROUP *M);
 void heatbath(Gauge_Conf * GC,
               Geometry const * const geo,
               GParam const * const param,
@@ -212,31 +227,13 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
                              GParam const * const param,
                              long r,
                              int i);
-int metropolis_totred(Gauge_Conf *GC,
-                      Geometry const * const geo,
-                      GParam const * const param,
-                      long r,
-                      int i);
-int metropolis_with_tracedef_totred(Gauge_Conf *GC,
-                                    Geometry const * const geo,
-                                    GParam const * const param,
-                                    long r,
-                                    int i);
-void update(Gauge_Conf * GC,
+void update(Gauge_Conf *GC,
             Geometry const * const geo,
             GParam const * const param);
-void update_with_trace_def(Gauge_Conf * GC,
+void update_with_trace_def(Gauge_Conf *GC,
                            Geometry const * const geo,
                            GParam const * const param,
                            double *acc);
-void update_with_trace_def_nototred(Gauge_Conf * GC,
-                                    Geometry const * const geo,
-                                    GParam const * const param,
-                                    double *acc);
-void update_with_trace_def_totred(Gauge_Conf * GC,
-                                  Geometry const * const geo,
-                                  GParam const * const param,
-                                  double *acc);
 void cooling(Gauge_Conf *GC,
              Geometry const * const geo,
              GParam const * const param,

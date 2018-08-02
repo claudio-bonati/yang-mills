@@ -136,6 +136,16 @@ void readinput(char *in_file, GParam *param)
                      param->d_h[i]=temp_d;
                      }
                   }
+           else if(strncmp(str, "theta", 4)==0)
+                  {
+                  err=fscanf(input, "%lf", &temp_d);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_theta=temp_d;
+                  }
 
            else if(strncmp(str, "sample", 6)==0)
                   { 
@@ -424,6 +434,19 @@ void readinput(char *in_file, GParam *param)
          }
       #endif
 
+      err=0;
+      for(i=0; i<param->d_stdim; i++)
+         {
+         if(param->d_size[i]==1)
+           {
+           err=1;
+           }
+         }
+      if(err==1)
+        {
+        fprintf(stderr, "Error: all sizes has to be larger than 1: the totally reduced case is not implemented! (%s, %d)\n", __FILE__, __LINE__);
+        }
+
       init_derived_constants(param);
       }
     }
@@ -517,6 +540,9 @@ void print_parameters_local(GParam const * const param, time_t time_start, time_
     fprintf(fp, "\n\n");
 
     fprintf(fp, "beta: %.10lf\n", param->d_beta);
+    #ifdef THETA_MODE
+      fprintf(fp, "theta: %.10lf\n", param->d_theta);
+    #endif
     fprintf(fp, "\n");
 
     fprintf(fp, "sample:    %d\n", param->d_sample);
@@ -581,6 +607,10 @@ void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_en
     fprintf(fp, "\n\n");
 
     fprintf(fp, "beta: %.10lf\n", param->d_beta);
+    #ifdef THETA_MODE
+      fprintf(fp, "theta: %.10lf\n", param->d_theta);
+    #endif
+
     fprintf(fp, "\n");
 
     fprintf(fp, "sample:    %d\n", param->d_sample);
@@ -657,6 +687,9 @@ void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t ti
     fprintf(fp, "\n\n");
 
     fprintf(fp, "beta: %.10lf\n", param->d_beta);
+    #ifdef THETA_MODE
+      fprintf(fp, "theta: %.10lf\n", param->d_theta);
+    #endif
     fprintf(fp, "\n");
 
     fprintf(fp, "sample:    %d\n", param->d_sample);
@@ -733,6 +766,9 @@ void print_parameters_tube_disc(GParam * param, time_t time_start, time_t time_e
     fprintf(fp, "\n\n");
 
     fprintf(fp, "beta: %.10lf\n", param->d_beta);
+    #ifdef THETA_MODE
+      fprintf(fp, "theta: %.10lf\n", param->d_theta);
+    #endif
     fprintf(fp, "\n");
 
     fprintf(fp, "sample:    %d\n", param->d_sample);
@@ -831,6 +867,7 @@ void print_parameters_t0(GParam * param, time_t time_start, time_t time_end)
     fclose(fp);
     }
 
+
 // print simulation parameters for the tracedef case
 void print_parameters_tracedef(GParam const * const param, time_t time_start, time_t time_end, double acc)
     {
@@ -858,6 +895,9 @@ void print_parameters_tracedef(GParam const * const param, time_t time_start, ti
     fprintf(fp, "\n\n");
 
     fprintf(fp, "beta: %.10lf\n", param->d_beta);
+    #ifdef THETA_MODE
+      fprintf(fp, "theta: %.10lf\n", param->d_theta);
+    #endif
     fprintf(fp, "h: %.10lf ", param->d_h[0]);
     for(i=1; i<(int) floor(NCOLOR/2.0); i++)
        {

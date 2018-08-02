@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([yang_mills], [0.5.0], [claudio.bonati82@gmail.com])
+AC_INIT([yang_mills], [0.5.1], [claudio.bonati82@gmail.com])
 AM_INIT_AUTOMAKE(subdir-objects)
 AC_CONFIG_SRCDIR([./include/macro.h])
 AC_CONFIG_HEADERS([config.h])
@@ -23,7 +23,6 @@ AC_PROG_AWK
 AC_PROG_CC
 
 
-
 # Checks for header files.
 AC_CHECK_HEADERS([complex.h], [], [AC_MSG_ERROR([Required header complex.h not found.])])
 
@@ -45,7 +44,6 @@ AC_CHECK_HEADERS([stdlib.h], [], [AC_MSG_ERROR([Required header stdlib.h not fou
 AC_CHECK_HEADERS([time.h], [], [AC_MSG_ERROR([Required header time.h not found.])])
 
 
-
 # Checks for libraries.
 AC_SEARCH_LIBS([MD5_Init], [crypto], [has_crypto=yes], 
      [AC_MSG_WARN([
@@ -56,7 +54,6 @@ AC_SEARCH_LIBS([MD5_Init], [crypto], [has_crypto=yes],
 
 AC_SEARCH_LIBS([sqrt], [m], [], 
      [AC_MSG_FAILURE([Required c mathematical library not found.])])
-
 
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -71,6 +68,11 @@ AC_ARG_ENABLE([use-openmp],
               [  --enable-use-openmp     to enable the use of openmp], 
               [use_openmp=yes], 
               [use_openmp=no])
+
+AC_ARG_ENABLE([use-theta], 
+              [  --enable-use-theta      to enable the use of an imaginary theta term], 
+              [use_theta=yes], 
+              [use_theta=no])
 
 
 
@@ -105,6 +107,9 @@ if test x${use_openmp} = xyes; then
   AC_DEFINE(OPENMP_MODE,, [Enable the use of openmp])
 fi
 
+if test x${use_theta} = xyes; then
+  AC_DEFINE(THETA_MODE,, [Enable the use of an imaginary theta term])
+fi
 
 
 ### TEST

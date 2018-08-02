@@ -15,6 +15,7 @@
 #include"../include/tens_prod.h"
 
 
+
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
 double plaquettep(Gauge_Conf const * const GC,
                   Geometry const * const geo,
@@ -110,8 +111,8 @@ void clover(Gauge_Conf const * const GC,
             Geometry const * const geo,
             GParam const * const param,
             long r,
-            int j,
             int i,
+            int j,
             GAUGE_GROUP *M)
    {
    GAUGE_GROUP aux;
@@ -123,7 +124,7 @@ void clover(Gauge_Conf const * const GC,
      fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
-   if(j >= param->d_stdim || i >= param->d_stdim)
+   if(i >= param->d_stdim || j >= param->d_stdim)
      {
      fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
@@ -155,35 +156,35 @@ void clover(Gauge_Conf const * const GC,
 //              (11)   k      (6)
 //
    // avanti-avanti
-   equal(&aux, &(GC->lattice[r][j]) );                               // 1
-   times_equal(&aux, &(GC->lattice[nnp(geo, r, j)][i]) );        // 2
-   times_equal_dag(&aux, &(GC->lattice[nnp(geo, r, i)][j]) );    // 3
-   times_equal_dag(&aux, &(GC->lattice[r][i]) );                     // 4
+   equal(&aux, &(GC->lattice[r][i]) );                           // 1
+   times_equal(&aux, &(GC->lattice[nnp(geo, r, i)][j]) );        // 2
+   times_equal_dag(&aux, &(GC->lattice[nnp(geo, r, j)][i]) );    // 3
+   times_equal_dag(&aux, &(GC->lattice[r][j]) );                 // 4
    plus_equal(M, &aux);
 
-   k=nnm(geo, r, i);
+   k=nnm(geo, r, j);
 
    // avanti-indietro
-   equal_dag(&aux, &(GC->lattice[k][i]) );                       // 5
-   times_equal(&aux, &(GC->lattice[k][j]) );                     // 6
-   times_equal(&aux, &(GC->lattice[nnp(geo, k, j)][i]) );    // 7
-   times_equal_dag(&aux, &(GC->lattice[r][j]) );                 // 8
+   equal_dag(&aux, &(GC->lattice[k][j]) );                       // 5
+   times_equal(&aux, &(GC->lattice[k][i]) );                     // 6
+   times_equal(&aux, &(GC->lattice[nnp(geo, k, i)][j]) );        // 7
+   times_equal_dag(&aux, &(GC->lattice[r][i]) );                 // 8
    plus_equal(M, &aux);
 
-   p=nnm(geo, r, j);
+   p=nnm(geo, r, i);
 
    // indietro-indietro
-   equal_dag(&aux, &(GC->lattice[p][j]) );                           // 9
-   times_equal_dag(&aux, &(GC->lattice[nnm(geo, k, j)][i]) );    // 10
-   times_equal(&aux, &(GC->lattice[nnm(geo, k, j)][j]) );        // 11
-   times_equal(&aux, &(GC->lattice[k][i]) );                         // 12
+   equal_dag(&aux, &(GC->lattice[p][i]) );                       // 9
+   times_equal_dag(&aux, &(GC->lattice[nnm(geo, k, i)][j]) );    // 10
+   times_equal(&aux, &(GC->lattice[nnm(geo, k, i)][i]) );        // 11
+   times_equal(&aux, &(GC->lattice[k][j]) );                     // 12
    plus_equal(M, &aux);
 
    // indietro-avanti
-   equal(&aux, &(GC->lattice[r][i]) );                                // 13
-   times_equal_dag(&aux, &(GC->lattice[nnp(geo, p, i)][j]) );     // 14
-   times_equal_dag(&aux, &(GC->lattice[p][i]) );                      // 15
-   times_equal(&aux, &(GC->lattice[p][j]) );                          // 16
+   equal(&aux, &(GC->lattice[r][j]) );                            // 13
+   times_equal_dag(&aux, &(GC->lattice[nnp(geo, p, j)][i]) );     // 14
+   times_equal_dag(&aux, &(GC->lattice[p][j]) );                  // 15
+   times_equal(&aux, &(GC->lattice[p][i]) );                      // 16
    plus_equal(M, &aux);
    }
 
@@ -319,6 +320,7 @@ void polyakov(Gauge_Conf const * const GC,
 
 
 // compute the topological charge
+// see readme for more details
 double topcharge(Gauge_Conf const * const GC,
                  Geometry const * const geo,
                  GParam const * const param)
@@ -342,42 +344,42 @@ double topcharge(Gauge_Conf const * const GC,
       GAUGE_GROUP aux1, aux2, aux3;
       double real1, real2, loc_charge;
       const double chnorm=1.0/(128.0*PI*PI);
-      int i, dir[4][4], sign;
+      int i, dir[4][3], sign;
 
-      dir[1][1] = 1;
-      dir[1][2] = 1;
-      dir[1][3] = 1;
-
-      dir[2][1] = 2;
-      dir[2][2] = 3;
-      dir[2][3] = 0;
-
-      dir[3][1] = 3;
-      dir[3][2] = 2;
-      dir[3][3] = 2;
-
+      dir[0][0] = 0;
       dir[0][1] = 0;
       dir[0][2] = 0;
-      dir[0][3] = 3;
 
-      sign=1;
+      dir[1][0] = 1;
+      dir[1][1] = 2;
+      dir[1][2] = 3;
+
+      dir[2][0] = 2;
+      dir[2][1] = 1;
+      dir[2][2] = 1;
+
+      dir[3][0] = 3;
+      dir[3][1] = 3;
+      dir[3][2] = 2;
+
+      sign=-1;
       loc_charge=0.0;
 
-      for(i=1; i<4; i++)
+      for(i=0; i<3; i++)
          {
-         clover(GC, geo, param, r, dir[1][i], dir[2][i], &aux1);
-         clover(GC, geo, param, r, dir[3][i], dir[0][i], &aux2);
+         clover(GC, geo, param, r, dir[0][i], dir[1][i], &aux1);
+         clover(GC, geo, param, r, dir[2][i], dir[3][i], &aux2);
 
          times_dag2(&aux3, &aux2, &aux1); // aux3=aux2*(aux1^{dag})
          real1=retr(&aux3)*NCOLOR;
 
          times(&aux3, &aux2, &aux1); // aux3=aux2*aux1
          real2=retr(&aux3)*NCOLOR;
-        
+
          loc_charge+=((double) sign*(real1-real2));
          sign=-sign;
          }
-      ris+=(loc_charge*chnorm); 
+      ris+=(loc_charge*chnorm);
       }
 
    return ris;

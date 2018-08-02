@@ -90,6 +90,9 @@
 /* Spacetime dimensionality */
 #undef STDIM
 
+/* Enable the use of an imaginary theta term */
+#undef THETA_MODE
+
 /* Version number of package */
 #undef VERSION
 

@@ -134,6 +134,7 @@ void print_template_input(void)
     fprintf(fp, "size 4 4 4 4\n");
     fprintf(fp,"\n");
     fprintf(fp, "beta 5.705\n");
+    fprintf(fp, "theta 1.5\n");
     fprintf(fp,"\n");
     fprintf(fp, "sample    10\n");
     fprintf(fp, "thermal   0\n");
@@ -184,6 +185,10 @@ int main (int argc, char **argv)
 
       #ifdef OPENMP_MODE
         printf("\n\tusing OpenMP with %d threads\n", NTHREADS);
+      #endif
+
+      #ifdef THETA_MODE
+        printf("\n\tusing imaginary theta\n");
       #endif
 
       #ifdef OPT_MULTIHIT

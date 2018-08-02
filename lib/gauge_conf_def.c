@@ -38,6 +38,10 @@ void init_gauge_conf(Gauge_Conf *GC, GParam const * const param)
        }
      }
 
+  #ifdef THETA_MODE
+    init_clover_array(GC, param);
+  #endif
+
   // initialize lattice
   if(param->d_start==0) // ordered start
     {
@@ -190,6 +194,10 @@ void end_gauge_conf(Gauge_Conf *GC, GParam const * const param)
      free(GC->lattice[i]);
      }
   free(GC->lattice);
+
+  #ifdef THETA_MODE
+    end_clover_array(GC, param);
+  #endif
   }
 
 
@@ -299,6 +307,10 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
        exit(EXIT_FAILURE);
        }
      }
+
+  #ifdef THETA_MODE
+    init_clover_array(GC, param);
+  #endif
 
   // initialize GC
   for(r=0; r<(param->d_volume); r++)
@@ -707,6 +719,62 @@ void end_polycorr_and_polyplaq(Gauge_Conf *GC,
      }
   free(GC->ml_polyplaq_ris);
   free(GC->ml_polyplaq_tmp);
+  }
+
+
+// allocate the clovers arrays
+void init_clover_array(Gauge_Conf *GC,
+                       GParam const * const param)
+  {
+  int i, err;
+  long r;
+
+  err=posix_memalign((void**)&(GC->clover_array), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume *sizeof(GAUGE_GROUP **));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating clovers (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(r=0; r<param->d_volume; r++)
+       {
+       err=posix_memalign((void**)&(GC->clover_array[r]), (size_t)DOUBLE_ALIGN, 4*sizeof(GAUGE_GROUP *));
+       if(err!=0)
+         {
+         fprintf(stderr, "Problems in allocating clovers[%ld] (%s, %d)\n", r, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       for(i=0; i<4; i++)
+          {
+          err=posix_memalign((void**)&(GC->clover_array[r][i]), (size_t)DOUBLE_ALIGN, 4*sizeof(GAUGE_GROUP));
+          if(err!=0)
+            {
+            fprintf(stderr, "Problems in allocating clovers[%ld][%d] (%s, %d)\n", r, i, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
+          }
+       }
+    }
+  }
+
+
+// free the clovers arrays
+void end_clover_array(Gauge_Conf *GC,
+                      GParam const * const param)
+  {
+  int i;
+  long r;
+
+  for(r=0; r<param->d_space_vol; r++)
+     {
+     for(i=0; i<4; i++)
+        {
+        free(GC->clover_array[r][i]);
+        }
+     free(GC->clover_array[r]);
+     }
+  free(GC->clover_array);
   }
 
 
