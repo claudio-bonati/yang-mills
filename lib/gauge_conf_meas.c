@@ -500,18 +500,18 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
   int i, mh, t_tmp, err;
   long r, r1, r2;
   double poly_std, poly_average, diff_sec;
-  double *poly_array;
+  double complex *poly_array;
   time_t time1, time2;
   GAUGE_GROUP matrix, tmp;
 
-  err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
+  err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
 
-  fprintf(datafilep, "Multihit optimization: ");
+  fprintf(datafilep, "Multihit optimization: \n");
   for(mh=1; mh<max_hit; mh++)
      {
      time(&time1);
@@ -531,7 +531,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
                     &tmp);
            times_equal(&matrix, &tmp);
            }
-        poly_array[r]=retr(&matrix);
+        poly_array[r]=retr(&matrix)+I*imtr(&matrix);
         }
 
      // average correlator computation
@@ -544,7 +544,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
            r1=nnp(geo, r1, dir);
            }
         si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
-        poly_average+=poly_array[r]*poly_array[r2];
+        poly_average+=cabs(poly_array[r]*conj(poly_array[r2]));
         }
      poly_average*=param->d_inv_space_vol;
 
@@ -558,7 +558,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
            r1=nnp(geo, r1, dir);
            }
         si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
-        poly_std += (poly_array[r]*poly_array[r2]-poly_average)*(poly_array[r]*poly_array[r2]-poly_average);
+        poly_std += pow(cabs(poly_array[r]*conj(poly_array[r2]))-poly_average, 2.0);
         }
      poly_std*=param->d_inv_space_vol;
      poly_std*=param->d_inv_space_vol;
@@ -584,9 +584,9 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
    int i, err;
    long r;
    double poly_std, poly_average;
-   double *poly_array;
+   double complex *poly_array;
 
-   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
    if(err!=0)
      {
      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
@@ -606,15 +606,15 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
    poly_average=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
-      poly_average+=poly_array[r];
+      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]))+I*imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      poly_average+=cabs(poly_array[r]);
       }
    poly_average*=param->d_inv_space_vol;
 
    poly_std=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      poly_std+=(poly_average-poly_array[r])*(poly_average-poly_array[r]);
+      poly_std+=pow(cabs(poly_array[r])-poly_average, 2.0);
       }
    poly_std*=param->d_inv_space_vol;
    poly_std*=param->d_inv_space_vol;
@@ -710,9 +710,9 @@ void optimize_multilevel_tube_disc(Gauge_Conf *GC,
    int i, err;
    long r;
    double poly_std, poly_average;
-   double *poly_array;
+   double complex *poly_array;
 
-   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
    if(err!=0)
      {
      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
@@ -732,17 +732,16 @@ void optimize_multilevel_tube_disc(Gauge_Conf *GC,
    poly_average=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
-      poly_array[r]-=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][0]));
-
-      poly_average+=poly_array[r];
+      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]))-retr_TensProd(&(GC->ml_polyplaq_ris[0][r][0]))
+               +I*( imtr_TensProd(&(GC->ml_polycorr_ris[0][r]))-imtr_TensProd(&(GC->ml_polyplaq_ris[0][r][0])) );
+      poly_average+=cabs(poly_array[r]);
       }
    poly_average*=param->d_inv_space_vol;
 
    poly_std=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      poly_std+=(poly_average-poly_array[r])*(poly_average-poly_array[r]);
+      poly_std+=pow(cabs(poly_array[r])-poly_average, 2.0);
       }
    poly_std*=param->d_inv_space_vol;
    poly_std*=param->d_inv_space_vol;
