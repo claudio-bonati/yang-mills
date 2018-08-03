@@ -110,7 +110,7 @@ void slice_compute_clovers(Gauge_Conf const * const GC,
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(t, r, rs, i, j, aux)
      #endif
-     for(rs=0; r<param->d_space_vol; rs++)
+     for(rs=0; rs<param->d_space_vol; rs++)
         {
         r=sisp_and_t_to_si(rs, t, param);
         for(i=0; i<4; i++)
@@ -144,7 +144,7 @@ void slice_compute_clovers(Gauge_Conf const * const GC,
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(t, r, rs, i, j, aux)
   #endif
-  for(rs=0; r<param->d_space_vol; rs++)
+  for(rs=0; rs<param->d_space_vol; rs++)
      {
      r=sisp_and_t_to_si(rs, t, param);
      for(i=0; i<4; i++)
