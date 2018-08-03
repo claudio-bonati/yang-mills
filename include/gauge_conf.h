@@ -10,6 +10,10 @@
 
 #include"gparam.h"
 #include"geometry.h"
+#include"su2.h"
+#include"sun.h"
+#include"tens_prod.h"
+#include"u1.h"
 
 
 typedef struct Gauge_Conf {
