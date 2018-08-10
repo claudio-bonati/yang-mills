@@ -185,12 +185,18 @@ void slice_single_update(Gauge_Conf * GC,
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(r)
   #endif
-  for(r=0; r<param->d_space_vol/2; r++) heatbath(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+  for(r=0; r<param->d_space_vol/2; r++)
+     {
+     heatbath(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+     }
 
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(r)
   #endif
-  for(r=param->d_space_vol/2; r<param->d_space_vol; r++) heatbath(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+  for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
+     {
+     heatbath(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+     }
 
   for(dir=0; dir<param->d_stdim; dir++)
      {
@@ -200,16 +206,21 @@ void slice_single_update(Gauge_Conf * GC,
 
      for(i=1; i<dt; i++)
         {
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r)
+        #endif
+        for(r=0; r<param->d_space_vol/2; r++)
+           {
+           heatbath(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+           }
 
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
         #endif
-        for(r=0; r<param->d_space_vol/2; r++) heatbath(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
-
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r)
-        #endif
-        for(r=param->d_space_vol/2; r<param->d_space_vol; r++) heatbath(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+        for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
+           {
+           heatbath(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+           }
         }
      }
 
@@ -223,12 +234,18 @@ void slice_single_update(Gauge_Conf * GC,
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
      #endif
-     for(r=0; r<param->d_space_vol/2; r++) overrelaxation(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+     for(r=0; r<param->d_space_vol/2; r++)
+        {
+        overrelaxation(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+        }
 
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
      #endif
-     for(r=param->d_space_vol/2; r<param->d_space_vol; r++) overrelaxation(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+     for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
+        {
+        overrelaxation(GC, geo, param, sisp_and_t_to_si(r, t_start, param), 0);
+        }
 
      for(dir=0; dir<param->d_stdim; dir++)
         {
@@ -238,16 +255,21 @@ void slice_single_update(Gauge_Conf * GC,
 
         for(i=1; i<dt; i++)
            {
+           #ifdef OPENMP_MODE
+           #pragma omp parallel for num_threads(NTHREADS) private(r)
+           #endif
+           for(r=0; r<param->d_space_vol/2; r++)
+              {
+              overrelaxation(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+              }
 
            #ifdef OPENMP_MODE
            #pragma omp parallel for num_threads(NTHREADS) private(r)
            #endif
-           for(r=0; r<param->d_space_vol/2; r++) overrelaxation(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
-
-           #ifdef OPENMP_MODE
-           #pragma omp parallel for num_threads(NTHREADS) private(r)
-           #endif
-           for(r=param->d_space_vol/2; r<param->d_space_vol; r++) overrelaxation(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+           for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
+              {
+              overrelaxation(GC, geo, param, sisp_and_t_to_si(r, t_start+i, param), dir);
+              }
            }
         }
      }
@@ -256,7 +278,10 @@ void slice_single_update(Gauge_Conf * GC,
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(r)
   #endif
-  for(r=0; r<param->d_space_vol; r++) unitarize( &(GC->lattice[sisp_and_t_to_si(r, t_start, param)][0]) );
+  for(r=0; r<param->d_space_vol; r++)
+     {
+     unitarize( &(GC->lattice[sisp_and_t_to_si(r, t_start, param)][0]) );
+     }
 
   for(i=1; i<dt; i++)
      {
@@ -374,10 +399,13 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
             {
             TensProd TP;
             long r1, r2;
-            int t_tmp ;
+            int j, t_tmp;
 
             r1=sisp_and_t_to_si(r, 0, param);
-            for(i=0; i<param->d_dist_poly; i++) r1=nnp(geo, r1, 1);
+            for(j=0; j<param->d_dist_poly; j++)
+               {
+               r1=nnp(geo, r1, 1);
+               }
             si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
 
             TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
@@ -586,10 +614,13 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
             {
             TensProd TP;
             long r1, r2;
-            int t_tmp;
+            int j, t_tmp;
 
             r1=sisp_and_t_to_si(r, 0, param);
-            for(i=0; i<param->d_dist_poly; i++) r1=nnp(geo, r1, 1);
+            for(j=0; j<param->d_dist_poly; j++)
+               {
+               r1=nnp(geo, r1, 1);
+               }
             si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
 
             TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
@@ -826,16 +857,16 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
          // compute the tensor products
          // and update ml_polycorr_tmp[level], ml_polyplaq_tmp[level]
          #ifdef OPENMP_MODE
-         #pragma omp parallel for num_threads(NTHREADS) private(r, i)
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
          #endif
          for(r=0; r<param->d_space_vol; r++)
             {
             TensProd TP, TP2;
             long r1, r2;
-            int t_tmp;
+            int j, t_tmp;
 
             r1=sisp_and_t_to_si(r, 0, param);
-            for(i=0; i<param->d_dist_poly; i++) r1=nnp(geo, r1, 1);
+            for(j=0; j<param->d_dist_poly; j++) r1=nnp(geo, r1, 1);
             si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
 
             TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
@@ -845,23 +876,29 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
             if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
               {
               r1=sisp_and_t_to_si(r, 0, param);
-              for(i=0; i<param->d_dist_poly/2; i++) r1=nnp(geo, r1, 1);
-              for(i=0; i<param->d_trasv_dist; i++) r1=nnp(geo, r1, 2);
+              for(j=0; j<param->d_dist_poly/2; j++)
+                 {
+                 r1=nnp(geo, r1, 1);
+                 }
+              for(j=0; j<param->d_trasv_dist; j++)
+                 {
+                 r1=nnp(geo, r1, 2);
+                 }
               si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
 
-              for(i=0; i<numplaqs; i++)
+              for(j=0; j<numplaqs; j++)
                  {
                  equal_TensProd(&TP2, &TP);
-                 times_equal_complex_TensProd(&TP2, loc_plaq[r2][i]);
+                 times_equal_complex_TensProd(&TP2, loc_plaq[r2][j]);
 
-                 plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r][i]), &TP2);
+                 plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r][j]), &TP2);
                  }
               }
             else
               {
-              for(i=0; i<numplaqs; i++)
+              for(j=0; j<numplaqs; j++)
                  {
-                 plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r][i]), &TP);
+                 plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r][j]), &TP);
                  }
               }
             }
