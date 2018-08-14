@@ -108,7 +108,7 @@ void slice_compute_clovers(Gauge_Conf const * const GC,
   for(t=t_start; t<t_start+dt; t++)
      {
      #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(t, r, rs, i, j, aux)
+     #pragma omp parallel for num_threads(NTHREADS) private(r, rs, i, j, aux)
      #endif
      for(rs=0; rs<param->d_space_vol; rs++)
         {
@@ -142,7 +142,7 @@ void slice_compute_clovers(Gauge_Conf const * const GC,
     }
 
   #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(t, r, rs, i, j, aux)
+  #pragma omp parallel for num_threads(NTHREADS) private(r, rs, i, j, aux)
   #endif
   for(rs=0; rs<param->d_space_vol; rs++)
      {
