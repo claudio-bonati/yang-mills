@@ -10,14 +10,16 @@
 #include"../include/geometry.h"
 #include"../include/gparam.h"
 
+// single index 4d = even/odd lexicographic index 4d
+// single index 3d = even/odd lexicographic index 3d
 void init_indexing_lexeo(void)
   {
   cart_to_si = &cart_to_lexeo;
   si_to_cart = &lexeo_to_cart;
   lex_to_si = &lex_to_lexeo;
   si_to_lex = &lexeo_to_lex;
-  sisp_and_t_to_si=&lexeosp_and_t_to_lexeo;
-  si_to_sisp_and_t=&lexeo_to_lexeosp_and_t;
+  sisp_and_t_to_si_compute=&lexeosp_and_t_to_lexeo;
+  si_to_sisp_and_t_compute=&lexeo_to_lexeosp_and_t;
   }
 
 
@@ -65,6 +67,34 @@ void init_geometry(Geometry *geo, GParam const * const param)
        }
      }
 
+  err=posix_memalign((void**)&(geo->d_timeslice), (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(int));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  err=posix_memalign((void**)&(geo->d_spacecomp), (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(long));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  err=posix_memalign((void**)&(geo->d_tsp), (size_t)INT_ALIGN, (size_t) param->d_size[0] * sizeof(long *));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  for(r=0; r<param->d_size[0]; r++)
+     {
+     err=posix_memalign((void**)&(geo->d_tsp[r]), (size_t)INT_ALIGN, (size_t) param->d_space_vol * sizeof(long));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating the geometry! (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     }
+
   // INITIALIZE
   for(r=0; r<param->d_volume; r++)
      {
@@ -96,6 +126,14 @@ void init_geometry(Geometry *geo, GParam const * const param)
         }
      } // end of loop on r
 
+  for(r=0; r<param->d_volume; r++)
+     {
+     si_to_sisp_and_t_compute(&rp, &value, r, param);
+     geo->d_spacecomp[r]=rp;
+     geo->d_timeslice[r]=value;
+     geo->d_tsp[value][rp]=r;
+     }
+
   #ifdef DEBUG
     test_geometry(geo, param);
   #endif
@@ -114,19 +152,27 @@ void free_geometry(Geometry *geo, GParam const * const param)
      }
   free(geo->d_nnp);
   free(geo->d_nnm);
+
+  free(geo->d_timeslice);
+  free(geo->d_spacecomp);
+  for(r=0; r<param->d_size[0]; r++)
+     {
+     free(geo->d_tsp[r]);
+     }
+  free(geo->d_tsp);
   }
 
 
-long nnp(Geometry const * const geo, long r, int i)
-  {
-  return geo->d_nnp[r][i];
-  }
+long nnp(Geometry const * const geo, long r, int i);
 
 
-long nnm(Geometry const * const geo, long r, int i)
-  {
-  return geo->d_nnm[r][i];
-  }
+long nnm(Geometry const * const geo, long r, int i);
+
+
+long sisp_and_t_to_si(Geometry const * const geo, long sisp, int t);
+
+
+void si_to_sisp_and_t(long *sisp, int *t, Geometry const * const geo, long si);
 
 
 void test_geometry(Geometry const * const geo, GParam const * const param)

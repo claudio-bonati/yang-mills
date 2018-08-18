@@ -703,7 +703,7 @@ void update_with_trace_def(Gauge_Conf * GC,
       #endif
       for(r=0; r<(param->d_space_vol)/2; r++)
          {
-         long r4=sisp_and_t_to_si(r, t, param);
+         long r4=sisp_and_t_to_si(geo, r, t);
          a+=metropolis_with_tracedef(GC, geo, param, r4, 0);
          }
 
@@ -712,7 +712,7 @@ void update_with_trace_def(Gauge_Conf * GC,
       #endif
       for(r=(param->d_space_vol)/2; r<(param->d_space_vol); r++)
          {
-         long r4=sisp_and_t_to_si(r, t, param);
+         long r4=sisp_and_t_to_si(geo, r, t);
          a+=metropolis_with_tracedef(GC, geo, param, r4, 0);
          }
       }

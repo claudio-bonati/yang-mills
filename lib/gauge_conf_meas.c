@@ -301,7 +301,7 @@ void polyakov(Gauge_Conf const * const GC,
       int i;
       GAUGE_GROUP matrix;
 
-      r=sisp_and_t_to_si(rsp, 0, param);
+      r=sisp_and_t_to_si(geo, rsp, 0);
 
       one(&matrix);
       for(i=0; i<param->d_size[0]; i++)
@@ -525,7 +525,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
            multihit(GC,
                     geo,
                     param,
-                    sisp_and_t_to_si(r, i, param),
+                    sisp_and_t_to_si(geo, r, i),
                     0,
                     mh,
                     &tmp);
@@ -538,12 +538,12 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
      poly_average=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
-        r1=sisp_and_t_to_si(r, 0, param);
+        r1=sisp_and_t_to_si(geo, r, 0);
         for(i=0; i<param->d_dist_poly; i++)
            {
            r1=nnp(geo, r1, dir);
            }
-        si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
+        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
         poly_average+=cabs(poly_array[r]*conj(poly_array[r2]));
         }
      poly_average*=param->d_inv_space_vol;
@@ -552,12 +552,12 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
      poly_std=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
-        r1=sisp_and_t_to_si(r, 0, param);
+        r1=sisp_and_t_to_si(geo, r, 0);
         for(i=0; i<param->d_dist_poly; i++)
            {
            r1=nnp(geo, r1, dir);
            }
-        si_to_sisp_and_t(&r2, &t_tmp, r1, param); // r2 is the spatial value of r1
+        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
         poly_std += pow(cabs(poly_array[r]*conj(poly_array[r2]))-poly_average, 2.0);
         }
      poly_std*=param->d_inv_space_vol;
@@ -698,6 +698,67 @@ void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
 
    fprintf(datafilep, "%.12g\n", ris);
    fflush(datafilep);
+   }
+
+
+// to optimize the multilevel
+void optimize_multilevel_potQbarQ_long(Gauge_Conf *GC,
+                                       GParam const * const param,
+                                       FILE *datafilep)
+   {
+   int i, err;
+   long r;
+   double poly_std, poly_average;
+   double complex *poly_array;
+
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   fprintf(datafilep, "Multilevel optimization: ");
+   fprintf(datafilep, "the smaller the value the better the update\n");
+
+   // polyakov loop correlator
+   poly_average=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]))+I*imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      poly_average+=cabs(poly_array[r]);
+      }
+   poly_average*=param->d_inv_space_vol;
+
+   poly_std=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_std+=pow(cabs(poly_array[r])-poly_average, 2.0);
+      }
+   poly_std*=param->d_inv_space_vol;
+   poly_std*=param->d_inv_space_vol;
+
+   for(i=0; i<NLEVELS; i++)
+      {
+      poly_average*=(double) param->d_ml_upd[i];
+      }
+
+   for(i=0; i<NLEVELS; i++)
+      {
+      poly_std*=(double) param->d_ml_upd[i];
+      }
+
+   fprintf(datafilep, "%.12g  %.12g ", poly_average, poly_std);
+   for(i=0; i<NLEVELS; i++)
+      {
+      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
+      }
+   fprintf(datafilep, "(%d) ", param->d_ml_level0_repeat);
+   fprintf(datafilep, "\n");
+
+   fflush(datafilep);
+
+   free(poly_array);
    }
 
 
