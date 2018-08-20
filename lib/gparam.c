@@ -406,9 +406,9 @@ void readinput(char *in_file, GParam *param)
       // VARIOUS CHECKS
       if(param->d_ml_step[0]!=0)
         {
-        if(param->d_size[0] % param->d_ml_step[0] || param->d_size[0] <= param->d_ml_step[0])
+        if(param->d_size[0] % param->d_ml_step[0] || param->d_size[0] < param->d_ml_step[0])
           {
-          fprintf(stderr, "Error: size[0] has to be divisible by ml_step[0] and larger than it (%s, %d)\n", __FILE__, __LINE__);
+          fprintf(stderr, "Error: size[0] has to be divisible by ml_step[0] and satisfy ml_step[0]<=size[0] (%s, %d)\n", __FILE__, __LINE__);
           exit(EXIT_FAILURE);
           }
         for(i=1; i<NLEVELS; i++)

@@ -307,6 +307,8 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
   long int r;
   int level;
 
+  // remember that d_ml_step[0]>d_ml_step[1]> d_ml_step[2] ...
+
   level=-2;
   // determine the level to be used
   if(dt>param->d_ml_step[0])
@@ -355,7 +357,22 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
       break;
       // end of the outermost level
 
+
     case NLEVELS-1 : // INNERMOST LEVEL
+
+      // in case level -1 is never used
+      if(level==0 && param->d_size[0]==param->d_ml_step[0])
+        {
+        // initialyze ml_polycorr_ris[0] to 1
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r)
+        #endif
+        for(r=0; r<param->d_space_vol; r++)
+           {
+           one_TensProd(&(GC->ml_polycorr_ris[0][r]));
+           }
+        }
+
       // initialize ml_polycorr_tmp[level] to 0
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -436,11 +453,26 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
       break;
       // end of innermost level
 
+
     default:  // NOT THE INNERMOST NOT THE OUTERMOST LEVEL
+
       if(level==-1 || level==NLEVELS-1)
         {
         fprintf(stderr, "Error in the multilevel (%s, %d)\n", __FILE__, __LINE__);
         exit(EXIT_FAILURE);
+        }
+
+      // in case level -1 is never used
+      if(level==0 && param->d_size[0]==param->d_ml_step[0])
+        {
+        // initialyze ml_polycorr_ris[0] to 1
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r)
+        #endif
+        for(r=0; r<param->d_space_vol; r++)
+           {
+           one_TensProd(&(GC->ml_polycorr_ris[0][r]));
+           }
         }
 
       // initialize ml_polycorr_tmp[level] to 0

@@ -566,7 +566,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
      time(&time2);
      diff_sec = difftime(time2, time1);
 
-     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_average*mh, poly_std*mh, diff_sec);
+     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_average*poly_average*mh, poly_std*mh, diff_sec);
 
      fflush(datafilep);
      }
@@ -619,6 +619,7 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
    poly_std*=param->d_inv_space_vol;
    poly_std*=param->d_inv_space_vol;
 
+   poly_average*=poly_average;
    for(i=0; i<NLEVELS; i++)
       {
       poly_average*=(double) param->d_ml_upd[i];
@@ -738,6 +739,7 @@ void optimize_multilevel_potQbarQ_long(Gauge_Conf *GC,
    poly_std*=param->d_inv_space_vol;
    poly_std*=param->d_inv_space_vol;
 
+   poly_average*=poly_average;
    for(i=0; i<NLEVELS; i++)
       {
       poly_average*=(double) param->d_ml_upd[i];
