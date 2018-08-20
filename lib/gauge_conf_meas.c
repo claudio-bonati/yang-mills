@@ -32,9 +32,9 @@ double plaquettep(Gauge_Conf const * const GC,
      fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
-   if(j >= param->d_stdim || i >= param->d_stdim)
+   if(j >= STDIM || i >= STDIM)
      {
-     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
+     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
    #else
@@ -77,9 +77,9 @@ double complex plaquettep_complex(Gauge_Conf const * const GC,
      fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
-   if(j >= param->d_stdim || i >= param->d_stdim)
+   if(j >= STDIM || i >= STDIM)
      {
-     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
+     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
    #else
@@ -124,9 +124,9 @@ void clover(Gauge_Conf const * const GC,
      fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
-   if(i >= param->d_stdim || j >= param->d_stdim)
+   if(i >= STDIM || j >= STDIM)
      {
-     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, param->d_stdim, __FILE__, __LINE__);
+     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
    #else
@@ -209,24 +209,24 @@ void plaquette(Gauge_Conf const * const GC,
       {
       int i, j;
       i=0;
-      for(j=1; j<param->d_stdim; j++)
+      for(j=1; j<STDIM; j++)
          {
          pt+=plaquettep(GC, geo, param, r, i, j);
          }
      
-      for(i=1; i<param->d_stdim; i++)
+      for(i=1; i<STDIM; i++)
          {
-         for(j=i+1; j<param->d_stdim; j++)
+         for(j=i+1; j<STDIM; j++)
             {
             ps+=plaquettep(GC, geo, param, r, i, j);
             }
          }
       }
 
-   if(param->d_stdim>2)
+   if(STDIM>2)
      {
      ps*=param->d_inv_vol;
-     ps/=((double) (param->d_stdim-1)*(param->d_stdim-2)/2);
+     ps/=((double) (STDIM)*(STDIM-2)/2);
      }
    else
      {
@@ -234,7 +234,7 @@ void plaquette(Gauge_Conf const * const GC,
      }
 
    pt*=param->d_inv_vol;
-   pt/=((double) param->d_stdim-1);
+   pt/=((double) STDIM-1);
 
    *plaqs=ps;
    *plaqt=pt;
@@ -261,9 +261,9 @@ void clover_disc_energy(Gauge_Conf const * const GC,
      int i, j;
      GAUGE_GROUP aux1, aux2;
 
-     for(i=0; i<param->d_stdim; i++)
+     for(i=0; i<STDIM; i++)
         {
-        for(j=i+1; j<param->d_stdim; j++)
+        for(j=i+1; j<STDIM; j++)
            {
            clover(GC, geo, param, r, i, j, &aux1);
 
@@ -328,9 +328,9 @@ double topcharge(Gauge_Conf const * const GC,
    double ris;
    long r;
 
-   if(param->d_stdim!=4)
+   if(STDIM !=4)
      {
-     fprintf(stderr, "Wrong number of dimension! (%d instead of 4) (%s, %d)\n", param->d_stdim, __FILE__, __LINE__);
+     fprintf(stderr, "Wrong number of dimension! (%d instead of 4) (%s, %d)\n", STDIM, __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
 
@@ -839,7 +839,7 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
      optimize_multilevel_tube_disc(GC, geo, param, datafilep);
    #else
      int i;
-     const int numplaqs=(param->d_stdim*(param->d_stdim-1))/2;
+     const int numplaqs=(STDIM*(STDIM-1))/2;
      double risr, risi;
      long r;
 

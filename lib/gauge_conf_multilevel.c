@@ -198,7 +198,7 @@ void slice_single_update(Gauge_Conf * GC,
      heatbath(GC, geo, param, sisp_and_t_to_si(geo, r, t_start), 0);
      }
 
-  for(dir=0; dir<param->d_stdim; dir++)
+  for(dir=0; dir<STDIM; dir++)
      {
      #ifdef THETA_MODE
        slice_compute_clovers(GC, geo, param, dir, t_start, dt);
@@ -247,7 +247,7 @@ void slice_single_update(Gauge_Conf * GC,
         overrelaxation(GC, geo, param, sisp_and_t_to_si(geo, r, t_start), 0);
         }
 
-     for(dir=0; dir<param->d_stdim; dir++)
+     for(dir=0; dir<STDIM; dir++)
         {
         #ifdef THETA_MODE
           slice_compute_clovers(GC, geo, param, dir, t_start, dt);
@@ -285,7 +285,7 @@ void slice_single_update(Gauge_Conf * GC,
 
   for(i=1; i<dt; i++)
      {
-     for(dir=0; dir<param->d_stdim; dir++)
+     for(dir=0; dir<STDIM; dir++)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -704,22 +704,22 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
      r4=sisp_and_t_to_si(geo, r, 1); // t=1
 
      i=0;
-     for(j=1; j<param->d_stdim; j++)
+     for(j=1; j<STDIM; j++)
         {
         plaq[r][tmp]=plaquettep_complex(GC, geo, param, r4, i, j);
         tmp++;
         }
 
-     for(i=1; i<param->d_stdim; i++)
+     for(i=1; i<STDIM; i++)
         {
-        for(j=i+1; j<param->d_stdim; j++)
+        for(j=i+1; j<STDIM; j++)
            {
            plaq[r][tmp]=plaquettep_complex(GC, geo, param, r4, i, j);
            tmp++;
            }
         }
      #ifdef DEBUG
-     if(tmp!=param->d_stdim*(param->d_stdim-1)/2)
+     if(tmp!=STDIM*(STDIM-1)/2)
        {
        fprintf(stderr, "Error in computation of the plaquettes in multilevel (%s, %d)\n", __FILE__, __LINE__);
        exit(EXIT_FAILURE);
@@ -736,7 +736,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
                                 int t_start,
                                 int dt)
   {
-  const int numplaqs=(param->d_stdim*(param->d_stdim-1))/2;
+  const int numplaqs=(STDIM*(STDIM-1))/2;
   int i, upd, err;
   long int r;
   int level;

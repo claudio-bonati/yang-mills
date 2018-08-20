@@ -37,7 +37,7 @@ void real_main(char *in_file)
     readinput(in_file, &param);
 
     int tmp=param.d_size[1];
-    for(count=2; count<param.d_stdim; count++)
+    for(count=2; count<STDIM; count++)
        {
        if(tmp!= param.d_size[count])
          {

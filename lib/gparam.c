@@ -72,12 +72,12 @@ void readinput(char *in_file, GParam *param)
        param->d_ml_step[i]=0;
        }
 
+    // just to avoid possible mistakes with uninitialized stuff
     for(i=0; i<NCOLOR; i++)
        {
        param->d_h[i]=0.0;
        }
-
-    param->d_stdim=STDIM;
+    param->d_theta=0.0;
 
     input=fopen(in_file, "r");  // open the input file
     if(input==NULL)
@@ -101,7 +101,7 @@ void readinput(char *in_file, GParam *param)
 
            if(strncmp(str, "size", 4)==0)
              {
-             for(i=0; i<param->d_stdim; i++)
+             for(i=0; i<STDIM; i++)
                 {
                 err=fscanf(input, "%d", &temp_i);
                 if(err!=1)
@@ -422,7 +422,7 @@ void readinput(char *in_file, GParam *param)
         }
 
       #ifdef OPENMP_MODE
-      for(i=0; i<param->d_stdim; i++)
+      for(i=0; i<STDIM; i++)
          {
          temp_i = param->d_size[i] % 2;
          if(temp_i!=0)
@@ -435,7 +435,7 @@ void readinput(char *in_file, GParam *param)
       #endif
 
       err=0;
-      for(i=0; i<param->d_stdim; i++)
+      for(i=0; i<STDIM; i++)
          {
          if(param->d_size[i]==1)
            {
@@ -458,14 +458,14 @@ void init_derived_constants(GParam *param)
 
   // derived constants
   param->d_volume=1;
-  for(i=0; i<param->d_stdim; i++)
+  for(i=0; i<STDIM; i++)
      {
      (param->d_volume)*=(param->d_size[i]);
      }
 
   param->d_space_vol=1;
   // direction 0 is time
-  for(i=1; i<param->d_stdim; i++)
+  for(i=1; i<STDIM; i++)
      {
      (param->d_space_vol)*=(param->d_size[i]);
      }
@@ -491,8 +491,8 @@ void init_data_file(FILE **dataf, GParam const * const param)
     else
       {
       *dataf=fopen(param->d_data_file, "w");
-      fprintf(*dataf, "%d ", param->d_stdim);
-      for(i=0; i<param->d_stdim; i++)
+      fprintf(*dataf, "%d ", STDIM);
+      for(i=0; i<STDIM; i++)
          {
          fprintf(*dataf, "%d ", param->d_size[i]);
          }
@@ -502,8 +502,8 @@ void init_data_file(FILE **dataf, GParam const * const param)
   else
     {
     *dataf=fopen(param->d_data_file, "w");
-    fprintf(*dataf, "%d ", param->d_stdim);
-    for(i=0; i<param->d_stdim; i++)
+    fprintf(*dataf, "%d ", STDIM);
+    for(i=0; i<STDIM; i++)
        {
        fprintf(*dataf, "%d ", param->d_size[i]);
        }
@@ -530,10 +530,10 @@ void print_parameters_local(GParam const * const param, time_t time_start, time_
     #endif
 
     fprintf(fp, "number of colors: %d\n", NCOLOR);
-    fprintf(fp, "spacetime dimensionality: %d\n\n", param->d_stdim);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
     fprintf(fp, "lattice: %d", param->d_size[0]);
-    for(i=1; i<param->d_stdim; i++)
+    for(i=1; i<STDIM; i++)
        {
        fprintf(fp, "x%d", param->d_size[i]);
        }
@@ -597,10 +597,10 @@ void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_en
     #endif
 
     fprintf(fp, "number of colors: %d\n", NCOLOR);
-    fprintf(fp, "spacetime dimensionality: %d\n\n", param->d_stdim);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
     fprintf(fp, "lattice: %d", param->d_size[0]);
-    for(i=1; i<param->d_stdim; i++)
+    for(i=1; i<STDIM; i++)
        {
        fprintf(fp, "x%d", param->d_size[i]);
        }
@@ -677,10 +677,10 @@ void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t ti
     #endif
 
     fprintf(fp, "number of colors: %d\n", NCOLOR);
-    fprintf(fp, "spacetime dimensionality: %d\n\n", param->d_stdim);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
     fprintf(fp, "lattice: %d", param->d_size[0]);
-    for(i=1; i<param->d_stdim; i++)
+    for(i=1; i<STDIM; i++)
        {
        fprintf(fp, "x%d", param->d_size[i]);
        }
@@ -756,10 +756,10 @@ void print_parameters_tube_disc(GParam * param, time_t time_start, time_t time_e
     #endif
 
     fprintf(fp, "number of colors: %d\n", NCOLOR);
-    fprintf(fp, "spacetime dimensionality: %d\n\n", param->d_stdim);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
     fprintf(fp, "lattice: %d", param->d_size[0]);
-    for(i=1; i<param->d_stdim; i++)
+    for(i=1; i<STDIM; i++)
        {
        fprintf(fp, "x%d", param->d_size[i]);
        }
@@ -836,10 +836,10 @@ void print_parameters_t0(GParam * param, time_t time_start, time_t time_end)
     #endif
 
     fprintf(fp, "number of colors: %d\n", NCOLOR);
-    fprintf(fp, "spacetime dimensionality: %d\n\n", param->d_stdim);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
     fprintf(fp, "lattice: %d", param->d_size[0]);
-    for(i=1; i<param->d_stdim; i++)
+    for(i=1; i<STDIM; i++)
        {
        fprintf(fp, "x%d", param->d_size[i]);
        }
@@ -885,10 +885,10 @@ void print_parameters_tracedef(GParam const * const param, time_t time_start, ti
     #endif
 
     fprintf(fp, "number of colors: %d\n", NCOLOR);
-    fprintf(fp, "spacetime dimensionality: %d\n\n", param->d_stdim);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
     fprintf(fp, "lattice: %d", param->d_size[0]);
-    for(i=1; i<param->d_stdim; i++)
+    for(i=1; i<STDIM; i++)
        {
        fprintf(fp, "x%d", param->d_size[i]);
        }

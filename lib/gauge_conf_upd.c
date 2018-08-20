@@ -32,18 +32,20 @@ void calcstaples_wilson(Gauge_Conf const * const GC,
     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  if(i >= param->d_stdim)
+  if(i >= STDIM)
     {
-    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #else
+  (void) param; // just to avoid warnings
   #endif
 
   zero(M); // M=0
 
-  for(l=i+1; l< i + param->d_stdim; l++)
+  for(l=i+1; l< i + STDIM; l++)
      {
-     j = (l % param->d_stdim);
+     j = (l % STDIM);
 
 //
 //       i ^
@@ -181,9 +183,9 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  if(i >= param->d_stdim)
+  if(i >= STDIM)
     {
-    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   #endif
@@ -192,7 +194,7 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
   calcstaples_wilson(GC, geo, param, r, i, M);
   #else
 
-  if(param->d_stdim!=4)
+  if(STDIM!=4)
     {
     fprintf(stderr, "Error: imaginary theta term can be used only in 4 dimensions! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
@@ -242,9 +244,9 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
   sood1[3][2] = 1;
   sood2[3][2] = 0;
 
-  for(l=i+1; l< i + param->d_stdim; l++)
+  for(l=i+1; l< i + STDIM; l++)
      {
-     j = (l % param->d_stdim);
+     j = (l % STDIM);
 
      i0=sood1[i][j];
      j0=sood2[i][j];
@@ -355,9 +357,9 @@ void heatbath(Gauge_Conf *GC,
     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  if(i >= param->d_stdim)
+  if(i >= STDIM)
     {
-    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   #endif
@@ -387,9 +389,9 @@ void overrelaxation(Gauge_Conf *GC,
     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  if(i >= param->d_stdim)
+  if(i >= STDIM)
     {
-    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   #endif
@@ -421,9 +423,9 @@ int metropolis(Gauge_Conf *GC,
     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  if(i >= param->d_stdim)
+  if(i >= STDIM)
     {
-    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   #endif
@@ -489,9 +491,9 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  if(i >= param->d_stdim)
+  if(i >= STDIM)
     {
-    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, param->d_stdim, __FILE__, __LINE__);
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   #endif
@@ -577,7 +579,7 @@ void update(Gauge_Conf * GC,
             Geometry const * const geo,
             GParam const * const param)
    {
-   for(int i=0; i<param->d_stdim; i++)
+   for(int i=0; i<STDIM; i++)
       {
       if(param->d_size[i]==1)
         {
@@ -590,7 +592,7 @@ void update(Gauge_Conf * GC,
    int j, dir;
 
    // heatbath
-   for(dir=0; dir<param->d_stdim; dir++)
+   for(dir=0; dir<STDIM; dir++)
       {
       #ifdef THETA_MODE
       compute_clovers(GC, geo, param, dir);
@@ -614,7 +616,7 @@ void update(Gauge_Conf * GC,
       }
 
    // overrelax
-   for(dir=0; dir<param->d_stdim; dir++)
+   for(dir=0; dir<STDIM; dir++)
       {
       #ifdef THETA_MODE
       compute_clovers(GC, geo, param, dir);
@@ -646,7 +648,7 @@ void update(Gauge_Conf * GC,
    #endif 
    for(r=0; r<(param->d_volume); r++)
       {
-      for(dir=0; dir<param->d_stdim; dir++)
+      for(dir=0; dir<STDIM; dir++)
          {
          unitarize(&(GC->lattice[r][dir]));
          } 
@@ -668,7 +670,7 @@ void update_with_trace_def(Gauge_Conf * GC,
    a=0; // number of accepted metropolis updates
 
    // heatbath on spatial links
-   for(dir=1; dir<param->d_stdim; dir++)
+   for(dir=1; dir<STDIM; dir++)
       {
       #ifdef THETA_MODE
       compute_clovers(GC, geo, param, dir);
@@ -720,7 +722,7 @@ void update_with_trace_def(Gauge_Conf * GC,
    *acc=((double)a)*param->d_inv_vol;
 
    // overrelax spatial links
-   for(dir=1; dir<param->d_stdim; dir++)
+   for(dir=1; dir<STDIM; dir++)
       {
       #ifdef THETA_MODE
       compute_clovers(GC, geo, param, dir);
@@ -752,7 +754,7 @@ void update_with_trace_def(Gauge_Conf * GC,
    #endif
    for(r=0; r<(param->d_volume); r++)
       {
-      for(dir=0; dir<param->d_stdim; dir++)
+      for(dir=0; dir<STDIM; dir++)
          {
          unitarize(&(GC->lattice[r][dir]));
          }
@@ -774,7 +776,7 @@ void cooling(Gauge_Conf *GC,
   for(k=0; k<n; k++)
      {
      // cooling
-     for(i=0; i<param->d_stdim; i++)
+     for(i=0; i<STDIM; i++)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -804,7 +806,7 @@ void cooling(Gauge_Conf *GC,
   #endif
   for(r=0; r<(param->d_volume); r++)
      {
-     for(i=0; i<param->d_stdim; i++)
+     for(i=0; i<STDIM; i++)
         {
         unitarize(&(GC->lattice[r][i]));
         }
@@ -825,7 +827,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
   int dir;
 
   // initialize
-  for(dir=0; dir<param->d_stdim; dir++)
+  for(dir=0; dir<STDIM; dir++)
      {
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -838,7 +840,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
      }
 
 
-  for(dir=0; dir<param->d_stdim; dir++)
+  for(dir=0; dir<STDIM; dir++)
      {
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -859,7 +861,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
 
   // now helper1=W_0, helper2=(1/4)Z_0 and GC=W_1
 
-  for(dir=0; dir<param->d_stdim; dir++)
+  for(dir=0; dir<STDIM; dir++)
      {
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -881,7 +883,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
 
   // now helper1=W_2, helper2=(8/9)Z_1-(17/36)Z_0 and GC=W_1
 
-  for(dir=0; dir<param->d_stdim; dir++)
+  for(dir=0; dir<STDIM; dir++)
      {
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -907,7 +909,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
   for(r=0; r<(param->d_volume); r++)
      {
      int i;
-     for(i=0; i<param->d_stdim; i++)
+     for(i=0; i<STDIM; i++)
         {
         unitarize(&(GC->lattice[r][i]));
         }
@@ -934,7 +936,7 @@ void ape_smearing(Gauge_Conf *GC,
      {
      if(count%2==0) // smear(helper1)->GC
        {
-       for(dir=0; dir<param->d_stdim; dir++)
+       for(dir=0; dir<STDIM; dir++)
           {
           #ifdef OPENMP_MODE
           #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -955,7 +957,7 @@ void ape_smearing(Gauge_Conf *GC,
        }
      else // smear(GC)->helper1
        {
-       for(dir=0; dir<param->d_stdim; dir++)
+       for(dir=0; dir<STDIM; dir++)
           {
           #ifdef OPENMP_MODE
           #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -978,7 +980,7 @@ void ape_smearing(Gauge_Conf *GC,
 
   if(n>0 && n%2==0) // GC=helper1
     {
-    for(dir=0; dir<param->d_stdim; dir++)
+    for(dir=0; dir<STDIM; dir++)
        {
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(r)

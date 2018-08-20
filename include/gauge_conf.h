@@ -27,8 +27,8 @@ typedef struct Gauge_Conf {
   TensProd **ml_polycorr_tmp;    // [NLEVELS][space_vol]
 
   // for the disconnected correlator for string width
-  TensProd ***ml_polyplaq_ris;   // [NLEVELS][space_vol][stdim*(stdim-1)/2]
-  TensProd ***ml_polyplaq_tmp;   // [NLEVELS][space_vol][stdim*(stdim-1)/2]
+  TensProd ***ml_polyplaq_ris;   // [NLEVELS][space_vol][STDIM*(STDIM-1)/2]
+  TensProd ***ml_polyplaq_tmp;   // [NLEVELS][space_vol][STDIM*(STDIM-1)/2]
 
   } Gauge_Conf;
 
