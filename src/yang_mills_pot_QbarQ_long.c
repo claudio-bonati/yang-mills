@@ -234,10 +234,6 @@ int main (int argc, char **argv)
         printf("\n\tusing imaginary theta\n");
       #endif
 
-      #ifdef OPT_MULTIHIT
-        printf("\tcompiled for multihit optimization\n");
-      #endif
-
       #ifdef OPT_MULTILEVEL
         printf("\tcompiled for multilevel optimization\n");
       #endif

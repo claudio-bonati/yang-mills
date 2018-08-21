@@ -687,18 +687,22 @@ void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep)
    {
-   double ris;
-   long r;
+   #ifndef OPT_MULTIHIT
+     double ris;
+     long r;
 
-   ris=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
-      }
-   ris*=param->d_inv_space_vol;
+     ris=0.0;
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+        }
+     ris*=param->d_inv_space_vol;
 
-   fprintf(datafilep, "%.12g\n", ris);
-   fflush(datafilep);
+     fprintf(datafilep, "%.12g\n", ris);
+     fflush(datafilep);
+   #else
+     optimize_multilevel_potQbarQ_long(GC, param, datafilep);
+   #endif
    }
 
 
@@ -809,6 +813,7 @@ void optimize_multilevel_tube_disc(Gauge_Conf *GC,
    poly_std*=param->d_inv_space_vol;
    poly_std*=param->d_inv_space_vol;
 
+   poly_average*=poly_average;
    for(i=0; i<NLEVELS; i++)
       {
       poly_average*=(double) param->d_ml_upd[i];
