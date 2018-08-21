@@ -69,7 +69,7 @@ void real_main(char *in_file)
     time(&time1);
     if(param.d_start != 2) // NEW SIMULATION
       {
-      for(count=1; count<param.d_measevery; count++)
+      for(count=0; count<param.d_measevery; count++)
          {
          update(&GC, &geo, &param);
          }
@@ -91,7 +91,7 @@ void real_main(char *in_file)
 
       if(tstart<0) // update the conf, no multilevel
         {
-        for(count=1; count<param.d_measevery; count++)
+        for(count=0; count<param.d_measevery; count++)
            {
            update(&GC, &geo, &param);
            }

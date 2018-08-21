@@ -557,161 +557,130 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
   {
   int i, upd, err;
   long int r;
-  int level;
 
-  level=-2;
-  // determine the level to be used
-  if(dt>param->d_ml_step[0])
+  if(dt!=param->d_ml_step[0])
     {
-    fprintf(stderr, "Value of 'dt' not permitted in multilevel_pot_QbarQ_long (%s, %d)\n", __FILE__, __LINE__);
+    fprintf(stderr, "'dt' has to be equal to ml_step[0] in multilevel_pot_QbarQ_long (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  else
+
+  // initialize ml_polycorr_ris[0] to 1 if needed
+  if(t_start==0 && iteration==0)
     {
-    int tmp;
-    for(tmp=0; tmp<NLEVELS; tmp++)
+    #ifdef OPENMP_MODE
+    #pragma omp parallel for num_threads(NTHREADS) private(r)
+    #endif
+    for(r=0; r<param->d_space_vol; r++)
        {
-       if(param->d_ml_step[tmp]==dt)
-         {
-         level=tmp;
-         tmp=NLEVELS+10;
-         }
+       one_TensProd(&(GC->ml_polycorr_ris[0][r]));
        }
-    if(level==-2)
-      {
-      fprintf(stderr, "Error in the determination of the level in the multilevel (%s, %d)\n", __FILE__, __LINE__);
-      exit(EXIT_FAILURE);
-      }
     }
 
-  if(level==0)
+  if(iteration==0)
     {
-    // initialize ml_polycorr_ris[0] to 1 if needed
-    if(t_start==0 && iteration==0)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         one_TensProd(&(GC->ml_polycorr_ris[0][r]));
-         }
-      }
-
-    if(iteration==0)
-      {
-      // initialize ml_polycorr_tmp[0] to 0 when needed
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         zero_TensProd(&(GC->ml_polycorr_tmp[0][r]));
-         }
-      }
-
-    if(NLEVELS==1)
-      {
-      // perform the update
-      for(upd=0; upd< param->d_ml_upd[0]; upd++)
-         {
-         slice_single_update(GC,
-                             geo,
-                             param,
-                             t_start,
-                             dt);
-
-         // compute Polyakov loop restricted to the slice
-         GAUGE_GROUP *loc_poly;
-         err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
-         if(err!=0)
-           {
-           fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-           exit(EXIT_FAILURE);
-           }
-
-         compute_local_poly(GC,
-                            geo,
-                            param,
-                            t_start,
-                            dt,
-                            loc_poly);
-
-         // compute the tensor products
-         // and update ml_polycorr_tmp[level]
-         #ifdef OPENMP_MODE
-         #pragma omp parallel for num_threads(NTHREADS) private(r)
-         #endif
-         for(r=0; r<param->d_space_vol; r++)
-            {
-            TensProd TP;
-            long r1, r2;
-            int j, t_tmp;
-
-            r1=sisp_and_t_to_si(geo, r, 0);
-            for(j=0; j<param->d_dist_poly; j++)
-               {
-               r1=nnp(geo, r1, 1);
-               }
-            si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
-
-            TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
-            plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &TP);
-            }
-
-         free(loc_poly);
-         } // end of update
-      }
-    else  // NLEVELS!=1
-      {
-      // initialyze ml_polycorr_ris[1] to 1
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         one_TensProd(&(GC->ml_polycorr_ris[1][r]));
-         }
-
-      // call inner levels
-      for(i=0; i<(param->d_size[0])/(param->d_ml_step[1]); i++)
-         {
-         multilevel_pot_QbarQ(GC,
-                    geo,
-                    param,
-                    t_start+i*param->d_ml_step[1],
-                    param->d_ml_step[1]);
-         }
-      }
-
-    if(iteration==param->d_ml_level0_repeat-1) // iteration starts from zero
-      {
-      // normalize polycorr_tmp[0]
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_real_TensProd(&(GC->ml_polycorr_tmp[0][r]), 1.0/( (double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat));
-         }
-
-      // update polycorr_ris[level]
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProd(&(GC->ml_polycorr_ris[0][r]), &(GC->ml_polycorr_tmp[0][r]));
-         }
-      }
+    // initialize ml_polycorr_tmp[0] to 0 when needed
+    #ifdef OPENMP_MODE
+    #pragma omp parallel for num_threads(NTHREADS) private(r)
+    #endif
+    for(r=0; r<param->d_space_vol; r++)
+       {
+       zero_TensProd(&(GC->ml_polycorr_tmp[0][r]));
+       }
     }
-  else // level != 0
-    {
-    multilevel_pot_QbarQ(GC,
+
+  // perform the update
+  for(upd=0; upd< param->d_ml_upd[0]; upd++)
+     {
+     slice_single_update(GC,
                          geo,
                          param,
                          t_start,
                          dt);
+     if(NLEVELS==1)
+       {
+       // compute Polyakov loop restricted to the slice
+       GAUGE_GROUP *loc_poly;
+       err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
+       if(err!=0)
+         {
+         fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+
+       compute_local_poly(GC,
+                          geo,
+                          param,
+                          t_start,
+                          dt,
+                          loc_poly);
+
+       // compute the tensor products
+       // and update ml_polycorr_tmp[0]
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(r)
+       #endif
+       for(r=0; r<param->d_space_vol; r++)
+          {
+          TensProd TP;
+          long r1, r2;
+          int j, t_tmp;
+
+          r1=sisp_and_t_to_si(geo, r, 0);
+          for(j=0; j<param->d_dist_poly; j++)
+             {
+             r1=nnp(geo, r1, 1);
+             }
+          si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
+
+          TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
+          plus_equal_TensProd(&(GC->ml_polycorr_tmp[0][r]), &TP);
+          }
+
+       free(loc_poly);
+       }
+     else  // NLEVELS>1
+       {
+       // initialyze ml_polycorr_ris[1] to 1
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(r)
+       #endif
+       for(r=0; r<param->d_space_vol; r++)
+          {
+          one_TensProd(&(GC->ml_polycorr_ris[1][r]));
+          }
+
+       // call inner levels
+       for(i=0; i<(param->d_ml_step[0])/(param->d_ml_step[1]); i++)
+          {
+          // important: we have to call the "non long" version in inner levels
+          multilevel_pot_QbarQ(GC,
+                     geo,
+                     param,
+                     t_start+i*param->d_ml_step[1],
+                     param->d_ml_step[1]);
+          }
+       }
+    } // end update
+
+  if(iteration==param->d_ml_level0_repeat-1) // iteration starts from zero
+    {
+    // normalize polycorr_tmp[0]
+    #ifdef OPENMP_MODE
+    #pragma omp parallel for num_threads(NTHREADS) private(r)
+    #endif
+    for(r=0; r<param->d_space_vol; r++)
+       {
+       times_equal_real_TensProd(&(GC->ml_polycorr_tmp[0][r]), 1.0/( (double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat));
+       }
+
+    // update polycorr_ris[0]
+    #ifdef OPENMP_MODE
+    #pragma omp parallel for num_threads(NTHREADS) private(r)
+    #endif
+    for(r=0; r<param->d_space_vol; r++)
+       {
+       times_equal_TensProd(&(GC->ml_polycorr_ris[0][r]), &(GC->ml_polycorr_tmp[0][r]));
+       }
     }
   } // end of multilevel
 
