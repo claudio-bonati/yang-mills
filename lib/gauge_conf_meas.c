@@ -865,7 +865,7 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
         }
      risr*=param->d_inv_space_vol;
      risi*=param->d_inv_space_vol;
-     fprintf(datafilep, "%.12g %.12g", risr, risi);
+     fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
      for(i=0; i<numplaqs; i++)
         {
@@ -879,7 +879,7 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
            }
         risr*=param->d_inv_space_vol;
         risi*=param->d_inv_space_vol;
-        fprintf(datafilep, "%.12g %.12g", risr, risi);
+        fprintf(datafilep, "%.12g %.12g ", risr, risi);
         }
      fprintf(datafilep, "\n");
 

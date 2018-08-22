@@ -1,10 +1,11 @@
 direzione 0 = tempo
 
-nell'input size tempo x1 x2 ...
+nell'input i numeri che seguono size sono "tempo x1 x2 ..."
 
 roba che comincia con # e' un commento nell'imput file
 
 con la macro DEBUG si attivano un mucchio di controlli
+altre macro utili sono OPT_MULTIHIT e OPT_MULTILEVEL
 
 i loop di Polyakov sono separati nella direzione 1 e la direzione trasversale per il tubo e' la 2
 
