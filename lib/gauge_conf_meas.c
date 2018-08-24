@@ -687,7 +687,7 @@ void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep)
    {
-   #ifndef OPT_MULTIHIT
+   #ifndef OPT_MULTILEVEL
      double ris;
      long r;
 

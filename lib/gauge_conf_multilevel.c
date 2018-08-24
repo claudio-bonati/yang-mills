@@ -659,6 +659,15 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
                      t_start+i*param->d_ml_step[1],
                      param->d_ml_step[1]);
           }
+
+       // update polycorr_tmp[0] with polycorr_ris[1]
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(r)
+       #endif
+       for(r=0; r<param->d_space_vol; r++)
+          {
+          plus_equal_TensProd(&(GC->ml_polycorr_tmp[0][r]), &(GC->ml_polycorr_ris[1][r]));
+          }
        }
     } // end update
 
