@@ -103,14 +103,12 @@ void real_main(char *in_file)
     print_parameters_t0(&param, time1, time2);
 
     // free gauge configurations
-    end_gauge_conf(&GC, &param);
-    end_gauge_conf(&help1, &param);
-    end_gauge_conf(&help2, &param);
+    free_gauge_conf(&GC, &param);
+    free_gauge_conf(&help1, &param);
+    free_gauge_conf(&help2, &param);
 
     // free geometry
     free_geometry(&geo, &param);
-
-    exit(EXIT_SUCCESS);
     }
 
 

@@ -63,7 +63,7 @@ void real_main(char *in_file)
     init_gauge_conf(&GC, &param);
 
     // initialize ml_polycorr arrays
-    init_polycorr(&GC, &param);
+    alloc_polycorr(&GC, &param);
 
     // montecarlo starts
     time(&time1);
@@ -145,18 +145,16 @@ void real_main(char *in_file)
       }
 
     // print simulation details
-    print_parameters_polycorr_long(&param, time1, time2);
+    print_parameters_pot_QbarQ_long(&param, time1, time2);
 
     // free gauge configuration
-    end_gauge_conf(&GC, &param);
+    free_gauge_conf(&GC, &param);
 
     // free ml_polycorr
-    end_polycorr(&GC);
+    free_polycorr(&GC);
 
     // free geometry
     free_geometry(&geo, &param);
-
-    exit(EXIT_SUCCESS);
     }
 
 

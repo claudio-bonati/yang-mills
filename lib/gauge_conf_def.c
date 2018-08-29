@@ -185,7 +185,7 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
   }
 
 
-void end_gauge_conf(Gauge_Conf *GC, GParam const * const param)
+void free_gauge_conf(Gauge_Conf *GC, GParam const * const param)
   {
   long i;
 
@@ -374,7 +374,7 @@ void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const
 
 
 // allocate the ml_polycorr arrays
-void init_polycorr(Gauge_Conf *GC,
+void alloc_polycorr(Gauge_Conf *GC,
                               GParam const * const param)
   {
   int i, err;
@@ -420,7 +420,7 @@ void init_polycorr(Gauge_Conf *GC,
 
 
 // free the ml_polycorr arrays
-void end_polycorr(Gauge_Conf *GC)
+void free_polycorr(Gauge_Conf *GC)
   {
   int i;
 
@@ -440,7 +440,6 @@ void write_polycorr_on_file(Gauge_Conf const * const GC,
                            int tstart,
                            int iteration)
   {
-  const int ml=0;
   long i;
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
@@ -479,11 +478,11 @@ void write_polycorr_on_file(Gauge_Conf const * const GC,
     {
     for(i=0; i<(param->d_space_vol); i++)
        {
-       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_ris[ml][i]));
+       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_ris[0][i]));
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_tmp[ml][i]));
+       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_tmp[0][i]));
        }
 
     fclose(fp);
@@ -497,7 +496,6 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
                              int *tstart,
                              int *iteration)
   {
-  const int ml=0;
   long i, loc_space_vol;
   FILE *fp;
   #ifdef HASH_MODE
@@ -547,11 +545,11 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
 
     for(i=0; i<(param->d_space_vol); i++)
        {
-       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_ris[ml][i]));
+       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_ris[0][i]));
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_tmp[ml][i]));
+       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_tmp[0][i]));
        }
 
     fclose(fp);
@@ -577,7 +575,6 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
     unsigned char c[MD5_DIGEST_LENGTH];
     long i;
     int n1, n2, n3, n4;
-    const int ml=0;
 
     MD5_Init(&mdContext);
 
@@ -591,7 +588,7 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
                 {
                 for(n4=0; n4<NCOLOR; n4++)
                    {
-                   MD5_Update(&mdContext, &((GC->ml_polycorr_ris[ml][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                   MD5_Update(&mdContext, &((GC->ml_polycorr_ris[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
                    }
                 }
              }
@@ -608,7 +605,7 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
                 {
                 for(n4=0; n4<NCOLOR; n4++)
                    {
-                   MD5_Update(&mdContext, &((GC->ml_polycorr_tmp[ml][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                   MD5_Update(&mdContext, &((GC->ml_polycorr_tmp[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
                    }
                 }
              }
@@ -631,14 +628,14 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
 
 
 // allocate the ml_polycorr arrays
-void init_polycorr_and_polyplaq(Gauge_Conf *GC,
+void alloc_polycorr_and_polyplaq(Gauge_Conf *GC,
                                 GParam const * const param)
   {
   const unsigned long numplaq=(unsigned long) (STDIM*(STDIM-1))/2;
   int i, err;
   long r;
 
-  init_polycorr(GC, param);
+  alloc_polycorr(GC, param);
 
   err=posix_memalign((void**)&(GC->ml_polyplaq_ris), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd **));
   if(err!=0)
@@ -699,13 +696,13 @@ void init_polycorr_and_polyplaq(Gauge_Conf *GC,
 
 
 // free the ml_polycorr arrays
-void end_polycorr_and_polyplaq(Gauge_Conf *GC,
+void free_polycorr_and_polyplaq(Gauge_Conf *GC,
                                GParam const * const param)
   {
   int i;
   long r;
 
-  end_polycorr(GC);
+  free_polycorr(GC);
 
   for(i=0; i<NLEVELS; i++)
      {
@@ -722,8 +719,281 @@ void end_polycorr_and_polyplaq(Gauge_Conf *GC,
   }
 
 
+// save ml_polycorr[0] and ml_polyplaq[0] arrays on file
+void write_polycorr_and_polyplaq_on_file(Gauge_Conf const * const GC,
+                                         GParam const * const param,
+                                         int tstart,
+                                         int iteration)
+  {
+  long i;
+  int j;
+  const int numplaqs=(STDIM*(STDIM-1))/2;
+  #ifdef HASH_MODE
+    char md5sum[2*MD5_DIGEST_LENGTH+1];
+  #else
+    char md5sum[2*STD_STRING_LENGTH+1]={0};
+  #endif
+  FILE *fp;
+
+  #ifdef HASH_MODE
+    compute_md5sum_polycorr_and_polyplaq(md5sum, GC, param);
+  #endif
+
+  fp=fopen(param->d_ml_file, "w"); // open the configuration file
+  if(fp==NULL)
+    {
+    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    fprintf(fp, "%ld %d %d %d %s\n",
+                param->d_space_vol,
+                STDIM,
+                tstart,
+                iteration,
+                md5sum);
+    }
+  fclose(fp);
+
+  fp=fopen(param->d_ml_file, "ab"); // open the configuration file in binary mode
+  if(fp==NULL)
+    {
+    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_ris[0][i]));
+       }
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_tmp[0][i]));
+       }
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       for(j=0; j<numplaqs; j++)
+          {
+          print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_ris[0][i][j]));
+          }
+       }
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       for(j=0; j<numplaqs; j++)
+          {
+          print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_tmp[0][i][j]));
+          }
+       }
+
+    fclose(fp);
+    }
+  }
+
+
+// read ml_polycorr[0] and ml_polyplaq[0] arrays from file
+void read_polycorr_and_polyplaq_from_file(Gauge_Conf const * const GC,
+                                          GParam const * const param,
+                                          int *tstart,
+                                          int *iteration)
+  {
+  long i, loc_space_vol;
+  int loc_stdim, j;
+  const int numplaqs=(STDIM*(STDIM-1))/2;
+  FILE *fp;
+  #ifdef HASH_MODE
+    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
+    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
+  #else
+    char md5sum_old[2*STD_STRING_LENGTH+1]={0};
+  #endif
+
+  fp=fopen(param->d_ml_file, "r"); // open the multilevel file
+  if(fp==NULL)
+    {
+    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    i=fscanf(fp, "%ld %d %d %d %s\n", &loc_space_vol, &loc_stdim, tstart, iteration, md5sum_old);
+    if(i!=5)
+      {
+      fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+    if(loc_space_vol != param->d_space_vol)
+      {
+      fprintf(stderr, "Error: space_vol in the multilevel file %s is different from the one in the input (%s, %d)\n",
+              param->d_ml_file, __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+    if(loc_stdim != STDIM)
+      {
+      fprintf(stderr, "Error: STDIM in the multilevel file %s is different from the one in the input (%s, %d)\n",
+              param->d_ml_file, __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+    }
+  fclose(fp);
+
+  fp=fopen(param->d_ml_file, "rb"); // open the multilevel file in binary mode
+  if(fp==NULL)
+    {
+    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    // read again the header: loc_space_vol, loc_stdim,  tstart, iteration, hash
+    i=0;
+    while(i!='\n')
+         {
+         i=fgetc(fp);
+         }
+
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_ris[0][i]));
+       }
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_tmp[0][i]));
+       }
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       for(j=0; j<numplaqs; j++)
+          {
+          read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_ris[0][i][j]));
+          }
+       }
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       for(j=0; j<numplaqs; j++)
+          {
+          read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_tmp[0][i][j]));
+          }
+       }
+
+    fclose(fp);
+    }
+
+  #ifdef HASH_MODE
+    // compute the new md5sum and check for consistency
+    compute_md5sum_polycorr_and_polyplaq(md5sum_new, GC, param);
+    if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
+      {
+      fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
+      exit(EXIT_FAILURE);
+      }
+  #endif
+  }
+
+
+// compute the md5sum of the ml_polycorr[0] and ml_polyplaq[0] arrays and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
+void compute_md5sum_polycorr_and_polyplaq(char *res, Gauge_Conf const * const GC, GParam const * const param)
+  {
+  #ifdef HASH_MODE
+    MD5_CTX mdContext;
+    unsigned char c[MD5_DIGEST_LENGTH];
+    long i;
+    int n1, n2, n3, n4, j;
+    const int numplaqs=(STDIM*(STDIM-1))/2;
+
+    MD5_Init(&mdContext);
+
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       for(n1=0; n1<NCOLOR; n1++)
+          {
+          for(n2=0; n2<NCOLOR; n2++)
+             {
+             for(n3=0; n3<NCOLOR; n3++)
+                {
+                for(n4=0; n4<NCOLOR; n4++)
+                   {
+                   MD5_Update(&mdContext, &((GC->ml_polycorr_ris[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                   }
+                }
+             }
+          }
+       }
+
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       for(n1=0; n1<NCOLOR; n1++)
+          {
+          for(n2=0; n2<NCOLOR; n2++)
+             {
+             for(n3=0; n3<NCOLOR; n3++)
+                {
+                for(n4=0; n4<NCOLOR; n4++)
+                   {
+                   MD5_Update(&mdContext, &((GC->ml_polycorr_tmp[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                   }
+                }
+             }
+          }
+       }
+
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       for(j=0; j<numplaqs; j++)
+          {
+          for(n1=0; n1<NCOLOR; n1++)
+             {
+             for(n2=0; n2<NCOLOR; n2++)
+                {
+                for(n3=0; n3<NCOLOR; n3++)
+                   {
+                   for(n4=0; n4<NCOLOR; n4++)
+                      {
+                      MD5_Update(&mdContext, &((GC->ml_polyplaq_ris[0][i][j]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                      }
+                   }
+                }
+             }
+          }
+       }
+
+    for(i=0; i<(param->d_space_vol); i++)
+       {
+       for(j=0; j<numplaqs; j++)
+          {
+          for(n1=0; n1<NCOLOR; n1++)
+             {
+             for(n2=0; n2<NCOLOR; n2++)
+                {
+                for(n3=0; n3<NCOLOR; n3++)
+                   {
+                   for(n4=0; n4<NCOLOR; n4++)
+                      {
+                      MD5_Update(&mdContext, &((GC->ml_polyplaq_tmp[0][i][j]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                      }
+                   }
+                }
+             }
+          }
+       }
+
+    MD5_Final(c, &mdContext);
+
+    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+       {
+       sprintf(&(res[2*i]), "%02x", c[i]);
+       }
+  #else
+    // just to avoid warning at compile time
+    (void) res;
+    (void) GC;
+    (void) param;
+  #endif
+  }
+
+
 // allocate the clovers arrays
-void init_clover_array(Gauge_Conf *GC,
+void alloc_clover_array(Gauge_Conf *GC,
                        GParam const * const param)
   {
   int i, err;

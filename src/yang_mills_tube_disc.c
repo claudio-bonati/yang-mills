@@ -62,8 +62,8 @@ void real_main(char *in_file)
     // initialize gauge configuration
     init_gauge_conf(&GC, &param);
 
-    // initialize ml_polycorr arrays
-    init_polycorr_and_polyplaq(&GC, &param);
+    // initialize ml_polycorr and ml_polyplaq arrays
+    alloc_polycorr_and_polyplaq(&GC, &param);
 
     // montecarlo
     time(&time1);
@@ -106,15 +106,13 @@ void real_main(char *in_file)
     print_parameters_tube_disc(&param, time1, time2);
 
     // free gauge configuration
-    end_gauge_conf(&GC, &param);
+    free_gauge_conf(&GC, &param);
 
-    // free ml_polycorr
-    end_polycorr_and_polyplaq(&GC, &param);
+    // free ml_polycorr and ml_polyplaq
+    free_polycorr_and_polyplaq(&GC, &param);
 
     // free geometry
     free_geometry(&geo, &param);
-
-    exit(EXIT_SUCCESS);
     }
 
 

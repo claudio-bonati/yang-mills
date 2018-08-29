@@ -992,7 +992,7 @@ void ape_smearing(Gauge_Conf *GC,
        }
     }
 
-  end_gauge_conf(&helper1, param);
+  free_gauge_conf(&helper1, param);
   }
 
 

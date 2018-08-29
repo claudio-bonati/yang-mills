@@ -414,7 +414,7 @@ void topcharge_cooling(Gauge_Conf const * const GC,
         meanplaq[iter]=0.5*(plaqs+plaqt); // this is in 4d: 3 spatial and 3 temporal plaquettes
         }
 
-     end_gauge_conf(&helperconf, param); 
+     free_gauge_conf(&helperconf, param); 
      }
    else   // no cooling
      {
@@ -682,30 +682,6 @@ void perform_measures_pot_QbarQ(Gauge_Conf *GC,
    }
 
 
-// print the value of the polyakov loop correlator that has been computed by multilevel
-void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
-                                     GParam const * const param,
-                                     FILE *datafilep)
-   {
-   #ifndef OPT_MULTILEVEL
-     double ris;
-     long r;
-
-     ris=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
-        }
-     ris*=param->d_inv_space_vol;
-
-     fprintf(datafilep, "%.12g\n", ris);
-     fflush(datafilep);
-   #else
-     optimize_multilevel_potQbarQ_long(GC, param, datafilep);
-   #endif
-   }
-
-
 // to optimize the multilevel
 void optimize_multilevel_potQbarQ_long(Gauge_Conf *GC,
                                        GParam const * const param,
@@ -765,6 +741,30 @@ void optimize_multilevel_potQbarQ_long(Gauge_Conf *GC,
    fflush(datafilep);
 
    free(poly_array);
+   }
+
+
+// print the value of the polyakov loop correlator that has been computed by multilevel
+void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
+                                     GParam const * const param,
+                                     FILE *datafilep)
+   {
+   #ifdef OPT_MULTILEVEL
+      optimize_multilevel_potQbarQ_long(GC, param, datafilep);
+   #else
+     double ris;
+     long r;
+
+     ris=0.0;
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+        }
+     ris*=param->d_inv_space_vol;
+
+     fprintf(datafilep, "%.12g\n", ris);
+     fflush(datafilep);
+   #endif
    }
 
 
@@ -836,11 +836,12 @@ void optimize_multilevel_tube_disc(Gauge_Conf *GC,
    }
 
 
-// perform the computation of the polyakov loop correlator with the multilevel algorithm
+// perform the computation of the string width with the
+// disconnected correlator using the multilevel algorithm
 void perform_measures_tube_disc(Gauge_Conf *GC,
-                                   Geometry const * const geo,
-                                   GParam const * const param,
-                                   FILE *datafilep)
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                FILE *datafilep)
    {
    #ifdef OPT_MULTILEVEL
      optimize_multilevel_tube_disc(GC, geo, param, datafilep);
@@ -851,10 +852,119 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
      long r;
 
      multilevel_tube_disc_QbarQ(GC,
-                             geo,
-                             param,
-                             0,
-                             param->d_size[0]);
+                                geo,
+                                param,
+                                0,
+                                param->d_size[0]);
+
+     risr=0.0;
+     risi=0.0;
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        risr+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+        risi+=imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+        }
+     risr*=param->d_inv_space_vol;
+     risi*=param->d_inv_space_vol;
+     fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
+     for(i=0; i<numplaqs; i++)
+        {
+        risr=0.0;
+        risi=0.0;
+
+        for(r=0; r<param->d_space_vol; r++)
+           {
+           risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
+           risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
+           }
+        risr*=param->d_inv_space_vol;
+        risi*=param->d_inv_space_vol;
+        fprintf(datafilep, "%.12g %.12g ", risr, risi);
+        }
+     fprintf(datafilep, "\n");
+
+     fflush(datafilep);
+   #endif
+   }
+
+
+// to optimize the multilevel for stringwidth in long simulations
+void optimize_multilevel_tube_disc_long(Gauge_Conf *GC,
+                                        GParam const * const param,
+                                        FILE *datafilep)
+   {
+   int i, err;
+   long r;
+   double poly_std, poly_average;
+   double complex *poly_array;
+
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   fprintf(datafilep, "Multilevel optimization: ");
+   fprintf(datafilep, "the smaller the value the better the update\n");
+
+   // polyakov loop correlator
+   poly_average=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]))-retr_TensProd(&(GC->ml_polyplaq_ris[0][r][0]))
+               +I*( imtr_TensProd(&(GC->ml_polycorr_ris[0][r]))-imtr_TensProd(&(GC->ml_polyplaq_ris[0][r][0])) );
+      poly_average+=cabs(poly_array[r]);
+      }
+   poly_average*=param->d_inv_space_vol;
+
+   poly_std=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_std+=pow(cabs(poly_array[r])-poly_average, 2.0);
+      }
+   poly_std*=param->d_inv_space_vol;
+   poly_std*=param->d_inv_space_vol;
+
+   poly_average*=poly_average;
+   for(i=0; i<NLEVELS; i++)
+      {
+      poly_average*=(double) param->d_ml_upd[i];
+      }
+   for(i=0; i<NLEVELS; i++)
+      {
+      poly_std*=(double) param->d_ml_upd[i];
+      }
+
+   fprintf(datafilep, "%.12g  %.12g  ", poly_average, poly_std);
+   for(i=0; i<NLEVELS; i++)
+      {
+      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
+      }
+   fprintf(datafilep, "\n");
+
+   fflush(datafilep);
+
+   free(poly_array);
+   }
+
+
+
+// perform the computation of the string width with the
+// disconnected correlator using the multilevel algorithm
+// for long simulations
+void perform_measures_tube_disc_long(Gauge_Conf *GC,
+                                     GParam const * const param,
+                                     FILE *datafilep)
+   {
+   #ifdef OPT_MULTILEVEL
+     optimize_multilevel_tube_disc_long(GC, geo, param, datafilep);
+   #else
+     int i;
+     const int numplaqs=(STDIM*(STDIM-1))/2;
+     double risr, risi;
+     long r;
 
      risr=0.0;
      risi=0.0;

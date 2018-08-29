@@ -106,12 +106,10 @@ void real_main(char *in_file)
     print_parameters_local(&param, time1, time2);
 
     // free gauge configuration
-    end_gauge_conf(&GC, &param);
+    free_gauge_conf(&GC, &param);
 
     // free geometry
     free_geometry(&geo, &param);
-
-    exit(EXIT_SUCCESS);
     }
 
 

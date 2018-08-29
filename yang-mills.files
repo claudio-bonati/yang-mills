@@ -58,3 +58,4 @@ src/yang_mills_pot_QbarQ_long.c
 src/yang_mills_tube_disc.c
 src/yang_mills_t0.c
 src/yang_mills_tracedef.c
+src/yang_mills_tube_disc_long.c

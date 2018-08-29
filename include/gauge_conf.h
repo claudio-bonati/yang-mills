@@ -38,7 +38,7 @@ void init_gauge_conf(Gauge_Conf *GC,
                      GParam const * const param);
 void read_gauge_conf(Gauge_Conf *GC,
                      GParam const * const param);
-void end_gauge_conf(Gauge_Conf *GC,
+void free_gauge_conf(Gauge_Conf *GC,
                     GParam const * const param);
 void write_conf_on_file_with_name(Gauge_Conf const * const GC,
                                   GParam const * const param,
@@ -53,9 +53,9 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC,
 void compute_md5sum(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                     Gauge_Conf const * const GC,
                     GParam const * const param);
-void init_polycorr(Gauge_Conf *GC,
+void alloc_polycorr(Gauge_Conf *GC,
                    GParam const * const param);
-void end_polycorr(Gauge_Conf *GC);
+void free_polycorr(Gauge_Conf *GC);
 void write_polycorr_on_file(Gauge_Conf const * const GC,
                             GParam const * const param,
                             int tstart,
@@ -67,12 +67,23 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
 void compute_md5sum_polycorr(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                              Gauge_Conf const * const GC,
                              GParam const * const param);
-void init_polycorr_and_polyplaq(Gauge_Conf *GC,
+void alloc_polycorr_and_polyplaq(Gauge_Conf *GC,
                                 GParam const * const param);
-void end_polycorr_and_polyplaq(Gauge_Conf *GC,
+void free_polycorr_and_polyplaq(Gauge_Conf *GC,
                                GParam const * const param);
-void init_clover_array(Gauge_Conf *GC,
-                       GParam const * const param);
+void write_polycorr_and_polyplaq_on_file(Gauge_Conf const * const GC,
+                                         GParam const * const param,
+                                         int tstart,
+                                         int iteration);
+void read_polycorr_and_polyplaq_from_file(Gauge_Conf const * const GC,
+                                          GParam const * const param,
+                                          int *tstart,
+                                          int *iteration);
+void compute_md5sum_polycorr_and_polyplaq(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
+                                          Gauge_Conf const * const GC,
+                                          GParam const * const param);
+void alloc_clover_array(Gauge_Conf *GC,
+                        GParam const * const param);
 void end_clover_array(Gauge_Conf *GC,
                       GParam const * const param);
 
@@ -129,12 +140,12 @@ void perform_measures_pot_QbarQ(Gauge_Conf * GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
                                 FILE *datafilep);
-void perform_measures_pot_QbarQ_long(Gauge_Conf * GC,
-                                     GParam const * const param,
-                                     FILE *datafilep);
 void optimize_multilevel_potQbarQ_long(Gauge_Conf *GC,
                                        GParam const * const param,
                                        FILE *datafilep);
+void perform_measures_pot_QbarQ_long(Gauge_Conf * GC,
+                                     GParam const * const param,
+                                     FILE *datafilep);
 void optimize_multilevel_tube_disc(Gauge_Conf *GC,
                                      Geometry const * const geo,
                                      GParam const * const param,
@@ -143,6 +154,13 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
                                    Geometry const * const geo,
                                    GParam const * const param,
                                    FILE *datafilep);
+void optimize_multilevel_tube_disc_long(Gauge_Conf *GC,
+                                        GParam const * const param,
+                                        FILE *datafilep);
+void perform_measures_tube_disc_long(Gauge_Conf *GC,
+                                     GParam const * const param,
+                                     FILE *datafilep);
+
 
 // in gauge_conf_multilevel.c
 void multihit(Gauge_Conf const * const GC,
@@ -189,6 +207,12 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
                                 GParam const * const param,
                                 int t_start,
                                 int dt);
+void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
+                                     Geometry const * const geo,
+                                     GParam const * const param,
+                                     int t_start,
+                                     int dt,
+                                     int iteration);
 
 
 // in gauge_conf_upd.c
