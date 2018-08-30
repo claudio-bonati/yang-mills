@@ -146,17 +146,10 @@ void optimize_multilevel_potQbarQ_long(Gauge_Conf *GC,
 void perform_measures_pot_QbarQ_long(Gauge_Conf * GC,
                                      GParam const * const param,
                                      FILE *datafilep);
-void optimize_multilevel_tube_disc(Gauge_Conf *GC,
-                                     Geometry const * const geo,
-                                     GParam const * const param,
-                                     FILE *datafilep);
 void perform_measures_tube_disc(Gauge_Conf *GC,
                                    Geometry const * const geo,
                                    GParam const * const param,
                                    FILE *datafilep);
-void optimize_multilevel_tube_disc_long(Gauge_Conf *GC,
-                                        GParam const * const param,
-                                        FILE *datafilep);
 void perform_measures_tube_disc_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep);

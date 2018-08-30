@@ -186,9 +186,10 @@ int main (int argc, char **argv)
         printf("\n\tusing OpenMP with %d threads\n", NTHREADS);
       #endif
 
-      #ifdef OPT_MULTILEVEL
-        printf("\tcompiled for multilevel optimization\n");
+      #ifdef THETA_MODE
+        printf("\n\tusing imaginary theta\n");
       #endif
+
 
       printf("\n");
 
