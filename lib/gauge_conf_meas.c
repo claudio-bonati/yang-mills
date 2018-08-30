@@ -959,7 +959,7 @@ void perform_measures_tube_disc_long(Gauge_Conf *GC,
                                      FILE *datafilep)
    {
    #ifdef OPT_MULTILEVEL
-     optimize_multilevel_tube_disc_long(GC, geo, param, datafilep);
+     optimize_multilevel_tube_disc_long(GC, param, datafilep);
    #else
      int i;
      const int numplaqs=(STDIM*(STDIM-1))/2;
