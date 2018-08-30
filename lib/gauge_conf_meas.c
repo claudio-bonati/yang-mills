@@ -226,7 +226,7 @@ void plaquette(Gauge_Conf const * const GC,
    if(STDIM>2)
      {
      ps*=param->d_inv_vol;
-     ps/=((double) (STDIM)*(STDIM-2)/2);
+     ps/=((double) (STDIM-1)*(STDIM-2)/2);
      }
    else
      {
