@@ -39,7 +39,7 @@ void init_gauge_conf(Gauge_Conf *GC, GParam const * const param)
      }
 
   #ifdef THETA_MODE
-    init_clover_array(GC, param);
+    alloc_clover_array(GC, param);
   #endif
 
   // initialize lattice
@@ -309,7 +309,7 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
      }
 
   #ifdef THETA_MODE
-    init_clover_array(GC, param);
+    alloc_clover_array(GC, param);
   #endif
 
   // initialize GC
