@@ -151,7 +151,7 @@ void real_main(char *in_file)
     free_gauge_conf(&GC, &param);
 
     // free ml_polycorr and ml_polyplaq
-    free_polycorr_and_polyplaq(&GC, &param);
+    free_polycorr_and_polyplaq(&GC);
 
     // free geometry
     free_geometry(&geo, &param);
@@ -189,6 +189,7 @@ void print_template_input(void)
     fprintf(fp, "ml_upd           10  # number of updates for various levels\n");
     fprintf(fp, "ml_level0_repeat 1   # number of times level0 is repeated in long sim.\n");
     fprintf(fp, "dist_poly        2   # distance between the polyakov loop\n");
+    fprintf(fp, "plaq_dir         1 0 # plaquette orientation for flux tube\n");
     fprintf(fp,"\n");
     fprintf(fp, "#output files\n");
     fprintf(fp, "conf_file  conf.dat\n");

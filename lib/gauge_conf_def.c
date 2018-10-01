@@ -627,17 +627,15 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
   }
 
 
-// allocate the ml_polycorr arrays
+// allocate the ml_polycorr and polyplaq arrays
 void alloc_polycorr_and_polyplaq(Gauge_Conf *GC,
                                 GParam const * const param)
   {
-  const unsigned long numplaq=(unsigned long) (STDIM*(STDIM-1))/2;
   int i, err;
-  long r;
 
   alloc_polycorr(GC, param);
 
-  err=posix_memalign((void**)&(GC->ml_polyplaq_ris), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd **));
+  err=posix_memalign((void**)&(GC->ml_polyplaq_ris), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polyplaq_ris (%s, %d)\n", __FILE__, __LINE__);
@@ -647,25 +645,16 @@ void alloc_polycorr_and_polyplaq(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)&(GC->ml_polyplaq_ris[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd *));
+       err=posix_memalign((void**)&(GC->ml_polyplaq_ris[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
-       for(r=0; r<param->d_space_vol; r++)
-          {
-          err=posix_memalign((void**)&(GC->ml_polyplaq_ris[i][r]), (size_t)DOUBLE_ALIGN, (size_t) numplaq *sizeof(TensProd));
-          if(err!=0)
-            {
-            fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d][%ld] (%s, %d)\n", i, r, __FILE__, __LINE__);
-            exit(EXIT_FAILURE);
-            }
-          }
        }
     }
 
-  err=posix_memalign((void**)&(GC->ml_polyplaq_tmp), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd **));
+  err=posix_memalign((void**)&(GC->ml_polyplaq_tmp), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polyplaq_tmp (%s, %d)\n", __FILE__, __LINE__);
@@ -675,42 +664,26 @@ void alloc_polycorr_and_polyplaq(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)&(GC->ml_polyplaq_tmp[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd *));
+       err=posix_memalign((void**)&(GC->ml_polyplaq_tmp[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
-       for(r=0; r<param->d_space_vol; r++)
-          {
-          err=posix_memalign((void**)&(GC->ml_polyplaq_tmp[i][r]), (size_t)DOUBLE_ALIGN, (size_t) numplaq *sizeof(TensProd));
-          if(err!=0)
-            {
-            fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d][%ld] (%s, %d)\n", i, r, __FILE__, __LINE__);
-            exit(EXIT_FAILURE);
-            }
-          }
        }
     }
   }
 
 
 // free the ml_polycorr arrays
-void free_polycorr_and_polyplaq(Gauge_Conf *GC,
-                               GParam const * const param)
+void free_polycorr_and_polyplaq(Gauge_Conf *GC)
   {
   int i;
-  long r;
 
   free_polycorr(GC);
 
   for(i=0; i<NLEVELS; i++)
      {
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        free(GC->ml_polyplaq_ris[i][r]);
-        free(GC->ml_polyplaq_tmp[i][r]);
-        }
      free(GC->ml_polyplaq_ris[i]);
      free(GC->ml_polyplaq_tmp[i]);
      }
@@ -726,8 +699,6 @@ void write_polycorr_and_polyplaq_on_file(Gauge_Conf const * const GC,
                                          int iteration)
   {
   long i;
-  int j;
-  const int numplaqs=(STDIM*(STDIM-1))/2;
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
@@ -774,17 +745,11 @@ void write_polycorr_and_polyplaq_on_file(Gauge_Conf const * const GC,
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       for(j=0; j<numplaqs; j++)
-          {
-          print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_ris[0][i][j]));
-          }
+       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_ris[0][i]));
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       for(j=0; j<numplaqs; j++)
-          {
-          print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_tmp[0][i][j]));
-          }
+       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_tmp[0][i]));
        }
 
     fclose(fp);
@@ -799,8 +764,7 @@ void read_polycorr_and_polyplaq_from_file(Gauge_Conf const * const GC,
                                           int *iteration)
   {
   long i, loc_space_vol;
-  int loc_stdim, j;
-  const int numplaqs=(STDIM*(STDIM-1))/2;
+  int loc_stdim;
   FILE *fp;
   #ifdef HASH_MODE
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
@@ -863,17 +827,11 @@ void read_polycorr_and_polyplaq_from_file(Gauge_Conf const * const GC,
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       for(j=0; j<numplaqs; j++)
-          {
-          read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_ris[0][i][j]));
-          }
+       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_ris[0][i]));
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       for(j=0; j<numplaqs; j++)
-          {
-          read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_tmp[0][i][j]));
-          }
+       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_tmp[0][i]));
        }
 
     fclose(fp);
@@ -898,8 +856,7 @@ void compute_md5sum_polycorr_and_polyplaq(char *res, Gauge_Conf const * const GC
     MD5_CTX mdContext;
     unsigned char c[MD5_DIGEST_LENGTH];
     long i;
-    int n1, n2, n3, n4, j;
-    const int numplaqs=(STDIM*(STDIM-1))/2;
+    int n1, n2, n3, n4;
 
     MD5_Init(&mdContext);
 
@@ -939,18 +896,15 @@ void compute_md5sum_polycorr_and_polyplaq(char *res, Gauge_Conf const * const GC
 
     for(i=0; i<(param->d_space_vol); i++)
        {
-       for(j=0; j<numplaqs; j++)
+       for(n1=0; n1<NCOLOR; n1++)
           {
-          for(n1=0; n1<NCOLOR; n1++)
+          for(n2=0; n2<NCOLOR; n2++)
              {
-             for(n2=0; n2<NCOLOR; n2++)
+             for(n3=0; n3<NCOLOR; n3++)
                 {
-                for(n3=0; n3<NCOLOR; n3++)
+                for(n4=0; n4<NCOLOR; n4++)
                    {
-                   for(n4=0; n4<NCOLOR; n4++)
-                      {
-                      MD5_Update(&mdContext, &((GC->ml_polyplaq_ris[0][i][j]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                      }
+                   MD5_Update(&mdContext, &((GC->ml_polyplaq_ris[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
                    }
                 }
              }
@@ -959,18 +913,15 @@ void compute_md5sum_polycorr_and_polyplaq(char *res, Gauge_Conf const * const GC
 
     for(i=0; i<(param->d_space_vol); i++)
        {
-       for(j=0; j<numplaqs; j++)
+       for(n1=0; n1<NCOLOR; n1++)
           {
-          for(n1=0; n1<NCOLOR; n1++)
+          for(n2=0; n2<NCOLOR; n2++)
              {
-             for(n2=0; n2<NCOLOR; n2++)
+             for(n3=0; n3<NCOLOR; n3++)
                 {
-                for(n3=0; n3<NCOLOR; n3++)
+                for(n4=0; n4<NCOLOR; n4++)
                    {
-                   for(n4=0; n4<NCOLOR; n4++)
-                      {
-                      MD5_Update(&mdContext, &((GC->ml_polyplaq_tmp[0][i][j]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                      }
+                   MD5_Update(&mdContext, &((GC->ml_polyplaq_tmp[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
                    }
                 }
              }

@@ -698,7 +698,7 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
 void compute_plaq_on_slice1(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
-                            double complex **plaq)
+                            double complex *plaq)
   {
   long r;
 
@@ -707,10 +707,9 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
   #endif
   for(r=0; r<param->d_space_vol; r++)
      {
-     int i, j, tmp;
+     int j;
      long r4;
 
-     tmp=0;
      r4=sisp_and_t_to_si(geo, r, 1); // t=1
 
      // moves to the correct position of the plaquette
@@ -723,27 +722,7 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
         r4=nnp(geo, r4, 2);
         }
 
-     for(j=1; j<STDIM; j++)
-        {
-        plaq[r][tmp]=plaquettep_complex(GC, geo, param, r4, j, 0);
-        tmp++;
-        }
-
-     for(i=1; i<STDIM; i++)
-        {
-        for(j=i+1; j<STDIM; j++)
-           {
-           plaq[r][tmp]=plaquettep_complex(GC, geo, param, r4, i, j);
-           tmp++;
-           }
-        }
-     #ifdef DEBUG
-     if(tmp!=STDIM*(STDIM-1)/2)
-       {
-       fprintf(stderr, "Error in computation of the plaquettes in multilevel (%s, %d)\n", __FILE__, __LINE__);
-       exit(EXIT_FAILURE);
-       }
-     #endif
+     plaq[r]=plaquettep_complex(GC, geo, param, r4, param->d_plaq_dir[0], param->d_plaq_dir[1]);
      }
   }
 
@@ -755,7 +734,6 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
                                 int t_start,
                                 int dt)
   {
-  const int numplaqs=(STDIM*(STDIM-1))/2;
   int i, upd, err;
   long int r;
   int level;
@@ -795,10 +773,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
       for(r=0; r<param->d_space_vol; r++)
          {
          one_TensProd(&(GC->ml_polycorr_ris[0][r]));
-         for(i=0; i<numplaqs; i++)
-            {
-            one_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
-            }
+         one_TensProd(&(GC->ml_polyplaq_ris[0][r]));
          }
 
       // call lower levels
@@ -826,10 +801,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
         for(r=0; r<param->d_space_vol; r++)
            {
            one_TensProd(&(GC->ml_polycorr_ris[0][r]));
-           for(i=0; i<numplaqs; i++)
-              {
-              one_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
-              }
+           one_TensProd(&(GC->ml_polyplaq_ris[0][r]));
            }
         }
 
@@ -840,10 +812,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
       for(r=0; r<param->d_space_vol; r++)
          {
          zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
-         for(i=0; i<numplaqs; i++)
-            {
-            zero_TensProd(&(GC->ml_polyplaq_tmp[level][r][i]));
-            }
+         zero_TensProd(&(GC->ml_polyplaq_tmp[level][r]));
          }
 
       // perform the update
@@ -857,7 +826,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
 
          // compute Polyakov loop and plaquettes (when needed) restricted to the slice
          GAUGE_GROUP *loc_poly;
-         double complex **loc_plaq;
+         double complex *loc_plaq;
 
          err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
          if(err!=0)
@@ -868,21 +837,12 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
 
          if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
            {
-           err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex *));
+           err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
            if(err!=0)
              {
              fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
              exit(EXIT_FAILURE);
              }
-           for(r=0; r<param->d_space_vol; r++)
-              {
-              err=posix_memalign((void**)&(loc_plaq[r]), (size_t) DOUBLE_ALIGN, (size_t) numplaqs * sizeof(double complex));
-              if(err!=0)
-                {
-                fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-                exit(EXIT_FAILURE);
-                }
-              }
            }
 
          compute_local_poly(GC,
@@ -923,31 +883,21 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
             // update ml_polyplaq_tmp when needed
             if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
               {
-              for(j=0; j<numplaqs; j++)
-                 {
-                 equal_TensProd(&TP2, &TP);
-                 times_equal_complex_TensProd(&TP2, loc_plaq[r][j]); // the plaquette is computed in such a way that
-                                                                     // here just "r" is needed
+              equal_TensProd(&TP2, &TP);
+              times_equal_complex_TensProd(&TP2, loc_plaq[r]); // the plaquette is computed in such a way that
+                                                               // here just "r" is needed
 
-                 plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r][j]), &TP2);
-                 }
+              plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r]), &TP2);
               }
             else
               {
-              for(j=0; j<numplaqs; j++)
-                 {
-                 plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r][j]), &TP);
-                 }
+              plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r]), &TP);
               }
             }
 
          free(loc_poly);
          if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
            {
-           for(r=0; r<param->d_space_vol; r++)
-              {
-              free(loc_plaq[r]);
-              }
            free(loc_plaq);
            }
          } // end of the for on "upd"
@@ -959,10 +909,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
       for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
-         for(i=0; i<numplaqs; i++)
-            {
-            times_equal_real_TensProd(&(GC->ml_polyplaq_tmp[level][r][i]), 1.0/(double) param->d_ml_upd[level]);
-            }
+         times_equal_real_TensProd(&(GC->ml_polyplaq_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
          }
 
       // update polycorr_ris[level] and polyplaq_ris[level]
@@ -972,10 +919,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
       for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
-         for(i=0; i<numplaqs; i++)
-            {
-            times_equal_TensProd(&(GC->ml_polyplaq_ris[level][r][i]), &(GC->ml_polyplaq_tmp[level][r][i]));
-            }
+         times_equal_TensProd(&(GC->ml_polyplaq_ris[level][r]), &(GC->ml_polyplaq_tmp[level][r]));
          }
 
       break;
@@ -1000,10 +944,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
         for(r=0; r<param->d_space_vol; r++)
            {
            one_TensProd(&(GC->ml_polycorr_ris[0][r]));
-           for(i=0; i<numplaqs; i++)
-              {
-              one_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
-              }
+           one_TensProd(&(GC->ml_polyplaq_ris[0][r]));
            }
         }
 
@@ -1014,10 +955,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
       for(r=0; r<param->d_space_vol; r++)
          {
          zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
-         for(i=0; i<numplaqs; i++)
-            {
-            zero_TensProd(&(GC->ml_polyplaq_tmp[level][r][i]));
-            }
+         zero_TensProd(&(GC->ml_polyplaq_tmp[level][r]));
          }
 
       // perform the update
@@ -1036,10 +974,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
          for(r=0; r<param->d_space_vol; r++)
             {
             one_TensProd(&(GC->ml_polycorr_ris[level+1][r]));
-            for(i=0; i<numplaqs; i++)
-               {
-               one_TensProd(&(GC->ml_polyplaq_ris[level+1][r][i]));
-               }
+            one_TensProd(&(GC->ml_polyplaq_ris[level+1][r]));
             }
 
          // call higher levels
@@ -1060,10 +995,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
          for(r=0; r<param->d_space_vol; r++)
             {
             plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &(GC->ml_polycorr_ris[level+1][r]));
-            for(i=0; i<numplaqs; i++)
-               {
-               plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r][i]), &(GC->ml_polyplaq_ris[level+1][r][i]));
-               }
+            plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r]), &(GC->ml_polyplaq_ris[level+1][r]));
             }
 
          } // end of update
@@ -1075,10 +1007,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
       for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
-         for(i=0; i<numplaqs; i++)
-            {
-            times_equal_real_TensProd(&(GC->ml_polyplaq_tmp[level][r][i]), 1.0/(double) param->d_ml_upd[level]);
-            }
+         times_equal_real_TensProd(&(GC->ml_polyplaq_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
          }
 
       // update polycorr_ris[level] and polyplaq_ris[level]
@@ -1088,10 +1017,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
       for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
-         for(i=0; i<numplaqs; i++)
-            {
-            times_equal_TensProd(&(GC->ml_polyplaq_ris[level][r][i]), &(GC->ml_polyplaq_tmp[level][r][i]));
-            }
+         times_equal_TensProd(&(GC->ml_polyplaq_ris[level][r]), &(GC->ml_polyplaq_tmp[level][r]));
          }
       break;
       // end of the not innermost not outermost level
@@ -1108,7 +1034,6 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
                                      int dt,
                                      int iteration)
   {
-  const int numplaqs=(STDIM*(STDIM-1))/2;
   int i, upd, err;
   long int r;
 
@@ -1127,10 +1052,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
     for(r=0; r<param->d_space_vol; r++)
        {
        one_TensProd(&(GC->ml_polycorr_ris[0][r]));
-       for(i=0; i<numplaqs; i++)
-          {
-          one_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
-          }
+       one_TensProd(&(GC->ml_polyplaq_ris[0][r]));
        }
     }
 
@@ -1143,10 +1065,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
     for(r=0; r<param->d_space_vol; r++)
        {
        zero_TensProd(&(GC->ml_polycorr_tmp[0][r]));
-       for(i=0; i<numplaqs; i++)
-          {
-          zero_TensProd(&(GC->ml_polyplaq_tmp[0][r][i]));
-          }
+       zero_TensProd(&(GC->ml_polyplaq_tmp[0][r]));
        }
     }
 
@@ -1162,7 +1081,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
        {
        // compute Polyakov loop and plaquettes (when needed) restricted to the slice
        GAUGE_GROUP *loc_poly;
-       double complex **loc_plaq;
+       double complex *loc_plaq;
 
        err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
        if(err!=0)
@@ -1173,21 +1092,12 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
 
        if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
          {
-         err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex *));
+         err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
          if(err!=0)
            {
            fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
            exit(EXIT_FAILURE);
            }
-         for(r=0; r<param->d_space_vol; r++)
-            {
-            err=posix_memalign((void**)&(loc_plaq[r]), (size_t) DOUBLE_ALIGN, (size_t) numplaqs * sizeof(double complex));
-            if(err!=0)
-              {
-              fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-              exit(EXIT_FAILURE);
-              }
-            }
          }
 
        compute_local_poly(GC,
@@ -1228,31 +1138,21 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
           // update ml_polyplaq_tmp when needed
           if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
             {
-            for(j=0; j<numplaqs; j++)
-               {
-               equal_TensProd(&TP2, &TP);
-               times_equal_complex_TensProd(&TP2, loc_plaq[r][j]); // the plaquette is computed in such a way that
-                                                                   // here just "r" is needed
+            equal_TensProd(&TP2, &TP);
+            times_equal_complex_TensProd(&TP2, loc_plaq[r]); // the plaquette is computed in such a way that
+                                                             // here just "r" is needed
 
-               plus_equal_TensProd(&(GC->ml_polyplaq_tmp[0][r][j]), &TP2);
-               }
+            plus_equal_TensProd(&(GC->ml_polyplaq_tmp[0][r]), &TP2);
             }
           else
             {
-            for(j=0; j<numplaqs; j++)
-               {
-               plus_equal_TensProd(&(GC->ml_polyplaq_tmp[0][r][j]), &TP);
-               }
+            plus_equal_TensProd(&(GC->ml_polyplaq_tmp[0][r]), &TP);
             }
           }
 
        free(loc_poly);
        if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
          {
-         for(r=0; r<param->d_space_vol; r++)
-            {
-            free(loc_plaq[r]);
-            }
          free(loc_plaq);
          }
        }
@@ -1265,10 +1165,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
        for(r=0; r<param->d_space_vol; r++)
           {
           one_TensProd(&(GC->ml_polycorr_ris[1][r]));
-          for(i=0; i<numplaqs; i++)
-             {
-             one_TensProd(&(GC->ml_polyplaq_ris[1][r][i]));
-             }
+          one_TensProd(&(GC->ml_polyplaq_ris[1][r]));
           }
 
        // call inner levels
@@ -1289,10 +1186,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
        for(r=0; r<param->d_space_vol; r++)
           {
           plus_equal_TensProd(&(GC->ml_polycorr_tmp[0][r]), &(GC->ml_polycorr_ris[1][r]));
-          for(i=0; i<numplaqs; i++)
-             {
-             plus_equal_TensProd(&(GC->ml_polyplaq_tmp[0][r][i]), &(GC->ml_polyplaq_ris[1][r][i]));
-             }
+          plus_equal_TensProd(&(GC->ml_polyplaq_tmp[0][r]), &(GC->ml_polyplaq_ris[1][r]));
           }
        }
     } // end update
@@ -1306,10 +1200,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
     for(r=0; r<param->d_space_vol; r++)
        {
        times_equal_real_TensProd(&(GC->ml_polycorr_tmp[0][r]), 1.0/( (double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat));
-       for(i=0; i<numplaqs; i++)
-          {
-          times_equal_real_TensProd(&(GC->ml_polyplaq_tmp[0][r][i]), 1.0/( (double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat));
-          }
+       times_equal_real_TensProd(&(GC->ml_polyplaq_tmp[0][r]), 1.0/( (double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat));
        }
 
     // update polycorr_ris[0] and polyplaq_ris[0]
@@ -1319,10 +1210,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
     for(r=0; r<param->d_space_vol; r++)
        {
        times_equal_TensProd(&(GC->ml_polycorr_ris[0][r]), &(GC->ml_polycorr_tmp[0][r]));
-       for(i=0; i<numplaqs; i++)
-          {
-          times_equal_TensProd(&(GC->ml_polyplaq_ris[0][r][i]), &(GC->ml_polyplaq_ris[0][r][i]));
-          }
+       times_equal_TensProd(&(GC->ml_polyplaq_ris[0][r]), &(GC->ml_polyplaq_ris[0][r]));
        }
     }
   } // end of multilevel

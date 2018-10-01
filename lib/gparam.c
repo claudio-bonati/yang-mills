@@ -328,6 +328,24 @@ void readinput(char *in_file, GParam *param)
                     }
                   param->d_trasv_dist=temp_i;
                   }
+           else if(strncmp(str, "plaq_dir", 8)==0)
+                  {
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_plaq_dir[0]=temp_i;
+
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_plaq_dir[1]=temp_i;
+                  }
 
            else if(strncmp(str, "conf_file", 9)==0)
                   { 
@@ -920,6 +938,7 @@ void print_parameters_tube_disc_long(GParam * param, time_t time_start, time_t t
     fprintf(fp, "\n");
     fprintf(fp, "level0_repeat:   %d\n", param->d_ml_level0_repeat);
     fprintf(fp, "dist_poly:   %d\n", param->d_dist_poly);
+    fprintf(fp, "plaq_dir: %d %d\n", param->d_plaq_dir[0], param->d_plaq_dir[1]);
     fprintf(fp, "\n");
 
     fprintf(fp, "randseed: %u\n", param->d_randseed);
@@ -1000,6 +1019,7 @@ void print_parameters_tube_disc(GParam * param, time_t time_start, time_t time_e
     fprintf(fp, "\n");
     fprintf(fp, "dist_poly:   %d\n", param->d_dist_poly);
     fprintf(fp, "transv_dist: %d\n", param->d_trasv_dist);
+    fprintf(fp, "plaq_dir: %d %d\n", param->d_plaq_dir[0], param->d_plaq_dir[1]);
     fprintf(fp, "\n");
 
     fprintf(fp, "randseed: %u\n", param->d_randseed);

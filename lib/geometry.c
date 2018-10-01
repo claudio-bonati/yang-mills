@@ -6,7 +6,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#include"../include/function_pointers.h"
 #include"../include/geometry.h"
 #include"../include/gparam.h"
 

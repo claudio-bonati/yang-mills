@@ -43,6 +43,7 @@ typedef struct GParam {
   int d_ml_level0_repeat;
   int d_dist_poly;
   int d_trasv_dist;
+  int d_plaq_dir[2];
 
   // output file names
   char d_conf_file[STD_STRING_LENGTH];

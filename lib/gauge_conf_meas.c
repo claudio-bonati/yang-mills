@@ -775,8 +775,6 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
                                 GParam const * const param,
                                 FILE *datafilep)
    {
-   int i;
-   const int numplaqs=(STDIM*(STDIM-1))/2;
    double risr, risi;
    long r;
 
@@ -797,20 +795,18 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
    risi*=param->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
-   for(i=0; i<numplaqs; i++)
-      {
-      risr=0.0;
-      risi=0.0;
+   risr=0.0;
+   risi=0.0;
 
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
-         risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
-         }
-      risr*=param->d_inv_space_vol;
-      risi*=param->d_inv_space_vol;
-      fprintf(datafilep, "%.12g %.12g ", risr, risi);
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
       }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
    fprintf(datafilep, "\n");
 
    fflush(datafilep);
@@ -824,8 +820,6 @@ void perform_measures_tube_disc_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep)
    {
-   int i;
-   const int numplaqs=(STDIM*(STDIM-1))/2;
    double risr, risi;
    long r;
 
@@ -840,20 +834,18 @@ void perform_measures_tube_disc_long(Gauge_Conf *GC,
    risi*=param->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
-   for(i=0; i<numplaqs; i++)
-      {
-      risr=0.0;
-      risi=0.0;
+   risr=0.0;
+   risi=0.0;
 
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
-         risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r][i]));
-         }
-      risr*=param->d_inv_space_vol;
-      risi*=param->d_inv_space_vol;
-      fprintf(datafilep, "%.12g %.12g ", risr, risi);
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
       }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
    fprintf(datafilep, "\n");
 
    fflush(datafilep);

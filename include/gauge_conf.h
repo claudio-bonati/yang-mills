@@ -27,8 +27,8 @@ typedef struct Gauge_Conf {
   TensProd **ml_polycorr_tmp;    // [NLEVELS][space_vol]
 
   // for the disconnected correlator for string width
-  TensProd ***ml_polyplaq_ris;   // [NLEVELS][space_vol][STDIM*(STDIM-1)/2]
-  TensProd ***ml_polyplaq_tmp;   // [NLEVELS][space_vol][STDIM*(STDIM-1)/2]
+  TensProd **ml_polyplaq_ris;   // [NLEVELS][space_vol]
+  TensProd **ml_polyplaq_tmp;   // [NLEVELS][space_vol]
 
   } Gauge_Conf;
 
@@ -69,8 +69,7 @@ void compute_md5sum_polycorr(char *res,        // the lenght is 2*MD5_DIGEST_LEN
                              GParam const * const param);
 void alloc_polycorr_and_polyplaq(Gauge_Conf *GC,
                                 GParam const * const param);
-void free_polycorr_and_polyplaq(Gauge_Conf *GC,
-                               GParam const * const param);
+void free_polycorr_and_polyplaq(Gauge_Conf *GC);
 void write_polycorr_and_polyplaq_on_file(Gauge_Conf const * const GC,
                                          GParam const * const param,
                                          int tstart,
@@ -194,7 +193,7 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
 void compute_plaq_on_slice1(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
-                            double complex **plaq);
+                            double complex *plaq);
 void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
