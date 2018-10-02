@@ -7,6 +7,7 @@ bin_PROGRAMS = conf_check \
                yang_mills_pot_QbarQ \
                yang_mills_pot_QbarQ_long \
                yang_mills_t0 \
+               yang_mills_tube_conn \
                yang_mills_tube_disc \
                yang_mills_tube_disc_long \
                yang_mills_tracedef 
@@ -166,6 +167,21 @@ yang_mills_t0_SOURCES=./src/yang_mills_t0.c \
                        $(sun) \
                        $(tens_prod) \
                        $(u1) 
+
+yang_mills_tube_conn_SOURCES=./src/yang_mills_tube_conn.c \
+                             $(dSFMT)  \
+                             $(endian) \
+                             $(funcpoint) \
+                             $(gauge_conf) \
+                             $(geometry) \
+                             $(gparam) \
+                             ./include/macro.h \
+                             $(random) \
+                             $(su2) \
+                             $(sun) \
+                             $(tens_prod) \
+                             $(u1) 
+
 
 yang_mills_tube_disc_SOURCES=./src/yang_mills_tube_disc.c \
                              $(dSFMT)  \

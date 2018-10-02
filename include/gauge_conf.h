@@ -30,6 +30,9 @@ typedef struct Gauge_Conf {
   TensProd **ml_polyplaq_ris;   // [NLEVELS][space_vol]
   TensProd **ml_polyplaq_tmp;   // [NLEVELS][space_vol]
 
+  // for the connected correlator for string width
+  TensProd **ml_polyplaqconn_ris;   // [NLEVELS][space_vol]
+  TensProd **ml_polyplaqconn_tmp;   // [NLEVELS][space_vol]
   } Gauge_Conf;
 
 
@@ -81,6 +84,9 @@ void read_polycorr_and_polyplaq_from_file(Gauge_Conf const * const GC,
 void compute_md5sum_polycorr_and_polyplaq(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                                           Gauge_Conf const * const GC,
                                           GParam const * const param);
+void alloc_polycorr_polyplaq_and_polyplaqconn(Gauge_Conf *GC,
+                                              GParam const * const param);
+void free_polycorr_polyplaq_and_polyplaqconn(Gauge_Conf *GC);
 void alloc_clover_array(Gauge_Conf *GC,
                         GParam const * const param);
 void end_clover_array(Gauge_Conf *GC,
@@ -99,6 +105,13 @@ double complex plaquettep_complex(Gauge_Conf const * const GC,
                                   long r,
                                   int i,
                                   int j);
+void plaquettep_matrix(Gauge_Conf const * const GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       long r,
+                       int i,
+                       int j,
+                       GAUGE_GROUP *matrix);
 void clover(Gauge_Conf const * const GC,
             Geometry const * const geo,
             GParam const * const param,
@@ -146,12 +159,16 @@ void perform_measures_pot_QbarQ_long(Gauge_Conf * GC,
                                      GParam const * const param,
                                      FILE *datafilep);
 void perform_measures_tube_disc(Gauge_Conf *GC,
-                                   Geometry const * const geo,
-                                   GParam const * const param,
-                                   FILE *datafilep);
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                FILE *datafilep);
 void perform_measures_tube_disc_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep);
+void perform_measures_tube_conn(Gauge_Conf *GC,
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                FILE *datafilep);
 
 
 // in gauge_conf_multilevel.c
@@ -205,6 +222,17 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
                                      int t_start,
                                      int dt,
                                      int iteration);
+void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf const * const GC,
+                                                      Geometry const * const geo,
+                                                      GParam const * const param,
+                                                      GAUGE_GROUP *loc_poly,
+                                                      double complex *loc_plaq,
+                                                      GAUGE_GROUP *loc_polyplaqconn);
+void multilevel_tube_conn_QbarQ(Gauge_Conf * GC,
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                int t_start,
+                                int dt);
 
 
 // in gauge_conf_upd.c

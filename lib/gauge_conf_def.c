@@ -943,6 +943,71 @@ void compute_md5sum_polycorr_and_polyplaq(char *res, Gauge_Conf const * const GC
   }
 
 
+// allocate the ml_polycorr and polyplaq arrays
+void alloc_polycorr_polyplaq_and_polyplaqconn(Gauge_Conf *GC,
+                                              GParam const * const param)
+  {
+  int i, err;
+
+  alloc_polycorr_and_polyplaq(GC, param);
+
+  err=posix_memalign((void**)&(GC->ml_polyplaqconn_ris), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating ml_polyplaq_ris (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(i=0; i<NLEVELS; i++)
+       {
+       err=posix_memalign((void**)&(GC->ml_polyplaqconn_ris[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
+       if(err!=0)
+         {
+         fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       }
+    }
+
+  err=posix_memalign((void**)&(GC->ml_polyplaqconn_tmp), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating ml_polyplaq_tmp (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(i=0; i<NLEVELS; i++)
+       {
+       err=posix_memalign((void**)&(GC->ml_polyplaqconn_tmp[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
+       if(err!=0)
+         {
+         fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       }
+    }
+  }
+
+
+// free the ml_polycorr arrays
+void free_polycorr_polyplaq_and_polyplaqconn(Gauge_Conf *GC)
+  {
+  int i;
+
+  free_polycorr_and_polyplaq(GC);
+
+  for(i=0; i<NLEVELS; i++)
+     {
+     free(GC->ml_polyplaqconn_ris[i]);
+     free(GC->ml_polyplaqconn_tmp[i]);
+     }
+  free(GC->ml_polyplaqconn_ris);
+  free(GC->ml_polyplaqconn_tmp);
+  }
+
+
 // allocate the clovers arrays
 void alloc_clover_array(Gauge_Conf *GC,
                        GParam const * const param)

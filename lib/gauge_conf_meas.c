@@ -106,6 +106,48 @@ double complex plaquettep_complex(Gauge_Conf const * const GC,
    }
 
 
+// computation of the plaquette (matrix) in position r and positive directions i,j
+void plaquettep_matrix(Gauge_Conf const * const GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       long r,
+                       int i,
+                       int j,
+                       GAUGE_GROUP *matrix)
+   {
+   #ifdef DEBUG
+   if(r >= param->d_volume)
+     {
+     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   if(j >= STDIM || i >= STDIM)
+     {
+     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #else
+   (void) param; // just to avoid warning at compile time
+   #endif
+
+//
+//       ^ i
+//       |   (2)
+//       +---<---+
+//       |       |
+//   (3) V       ^ (1)
+//       |       |
+//       +--->---+---> j
+//       r   (4)
+//
+
+   equal(matrix, &(GC->lattice[nnp(geo, r, j)][i]));
+   times_equal_dag(matrix, &(GC->lattice[nnp(geo, r, i)][j]));
+   times_equal_dag(matrix, &(GC->lattice[r][i]));
+   times_equal(matrix, &(GC->lattice[r][j]));
+   }
+
+
 // compute the four-leaf clover in position r, in the plane i,j and save it in M
 void clover(Gauge_Conf const * const GC,
             Geometry const * const geo,
@@ -797,7 +839,6 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
 
    risr=0.0;
    risi=0.0;
-
    for(r=0; r<param->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
@@ -836,11 +877,65 @@ void perform_measures_tube_disc_long(Gauge_Conf *GC,
 
    risr=0.0;
    risi=0.0;
-
    for(r=0; r<param->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
       risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
+      }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
+   fprintf(datafilep, "\n");
+
+   fflush(datafilep);
+   }
+
+
+// perform the computation of the string width with the
+// connected correlator using the multilevel algorithm
+void perform_measures_tube_conn(Gauge_Conf *GC,
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                FILE *datafilep)
+   {
+   double risr, risi;
+   long r;
+
+   multilevel_tube_conn_QbarQ(GC,
+                              geo,
+                              param,
+                              0,
+                              param->d_size[0]);
+
+   risr=0.0;
+   risi=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
+   risr=0.0;
+   risi=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
+      }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
+   risr=0.0;
+   risi=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polyplaqconn_ris[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaqconn_ris[0][r]));
       }
    risr*=param->d_inv_space_vol;
    risi*=param->d_inv_space_vol;
