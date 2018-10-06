@@ -63,7 +63,7 @@ void real_main(char *in_file)
     init_gauge_conf(&GC, &param);
 
     // initialize ml_polycorr and ml_polyplaq arrays
-    alloc_polycorr_and_polyplaq(&GC, &param);
+    alloc_tube_disc_stuff(&GC, &param);
 
     // montecarlo
     time(&time1);
@@ -109,7 +109,7 @@ void real_main(char *in_file)
     free_gauge_conf(&GC, &param);
 
     // free ml_polycorr and ml_polyplaq
-    free_polycorr_and_polyplaq(&GC);
+    free_tube_disc_stuff(&GC);
 
     // free geometry
     free_geometry(&geo, &param);

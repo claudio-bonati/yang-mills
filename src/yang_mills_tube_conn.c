@@ -41,7 +41,7 @@ void real_main(char *in_file)
        {
        if(tmp!= param.d_size[count])
          {
-         fprintf(stderr, "When using yang_mills_tube_disc all the spatial sizes have to be of equal length.\n");
+         fprintf(stderr, "When using yang_mills_tube_conn all the spatial sizes have to be of equal length.\n");
          exit(EXIT_FAILURE);
          }
        }
@@ -63,7 +63,7 @@ void real_main(char *in_file)
     init_gauge_conf(&GC, &param);
 
     // initialize ml_polycorr and ml_polyplaq arrays
-    alloc_polycorr_polyplaq_and_polyplaqconn(&GC, &param);
+    alloc_tube_conn_stuff(&GC, &param);
 
     // montecarlo
     time(&time1);
@@ -109,7 +109,7 @@ void real_main(char *in_file)
     free_gauge_conf(&GC, &param);
 
     // free ml_polycorr and ml_polyplaq
-    free_polycorr_polyplaq_and_polyplaqconn(&GC);
+    free_tube_conn_stuff(&GC);
 
     // free geometry
     free_geometry(&geo, &param);

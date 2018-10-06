@@ -4,8 +4,8 @@ bin_PROGRAMS = conf_check \
                debug_sun \
                debug_u1 \
                yang_mills_local \
-               yang_mills_pot_QbarQ \
-               yang_mills_pot_QbarQ_long \
+               yang_mills_polycorr \
+               yang_mills_polycorr_long \
                yang_mills_t0 \
                yang_mills_tube_conn \
                yang_mills_tube_disc \
@@ -126,7 +126,7 @@ yang_mills_local_SOURCES=./src/yang_mills_local.c \
                           $(tens_prod) \
                           $(u1) 
 
-yang_mills_pot_QbarQ_SOURCES=./src/yang_mills_pot_QbarQ.c \
+yang_mills_polycorr_SOURCES=./src/yang_mills_polycorr.c \
                              $(dSFMT)  \
                              $(endian) \
                              $(funcpoint) \
@@ -140,7 +140,7 @@ yang_mills_pot_QbarQ_SOURCES=./src/yang_mills_pot_QbarQ.c \
                              $(tens_prod) \
                              $(u1) 
 
-yang_mills_pot_QbarQ_long_SOURCES=./src/yang_mills_pot_QbarQ_long.c \
+yang_mills_polycorr_long_SOURCES=./src/yang_mills_polycorr_long.c \
                                   $(dSFMT)  \
                                   $(endian) \
                                   $(funcpoint) \

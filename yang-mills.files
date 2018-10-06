@@ -51,10 +51,10 @@ src/debug_u1.c
 include/tens_prod.h
 lib/tens_prod.c
 src/conf_check.c
-src/yang_mills_pot_QbarQ.c
+src/yang_mills_polycorr.c
 lib/gauge_conf_multilevel.c
 include/aligncheck.h
-src/yang_mills_pot_QbarQ_long.c
+src/yang_mills_polycorr_long.c
 src/yang_mills_tube_disc.c
 src/yang_mills_t0.c
 src/yang_mills_tracedef.c

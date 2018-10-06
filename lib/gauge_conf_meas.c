@@ -618,7 +618,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
 
 
 // to optimize the multilevel
-void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
+void optimize_multilevel_polycorr(Gauge_Conf *GC,
                                   Geometry const * const geo,
                                   GParam const * const param,
                                   FILE *datafilep)
@@ -638,7 +638,7 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
    fprintf(datafilep, "Multilevel optimization: ");
    fprintf(datafilep, "the smaller the value the better the update\n");
 
-   multilevel_pot_QbarQ(GC,
+   multilevel_polycorr(GC,
                         geo,
                         param,
                         0,
@@ -686,7 +686,7 @@ void optimize_multilevel_potQbarQ(Gauge_Conf *GC,
 
 
 // perform the computation of the polyakov loop correlator with the multilevel algorithm
-void perform_measures_pot_QbarQ(Gauge_Conf *GC,
+void perform_measures_polycorr(Gauge_Conf *GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
                                 FILE *datafilep)
@@ -696,7 +696,7 @@ void perform_measures_pot_QbarQ(Gauge_Conf *GC,
      double ris;
      long r;
 
-     multilevel_pot_QbarQ(GC,
+     multilevel_polycorr(GC,
                 geo,
                 param,
                 0,
@@ -719,13 +719,13 @@ void perform_measures_pot_QbarQ(Gauge_Conf *GC,
    #endif
 
    #ifdef OPT_MULTILEVEL
-     optimize_multilevel_potQbarQ(GC, geo, param, datafilep);
+     optimize_multilevel_polycorr(GC, geo, param, datafilep);
    #endif
    }
 
 
 // to optimize the multilevel
-void optimize_multilevel_potQbarQ_long(Gauge_Conf *GC,
+void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
                                        GParam const * const param,
                                        FILE *datafilep)
    {
@@ -787,12 +787,12 @@ void optimize_multilevel_potQbarQ_long(Gauge_Conf *GC,
 
 
 // print the value of the polyakov loop correlator that has been computed by multilevel
-void perform_measures_pot_QbarQ_long(Gauge_Conf *GC,
+void perform_measures_potlycorr_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep)
    {
    #ifdef OPT_MULTILEVEL
-      optimize_multilevel_potQbarQ_long(GC, param, datafilep);
+      optimize_multilevel_polycorr_long(GC, param, datafilep);
    #else
      double ris;
      long r;
@@ -820,7 +820,7 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
    double risr, risi;
    long r;
 
-   multilevel_tube_disc_QbarQ(GC,
+   multilevel_tube_disc(GC,
                               geo,
                               param,
                               0,
@@ -902,7 +902,7 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
    double risr, risi;
    long r;
 
-   multilevel_tube_conn_QbarQ(GC,
+   multilevel_tube_conn(GC,
                               geo,
                               param,
                               0,

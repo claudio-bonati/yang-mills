@@ -604,16 +604,16 @@ void print_parameters_local(GParam const * const param, time_t time_start, time_
 
 
 // print simulation parameters
-void print_parameters_pot_QbarQ_long(GParam * param, time_t time_start, time_t time_end)
+void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t time_end)
     {
     FILE *fp;
     int i;
     double diff_sec;
 
     fp=fopen(param->d_log_file, "w");
-    fprintf(fp, "+--------------------------------------------------+\n");
-    fprintf(fp, "| Simulation details for yang_mills_pot_QbarQ_long |\n");
-    fprintf(fp, "+--------------------------------------------------+\n\n");
+    fprintf(fp, "+-------------------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_polycorr_long |\n");
+    fprintf(fp, "+-------------------------------------------------+\n\n");
 
     #ifdef OPENMP_MODE
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
@@ -683,16 +683,16 @@ void print_parameters_pot_QbarQ_long(GParam * param, time_t time_start, time_t t
 
 
 // print simulation parameters
-void print_parameters_pot_QbarQ(GParam * param, time_t time_start, time_t time_end)
+void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_end)
     {
     FILE *fp;
     int i;
     double diff_sec;
 
     fp=fopen(param->d_log_file, "w");
-    fprintf(fp, "+---------------------------------------------+\n");
-    fprintf(fp, "| Simulation details for yang_mills_pot_QbarQ |\n");
-    fprintf(fp, "+---------------------------------------------+\n\n");
+    fprintf(fp, "+--------------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_polycorr |\n");
+    fprintf(fp, "+--------------------------------------------+\n\n");
 
     #ifdef OPENMP_MODE
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);

@@ -373,9 +373,9 @@ void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const
   }
 
 
-// allocate the ml_polycorr arrays
-void alloc_polycorr(Gauge_Conf *GC,
-                              GParam const * const param)
+// allocate the ml_polycorr arrays and related stuff
+void alloc_polycorr_stuff(Gauge_Conf *GC,
+                           GParam const * const param)
   {
   int i, err;
 
@@ -416,11 +416,18 @@ void alloc_polycorr(Gauge_Conf *GC,
          }
        }
     }
+
+  err=posix_memalign((void**)&(GC->loc_poly), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(GAUGE_GROUP));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating loc_poly (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
   }
 
 
-// free the ml_polycorr arrays
-void free_polycorr(Gauge_Conf *GC)
+// free the ml_polycorr arrays and related stuff
+void free_polycorr_stuff(Gauge_Conf *GC)
   {
   int i;
 
@@ -431,6 +438,7 @@ void free_polycorr(Gauge_Conf *GC)
      }
   free(GC->ml_polycorr_ris);
   free(GC->ml_polycorr_tmp);
+  free(GC->loc_poly);
   }
 
 
@@ -627,13 +635,13 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
   }
 
 
-// allocate the ml_polycorr and polyplaq arrays
-void alloc_polycorr_and_polyplaq(Gauge_Conf *GC,
+// allocate the ml_polycorr, polyplaq arrays and related stuff
+void alloc_tube_disc_stuff(Gauge_Conf *GC,
                                 GParam const * const param)
   {
   int i, err;
 
-  alloc_polycorr(GC, param);
+  alloc_polycorr_stuff(GC, param);
 
   err=posix_memalign((void**)&(GC->ml_polyplaq_ris), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
   if(err!=0)
@@ -672,15 +680,22 @@ void alloc_polycorr_and_polyplaq(Gauge_Conf *GC,
          }
        }
     }
+
+  err=posix_memalign((void**)&(GC->loc_plaq), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(double complex));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating loc_plaq (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
   }
 
 
-// free the ml_polycorr arrays
-void free_polycorr_and_polyplaq(Gauge_Conf *GC)
+// free the ml_polycorr arrays and relates stuff
+void free_tube_disc_stuff(Gauge_Conf *GC)
   {
   int i;
 
-  free_polycorr(GC);
+  free_polycorr_stuff(GC);
 
   for(i=0; i<NLEVELS; i++)
      {
@@ -689,6 +704,7 @@ void free_polycorr_and_polyplaq(Gauge_Conf *GC)
      }
   free(GC->ml_polyplaq_ris);
   free(GC->ml_polyplaq_tmp);
+  free(GC->loc_plaq);
   }
 
 
@@ -944,12 +960,12 @@ void compute_md5sum_polycorr_and_polyplaq(char *res, Gauge_Conf const * const GC
 
 
 // allocate the ml_polycorr and polyplaq arrays
-void alloc_polycorr_polyplaq_and_polyplaqconn(Gauge_Conf *GC,
-                                              GParam const * const param)
+void alloc_tube_conn_stuff(Gauge_Conf *GC,
+                           GParam const * const param)
   {
   int i, err;
 
-  alloc_polycorr_and_polyplaq(GC, param);
+  alloc_tube_disc_stuff(GC, param);
 
   err=posix_memalign((void**)&(GC->ml_polyplaqconn_ris), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
   if(err!=0)
@@ -988,15 +1004,23 @@ void alloc_polycorr_polyplaq_and_polyplaqconn(Gauge_Conf *GC,
          }
        }
     }
+
+  err=posix_memalign((void**)&(GC->loc_polyplaqconn), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(GAUGE_GROUP));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating loc_polyplaqconn (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+
   }
 
 
 // free the ml_polycorr arrays
-void free_polycorr_polyplaq_and_polyplaqconn(Gauge_Conf *GC)
+void free_tube_conn_stuff(Gauge_Conf *GC)
   {
   int i;
 
-  free_polycorr_and_polyplaq(GC);
+  free_tube_disc_stuff(GC);
 
   for(i=0; i<NLEVELS; i++)
      {
@@ -1005,6 +1029,7 @@ void free_polycorr_polyplaq_and_polyplaqconn(Gauge_Conf *GC)
      }
   free(GC->ml_polyplaqconn_ris);
   free(GC->ml_polyplaqconn_tmp);
+  free(GC->loc_polyplaqconn);
   }
 
 

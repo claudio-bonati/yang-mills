@@ -49,12 +49,11 @@ void multihit(Gauge_Conf const * const GC,
 
 
 // compute polyakov loop on a single slice
-void compute_local_poly(Gauge_Conf const * const GC,
+void compute_local_poly(Gauge_Conf *GC,
                         Geometry const * const geo,
                         GParam const * const param,
                         int t_start,
-                        int dt,
-                        GAUGE_GROUP *loc_poly)
+                        int dt)
   {
   int num_hit;
   long r;
@@ -76,7 +75,7 @@ void compute_local_poly(Gauge_Conf const * const GC,
      int i;
      GAUGE_GROUP matrix;
 
-     one(&(loc_poly[r]));
+     one(&(GC->loc_poly[r]));
      for(i=0; i<dt; i++)
         {
         multihit(GC,
@@ -86,7 +85,7 @@ void compute_local_poly(Gauge_Conf const * const GC,
                  0,
                  num_hit,
                  &matrix);
-        times_equal(&(loc_poly[r]), &matrix);
+        times_equal(&(GC->loc_poly[r]), &matrix);
         }
      }
   }
@@ -297,14 +296,14 @@ void slice_single_update(Gauge_Conf * GC,
   }
 
 
-// multilevel for polyakov QbarQ correlator
-void multilevel_pot_QbarQ(Gauge_Conf * GC,
+// multilevel for polyakov correlator
+void multilevel_polycorr(Gauge_Conf * GC,
                           Geometry const * const geo,
                           GParam const * const param,
                           int t_start,
                           int dt)
   {
-  int i, upd, err;
+  int i, upd;
   long int r;
   int level;
 
@@ -349,7 +348,7 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
       // call lower levels
       for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
          {
-         multilevel_pot_QbarQ(GC,
+         multilevel_polycorr(GC,
                               geo,
                               param,
                               t_start+i*param->d_ml_step[0],
@@ -389,15 +388,7 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
          slice_single_update(GC, geo, param, t_start, dt);
 
          // compute Polyakov loop restricted to the slice
-         GAUGE_GROUP *loc_poly;
-         err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
-         if(err!=0)
-           {
-           fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-           exit(EXIT_FAILURE);
-           }
-
-         compute_local_poly(GC, geo, param, t_start, dt, loc_poly);
+         compute_local_poly(GC, geo, param, t_start, dt);
 
          // compute the tensor products
          // and update ml_polycorr_tmp[level]
@@ -417,11 +408,9 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
                }
             si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
 
-            TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
+            TensProd_init(&TP, &(GC->loc_poly[r]), &(GC->loc_poly[r2]) );
             plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &TP);
             }
-
-        free(loc_poly);
         } // end of update
 
       // normalize polycorr_tmp
@@ -493,7 +482,7 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
          // call higher levels
          for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
             {
-            multilevel_pot_QbarQ(GC,
+            multilevel_polycorr(GC,
                                  geo,
                                  param,
                                  t_start+i*param->d_ml_step[level+1],
@@ -535,20 +524,20 @@ void multilevel_pot_QbarQ(Gauge_Conf * GC,
   } // end of multilevel
 
 
-// multilevel for polyakov QbarQ correlator to be used in long simulations
-void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
+// multilevel for polyakov orrelator to be used in long simulations
+void multilevel_potlycorr_long(Gauge_Conf * GC,
                                Geometry const * const geo,
                                GParam const * const param,
                                int t_start,
                                int dt,
                                int iteration)
   {
-  int i, upd, err;
+  int i, upd;
   long int r;
 
   if(dt!=param->d_ml_step[0])
     {
-    fprintf(stderr, "'dt' has to be equal to ml_step[0] in multilevel_pot_QbarQ_long (%s, %d)\n", __FILE__, __LINE__);
+    fprintf(stderr, "'dt' has to be equal to ml_step[0] in multilevel_polycorr_long (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
 
@@ -583,15 +572,7 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
      if(NLEVELS==1)
        {
        // compute Polyakov loop restricted to the slice
-       GAUGE_GROUP *loc_poly;
-       err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
-       if(err!=0)
-         {
-         fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-         exit(EXIT_FAILURE);
-         }
-
-       compute_local_poly(GC, geo, param, t_start, dt, loc_poly);
+       compute_local_poly(GC, geo, param, t_start, dt);
 
        // compute the tensor products
        // and update ml_polycorr_tmp[0]
@@ -611,11 +592,9 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
              }
           si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
 
-          TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
+          TensProd_init(&TP, &(GC->loc_poly[r]), &(GC->loc_poly[r2]) );
           plus_equal_TensProd(&(GC->ml_polycorr_tmp[0][r]), &TP);
           }
-
-       free(loc_poly);
        }
      else  // NLEVELS>1
        {
@@ -632,7 +611,7 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
        for(i=0; i<(param->d_ml_step[0])/(param->d_ml_step[1]); i++)
           {
           // important: we have to call the "non long" version in inner levels
-          multilevel_pot_QbarQ(GC,
+          multilevel_polycorr(GC,
                                geo,
                                param,
                                t_start+i*param->d_ml_step[1],
@@ -674,10 +653,9 @@ void multilevel_pot_QbarQ_long(Gauge_Conf * GC,
 
 
 // compute plaquettes on the t=1 time slice
-void compute_plaq_on_slice1(Gauge_Conf const * const GC,
+void compute_plaq_on_slice1(Gauge_Conf *GC,
                             Geometry const * const geo,
-                            GParam const * const param,
-                            double complex *plaq)
+                            GParam const * const param)
   {
   long r;
 
@@ -701,19 +679,19 @@ void compute_plaq_on_slice1(Gauge_Conf const * const GC,
         r4=nnp(geo, r4, 2);
         }
 
-     plaq[r]=plaquettep_complex(GC, geo, param, r4, param->d_plaq_dir[0], param->d_plaq_dir[1]);
+     GC->loc_plaq[r]=plaquettep_complex(GC, geo, param, r4, param->d_plaq_dir[0], param->d_plaq_dir[1]);
      }
   }
 
 
-// multilevel for polyakov string width of QbarQ
-void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
+// multilevel for polyakov string width
+void multilevel_tube_disc(Gauge_Conf * GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
                                 int t_start,
                                 int dt)
   {
-  int i, upd, err;
+  int i, upd;
   long int r;
   int level;
 
@@ -758,7 +736,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
       // call lower levels
       for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
          {
-         multilevel_tube_disc_QbarQ(GC,
+         multilevel_tube_disc(GC,
                                     geo,
                                     param,
                                     t_start+i*param->d_ml_step[0],
@@ -800,31 +778,10 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
          slice_single_update(GC, geo, param, t_start, dt);
 
          // compute Polyakov loop and plaquettes (when needed) restricted to the slice
-         GAUGE_GROUP *loc_poly;
-         double complex *loc_plaq;
-
-         err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
-         if(err!=0)
-           {
-           fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-           exit(EXIT_FAILURE);
-           }
-
+         compute_local_poly(GC, geo, param, t_start, dt);
          if(t_start==0)
            {
-           err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
-           if(err!=0)
-             {
-             fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-             exit(EXIT_FAILURE);
-             }
-           }
-
-         compute_local_poly(GC, geo, param, t_start, dt, loc_poly);
-
-         if(t_start==0)
-           {
-           compute_plaq_on_slice1(GC, geo, param, loc_plaq);
+           compute_plaq_on_slice1(GC, geo, param);
            }
 
          // compute the tensor products
@@ -845,7 +802,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
                }
             si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
 
-            TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
+            TensProd_init(&TP, &(GC->loc_poly[r]), &(GC->loc_poly[r2]) );
 
             // update ml_polycorr_tmp
             plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &TP);
@@ -854,7 +811,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
             if(t_start==0)
               {
               equal_TensProd(&TP2, &TP);
-              times_equal_complex_TensProd(&TP2, loc_plaq[r]); // the plaquette is computed in such a way that
+              times_equal_complex_TensProd(&TP2, GC->loc_plaq[r]); // the plaquette is computed in such a way that
                                                                // here just "r" is needed
               plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r]), &TP2);
               }
@@ -863,12 +820,6 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
               plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r]), &TP);
               }
             }
-
-         free(loc_poly);
-         if(t_start==0)
-           {
-           free(loc_plaq);
-           }
          } // end of the for on "upd"
 
       // normalize polycorr_tmp[level] and polyplaq_tmp[level]
@@ -945,7 +896,7 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
          // call higher levels
          for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
             {
-            multilevel_tube_disc_QbarQ(GC,
+            multilevel_tube_disc(GC,
                                        geo,
                                        param,
                                        t_start+i*param->d_ml_step[level+1],
@@ -991,20 +942,20 @@ void multilevel_tube_disc_QbarQ(Gauge_Conf * GC,
   } // end of multilevel
 
 
-// multilevel for polyakov string width of QbarQ to be used in long simulations
-void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
+// multilevel for polyakov string width to be used in long simulations
+void multilevel_tube_disc_long(Gauge_Conf * GC,
                                      Geometry const * const geo,
                                      GParam const * const param,
                                      int t_start,
                                      int dt,
                                      int iteration)
   {
-  int i, upd, err;
+  int i, upd;
   long int r;
 
   if(dt!=param->d_ml_step[0])
     {
-    fprintf(stderr, "'dt' has to be equal to ml_step[0] in multilevel_pot_QbarQ_long (%s, %d)\n", __FILE__, __LINE__);
+    fprintf(stderr, "'dt' has to be equal to ml_step[0] in multilevel_polycorr_long (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
 
@@ -1041,31 +992,10 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
      if(NLEVELS==1)
        {
        // compute Polyakov loop and plaquettes (when needed) restricted to the slice
-       GAUGE_GROUP *loc_poly;
-       double complex *loc_plaq;
-
-       err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
-       if(err!=0)
-         {
-         fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-         exit(EXIT_FAILURE);
-         }
-
+       compute_local_poly(GC, geo, param, t_start, dt);
        if(t_start==0)
          {
-         err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
-         if(err!=0)
-           {
-           fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-           exit(EXIT_FAILURE);
-           }
-         }
-
-       compute_local_poly(GC, geo, param, t_start, dt, loc_poly);
-
-       if(t_start==0)
-         {
-         compute_plaq_on_slice1(GC, geo, param, loc_plaq);
+         compute_plaq_on_slice1(GC, geo, param);
          }
 
        // compute the tensor products
@@ -1086,7 +1016,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
              }
           si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
 
-          TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
+          TensProd_init(&TP, &(GC->loc_poly[r]), &(GC->loc_poly[r2]) );
 
           // update ml_polycorr_tmp
           plus_equal_TensProd(&(GC->ml_polycorr_tmp[0][r]), &TP);
@@ -1095,7 +1025,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
           if(t_start==0)
             {
             equal_TensProd(&TP2, &TP);
-            times_equal_complex_TensProd(&TP2, loc_plaq[r]); // the plaquette is computed in such a way that
+            times_equal_complex_TensProd(&TP2, GC->loc_plaq[r]); // the plaquette is computed in such a way that
                                                              // here just "r" is needed
             plus_equal_TensProd(&(GC->ml_polyplaq_tmp[0][r]), &TP2);
             }
@@ -1104,12 +1034,6 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
             plus_equal_TensProd(&(GC->ml_polyplaq_tmp[0][r]), &TP);
             }
           }
-
-       free(loc_poly);
-       if((t_start==0 && param->d_ml_step[NLEVELS-1]>1) || (t_start==1 && param->d_ml_step[NLEVELS-1]==1))
-         {
-         free(loc_plaq);
-         }
        }
      else  // NLEVELS>1
        {
@@ -1127,7 +1051,7 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
        for(i=0; i<(param->d_ml_step[0])/(param->d_ml_step[1]); i++)
           {
           // important: we have to call the "non long" version in inner levels
-          multilevel_tube_disc_QbarQ(GC,
+          multilevel_tube_disc(GC,
                                      geo,
                                      param,
                                      t_start+i*param->d_ml_step[1],
@@ -1172,12 +1096,9 @@ void multilevel_tube_disc_QbarQ_long(Gauge_Conf * GC,
 
 
 // compute auxlilliary stuff on the first time slice for connected correlator
-void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf const * const GC,
+void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf *GC,
                                                       Geometry const * const geo,
-                                                      GParam const * const param,
-                                                      GAUGE_GROUP *loc_poly,
-                                                      double complex *loc_plaq,
-                                                      GAUGE_GROUP *loc_polyplaqconn)
+                                                      GParam const * const param)
   {
   int num_hit;
   long r;
@@ -1207,8 +1128,8 @@ void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf const * const G
      r4=sisp_and_t_to_si(geo, r, 0); // t=0 starting point
 
      multihit(GC, geo, param, r4, 0, num_hit, &matrix);
-     equal(&(loc_poly[r]), &matrix);
-     equal(&(loc_polyplaqconn[r]), &matrix);
+     equal(&(GC->loc_poly[r]), &matrix);
+     equal(&(GC->loc_polyplaqconn[r]), &matrix);
 
      r4=nnp(geo, r4, 0); // now we are in the t=1 plane
      #ifdef DEBUG
@@ -1217,34 +1138,34 @@ void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf const * const G
 
      if(param->d_dist_poly/2>=1)
        {
-       times_equal(&(loc_polyplaqconn[r]), &GC->lattice[r4][1]);
+       times_equal(&(GC->loc_polyplaqconn[r]), &GC->lattice[r4][1]);
        r4=nnp(geo, r4, 1);
 
        for(j=1; j<param->d_dist_poly/2; j++)
           {
           multihit(GC, geo, param, r4, 1, num_hit, &matrix);
-          times_equal(&(loc_polyplaqconn[r]), &matrix);
+          times_equal(&(GC->loc_polyplaqconn[r]), &matrix);
           r4=nnp(geo, r4, 1);
           }
        }
 
      if(param->d_trasv_dist>=1)
        {
-       times_equal(&(loc_polyplaqconn[r]), &GC->lattice[r4][2]);
+       times_equal(&(GC->loc_polyplaqconn[r]), &GC->lattice[r4][2]);
        r4=nnp(geo, r4, 2);
 
        for(j=1; j<param->d_trasv_dist; j++)
           {
           multihit(GC, geo, param, r4, 2, num_hit, &matrix);
-          times_equal(&(loc_polyplaqconn[r]), &matrix);
+          times_equal(&(GC->loc_polyplaqconn[r]), &matrix);
           r4=nnp(geo, r4, 2);
           }
        }
 
      plaquettep_matrix(GC, geo, param, r4, param->d_plaq_dir[0], param->d_plaq_dir[1], &matrix);
 
-     loc_plaq[r]=retr(&matrix)+I*imtr(&matrix);
-     times_equal(&(loc_polyplaqconn[r]), &matrix);
+     GC->loc_plaq[r]=retr(&matrix)+I*imtr(&matrix);
+     times_equal(&(GC->loc_polyplaqconn[r]), &matrix);
 
      if(param->d_trasv_dist>=1)
        {
@@ -1252,11 +1173,11 @@ void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf const * const G
           {
           r4=nnm(geo, r4, 2);
           multihit(GC, geo, param, r4, 2, num_hit, &matrix);
-          times_equal_dag(&(loc_polyplaqconn[r]), &matrix);
+          times_equal_dag(&(GC->loc_polyplaqconn[r]), &matrix);
           }
 
        r4=nnm(geo, r4, 2);
-       times_equal_dag(&(loc_polyplaqconn[r]), &GC->lattice[r4][2]);
+       times_equal_dag(&(GC->loc_polyplaqconn[r]), &GC->lattice[r4][2]);
        }
 
      if(param->d_dist_poly/2>=1)
@@ -1265,11 +1186,11 @@ void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf const * const G
           {
           r4=nnm(geo, r4, 1);
           multihit(GC, geo, param, r4, 1, num_hit, &matrix);
-          times_equal_dag(&(loc_polyplaqconn[r]), &matrix);
+          times_equal_dag(&(GC->loc_polyplaqconn[r]), &matrix);
           }
 
        r4=nnm(geo, r4, 1);
-       times_equal_dag(&(loc_polyplaqconn[r]), &GC->lattice[r4][1]);
+       times_equal_dag(&(GC->loc_polyplaqconn[r]), &GC->lattice[r4][1]);
        }
 
      #ifdef DEBUG
@@ -1283,22 +1204,22 @@ void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf const * const G
      for(j=1; j<param->d_ml_step[NLEVELS-1]; j++)
         {
         multihit(GC, geo, param, r4, 0, num_hit, &matrix);
-        times_equal(&(loc_polyplaqconn[r]), &matrix);
-        times_equal(&(loc_poly[r]), &matrix);
+        times_equal(&(GC->loc_polyplaqconn[r]), &matrix);
+        times_equal(&(GC->loc_poly[r]), &matrix);
         r4=nnp(geo, r4, 1);
         }
      }
   }
 
 
-// multilevel for polyakov string width of QbarQ using the connected operator
-void multilevel_tube_conn_QbarQ(Gauge_Conf * GC,
-                                Geometry const * const geo,
-                                GParam const * const param,
-                                int t_start,
-                                int dt)
+// multilevel for string width using the connected operator
+void multilevel_tube_conn(Gauge_Conf * GC,
+                          Geometry const * const geo,
+                          GParam const * const param,
+                          int t_start,
+                          int dt)
   {
-  int i, upd, err;
+  int i, upd;
   long int r;
   int level;
 
@@ -1344,11 +1265,11 @@ void multilevel_tube_conn_QbarQ(Gauge_Conf * GC,
       // call lower levels
       for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
          {
-         multilevel_tube_conn_QbarQ(GC,
-                                    geo,
-                                    param,
-                                    t_start+i*param->d_ml_step[0],
-                                    param->d_ml_step[0]);
+         multilevel_tube_conn(GC,
+                              geo,
+                              param,
+                              t_start+i*param->d_ml_step[0],
+                              param->d_ml_step[0]);
          }
       break;
       // end of the outermost level
@@ -1388,42 +1309,14 @@ void multilevel_tube_conn_QbarQ(Gauge_Conf * GC,
          slice_single_update(GC, geo, param, t_start, dt);
 
          // compute Polyakov loop and plaquettes (when needed) restricted to the slice
-         GAUGE_GROUP *loc_poly, *loc_polyplaqconn;
-         double complex *loc_plaq;
-
-         err=posix_memalign((void**)&loc_poly, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
-         if(err!=0)
-           {
-           fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-           exit(EXIT_FAILURE);
-           }
-
          if(t_start==0)
            {
-           err=posix_memalign((void**)&loc_polyplaqconn, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(GAUGE_GROUP));
-           if(err!=0)
-             {
-             fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-             exit(EXIT_FAILURE);
-             }
-
-           err=posix_memalign((void**)&loc_plaq, (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
-           if(err!=0)
-             {
-             fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-             exit(EXIT_FAILURE);
-             }
-           }
-
-         if(t_start==0)
-           {
-           compute_poly_polyplaq_and_polyplaqconn_on_slice1(GC, geo, param, loc_poly, loc_plaq, loc_polyplaqconn);
+           compute_poly_polyplaq_and_polyplaqconn_on_slice1(GC, geo, param);
            }
          else
            {
-           compute_local_poly(GC, geo, param, t_start, dt, loc_poly);
+           compute_local_poly(GC, geo, param, t_start, dt);
            }
-
 
          // compute the tensor products
          // and update ml_polycorr_tmp[level], ml_polyplaq_tmp[level] and ml_polyplaqconn_tmp[level]
@@ -1443,7 +1336,7 @@ void multilevel_tube_conn_QbarQ(Gauge_Conf * GC,
                }
             si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
 
-            TensProd_init(&TP, &(loc_poly[r]), &(loc_poly[r2]) );
+            TensProd_init(&TP, &(GC->loc_poly[r]), &(GC->loc_poly[r2]) );
 
             // update ml_polycorr_tmp
             plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &TP);
@@ -1452,11 +1345,11 @@ void multilevel_tube_conn_QbarQ(Gauge_Conf * GC,
             if(t_start==0)
               {
               equal_TensProd(&TP2, &TP);
-              times_equal_complex_TensProd(&TP2, loc_plaq[r]); // the plaquette is computed in such a way that
+              times_equal_complex_TensProd(&TP2, GC->loc_plaq[r]); // the plaquette is computed in such a way that
                                                                // here just "r" is needed
               plus_equal_TensProd(&(GC->ml_polyplaq_tmp[level][r]), &TP2);
 
-              TensProd_init(&TP, &(loc_polyplaqconn[r]), &(loc_poly[r2]) );
+              TensProd_init(&TP, &(GC->loc_polyplaqconn[r]), &(GC->loc_poly[r2]) );
               plus_equal_TensProd(&(GC->ml_polyplaqconn_tmp[level][r]), &TP);
               }
             else
@@ -1465,13 +1358,6 @@ void multilevel_tube_conn_QbarQ(Gauge_Conf * GC,
               plus_equal_TensProd(&(GC->ml_polyplaqconn_tmp[level][r]), &TP);
               }
             }
-
-         free(loc_poly);
-         if(t_start==0)
-           {
-           free(loc_plaq);
-           free(loc_polyplaqconn);
-           }
          } // end of the for on "upd"
 
       // normalize polycorr_tmp[level], polyplaq_tmp[level] and ml_polyplaqconn_tmp[level]
@@ -1553,7 +1439,7 @@ void multilevel_tube_conn_QbarQ(Gauge_Conf * GC,
          // call higher levels
          for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
             {
-            multilevel_tube_disc_QbarQ(GC,
+            multilevel_tube_disc(GC,
                                        geo,
                                        param,
                                        t_start+i*param->d_ml_step[level+1],
