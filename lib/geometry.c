@@ -265,17 +265,17 @@ long cart_to_lex(int const * const cartcoord, GParam const * const param)
 
   ris=0;
   aux=1;
-  for(i=0; i<STDIM; i++)
+  for(i=STDIM-1; i>=0; i--)
      {
      ris+=cartcoord[i]*aux;
      aux*=param->d_size[i];
      }
 
-  // ris = cartcoord[0]
-  //      +cartcoord[1]*size[0]
-  //      +cartcoord[2]*size[0]*size[1]
+  // ris = cartcoord[STDIM-1] +
+  //      +cartcoord[STDIM-2]*size[STDIM-1]+
+  //      +cartcoord[STDIM-3]*size[STDIM-1]*size[STDIM-2]+
   //      +...
-  //      +cartcoord[STDIM-1]*size[0]*size[1]*...*size[STDIM-2]
+  //      +cartcoord[0]*size[STDIM-1]*size[STDIM-2]*...*size[1]
 
   return ris;
   }
@@ -287,18 +287,18 @@ void lex_to_cart(int *cartcoord, long lex, GParam const * const param)
   int i;
   long aux[STDIM];
 
-  aux[0]=1;
-  for(i=1; i<STDIM; i++)
+  aux[STDIM-1]=1;
+  for(i=STDIM-2; i>=0; i--)
      {
-     aux[i]=aux[i-1]*param->d_size[i-1];
+     aux[i]=aux[i+1]*param->d_size[i+1];
      }
-  // aux[0]=1
-  // aux[1]=size[0]
-  // aux[2]=size[0]*size[1]
+  // aux[STDIM-1] = 1
+  // aux[STDIM-2] = size[STDIM-1]
+  // aux[STDIM-3] = size[STDIM-1]*size[STDIM-2]
   // ...
-  // aux[STDIM-1]=size[0]*size[1]*...*size[STDIM-2]
+  // aux[0]       = size[STDIM-1]*size[STDIM-2]*...*size[1]
 
-  for(i=STDIM-1; i>=0; i--)
+  for(i=0; i<STDIM; i++)
      {
      cartcoord[i]=(int) (lex/aux[i]);
      lex-=aux[i]*cartcoord[i];
@@ -328,6 +328,7 @@ long cart_to_lexeo(int const * const cartcoord, GParam const * const param)
     {
     return (lex + param->d_volume)/2;
     }
+  // even sites are written first
   }
 
 
@@ -356,6 +357,8 @@ void lexeo_to_cart(int *cartcoord, long lexeo, GParam const * const param)
        }
     eo = eo % 2;
 
+    // this is to take care of the case d_volume is even but not
+    // all the lattice extents are even
     if( (eo == 0 && lexeo >= param->d_volume/2) ||
         (eo == 1 && lexeo < param->d_volume/2) )
       {
@@ -404,23 +407,24 @@ long lexeo_to_lex(long lexeo, GParam const * const param)
 long cartsp_to_lexsp(int const * const ccsp, GParam const * const param)
   {
   // the index for the spatial cartesian coord. goes from 0 to STDIM-2 hence ccsp[STDIM-1]
-
+  // cc   = t x1 x2 ... x_{STDIM-1}
+  // ccsp =   x1 x2     x_{STDIM-1}
   int i;
   long ris, aux;
 
   ris=0;
   aux=1;
-  for(i=0; i<STDIM-1; i++)
+  for(i=STDIM-2; i>=0; i--)
      {
      ris+=ccsp[i]*aux;
      aux*=param->d_size[i+1];
      }
 
-  // ris = ccsp[0]
-  //      +ccsp[1]*size[1]
-  //      +ccsp[2]*size[1]*size[2]
-  //      +...
-  //      +ccsp[STDIM-2]*size[1]*size[2]*...*size[STDIM-2]
+  // ris = ccsp[STDIM-2] +
+  //      +ccsp[STDIM-3]*size[STDIM-1]+
+  //      +ccsp[STDIM-4]*size[STDIM-1]*size[STDIM-2]+
+  //      +ccsp
+  //      +ccsp[0]*size[STDIM-1]*size[STDIM-2]*...*size[2]
 
   return ris;
   }
@@ -430,22 +434,24 @@ long cartsp_to_lexsp(int const * const ccsp, GParam const * const param)
 void lexsp_to_cartsp(int *ccsp, long lexsp, GParam const * const param)
   {
   // the index for the spatial cartesian coord. goes from 0 to STDIM-2 hence ccsp[STDIM-1]
+  // cc   = t x1 x2 ... x_{STDIM-1}
+  // ccsp =   x1 x2     x_{STDIM-1}
 
   int i;
   long aux[STDIM-1];
 
-  aux[0]=1;
-  for(i=1; i<STDIM-1; i++)
+  aux[STDIM-2]=1;
+  for(i=STDIM-3; i>=0; i--)
      {
-     aux[i]=aux[i-1]*param->d_size[i];
+     aux[i]=aux[i+1]*param->d_size[i+2];
      }
-  // aux[0]=1
-  // aux[1]=size[1]
-  // aux[2]=size[1]*size[2]
+  // aux[STDIM-2] = 1
+  // aux[STDIM-3] = size[STDIM-1]
+  // aux[STDIM-4] = size[STDIM-1]*size[STDIM-2]
   // ...
-  // aux[STDIM-2]=size[1]*size[2]*...*size[STDIM-2]
+  // aux[0]       = size[STDIM-1]*size[STDIM-2]*...*size[2]
 
-  for(i=STDIM-2; i>=0; i--)
+  for(i=0; i<STDIM-1; i++)
      {
      ccsp[i]=(int) (lexsp/aux[i]);
      lexsp-=aux[i]*ccsp[i];
