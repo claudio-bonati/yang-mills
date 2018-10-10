@@ -664,10 +664,16 @@ void update_with_trace_def(Gauge_Conf * GC,
                            GParam const * const param,
                            double *acc)
    {
-   long r, a;
+   int err, *a;
+   long r, asum;
    int j, dir, t;
 
-   a=0; // number of accepted metropolis updates
+   err=posix_memalign((void**)&a, (size_t)INT_ALIGN, (size_t) param->d_space_vol * sizeof(int));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
 
    // heatbath on spatial links
    for(dir=1; dir<STDIM; dir++)
@@ -706,7 +712,7 @@ void update_with_trace_def(Gauge_Conf * GC,
       for(r=0; r<(param->d_space_vol)/2; r++)
          {
          long r4=sisp_and_t_to_si(geo, r, t);
-         a+=metropolis_with_tracedef(GC, geo, param, r4, 0);
+         a[r]=metropolis_with_tracedef(GC, geo, param, r4, 0);
          }
 
       #ifdef OPENMP_MODE
@@ -715,11 +721,20 @@ void update_with_trace_def(Gauge_Conf * GC,
       for(r=(param->d_space_vol)/2; r<(param->d_space_vol); r++)
          {
          long r4=sisp_and_t_to_si(geo, r, t);
-         a+=metropolis_with_tracedef(GC, geo, param, r4, 0);
+         a[r]=metropolis_with_tracedef(GC, geo, param, r4, 0);
          }
       }
 
-   *acc=((double)a)*param->d_inv_vol;
+   asum=0;
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for reduction(+:asum) private(r)
+   #endif
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      asum+=(long)a[r];
+      }
+
+   *acc=((double)asum)*param->d_inv_vol;
 
    // overrelax spatial links
    for(dir=1; dir<STDIM; dir++)
@@ -759,6 +774,8 @@ void update_with_trace_def(Gauge_Conf * GC,
          unitarize(&(GC->lattice[r][dir]));
          }
       }
+
+   free(a);
 
    GC->update_index++;
    }
