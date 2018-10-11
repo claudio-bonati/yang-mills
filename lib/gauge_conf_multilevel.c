@@ -101,17 +101,20 @@ void slice_compute_clovers(Gauge_Conf const * const GC,
                            int t_start,
                            int dt)
   {
-  GAUGE_GROUP aux;
-  long r, rs;
-  int t, i, j;
+  long rs;
+  int t;
 
   for(t=t_start; t<t_start+dt; t++)
      {
      #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r, rs, i, j, aux)
+     #pragma omp parallel for num_threads(NTHREADS) private(t, rs)
      #endif
      for(rs=0; rs<param->d_space_vol; rs++)
         {
+        GAUGE_GROUP aux;
+        long r;
+        int i, j;
+
         r=sisp_and_t_to_si(geo, rs, t);
         for(i=0; i<4; i++)
            {
@@ -142,10 +145,14 @@ void slice_compute_clovers(Gauge_Conf const * const GC,
     }
 
   #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r, rs, i, j, aux)
+  #pragma omp parallel for num_threads(NTHREADS) private(t, rs)
   #endif
   for(rs=0; rs<param->d_space_vol; rs++)
      {
+     GAUGE_GROUP aux;
+     long r;
+     int i, j;
+
      r=sisp_and_t_to_si(geo, rs, t);
      for(i=0; i<4; i++)
         {
@@ -737,10 +744,10 @@ void multilevel_tube_disc(Gauge_Conf * GC,
       for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
          {
          multilevel_tube_disc(GC,
-                                    geo,
-                                    param,
-                                    t_start+i*param->d_ml_step[0],
-                                    param->d_ml_step[0]);
+                              geo,
+                              param,
+                              t_start+i*param->d_ml_step[0],
+                              param->d_ml_step[0]);
          }
       break;
       // end of the outermost level
