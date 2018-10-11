@@ -342,7 +342,7 @@ void unitarize_SuN(SuN * restrict A)
   {
   const double beta_aux=1.0e+20;
   double check;
-  SuN force, guess, guess_old, helper, helper2;
+  SuN force, guess, guess_old, helper, helper1, helper2;
 
   if(scheck_SuN(A)!=0)
     {
@@ -361,7 +361,8 @@ void unitarize_SuN(SuN * restrict A)
          // compute the check
          equal_SuN(&helper, &guess);
          minus_equal_SuN(&helper, &guess_old);
-         times_SuN(&helper2, &helper, &helper);
+         equal_SuN(&helper1, &helper);
+         times_SuN(&helper2, &helper, &helper1);
          check=sqrt(fabs(retr_SuN(&helper2))/(double) NCOLOR);
 
          //printf("aux: %g\n", check);

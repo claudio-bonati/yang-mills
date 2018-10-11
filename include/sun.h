@@ -386,8 +386,8 @@ inline void times_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
 
 // A=B*C
 inline void times_SuN(SuN * restrict A,
-               SuN const * const restrict B,
-               SuN const * const restrict C)
+                      SuN const * const restrict B,
+                      SuN const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)

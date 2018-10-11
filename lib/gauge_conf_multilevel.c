@@ -1128,10 +1128,6 @@ void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf *GC,
      long r4;
      GAUGE_GROUP matrix;
 
-     #ifdef DEBUG
-       long r4start;
-     #endif
-
      r4=sisp_and_t_to_si(geo, r, 0); // t=0 starting point
 
      multihit(GC, geo, param, r4, 0, num_hit, &matrix);
@@ -1139,66 +1135,43 @@ void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf *GC,
      equal(&(GC->loc_polyplaqconn[r]), &matrix);
 
      r4=nnp(geo, r4, 0); // now we are in the t=1 plane
+
      #ifdef DEBUG
-       r4start=r4;
+       long r4start=r4;
      #endif
 
-     if(param->d_dist_poly/2>=1)
-       {
-       times_equal(&(GC->loc_polyplaqconn[r]), &GC->lattice[r4][1]);
-       r4=nnp(geo, r4, 1);
+     // polyakov loop are separated along the "1" direction
+     for(j=0; j<param->d_dist_poly/2; j++)
+        {
+        times_equal(&(GC->loc_polyplaqconn[r]), &(GC->lattice[r4][1]));
+        r4=nnp(geo, r4, 1);
+        }
 
-       for(j=1; j<param->d_dist_poly/2; j++)
-          {
-          multihit(GC, geo, param, r4, 1, num_hit, &matrix);
-          times_equal(&(GC->loc_polyplaqconn[r]), &matrix);
-          r4=nnp(geo, r4, 1);
-          }
-       }
-
-     if(param->d_trasv_dist>=1)
-       {
-       times_equal(&(GC->loc_polyplaqconn[r]), &GC->lattice[r4][2]);
-       r4=nnp(geo, r4, 2);
-
-       for(j=1; j<param->d_trasv_dist; j++)
-          {
-          multihit(GC, geo, param, r4, 2, num_hit, &matrix);
-          times_equal(&(GC->loc_polyplaqconn[r]), &matrix);
-          r4=nnp(geo, r4, 2);
-          }
-       }
+     // the transverse direction is the "2" one
+     for(j=0; j<param->d_trasv_dist; j++)
+        {
+        times_equal(&(GC->loc_polyplaqconn[r]), &GC->lattice[r4][2]);
+        r4=nnp(geo, r4, 2);
+        }
 
      plaquettep_matrix(GC, geo, param, r4, param->d_plaq_dir[0], param->d_plaq_dir[1], &matrix);
 
      GC->loc_plaq[r]=retr(&matrix)+I*imtr(&matrix);
      times_equal(&(GC->loc_polyplaqconn[r]), &matrix);
 
-     if(param->d_trasv_dist>=1)
-       {
-       for(j=1; j<param->d_trasv_dist; j++)
-          {
-          r4=nnm(geo, r4, 2);
-          multihit(GC, geo, param, r4, 2, num_hit, &matrix);
-          times_equal_dag(&(GC->loc_polyplaqconn[r]), &matrix);
-          }
+     // the transverse direction is the "2" one
+     for(j=0; j<param->d_trasv_dist; j++)
+        {
+        r4=nnm(geo, r4, 2);
+        times_equal_dag(&(GC->loc_polyplaqconn[r]), &(GC->lattice[r4][2]));
+        }
 
-       r4=nnm(geo, r4, 2);
-       times_equal_dag(&(GC->loc_polyplaqconn[r]), &GC->lattice[r4][2]);
-       }
-
-     if(param->d_dist_poly/2>=1)
-       {
-       for(j=1; j<param->d_dist_poly/2; j++)
+       // polyakov loop are separated along the "1" direction
+       for(j=0; j<param->d_dist_poly/2; j++)
           {
           r4=nnm(geo, r4, 1);
-          multihit(GC, geo, param, r4, 1, num_hit, &matrix);
-          times_equal_dag(&(GC->loc_polyplaqconn[r]), &matrix);
+          times_equal_dag(&(GC->loc_polyplaqconn[r]), &(GC->lattice[r4][1]));
           }
-
-       r4=nnm(geo, r4, 1);
-       times_equal_dag(&(GC->loc_polyplaqconn[r]), &GC->lattice[r4][1]);
-       }
 
      #ifdef DEBUG
      if(r4start!=r4)
@@ -1213,7 +1186,7 @@ void compute_poly_polyplaq_and_polyplaqconn_on_slice1(Gauge_Conf *GC,
         multihit(GC, geo, param, r4, 0, num_hit, &matrix);
         times_equal(&(GC->loc_polyplaqconn[r]), &matrix);
         times_equal(&(GC->loc_poly[r]), &matrix);
-        r4=nnp(geo, r4, 1);
+        r4=nnp(geo, r4, 0);
         }
      }
   }
@@ -1447,10 +1420,10 @@ void multilevel_tube_conn(Gauge_Conf * GC,
          for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
             {
             multilevel_tube_disc(GC,
-                                       geo,
-                                       param,
-                                       t_start+i*param->d_ml_step[level+1],
-                                       param->d_ml_step[level+1]);
+                                 geo,
+                                 param,
+                                 t_start+i*param->d_ml_step[level+1],
+                                 param->d_ml_step[level+1]);
             }
 
          // update polycorr_tmp[level] with polycorr_ris[level+1]
