@@ -265,6 +265,26 @@ long cart_to_lex(int const * const cartcoord, GParam const * const param)
 
   ris=0;
   aux=1;
+  for(i=0; i<STDIM; i++)
+     {
+     ris+=cartcoord[i]*aux;
+     aux*=param->d_size[i];
+     }
+
+  // ris = cartcoord[0]
+  //      +cartcoord[1]*size[0]
+  //      +cartcoord[2]*size[0]*size[1]
+  //      +...
+  //      +cartcoord[STDIM-1]*size[0]*size[1]*...*size[STDIM-2]
+
+  return ris;
+
+  /*
+  int i;
+  long ris, aux;
+
+  ris=0;
+  aux=1;
   for(i=STDIM-1; i>=0; i--)
      {
      ris+=cartcoord[i]*aux;
@@ -278,12 +298,34 @@ long cart_to_lex(int const * const cartcoord, GParam const * const param)
   //      +cartcoord[0]*size[STDIM-1]*size[STDIM-2]*...*size[1]
 
   return ris;
+  */
   }
 
 
 // lexicographic index -> cartesian coordinates
 void lex_to_cart(int *cartcoord, long lex, GParam const * const param)
   {
+  int i;
+  long aux[STDIM];
+
+  aux[0]=1;
+  for(i=1; i<STDIM; i++)
+     {
+     aux[i]=aux[i-1]*param->d_size[i-1];
+     }
+  // aux[0]=1
+  // aux[1]=size[0]
+  // aux[2]=size[0]*size[1]
+  // ...
+  // aux[STDIM-1]=size[0]*size[1]*...*size[STDIM-2]
+
+  for(i=STDIM-1; i>=0; i--)
+     {
+     cartcoord[i]=(int) (lex/aux[i]);
+     lex-=aux[i]*cartcoord[i];
+     }
+
+  /*
   int i;
   long aux[STDIM];
 
@@ -303,6 +345,7 @@ void lex_to_cart(int *cartcoord, long lex, GParam const * const param)
      cartcoord[i]=(int) (lex/aux[i]);
      lex-=aux[i]*cartcoord[i];
      }
+  */
   }
 
 
@@ -414,6 +457,26 @@ long cartsp_to_lexsp(int const * const ccsp, GParam const * const param)
 
   ris=0;
   aux=1;
+  for(i=0; i<STDIM-1; i++)
+     {
+     ris+=ccsp[i]*aux;
+     aux*=param->d_size[i+1];
+     }
+
+  // ris = ccsp[0]
+  //      +ccsp[1]*size[1]
+  //      +ccsp[2]*size[1]*size[2]
+  //      +...
+  //      +ccsp[STDIM-2]*size[1]*size[2]*...*size[STDIM-2]
+
+  return ris;
+
+  /*
+  int i;
+  long ris, aux;
+
+  ris=0;
+  aux=1;
   for(i=STDIM-2; i>=0; i--)
      {
      ris+=ccsp[i]*aux;
@@ -427,6 +490,7 @@ long cartsp_to_lexsp(int const * const ccsp, GParam const * const param)
   //      +ccsp[0]*size[STDIM-1]*size[STDIM-2]*...*size[2]
 
   return ris;
+  */
   }
 
 
@@ -437,6 +501,27 @@ void lexsp_to_cartsp(int *ccsp, long lexsp, GParam const * const param)
   // cc   = t x1 x2 ... x_{STDIM-1}
   // ccsp =   x1 x2     x_{STDIM-1}
 
+  int i;
+  long aux[STDIM-1];
+
+  aux[0]=1;
+  for(i=1; i<STDIM-1; i++)
+     {
+     aux[i]=aux[i-1]*param->d_size[i];
+     }
+  // aux[0]=1
+  // aux[1]=size[1]
+  // aux[2]=size[1]*size[2]
+  // ...
+  // aux[STDIM-2]=size[1]*size[2]*...*size[STDIM-2]
+
+  for(i=STDIM-2; i>=0; i--)
+     {
+     ccsp[i]=(int) (lexsp/aux[i]);
+     lexsp-=aux[i]*ccsp[i];
+     }
+
+  /*
   int i;
   long aux[STDIM-1];
 
@@ -456,6 +541,7 @@ void lexsp_to_cartsp(int *ccsp, long lexsp, GParam const * const param)
      ccsp[i]=(int) (lexsp/aux[i]);
      lexsp-=aux[i]*ccsp[i];
      }
+  */
   }
 
 
