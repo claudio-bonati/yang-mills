@@ -620,7 +620,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
   free(poly_array);
   }
 
-/*
+
 // to optimize the multilevel
 void optimize_multilevel_polycorr(Gauge_Conf *GC,
                                   Geometry const * const geo,
@@ -643,20 +643,32 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
    fprintf(datafilep, "the smaller the value the better the update\n");
 
    multilevel_polycorr(GC,
-                        geo,
-                        param,
-                        0,
-                        param->d_size[0]);
+                       geo,
+                       param,
+                       param->d_size[0]);
 
-   // polyakov loop correlator
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      int j;
+      for(j=1; j<param->d_size[0]/param->d_ml_step[0]; j++)
+         {
+         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][j][r]) );
+         }
+      }
+
+   // averages
    poly_average=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]))+I*imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
       poly_average+=cabs(poly_array[r]);
       }
    poly_average*=param->d_inv_space_vol;
 
+   // fluctuations
    poly_std=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
@@ -665,12 +677,12 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
    poly_std*=param->d_inv_space_vol;
    poly_std*=param->d_inv_space_vol;
 
+   // normalizations
    poly_average*=poly_average;
    for(i=0; i<NLEVELS; i++)
       {
       poly_average*=(double) param->d_ml_upd[i];
       }
-
    for(i=0; i<NLEVELS; i++)
       {
       poly_std*=(double) param->d_ml_upd[i];
@@ -682,18 +694,17 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
       }
    fprintf(datafilep, "\n");
-
    fflush(datafilep);
 
    free(poly_array);
    }
-*/
+
 
 // perform the computation of the polyakov loop correlator with the multilevel algorithm
 void perform_measures_polycorr(Gauge_Conf *GC,
-                                Geometry const * const geo,
-                                GParam const * const param,
-                                FILE *datafilep)
+                               Geometry const * const geo,
+                               GParam const * const param,
+                               FILE *datafilep)
    {
    #ifndef OPT_MULTIHIT
    #ifndef OPT_MULTILEVEL
@@ -704,7 +715,6 @@ void perform_measures_polycorr(Gauge_Conf *GC,
                 geo,
                 param,
                 param->d_size[0]);
-
 
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -729,7 +739,7 @@ void perform_measures_polycorr(Gauge_Conf *GC,
      fflush(datafilep);
    #endif
    #endif
-/*
+
    #ifdef OPT_MULTIHIT
      optimize_multihit_polycorr(GC, geo, param, datafilep);
    #endif
@@ -737,7 +747,6 @@ void perform_measures_polycorr(Gauge_Conf *GC,
    #ifdef OPT_MULTILEVEL
      optimize_multilevel_polycorr(GC, geo, param, datafilep);
    #endif
-*/
    }
 
 /*
