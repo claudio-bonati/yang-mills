@@ -139,18 +139,19 @@ void compute_clovers(Gauge_Conf const * const GC,
                      GParam const * const param,
                      int dir)
   {
-  GAUGE_GROUP aux;
   long r;
-  int i, j;
 
   #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r, i, j, aux)
+  #pragma omp parallel for num_threads(NTHREADS) private(r)
   #endif
   for(r=0; r<param->d_volume; r++)
      {
-     for(i=0; i<4; i++)
+     GAUGE_GROUP aux;
+     int i, j;
+
+     for(i=0; i<STDIM; i++)
         {
-        for(j=i+1; j<4; j++)
+        for(j=i+1; j<STDIM; j++)
            {
            if(i!=dir && j!=dir)
              {

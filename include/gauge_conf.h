@@ -20,14 +20,13 @@
 typedef struct Gauge_Conf {
   long update_index;
 
-  GAUGE_GROUP **lattice;       // [volume][4]
-  GAUGE_GROUP ***clover_array; // [volume][4][4]
+  GAUGE_GROUP **lattice;       // [volume] [STDIM]
+  GAUGE_GROUP ***clover_array; // [volume] [STDIM] [STDIM]
 
   // for computing the polyakov loop correlator with multilevel
-  TensProd **ml_polycorr_ris;    // [NLEVELS][space_vol]
-  TensProd **ml_polycorr_tmp;    // [NLEVELS][space_vol]
-  GAUGE_GROUP *loc_poly;         // [space_vol] auxilliary vector to be used in the multilevel
-
+  TensProd ***ml_polycorr;   // [NLEVELS] [d_size[0]/d_ml_step[i]] [space_vol]
+  GAUGE_GROUP **loc_poly;        // [d_size[0]/d_ml_step[NLEVELS-1]] [space_vol] auxilliary vector to be used in the multilevel
+/*
   // for the disconnected correlator for string width
   TensProd **ml_polyplaq_ris;   // [NLEVELS][space_vol]
   TensProd **ml_polyplaq_tmp;   // [NLEVELS][space_vol]
@@ -37,6 +36,7 @@ typedef struct Gauge_Conf {
   TensProd **ml_polyplaqconn_ris;   // [NLEVELS][space_vol]
   TensProd **ml_polyplaqconn_tmp;   // [NLEVELS][space_vol]
   GAUGE_GROUP *loc_polyplaqconn;    // [space_vol] auxilliary vector to be used in the multilevel
+*/
   } Gauge_Conf;
 
 
@@ -62,8 +62,10 @@ void compute_md5sum(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                     GParam const * const param);
 
 void alloc_polycorr_stuff(Gauge_Conf *GC,
-                           GParam const * const param);
-void free_polycorr_stuff(Gauge_Conf *GC);
+                          GParam const * const param);
+void free_polycorr_stuff(Gauge_Conf *GC,
+                         GParam const * const param);
+/*
 void write_polycorr_on_file(Gauge_Conf const * const GC,
                             GParam const * const param,
                             int tstart,
@@ -94,6 +96,7 @@ void compute_md5sum_polycorr_and_polyplaq(char *res,        // the lenght is 2*M
 void alloc_tube_conn_stuff(Gauge_Conf *GC,
                            GParam const * const param);
 void free_tube_conn_stuff(Gauge_Conf *GC);
+*/
 void alloc_clover_array(Gauge_Conf *GC,
                         GParam const * const param);
 void end_clover_array(Gauge_Conf *GC,
@@ -149,18 +152,22 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                GParam const * const param,
                                FILE *datafilep);
 
+
 void optimize_multihit_polycorr(Gauge_Conf *GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        FILE *datafilep);
+/*
 void optimize_multilevel_polycorr(Gauge_Conf *GC,
                                   Geometry const * const geo,
                                   GParam const * const param,
                                   FILE *datafilep);
+*/
 void perform_measures_polycorr(Gauge_Conf * GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
                                 FILE *datafilep);
+/*
 void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
                                        GParam const * const param,
                                        FILE *datafilep);
@@ -178,7 +185,7 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
                                 FILE *datafilep);
-
+*/
 
 // in gauge_conf_multilevel.c
 void multihit(Gauge_Conf const * const GC,
@@ -190,25 +197,16 @@ void multihit(Gauge_Conf const * const GC,
               GAUGE_GROUP *G);
 void compute_local_poly(Gauge_Conf *GC,
                         Geometry const * const geo,
-                        GParam const * const param,
-                        int t_start,
-                        int dt);
-void slice_compute_clovers(Gauge_Conf const * const GC,
+                        GParam const * const param);
+void update_for_multilevel(Gauge_Conf * GC,
                            Geometry const * const geo,
                            GParam const * const param,
-                           int dir,
-                           int t_start,
-                           int dt);
-void slice_single_update(Gauge_Conf *GC,
-                         Geometry const * const geo,
-                         GParam const * const param,
-                         int t_start,
-                         int dt);
+                           int level);
 void multilevel_polycorr(Gauge_Conf *GC,
                           Geometry const * const geo,
                           GParam const * const param,
-                          int t_start,
                           int dt);
+/*
 void multilevel_potlycorr_long(Gauge_Conf * GC,
                                Geometry const * const geo,
                                GParam const * const param,
@@ -237,7 +235,7 @@ void multilevel_tube_conn(Gauge_Conf * GC,
                           GParam const * const param,
                           int t_start,
                           int dt);
-
+*/
 
 // in gauge_conf_upd.c
 void calcstaples_wilson(Gauge_Conf const * const GC,

@@ -80,14 +80,15 @@ void real_main(char *in_file)
       write_conf_on_file_back(&GC, &param);
 
       // save ml polycorr arrays
-      write_polycorr_on_file(&GC, &param, 0, 0);
+/*      write_polycorr_on_file(&GC, &param, 0, 0); */
       }
     else // CONTINUATION OF PREVIOUS SIMULATION
       {
       int count, tstart, iteration;
 
       // read multilevel stuff
-      read_polycorr_from_file(&GC, &param, &tstart, &iteration);
+/*      read_polycorr_from_file(&GC, &param, &tstart, &iteration); */
+      tstart=0; /* to remove */
 
       if(tstart<0) // update the conf, no multilevel
         {
@@ -102,17 +103,18 @@ void real_main(char *in_file)
         write_conf_on_file_back(&GC, &param);
 
         // save multilevel stuff
-        write_polycorr_on_file(&GC, &param, 0, 0);
+/*        write_polycorr_on_file(&GC, &param, 0, 0);*/
         }
       else // tstart>=0, perform multilevel
         {
+/*
         multilevel_potlycorr_long(&GC,
                                   &geo,
                                   &param,
                                   tstart,
                                   param.d_ml_step[0],
                                   iteration);
-
+*/
         iteration+=1;
         if(iteration==param.d_ml_level0_repeat)
           {
@@ -123,13 +125,13 @@ void real_main(char *in_file)
         if(tstart==param.d_size[0])
           {
           // print the measure
-          perform_measures_potlycorr_long(&GC, &param, datafilep);
+/*          perform_measures_potlycorr_long(&GC, &param, datafilep); */
 
           tstart=-1; // next time the conf will be updated, no multilevel
           }
 
         // save multilevel stuff
-        write_polycorr_on_file(&GC, &param, tstart, iteration);
+/*        write_polycorr_on_file(&GC, &param, tstart, iteration); */
         }
       }
     time(&time2);
@@ -151,7 +153,7 @@ void real_main(char *in_file)
     free_gauge_conf(&GC, &param);
 
     // free ml_polycorr
-    free_polycorr_stuff(&GC);
+    free_polycorr_stuff(&GC, &param);
 
     // free geometry
     free_geometry(&geo, &param);

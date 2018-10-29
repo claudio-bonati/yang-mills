@@ -377,9 +377,9 @@ void compute_md5sum(char *res, Gauge_Conf const * const GC, GParam const * const
 void alloc_polycorr_stuff(Gauge_Conf *GC,
                            GParam const * const param)
   {
-  int i, err;
+  int i, j, err;
 
-  err=posix_memalign((void**)&(GC->ml_polycorr_ris), (size_t) DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
+  err=posix_memalign((void**)&(GC->ml_polycorr), (size_t) DOUBLE_ALIGN, (size_t) NLEVELS * sizeof(TensProd **));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating ml_polycorr_ris (%s, %d)\n", __FILE__, __LINE__);
@@ -389,59 +389,72 @@ void alloc_polycorr_stuff(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)&(GC->ml_polycorr_ris[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
+       err=posix_memalign((void**)&(GC->ml_polycorr[i]), (size_t) DOUBLE_ALIGN, (size_t) (param->d_size[0] / param->d_ml_step[i]) * sizeof(TensProd *));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polycorr_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
-       }
-    }
-
-  err=posix_memalign((void**)&(GC->ml_polycorr_tmp), (size_t) DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
-  if(err!=0)
-    {
-    fprintf(stderr, "Problems in allocating ml_polycorr_tmp (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  else
-    {
-    for(i=0; i<NLEVELS; i++)
-       {
-       err=posix_memalign((void**)&(GC->ml_polycorr_tmp[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
-       if(err!=0)
+       else
          {
-         fprintf(stderr, "Problems in allocating ml_polycorr_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
-         exit(EXIT_FAILURE);
+         for(j=0; j<(param->d_size[0]/param->d_ml_step[i]); j++)
+            {
+            err=posix_memalign((void**)&(GC->ml_polycorr[i][j]), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(TensProd));
+            if(err!=0)
+              {
+              fprintf(stderr, "Problems in allocating ml_polycorr_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+              exit(EXIT_FAILURE);
+              }
+            }
          }
        }
     }
 
-  err=posix_memalign((void**)&(GC->loc_poly), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(GAUGE_GROUP));
+  err=posix_memalign((void**)&(GC->loc_poly), (size_t) DOUBLE_ALIGN, (size_t) (param->d_size[0]/param->d_ml_step[NLEVELS-1]) * sizeof(GAUGE_GROUP *));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating loc_poly (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  else
+    {
+    for(i=0; i<param->d_size[0]/param->d_ml_step[NLEVELS-1]; i++)
+       {
+       err=posix_memalign((void**)&(GC->loc_poly[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(GAUGE_GROUP));
+       if(err!=0)
+         {
+         fprintf(stderr, "Problems in allocating loc_poly (%s, %d)\n", __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       }
+    }
   }
 
 
 // free the ml_polycorr arrays and related stuff
-void free_polycorr_stuff(Gauge_Conf *GC)
+void free_polycorr_stuff(Gauge_Conf *GC,
+                         GParam const * const param)
   {
-  int i;
+  int i, j;
 
   for(i=0; i<NLEVELS; i++)
      {
-     free(GC->ml_polycorr_ris[i]);
-     free(GC->ml_polycorr_tmp[i]);
+     for(j=0; j<(param->d_size[0]/param->d_ml_step[i]); j++)
+        {
+        free(GC->ml_polycorr[i][j]);
+        }
+     free(GC->ml_polycorr[i]);
      }
-  free(GC->ml_polycorr_ris);
-  free(GC->ml_polycorr_tmp);
+  free(GC->ml_polycorr);
+
+  for(i=0; i<param->d_size[0]/param->d_ml_step[NLEVELS-1]; i++)
+     {
+     free(GC->loc_poly[i]);
+     }
   free(GC->loc_poly);
   }
 
-
+/*
 // save ml_polycorr[0] arrays on file
 void write_polycorr_on_file(Gauge_Conf const * const GC,
                            GParam const * const param,
@@ -1031,7 +1044,7 @@ void free_tube_conn_stuff(Gauge_Conf *GC)
   free(GC->ml_polyplaqconn_tmp);
   free(GC->loc_polyplaqconn);
   }
-
+*/
 
 // allocate the clovers arrays
 void alloc_clover_array(Gauge_Conf *GC,
@@ -1050,15 +1063,15 @@ void alloc_clover_array(Gauge_Conf *GC,
     {
     for(r=0; r<param->d_volume; r++)
        {
-       err=posix_memalign((void**)&(GC->clover_array[r]), (size_t)DOUBLE_ALIGN, 4*sizeof(GAUGE_GROUP *));
+       err=posix_memalign((void**)&(GC->clover_array[r]), (size_t)DOUBLE_ALIGN, STDIM*sizeof(GAUGE_GROUP *));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating clovers[%ld] (%s, %d)\n", r, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
-       for(i=0; i<4; i++)
+       for(i=0; i<STDIM; i++)
           {
-          err=posix_memalign((void**)&(GC->clover_array[r][i]), (size_t)DOUBLE_ALIGN, 4*sizeof(GAUGE_GROUP));
+          err=posix_memalign((void**)&(GC->clover_array[r][i]), (size_t)DOUBLE_ALIGN, STDIM*sizeof(GAUGE_GROUP));
           if(err!=0)
             {
             fprintf(stderr, "Problems in allocating clovers[%ld][%d] (%s, %d)\n", r, i, __FILE__, __LINE__);
@@ -1079,7 +1092,7 @@ void end_clover_array(Gauge_Conf *GC,
 
   for(r=0; r<param->d_volume; r++)
      {
-     for(i=0; i<4; i++)
+     for(i=0; i<STDIM; i++)
         {
         free(GC->clover_array[r][i]);
         }

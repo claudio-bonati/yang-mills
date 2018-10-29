@@ -553,6 +553,10 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
     exit(EXIT_FAILURE);
     }
 
+  #ifdef THETA_MODE
+   compute_clovers(GC, geo, param, 0);
+  #endif
+
   fprintf(datafilep, "Multihit optimization: \n");
   for(mh=1; mh<max_hit; mh++)
      {
@@ -616,7 +620,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
   free(poly_array);
   }
 
-
+/*
 // to optimize the multilevel
 void optimize_multilevel_polycorr(Gauge_Conf *GC,
                                   Geometry const * const geo,
@@ -683,7 +687,7 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
 
    free(poly_array);
    }
-
+*/
 
 // perform the computation of the polyakov loop correlator with the multilevel algorithm
 void perform_measures_polycorr(Gauge_Conf *GC,
@@ -699,13 +703,25 @@ void perform_measures_polycorr(Gauge_Conf *GC,
      multilevel_polycorr(GC,
                 geo,
                 param,
-                0,
                 param->d_size[0]);
+
+
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r)
+     #endif
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        int i;
+        for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+           {
+           times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
+           }
+        }
 
      ris=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
-        ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+        ris+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
         }
      ris*=param->d_inv_space_vol;
 
@@ -713,7 +729,7 @@ void perform_measures_polycorr(Gauge_Conf *GC,
      fflush(datafilep);
    #endif
    #endif
-
+/*
    #ifdef OPT_MULTIHIT
      optimize_multihit_polycorr(GC, geo, param, datafilep);
    #endif
@@ -721,9 +737,10 @@ void perform_measures_polycorr(Gauge_Conf *GC,
    #ifdef OPT_MULTILEVEL
      optimize_multilevel_polycorr(GC, geo, param, datafilep);
    #endif
+*/
    }
 
-
+/*
 // to optimize the multilevel
 void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
                                        GParam const * const param,
@@ -945,6 +962,6 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
 
    fflush(datafilep);
    }
-
+*/
 
 #endif

@@ -109,7 +109,7 @@ void real_main(char *in_file)
     free_gauge_conf(&GC, &param);
 
     // free ml_polycorr
-    free_polycorr_stuff(&GC);
+    free_polycorr_stuff(&GC, &param);
 
     // free geometry
     free_geometry(&geo, &param);

@@ -30,7 +30,12 @@ void multihit(Gauge_Conf const * const GC,
 
     zero(G);
     equal(&partial, &(GC->lattice[r][dir]));
-    calcstaples_wilson(GC, geo, param, r, dir, &staple);
+    #ifndef THETA_MODE
+      calcstaples_wilson(GC, geo, param, r, dir, &staple);
+    #else
+      // compute_clovers in direction "dir" HAS TO BE CALLED BEFORE!
+      calcstaples_with_topo(GC, geo, param, r, dir, &staple);
+    #endif
 
     for(i=0; i<num_hit; i++)
        {
@@ -51,12 +56,10 @@ void multihit(Gauge_Conf const * const GC,
 // compute polyakov loop on a single slice
 void compute_local_poly(Gauge_Conf *GC,
                         Geometry const * const geo,
-                        GParam const * const param,
-                        int t_start,
-                        int dt)
+                        GParam const * const param)
   {
   int num_hit;
-  long r;
+  long raux;
 
   if(param->d_dist_poly>1 && param->d_size[1]-param->d_dist_poly>1) // Polyakov loops are separated along the "1" direction
     {
@@ -67,254 +70,162 @@ void compute_local_poly(Gauge_Conf *GC,
     num_hit=0;
     }
 
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r)
+  #ifdef THETA_MODE
+  // clovers are eventually needed by the multihit
+  compute_clovers(GC, geo, param, 0);
   #endif
-  for(r=0; r<param->d_space_vol; r++)
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(aux)
+  #endif
+  for(raux=0; raux<(param->d_space_vol*param->d_size[0]/param->d_ml_step[NLEVELS-1]); raux++)
      {
-     int i;
+     int i, t;
      GAUGE_GROUP matrix;
 
-     one(&(GC->loc_poly[r]));
-     for(i=0; i<dt; i++)
+     const long r = raux/(param->d_size[0]/param->d_ml_step[NLEVELS-1]);
+     const int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[NLEVELS-1]) );
+
+     one(&(GC->loc_poly[slice][r]));
+     for(i=0; i<param->d_ml_step[NLEVELS-1]; i++)
         {
+        t=slice*(param->d_ml_step[NLEVELS-1])+i;
         multihit(GC,
                  geo,
                  param,
-                 sisp_and_t_to_si(geo, r, t_start+i),
+                 sisp_and_t_to_si(geo, r, t),
                  0,
                  num_hit,
                  &matrix);
-        times_equal(&(GC->loc_poly[r]), &matrix);
+        times_equal(&(GC->loc_poly[slice][r]), &matrix);
         }
      }
   }
 
 
-// compute the clovers needed to update a slice
-// note that for t=t_start only temporal links are updated, thus
-// we do not need clovers at t=t_start-1, while we do need those at t=t_start+dt
-void slice_compute_clovers(Gauge_Conf const * const GC,
+// perform a complete update on the given level
+void update_for_multilevel(Gauge_Conf * GC,
                            Geometry const * const geo,
                            GParam const * const param,
-                           int dir,
-                           int t_start,
-                           int dt)
-  {
-  long rs;
-  int t;
-
-  for(t=t_start; t<t_start+dt; t++)
-     {
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(t, rs)
-     #endif
-     for(rs=0; rs<param->d_space_vol; rs++)
+                           int level)
+   {
+   for(int i=0; i<STDIM; i++)
+      {
+      if(param->d_size[i]==1)
         {
-        GAUGE_GROUP aux;
-        long r;
-        int i, j;
+        fprintf(stderr, "Error: this functon can not be used in the completely reduced case (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
+      }
 
-        r=sisp_and_t_to_si(geo, rs, t);
-        for(i=0; i<4; i++)
+   long r;
+   int j, dir;
+
+   // heatbath
+   for(dir=0; dir<STDIM; dir++)
+      {
+      #ifdef THETA_MODE
+      compute_clovers(GC, geo, param, dir);
+      #endif
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<(param->d_volume)/2; r++)
+         {
+         int t;
+         long int rsp;
+
+         si_to_sisp_and_t(&rsp, &t, geo, r);
+         if(t % param->d_ml_step[level]!=0 || dir==0)
            {
-           for(j=i+1; j<4; j++)
+           heatbath(GC, geo, param, r, dir);
+           }
+         }
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         {
+         int t;
+         long int rsp;
+
+         si_to_sisp_and_t(&rsp, &t, geo, r);
+         if(t % param->d_ml_step[level]!=0 || dir==0)
+           {
+           heatbath(GC, geo, param, r, dir);
+           }
+         }
+      }
+
+   // overrelax
+   for(dir=0; dir<STDIM; dir++)
+      {
+      #ifdef THETA_MODE
+      compute_clovers(GC, geo, param, dir);
+      #endif
+
+      for(j=0; j<param->d_overrelax; j++)
+         {
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #endif
+         for(r=0; r<(param->d_volume)/2; r++)
+            {
+            int t;
+            long int rsp;
+
+            si_to_sisp_and_t(&rsp, &t, geo, r);
+            if(t % param->d_ml_step[level]!=0 || dir==0)
               {
-              if(i!=dir && j!=dir)
-                {
-                clover(GC, geo, param, r, i, j, &aux);
-
-                equal(&(GC->clover_array[r][i][j]), &aux);
-                minus_equal_dag(&(GC->clover_array[r][i][j]), &aux);  // clover_array[r][i][j]=aux-aux^{dag}
-
-                equal(&(GC->clover_array[r][j][i]), &(GC->clover_array[r][i][j]));
-                times_equal_real(&(GC->clover_array[r][j][i]), -1.0); // clover_array[r][j][i]=-clover_array[r][i][j]
-                }
+              overrelaxation(GC, geo, param, r, dir);
               }
-           }
-        }
-     }
+            }
 
-  if(t_start+dt<param->d_size[0])
-    {
-    t=t_start+dt;
-    }
-  else
-    {
-    t=0;
-    }
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #endif
+         for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+            {
+            int t;
+            long int rsp;
 
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(t, rs)
-  #endif
-  for(rs=0; rs<param->d_space_vol; rs++)
-     {
-     GAUGE_GROUP aux;
-     long r;
-     int i, j;
-
-     r=sisp_and_t_to_si(geo, rs, t);
-     for(i=0; i<4; i++)
-        {
-        for(j=i+1; j<4; j++)
-           {
-           if(i!=dir && j!=dir)
-             {
-             clover(GC, geo, param, r, i, j, &aux);
-
-             equal(&(GC->clover_array[r][i][j]), &aux);
-             minus_equal_dag(&(GC->clover_array[r][i][j]), &aux);  // clover_array[r][i][j]=aux-aux^{dag}
-
-             equal(&(GC->clover_array[r][j][i]), &(GC->clover_array[r][i][j]));
-             times_equal_real(&(GC->clover_array[r][j][i]), -1.0); // clover_array[r][j][i]=-clover_array[r][i][j]
-             }
-           }
-        }
-     }
-  }
-
-
-// single update of a slice
-void slice_single_update(Gauge_Conf * GC,
-                         Geometry const * const geo,
-                         GParam const * const param,
-                         int t_start,
-                         int dt)
-  {
-  long r;
-  int i, dir, upd_over;
-
-  // heatbath
-  #ifdef THETA_MODE
-    slice_compute_clovers(GC, geo, param, 0, t_start, 1);
-  #endif
-
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r)
-  #endif
-  for(r=0; r<param->d_space_vol/2; r++)
-     {
-     heatbath(GC, geo, param, sisp_and_t_to_si(geo, r, t_start), 0);
-     }
-
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r)
-  #endif
-  for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
-     {
-     heatbath(GC, geo, param, sisp_and_t_to_si(geo, r, t_start), 0);
-     }
-
-  for(dir=0; dir<STDIM; dir++)
-     {
-     #ifdef THETA_MODE
-       slice_compute_clovers(GC, geo, param, dir, t_start, dt);
-     #endif
-
-     for(i=1; i<dt; i++)
-        {
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r)
-        #endif
-        for(r=0; r<param->d_space_vol/2; r++)
-           {
-           heatbath(GC, geo, param, sisp_and_t_to_si(geo, r, t_start+i), dir);
-           }
-
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r)
-        #endif
-        for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
-           {
-           heatbath(GC, geo, param, sisp_and_t_to_si(geo, r, t_start+i), dir);
-           }
-        }
-     }
-
-  // overrelaxation
-  for(upd_over=0; upd_over<param->d_overrelax; upd_over++)
-     {
-     #ifdef THETA_MODE
-       slice_compute_clovers(GC, geo, param, 0, t_start, 1);
-     #endif
-
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r)
-     #endif
-     for(r=0; r<param->d_space_vol/2; r++)
-        {
-        overrelaxation(GC, geo, param, sisp_and_t_to_si(geo, r, t_start), 0);
-        }
-
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r)
-     #endif
-     for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
-        {
-        overrelaxation(GC, geo, param, sisp_and_t_to_si(geo, r, t_start), 0);
-        }
-
-     for(dir=0; dir<STDIM; dir++)
-        {
-        #ifdef THETA_MODE
-          slice_compute_clovers(GC, geo, param, dir, t_start, dt);
-        #endif
-
-        for(i=1; i<dt; i++)
-           {
-           #ifdef OPENMP_MODE
-           #pragma omp parallel for num_threads(NTHREADS) private(r)
-           #endif
-           for(r=0; r<param->d_space_vol/2; r++)
+            si_to_sisp_and_t(&rsp, &t, geo, r);
+            if(t % param->d_ml_step[level]!=0 || dir==0)
               {
-              overrelaxation(GC, geo, param, sisp_and_t_to_si(geo, r, t_start+i), dir);
+              overrelaxation(GC, geo, param, r, dir);
               }
+            }
+         }
+      }
 
-           #ifdef OPENMP_MODE
-           #pragma omp parallel for num_threads(NTHREADS) private(r)
-           #endif
-           for(r=param->d_space_vol/2; r<param->d_space_vol; r++)
-              {
-              overrelaxation(GC, geo, param, sisp_and_t_to_si(geo, r, t_start+i), dir);
-              }
-           }
-        }
-     }
+   // final unitarization
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      for(dir=0; dir<STDIM; dir++)
+         {
+         unitarize(&(GC->lattice[r][dir]));
+         }
+      }
+   }
 
-  // unitarize
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r)
-  #endif
-  for(r=0; r<param->d_space_vol; r++)
-     {
-     unitarize( &(GC->lattice[sisp_and_t_to_si(geo, r, t_start)][0]) );
-     }
 
-  for(i=1; i<dt; i++)
-     {
-     for(dir=0; dir<STDIM; dir++)
-        {
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r)
-        #endif
-        for(r=0; r<param->d_space_vol; r++) unitarize( &(GC->lattice[sisp_and_t_to_si(geo, r, t_start+i)][dir]) );
-        }
-     }
-  }
 
 
 // multilevel for polyakov correlator
 void multilevel_polycorr(Gauge_Conf * GC,
-                          Geometry const * const geo,
-                          GParam const * const param,
-                          int t_start,
-                          int dt)
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         int dt)
   {
-  int i, upd;
-  long int r;
-  int level;
+  int upd, level;
+  long int raux;
 
-  // remember that d_ml_step[0]>d_ml_step[1]> d_ml_step[2] ...
+  // remember that d_size[0] >= d_ml_step[0]>d_ml_step[1]> d_ml_step[2] ...
 
   level=-2;
   // determine the level to be used
@@ -340,27 +251,28 @@ void multilevel_polycorr(Gauge_Conf * GC,
       }
     }
 
+
   switch(level)
     {
     case -1 :     // LEVEL -1, do not average
-      // initialyze ml_polycorr_ris[0] to 1
+
+      // initialyze ml_polycorr_ris[0] to 0
       #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #pragma omp parallel for num_threads(NTHREADS) private(raux)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
          {
-         one_TensProd(&(GC->ml_polycorr_ris[0][r]));
+         long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+         int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+         zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
          }
 
       // call lower levels
-      for(i=0; i<(param->d_size[0])/(param->d_ml_step[0]); i++)
-         {
-         multilevel_polycorr(GC,
-                              geo,
-                              param,
-                              t_start+i*param->d_ml_step[0],
-                              param->d_ml_step[0]);
-         }
+      multilevel_polycorr(GC,
+                          geo,
+                          param,
+                          param->d_ml_step[0]);
+
       break;
       // end of the outermost level
 
@@ -370,43 +282,39 @@ void multilevel_polycorr(Gauge_Conf * GC,
       // in case level -1 is never used
       if(level==0 && param->d_size[0]==param->d_ml_step[0])
         {
-        // initialyze ml_polycorr_ris[0] to 1
-        #ifdef openmp_mode
-        #pragma omp parallel for num_threads(nthreads) private(r)
+        // initialyze ml_polycorr_ris[0] to 0
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(nthreads) private(raux)
         #endif
-        for(r=0; r<param->d_space_vol; r++)
+        for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
            {
-           one_TensProd(&(GC->ml_polycorr_ris[0][r]));
+           long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+           int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+           zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
            }
         }
-
-      // initialize ml_polycorr_tmp[level] to 0
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
-         }
 
       // perform the update
       for(upd=0; upd< param->d_ml_upd[level]; upd++)
          {
-         slice_single_update(GC, geo, param, t_start, dt);
+         update_for_multilevel(GC, geo, param, level);
 
          // compute Polyakov loop restricted to the slice
-         compute_local_poly(GC, geo, param, t_start, dt);
+         compute_local_poly(GC, geo, param);
 
          // compute the tensor products
          // and update ml_polycorr_tmp[level]
          #ifdef OPENMP_MODE
-         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #pragma omp parallel for num_threads(NTHREADS) private(raux)
          #endif
-         for(r=0; r<param->d_space_vol; r++)
+         for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level]; raux++)
             {
             TensProd TP;
             long r1, r2;
             int j, t_tmp;
+
+            long r = raux/(param->d_size[0]/param->d_ml_step[level]);
+            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
 
             r1=sisp_and_t_to_si(geo, r, 0);
             for(j=0; j<param->d_dist_poly; j++)
@@ -415,27 +323,21 @@ void multilevel_polycorr(Gauge_Conf * GC,
                }
             si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
 
-            TensProd_init(&TP, &(GC->loc_poly[r]), &(GC->loc_poly[r2]) );
-            plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &TP);
+            TensProd_init(&TP, &(GC->loc_poly[slice][r]), &(GC->loc_poly[slice][r2]) );
+            plus_equal_TensProd(&(GC->ml_polycorr[level][slice][r]), &TP);
             }
+
         } // end of update
 
-      // normalize polycorr_tmp
+      // normalize polycorr
       #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #pragma omp parallel for num_threads(NTHREADS) private(raux)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level]; raux++)
          {
-         times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
-         }
-
-      // update polycorr_ris
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
+         long r = raux/(param->d_size[0]/param->d_ml_step[level]);
+         int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+         times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
          }
 
       break;
@@ -453,83 +355,101 @@ void multilevel_polycorr(Gauge_Conf * GC,
       // in case level -1 is never used
       if(level==0 && param->d_size[0]==param->d_ml_step[0])
         {
-        // initialyze ml_polycorr_ris[0] to 1
+        // initialyze ml_polycorr[0] to 0
         #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r)
+        #pragma omp parallel for num_threads(nthreads) private(raux)
         #endif
-        for(r=0; r<param->d_space_vol; r++)
+        for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
            {
-           one_TensProd(&(GC->ml_polycorr_ris[0][r]));
+           long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+           int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+           zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
            }
         }
-
-      // initialize ml_polycorr_tmp[level] to 0
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         zero_TensProd(&(GC->ml_polycorr_tmp[level][r]));
-         }
 
       // perform the update
       for(upd=0; upd< param->d_ml_upd[level]; upd++)
          {
-         slice_single_update(GC, geo, param, t_start, dt);
+         update_for_multilevel(GC, geo, param, level);
 
-         // initialyze ml_polycorr_ris[level+1] to 1
+         // initialyze ml_polycorr[level+1] to 0
          #ifdef OPENMP_MODE
-         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #pragma omp parallel for num_threads(nthreads) private(raux)
          #endif
-         for(r=0; r<param->d_space_vol; r++)
+         for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level+1]; raux++)
             {
-            one_TensProd(&(GC->ml_polycorr_ris[level+1][r]));
+            long r = raux/(param->d_size[0]/param->d_ml_step[level+1]);
+            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level+1]) );
+            zero_TensProd(&(GC->ml_polycorr[level+1][slice][r]));
             }
 
          // call higher levels
-         for(i=0; i<(param->d_ml_step[level])/(param->d_ml_step[level+1]); i++)
-            {
-            multilevel_polycorr(GC,
-                                 geo,
-                                 param,
-                                 t_start+i*param->d_ml_step[level+1],
-                                 param->d_ml_step[level+1]);
-            }
+         multilevel_polycorr(GC,
+                             geo,
+                             param,
+                             param->d_ml_step[level+1]);
 
-         // update polycorr_tmp[level] with polycorr_ris[level+1]
+         // update polycorr[level] with polycorr[level+1]
          #ifdef OPENMP_MODE
-         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #pragma omp parallel for num_threads(NTHREADS) private(raux)
          #endif
-         for(r=0; r<param->d_space_vol; r++)
+         for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level]; raux++)
             {
-            plus_equal_TensProd(&(GC->ml_polycorr_tmp[level][r]), &(GC->ml_polycorr_ris[level+1][r]));
+            int j;
+            TensProd TP;
+
+            long r = raux/(param->d_size[0]/param->d_ml_step[level]);
+            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
+            one_TensProd(&TP);
+            for(j=0; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
+               {
+               times_equal_TensProd(&TP, &(GC->ml_polycorr[level+1][slice*param->d_ml_step[level]/param->d_ml_step[level+1]+j][r]));
+               }
+
+            plus_equal_TensProd(&(GC->ml_polycorr[level][slice][r]), &TP);
             }
 
          } // end of update
 
-      // normalize polycorr_tmp[level]
+      // normalize polycorr[level]
       #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #pragma omp parallel for num_threads(NTHREADS) private(raux)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level]; raux++)
          {
-         times_equal_real_TensProd(&(GC->ml_polycorr_tmp[level][r]), 1.0/(double) param->d_ml_upd[level]);
+         long r = raux/(param->d_size[0]/param->d_ml_step[level]);
+         int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+         times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
          }
 
-      // update polycorr_ris[level]
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProd(&(GC->ml_polycorr_ris[level][r]), &(GC->ml_polycorr_tmp[level][r]));
-         }
       break;
       // end of the not innermost not outermost level
 
     } // end of switch
+
   } // end of multilevel
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 
 // multilevel for polyakov orrelator to be used in long simulations
 void multilevel_potlycorr_long(Gauge_Conf * GC,
@@ -1467,7 +1387,7 @@ void multilevel_tube_conn(Gauge_Conf * GC,
     } // end of switch
   } // end of multilevel
 
-
+*/
 
 #endif
 
