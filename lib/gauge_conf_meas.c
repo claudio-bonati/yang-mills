@@ -749,7 +749,7 @@ void perform_measures_polycorr(Gauge_Conf *GC,
    #endif
    }
 
-/*
+
 // to optimize the multilevel
 void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
                                        GParam const * const param,
@@ -770,15 +770,28 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
    fprintf(datafilep, "Multilevel optimization: ");
    fprintf(datafilep, "the smaller the value the better the update\n");
 
-   // polyakov loop correlator
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      int i;
+      for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+         {
+         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
+         }
+      }
+
+   // average
    poly_average=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      poly_array[r]=retr_TensProd(&(GC->ml_polycorr_ris[0][r]))+I*imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
       poly_average+=cabs(poly_array[r]);
       }
    poly_average*=param->d_inv_space_vol;
 
+   // fluctuation
    poly_std=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
@@ -787,16 +800,19 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
    poly_std*=param->d_inv_space_vol;
    poly_std*=param->d_inv_space_vol;
 
+   // normalization
    poly_average*=poly_average;
    for(i=0; i<NLEVELS; i++)
       {
       poly_average*=(double) param->d_ml_upd[i];
       }
+   poly_average*=(double) param->d_ml_level0_repeat;
 
    for(i=0; i<NLEVELS; i++)
       {
       poly_std*=(double) param->d_ml_upd[i];
       }
+   poly_std*=(double) param->d_ml_level0_repeat;
 
    fprintf(datafilep, "%.12g  %.12g ", poly_average, poly_std);
    for(i=0; i<NLEVELS; i++)
@@ -810,7 +826,7 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
 
    free(poly_array);
    }
-*/
+
 
 // print the value of the polyakov loop correlator that has been computed by multilevel
 void perform_measures_polycorr_long(Gauge_Conf *GC,
