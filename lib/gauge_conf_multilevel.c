@@ -76,7 +76,7 @@ void compute_local_poly(Gauge_Conf *GC,
   #endif
 
   #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(aux)
+  #pragma omp parallel for num_threads(NTHREADS)
   #endif
   for(raux=0; raux<(param->d_space_vol*param->d_size[0]/param->d_ml_step[NLEVELS-1]); raux++)
      {
@@ -284,7 +284,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
         {
         // initialyze ml_polycorr_ris[0] to 0
         #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(nthreads) private(raux)
+        #pragma omp parallel for num_threads(NTHREADS) private(raux)
         #endif
         for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
            {
@@ -357,7 +357,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
         {
         // initialyze ml_polycorr[0] to 0
         #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(nthreads) private(raux)
+        #pragma omp parallel for num_threads(NTHREADS) private(raux)
         #endif
         for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
            {
@@ -374,7 +374,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
 
          // initialyze ml_polycorr[level+1] to 0
          #ifdef OPENMP_MODE
-         #pragma omp parallel for num_threads(nthreads) private(raux)
+         #pragma omp parallel for num_threads(NTHREADS) private(raux)
          #endif
          for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level+1]; raux++)
             {
