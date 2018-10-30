@@ -810,12 +810,12 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
 
    free(poly_array);
    }
-
+*/
 
 // print the value of the polyakov loop correlator that has been computed by multilevel
-void perform_measures_potlycorr_long(Gauge_Conf *GC,
-                                     GParam const * const param,
-                                     FILE *datafilep)
+void perform_measures_polycorr_long(Gauge_Conf *GC,
+                                    GParam const * const param,
+                                    FILE *datafilep)
    {
    #ifdef OPT_MULTILEVEL
       optimize_multilevel_polycorr_long(GC, param, datafilep);
@@ -823,10 +823,22 @@ void perform_measures_potlycorr_long(Gauge_Conf *GC,
      double ris;
      long r;
 
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r)
+     #endif
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        int i;
+        for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+           {
+           times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
+           }
+        }
+
      ris=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
-        ris+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+        ris+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
         }
      ris*=param->d_inv_space_vol;
 
@@ -835,7 +847,7 @@ void perform_measures_potlycorr_long(Gauge_Conf *GC,
    #endif
    }
 
-
+/*
 // perform the computation of the string width with the
 // disconnected correlator using the multilevel algorithm
 void perform_measures_tube_disc(Gauge_Conf *GC,
