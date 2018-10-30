@@ -382,7 +382,7 @@ void alloc_polycorr_stuff(Gauge_Conf *GC,
   err=posix_memalign((void**)&(GC->ml_polycorr), (size_t) DOUBLE_ALIGN, (size_t) NLEVELS * sizeof(TensProd **));
   if(err!=0)
     {
-    fprintf(stderr, "Problems in allocating ml_polycorr_ris (%s, %d)\n", __FILE__, __LINE__);
+    fprintf(stderr, "Problems in allocating ml_polycorr (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   else
@@ -392,7 +392,7 @@ void alloc_polycorr_stuff(Gauge_Conf *GC,
        err=posix_memalign((void**)&(GC->ml_polycorr[i]), (size_t) DOUBLE_ALIGN, (size_t) (param->d_size[0] / param->d_ml_step[i]) * sizeof(TensProd *));
        if(err!=0)
          {
-         fprintf(stderr, "Problems in allocating ml_polycorr_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+         fprintf(stderr, "Problems in allocating ml_polycorr[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
        else
@@ -402,7 +402,7 @@ void alloc_polycorr_stuff(Gauge_Conf *GC,
             err=posix_memalign((void**)&(GC->ml_polycorr[i][j]), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(TensProd));
             if(err!=0)
               {
-              fprintf(stderr, "Problems in allocating ml_polycorr_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+              fprintf(stderr, "Problems in allocating ml_polycorr[%d][%d] (%s, %d)\n", i, j, __FILE__, __LINE__);
               exit(EXIT_FAILURE);
               }
             }
@@ -628,50 +628,39 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
   #endif
   }
 
-/*
 
 // allocate the ml_polycorr, polyplaq arrays and related stuff
 void alloc_tube_disc_stuff(Gauge_Conf *GC,
-                                GParam const * const param)
+                           GParam const * const param)
   {
   int i, err;
 
   alloc_polycorr_stuff(GC, param);
 
-  err=posix_memalign((void**)&(GC->ml_polyplaq_ris), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
+  err=posix_memalign((void**)&(GC->ml_polyplaq), (size_t) DOUBLE_ALIGN, (size_t) NLEVELS * sizeof(TensProd **));
   if(err!=0)
     {
-    fprintf(stderr, "Problems in allocating ml_polyplaq_ris (%s, %d)\n", __FILE__, __LINE__);
+    fprintf(stderr, "Problems in allocating ml_polyplaq (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   else
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)&(GC->ml_polyplaq_ris[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
+       err=posix_memalign((void**)&(GC->ml_polyplaq[i]), (size_t) DOUBLE_ALIGN, (size_t) (param->d_size[0] / param->d_ml_step[i]) * sizeof(TensProd *));
        if(err!=0)
          {
-         fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+         fprintf(stderr, "Problems in allocating ml_polyplaq[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
          }
-       }
-    }
-
-  err=posix_memalign((void**)&(GC->ml_polyplaq_tmp), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
-  if(err!=0)
-    {
-    fprintf(stderr, "Problems in allocating ml_polyplaq_tmp (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  else
-    {
-    for(i=0; i<NLEVELS; i++)
-       {
-       err=posix_memalign((void**)&(GC->ml_polyplaq_tmp[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
-       if(err!=0)
+       else
          {
-         fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
-         exit(EXIT_FAILURE);
+         err=posix_memalign((void**)&(GC->ml_polyplaq[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(TensProd));
+         if(err!=0)
+           {
+           fprintf(stderr, "Problems in allocating ml_polyplaq[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+           exit(EXIT_FAILURE);
+           }
          }
        }
     }
@@ -685,276 +674,25 @@ void alloc_tube_disc_stuff(Gauge_Conf *GC,
   }
 
 
-// free the ml_polycorr arrays and relates stuff
-void free_tube_disc_stuff(Gauge_Conf *GC)
+// free the ml_polycorr, ml_polyplaq arrays and relates stuff
+void free_tube_disc_stuff(Gauge_Conf *GC,
+                          GParam const * const param)
   {
   int i;
 
-  free_polycorr_stuff(GC);
+  free_polycorr_stuff(GC, param);
 
   for(i=0; i<NLEVELS; i++)
      {
-     free(GC->ml_polyplaq_ris[i]);
-     free(GC->ml_polyplaq_tmp[i]);
+     free(GC->ml_polyplaq[i]);
      }
-  free(GC->ml_polyplaq_ris);
-  free(GC->ml_polyplaq_tmp);
+  free(GC->ml_polyplaq);
+
   free(GC->loc_plaq);
   }
 
 
-// save ml_polycorr[0] and ml_polyplaq[0] arrays on file
-void write_polycorr_and_polyplaq_on_file(Gauge_Conf const * const GC,
-                                         GParam const * const param,
-                                         int tstart,
-                                         int iteration)
-  {
-  long i;
-  #ifdef HASH_MODE
-    char md5sum[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum[2*STD_STRING_LENGTH+1]={0};
-  #endif
-  FILE *fp;
-
-  #ifdef HASH_MODE
-    compute_md5sum_polycorr_and_polyplaq(md5sum, GC, param);
-  #endif
-
-  fp=fopen(param->d_ml_file, "w"); // open the configuration file
-  if(fp==NULL)
-    {
-    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  else
-    {
-    fprintf(fp, "%ld %d %d %d %s\n",
-                param->d_space_vol,
-                STDIM,
-                tstart,
-                iteration,
-                md5sum);
-    }
-  fclose(fp);
-
-  fp=fopen(param->d_ml_file, "ab"); // open the configuration file in binary mode
-  if(fp==NULL)
-    {
-    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  else
-    {
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_ris[0][i]));
-       }
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_tmp[0][i]));
-       }
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_ris[0][i]));
-       }
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_tmp[0][i]));
-       }
-
-    fclose(fp);
-    }
-  }
-
-
-// read ml_polycorr[0] and ml_polyplaq[0] arrays from file
-void read_polycorr_and_polyplaq_from_file(Gauge_Conf const * const GC,
-                                          GParam const * const param,
-                                          int *tstart,
-                                          int *iteration)
-  {
-  long i, loc_space_vol;
-  int loc_stdim;
-  FILE *fp;
-  #ifdef HASH_MODE
-    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
-    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={0};
-  #endif
-
-  fp=fopen(param->d_ml_file, "r"); // open the multilevel file
-  if(fp==NULL)
-    {
-    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  else
-    {
-    i=fscanf(fp, "%ld %d %d %d %s\n", &loc_space_vol, &loc_stdim, tstart, iteration, md5sum_old);
-    if(i!=5)
-      {
-      fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
-      exit(EXIT_FAILURE);
-      }
-    if(loc_space_vol != param->d_space_vol)
-      {
-      fprintf(stderr, "Error: space_vol in the multilevel file %s is different from the one in the input (%s, %d)\n",
-              param->d_ml_file, __FILE__, __LINE__);
-      exit(EXIT_FAILURE);
-      }
-    if(loc_stdim != STDIM)
-      {
-      fprintf(stderr, "Error: STDIM in the multilevel file %s is different from the one in the input (%s, %d)\n",
-              param->d_ml_file, __FILE__, __LINE__);
-      exit(EXIT_FAILURE);
-      }
-    }
-  fclose(fp);
-
-  fp=fopen(param->d_ml_file, "rb"); // open the multilevel file in binary mode
-  if(fp==NULL)
-    {
-    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  else
-    {
-    // read again the header: loc_space_vol, loc_stdim,  tstart, iteration, hash
-    i=0;
-    while(i!='\n')
-         {
-         i=fgetc(fp);
-         }
-
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_ris[0][i]));
-       }
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr_tmp[0][i]));
-       }
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_ris[0][i]));
-       }
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq_tmp[0][i]));
-       }
-
-    fclose(fp);
-    }
-
-  #ifdef HASH_MODE
-    // compute the new md5sum and check for consistency
-    compute_md5sum_polycorr_and_polyplaq(md5sum_new, GC, param);
-    if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
-      {
-      fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
-      exit(EXIT_FAILURE);
-      }
-  #endif
-  }
-
-
-// compute the md5sum of the ml_polycorr[0] and ml_polyplaq[0] arrays and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
-void compute_md5sum_polycorr_and_polyplaq(char *res, Gauge_Conf const * const GC, GParam const * const param)
-  {
-  #ifdef HASH_MODE
-    MD5_CTX mdContext;
-    unsigned char c[MD5_DIGEST_LENGTH];
-    long i;
-    int n1, n2, n3, n4;
-
-    MD5_Init(&mdContext);
-
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       for(n1=0; n1<NCOLOR; n1++)
-          {
-          for(n2=0; n2<NCOLOR; n2++)
-             {
-             for(n3=0; n3<NCOLOR; n3++)
-                {
-                for(n4=0; n4<NCOLOR; n4++)
-                   {
-                   MD5_Update(&mdContext, &((GC->ml_polycorr_ris[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                   }
-                }
-             }
-          }
-       }
-
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       for(n1=0; n1<NCOLOR; n1++)
-          {
-          for(n2=0; n2<NCOLOR; n2++)
-             {
-             for(n3=0; n3<NCOLOR; n3++)
-                {
-                for(n4=0; n4<NCOLOR; n4++)
-                   {
-                   MD5_Update(&mdContext, &((GC->ml_polycorr_tmp[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                   }
-                }
-             }
-          }
-       }
-
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       for(n1=0; n1<NCOLOR; n1++)
-          {
-          for(n2=0; n2<NCOLOR; n2++)
-             {
-             for(n3=0; n3<NCOLOR; n3++)
-                {
-                for(n4=0; n4<NCOLOR; n4++)
-                   {
-                   MD5_Update(&mdContext, &((GC->ml_polyplaq_ris[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                   }
-                }
-             }
-          }
-       }
-
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       for(n1=0; n1<NCOLOR; n1++)
-          {
-          for(n2=0; n2<NCOLOR; n2++)
-             {
-             for(n3=0; n3<NCOLOR; n3++)
-                {
-                for(n4=0; n4<NCOLOR; n4++)
-                   {
-                   MD5_Update(&mdContext, &((GC->ml_polyplaq_tmp[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                   }
-                }
-             }
-          }
-       }
-
-    MD5_Final(c, &mdContext);
-
-    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
-       {
-       sprintf(&(res[2*i]), "%02x", c[i]);
-       }
-  #else
-    // just to avoid warning at compile time
-    (void) res;
-    (void) GC;
-    (void) param;
-  #endif
-  }
-
-
-// allocate the ml_polycorr and polyplaq arrays
+// allocate the polycorr, polyplaq, polyplaqconn arrays and related stuff
 void alloc_tube_conn_stuff(Gauge_Conf *GC,
                            GParam const * const param)
   {
@@ -962,45 +700,35 @@ void alloc_tube_conn_stuff(Gauge_Conf *GC,
 
   alloc_tube_disc_stuff(GC, param);
 
-  err=posix_memalign((void**)&(GC->ml_polyplaqconn_ris), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
+  err=posix_memalign((void**)&(GC->ml_polyplaqconn), (size_t) DOUBLE_ALIGN, (size_t) NLEVELS * sizeof(TensProd **));
   if(err!=0)
     {
-    fprintf(stderr, "Problems in allocating ml_polyplaq_ris (%s, %d)\n", __FILE__, __LINE__);
+    fprintf(stderr, "Problems in allocating ml_polyplaqconn (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   else
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)&(GC->ml_polyplaqconn_ris[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
+       err=posix_memalign((void**)&(GC->ml_polyplaqconn[i]), (size_t) DOUBLE_ALIGN, (size_t) (param->d_size[0] / param->d_ml_step[i]) * sizeof(TensProd *));
        if(err!=0)
          {
-         fprintf(stderr, "Problems in allocating ml_polyplaq_ris[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+         fprintf(stderr, "Problems in allocating ml_polyplaqconn[%d] (%s, %d)\n", i, __FILE__, __LINE__);
          exit(EXIT_FAILURE);
+         }
+       else
+         {
+         err=posix_memalign((void**)&(GC->ml_polyplaqconn[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(TensProd));
+         if(err!=0)
+           {
+           fprintf(stderr, "Problems in allocating ml_polyplaqconn[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+           exit(EXIT_FAILURE);
+           }
          }
        }
     }
 
-  err=posix_memalign((void**)&(GC->ml_polyplaqconn_tmp), (size_t)DOUBLE_ALIGN, (size_t) NLEVELS *sizeof(TensProd *));
-  if(err!=0)
-    {
-    fprintf(stderr, "Problems in allocating ml_polyplaq_tmp (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  else
-    {
-    for(i=0; i<NLEVELS; i++)
-       {
-       err=posix_memalign((void**)&(GC->ml_polyplaqconn_tmp[i]), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(TensProd));
-       if(err!=0)
-         {
-         fprintf(stderr, "Problems in allocating ml_polyplaq_tmp[%d] (%s, %d)\n", i, __FILE__, __LINE__);
-         exit(EXIT_FAILURE);
-         }
-       }
-    }
-
-  err=posix_memalign((void**)&(GC->loc_polyplaqconn), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(GAUGE_GROUP));
+  err=posix_memalign((void**)&(GC->loc_plaqconn), (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(GAUGE_GROUP));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating loc_polyplaqconn (%s, %d)\n", __FILE__, __LINE__);
@@ -1010,23 +738,25 @@ void alloc_tube_conn_stuff(Gauge_Conf *GC,
   }
 
 
-// free the ml_polycorr arrays
-void free_tube_conn_stuff(Gauge_Conf *GC)
+// free the polycorr, polyplaq, polyplaqconn arrays and related stuff
+void free_tube_conn_stuff(Gauge_Conf *GC,
+                          GParam const * const param)
   {
-  int i;
-
-  free_tube_disc_stuff(GC);
+  int i, j;
 
   for(i=0; i<NLEVELS; i++)
      {
-     free(GC->ml_polyplaqconn_ris[i]);
-     free(GC->ml_polyplaqconn_tmp[i]);
+     for(j=0; j<(param->d_size[0]/param->d_ml_step[i]); j++)
+        {
+        free(GC->ml_polycorr[i][j]);
+        }
+     free(GC->ml_polycorr[i]);
      }
-  free(GC->ml_polyplaqconn_ris);
-  free(GC->ml_polyplaqconn_tmp);
-  free(GC->loc_polyplaqconn);
+  free(GC->ml_polycorr);
+
+  free(GC->loc_plaqconn);
   }
-*/
+
 
 // allocate the clovers arrays
 void alloc_clover_array(Gauge_Conf *GC,

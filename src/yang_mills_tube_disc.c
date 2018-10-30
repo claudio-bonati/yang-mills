@@ -63,7 +63,7 @@ void real_main(char *in_file)
     init_gauge_conf(&GC, &param);
 
     // initialize ml_polycorr and ml_polyplaq arrays
-/*    alloc_tube_disc_stuff(&GC, &param); */
+    alloc_tube_disc_stuff(&GC, &param);
 
     // montecarlo
     time(&time1);
@@ -74,7 +74,7 @@ void real_main(char *in_file)
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {
-/*         perform_measures_tube_disc(&GC, &geo, &param, datafilep); */
+         perform_measures_tube_disc(&GC, &geo, &param, datafilep);
          }
 
        // save configuration for backup
@@ -109,7 +109,7 @@ void real_main(char *in_file)
     free_gauge_conf(&GC, &param);
 
     // free ml_polycorr and ml_polyplaq
-/*    free_tube_disc_stuff(&GC); */
+    free_tube_disc_stuff(&GC, &param);
 
     // free geometry
     free_geometry(&geo, &param);

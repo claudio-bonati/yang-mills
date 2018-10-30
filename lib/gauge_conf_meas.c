@@ -863,7 +863,7 @@ void perform_measures_polycorr_long(Gauge_Conf *GC,
    #endif
    }
 
-/*
+
 // perform the computation of the string width with the
 // disconnected correlator using the multilevel algorithm
 void perform_measures_tube_disc(Gauge_Conf *GC,
@@ -875,17 +875,29 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
    long r;
 
    multilevel_tube_disc(GC,
-                              geo,
-                              param,
-                              0,
-                              param->d_size[0]);
+                        geo,
+                        param,
+                        param->d_size[0]);
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      int i;
+      for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+         {
+         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
+         times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
+         }
+      }
 
    risr=0.0;
    risi=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      risr+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
       }
    risr*=param->d_inv_space_vol;
    risi*=param->d_inv_space_vol;
@@ -895,53 +907,14 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
    risi=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   fprintf(datafilep, "\n");
-
-   fflush(datafilep);
-   }
-
-
-// perform the computation of the string width with the
-// disconnected correlator using the multilevel algorithm
-// for long simulations
-void perform_measures_tube_disc_long(Gauge_Conf *GC,
-                                     GParam const * const param,
-                                     FILE *datafilep)
-   {
-   double risr, risi;
-   long r;
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
+      risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
       }
    risr*=param->d_inv_space_vol;
    risi*=param->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    fprintf(datafilep, "\n");
-
    fflush(datafilep);
    }
 
@@ -957,17 +930,30 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
    long r;
 
    multilevel_tube_conn(GC,
-                              geo,
-                              param,
-                              0,
-                              param->d_size[0]);
+                        geo,
+                        param,
+                        param->d_size[0]);
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      int i;
+      for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+         {
+         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
+         times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
+         times_equal_TensProd(&(GC->ml_polyplaqconn[0][r]), &(GC->ml_polycorr[0][i][r]) );
+         }
+      }
 
    risr=0.0;
    risi=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      risr+=retr_TensProd(&(GC->ml_polycorr_ris[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polycorr_ris[0][r]));
+      risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
       }
    risr*=param->d_inv_space_vol;
    risi*=param->d_inv_space_vol;
@@ -977,8 +963,8 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
    risi=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      risr+=retr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaq_ris[0][r]));
+      risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
       }
    risr*=param->d_inv_space_vol;
    risi*=param->d_inv_space_vol;
@@ -988,17 +974,16 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
    risi=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
-      risr+=retr_TensProd(&(GC->ml_polyplaqconn_ris[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaqconn_ris[0][r]));
+      risr+=retr_TensProd(&(GC->ml_polyplaqconn[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaqconn[0][r]));
       }
    risr*=param->d_inv_space_vol;
    risi*=param->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    fprintf(datafilep, "\n");
-
    fflush(datafilep);
    }
-*/
+
 
 #endif
