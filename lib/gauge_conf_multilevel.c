@@ -261,6 +261,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
          {
          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
          zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
          }
 
@@ -286,6 +287,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
            {
            long r = raux/(param->d_size[0]/param->d_ml_step[0]);
            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
            zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
            }
         }
@@ -333,6 +335,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
          {
          long r = raux/(param->d_size[0]/param->d_ml_step[level]);
          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
          times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
          }
 
@@ -358,6 +361,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
            {
            long r = raux/(param->d_size[0]/param->d_ml_step[0]);
            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
            zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
            }
         }
@@ -375,6 +379,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
             {
             long r = raux/(param->d_size[0]/param->d_ml_step[level+1]);
             int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level+1]) );
+
             zero_TensProd(&(GC->ml_polycorr[level+1][slice][r]));
             }
 
@@ -415,6 +420,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
          {
          long r = raux/(param->d_size[0]/param->d_ml_step[level]);
          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
          times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
          }
 
@@ -453,6 +459,7 @@ void multilevel_polycorr_long(Gauge_Conf * GC,
        {
        long r = raux/(param->d_size[0]/param->d_ml_step[0]);
        int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
        zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
        }
     }
@@ -503,6 +510,7 @@ void multilevel_polycorr_long(Gauge_Conf * GC,
           {
           long r = raux/(param->d_size[0]/param->d_ml_step[1]);
           int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[1]) );
+
           zero_TensProd(&(GC->ml_polycorr[1][slice][r]));
           }
 
@@ -546,6 +554,7 @@ void multilevel_polycorr_long(Gauge_Conf * GC,
        {
        long r = raux/(param->d_size[0]/param->d_ml_step[0]);
        int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
        times_equal_real_TensProd(&(GC->ml_polycorr[0][slice][r]), 1.0/((double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat) );
        }
     }
@@ -667,6 +676,7 @@ void multilevel_tube_disc(Gauge_Conf * GC,
          {
          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
          zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
          if(slice==0)
            {
@@ -696,6 +706,7 @@ void multilevel_tube_disc(Gauge_Conf * GC,
            {
            long r = raux/(param->d_size[0]/param->d_ml_step[0]);
            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
            zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
            if(slice==0)
              {
@@ -753,6 +764,7 @@ void multilevel_tube_disc(Gauge_Conf * GC,
          {
          long r = raux/(param->d_size[0]/param->d_ml_step[level]);
          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
          times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
          if(slice==0)
            {
@@ -782,6 +794,7 @@ void multilevel_tube_disc(Gauge_Conf * GC,
            {
            long r = raux/(param->d_size[0]/param->d_ml_step[0]);
            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
            zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
            if(slice==0)
              {
@@ -803,6 +816,7 @@ void multilevel_tube_disc(Gauge_Conf * GC,
             {
             long r = raux/(param->d_size[0]/param->d_ml_step[level+1]);
             int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level+1]) );
+
             zero_TensProd(&(GC->ml_polycorr[level+1][slice][r]));
             if(slice==0)
               {
@@ -857,6 +871,7 @@ void multilevel_tube_disc(Gauge_Conf * GC,
          {
          long r = raux/(param->d_size[0]/param->d_ml_step[level]);
          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
          times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
          if(slice==0)
            {
@@ -1030,6 +1045,7 @@ void multilevel_tube_conn(Gauge_Conf * GC,
          {
          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
          zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
          if(slice==0)
            {
@@ -1060,6 +1076,7 @@ void multilevel_tube_conn(Gauge_Conf * GC,
            {
            long r = raux/(param->d_size[0]/param->d_ml_step[0]);
            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
            zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
            if(slice==0)
              {
@@ -1120,6 +1137,7 @@ void multilevel_tube_conn(Gauge_Conf * GC,
          {
          long r = raux/(param->d_size[0]/param->d_ml_step[level]);
          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
          times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
          if(slice==0)
            {
@@ -1150,6 +1168,7 @@ void multilevel_tube_conn(Gauge_Conf * GC,
            {
            long r = raux/(param->d_size[0]/param->d_ml_step[0]);
            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
            zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
            if(slice==0)
              {
@@ -1172,6 +1191,7 @@ void multilevel_tube_conn(Gauge_Conf * GC,
             {
             long r = raux/(param->d_size[0]/param->d_ml_step[level+1]);
             int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level+1]) );
+
             zero_TensProd(&(GC->ml_polycorr[level+1][slice][r]));
             if(slice==0)
               {
@@ -1233,6 +1253,7 @@ void multilevel_tube_conn(Gauge_Conf * GC,
          {
          long r = raux/(param->d_size[0]/param->d_ml_step[level]);
          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
          times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
          if(slice==0)
            {
