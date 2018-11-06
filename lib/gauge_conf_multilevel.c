@@ -994,6 +994,7 @@ void compute_local_poly_plaq_and_plaqconn(Gauge_Conf *GC,
           r4=nnp(geo, r4, 0);
           }
        }// end of if(slice==0)
+
      }
   }
 
