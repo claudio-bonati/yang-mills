@@ -131,20 +131,20 @@ void plaquettep_matrix(Gauge_Conf const * const GC,
    #endif
 
 //
-//       ^ i
-//       |   (2)
+//       ^ j
+//       |   (3)
 //       +---<---+
 //       |       |
-//   (3) V       ^ (1)
+//   (4) V       ^ (2)
 //       |       |
-//       +--->---+---> j
-//       r   (4)
+//       +--->---+---> i
+//       r   (1)
 //
 
-   equal(matrix, &(GC->lattice[nnp(geo, r, j)][i]));
-   times_equal_dag(matrix, &(GC->lattice[nnp(geo, r, i)][j]));
-   times_equal_dag(matrix, &(GC->lattice[r][i]));
-   times_equal(matrix, &(GC->lattice[r][j]));
+   equal(matrix, &(GC->lattice[r][i]));
+   times_equal(matrix, &(GC->lattice[nnp(geo, r, i)][j]));
+   times_equal_dag(matrix, &(GC->lattice[nnp(geo, r, j)][i]));
+   times_equal_dag(matrix, &(GC->lattice[r][j]));
    }
 
 
