@@ -62,7 +62,7 @@ void real_main(char *in_file)
     // initialize gauge configuration
     init_gauge_conf(&GC, &param);
 
-    // initialize ml_polycorr and ml_polyplaq arrays
+    // allocate ml_polycorr, ml_polyplaq and ml_polyplaqconn arrays
     alloc_tube_conn_stuff(&GC, &param);
 
     // montecarlo

@@ -1,5 +1,5 @@
-#ifndef YM_TUBE_DISC_C
-#define YM_TUBE_DISC_C
+#ifndef YM_TUBE_CONN_LONG_C
+#define YM_TUBE_CONN_LONG_C
 
 #include"../include/macro.h"
 
@@ -41,7 +41,7 @@ void real_main(char *in_file)
        {
        if(tmp!= param.d_size[count])
          {
-         fprintf(stderr, "When using yang_mills_tube_disc all the spatial sizes have to be of equal length.\n");
+         fprintf(stderr, "When using yang_mills_tube_conn_long all the spatial sizes have to be of equal length.\n");
          exit(EXIT_FAILURE);
          }
        }
@@ -62,34 +62,68 @@ void real_main(char *in_file)
     // initialize gauge configuration
     init_gauge_conf(&GC, &param);
 
-    // allocate ml_polycorr and ml_polyplaq arrays
-    alloc_tube_disc_stuff(&GC, &param);
+    // allocate ml_polycorr, ml_polyplaq and ml_polyplaqconn arrays
+    alloc_tube_conn_stuff(&GC, &param);
 
-    // montecarlo
+    // montecarlo starts
     time(&time1);
-    // count starts from 1 to avoid problems using %
-    for(count=1; count < param.d_sample + 1; count++)
-       {
-       update(&GC, &geo, &param);
-
-       if(count % param.d_measevery ==0 && count >= param.d_thermal)
+    if(param.d_start != 2) // NEW SIMULATION
+      {
+      for(count=0; count<param.d_measevery; count++)
          {
-         perform_measures_tube_disc(&GC, &geo, &param, datafilep);
+         update(&GC, &geo, &param);
          }
 
-       // save configuration for backup
-       if(param.d_saveconf_back_every!=0)
-         {
-         if(count % param.d_saveconf_back_every == 0 )
+      // save configuration
+      write_conf_on_file(&GC, &param);
+      // backup copy
+      write_conf_on_file_back(&GC, &param);
+
+      // save multilevel stuff
+      write_tube_conn_stuff_on_file(&GC, &param, 0);
+      }
+    else // CONTINUATION OF PREVIOUS SIMULATION
+      {
+      int count, iteration;
+
+      // read multilevel stuff
+      read_tube_conn_stuff_from_file(&GC, &param, &iteration);
+
+      if(iteration<0) // update the conf, no multilevel
+        {
+        for(count=0; count<param.d_measevery; count++)
            {
-           // simple
-           write_conf_on_file(&GC, &param);
-
-           // backup copy
-           write_conf_on_file_back(&GC, &param);
+           update(&GC, &geo, &param);
            }
-         }
-       }
+
+        // save configuration
+        write_conf_on_file(&GC, &param);
+        // backup copy
+        write_conf_on_file_back(&GC, &param);
+
+        // save multilevel stuff
+        write_tube_conn_stuff_on_file(&GC, &param, 0);
+        }
+      else // iteration >=0, perform multilevel
+        {
+        multilevel_tube_conn_long(&GC,
+                                  &geo,
+                                  &param,
+                                  param.d_ml_step[0],
+                                  iteration);
+        iteration+=1;
+        if(iteration==param.d_ml_level0_repeat)
+          {
+          // print the measure
+          perform_measures_tube_conn_long(&GC, &param, datafilep);
+
+          iteration=-1; // next time the conf will be updated, no multilevel
+          }
+
+        // save multilevel stuff
+        write_tube_conn_stuff_on_file(&GC, &param, iteration);
+        }
+      }
     time(&time2);
     // montecarlo end
 
@@ -103,13 +137,13 @@ void real_main(char *in_file)
       }
 
     // print simulation details
-    print_parameters_tube_disc(&param, time1, time2);
+    print_parameters_polycorr_long(&param, time1, time2);
 
     // free gauge configuration
     free_gauge_conf(&GC, &param);
 
-    // free ml_polycorr and ml_polyplaq
-    free_tube_disc_stuff(&GC, &param);
+    // free ml_polycorr
+    free_polycorr_stuff(&GC, &param);
 
     // free geometry
     free_geometry(&geo, &param);
@@ -140,12 +174,12 @@ void print_template_input(void)
     fprintf(fp, "measevery 1\n");
     fprintf(fp,"\n");
     fprintf(fp, "start                   0  # 0=ordered  1=random  2=from saved configuration\n");
-    fprintf(fp, "saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates\n");
     fprintf(fp,"\n");
     fprintf(fp, "#for multilevel\n");
     fprintf(fp, "multihit         10  # number of multihit step\n");
     fprintf(fp, "ml_step          2   # timeslices for multilevel (from largest to smallest)\n");
     fprintf(fp, "ml_upd           10  # number of updates for various levels\n");
+    fprintf(fp, "ml_level0_repeat 1   # number of times level0 is repeated in long sim.\n");
     fprintf(fp, "dist_poly        2   # distance between the polyakov loop\n");
     fprintf(fp, "transv_dist      2   # transverse distance from the polyakov correlator\n");
     fprintf(fp, "plaq_dir         1 0 # plaquette orientation for flux tube\n");
@@ -154,6 +188,7 @@ void print_template_input(void)
     fprintf(fp, "conf_file  conf.dat\n");
     fprintf(fp, "data_file  dati.dat\n");
     fprintf(fp, "log_file   log.dat\n");
+    fprintf(fp, "ml_file    ml.dat\n");
     fprintf(fp, "\n");
     fprintf(fp, "randseed 0    #(0=time)\n");
     fclose(fp);
@@ -191,6 +226,9 @@ int main (int argc, char **argv)
         printf("\n\tusing imaginary theta\n");
       #endif
 
+      #ifdef OPT_MULTILEVEL
+        printf("\tcompiled for multilevel optimization\n");
+      #endif
 
       printf("\n");
 

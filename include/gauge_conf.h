@@ -54,9 +54,9 @@ void write_conf_on_file_back(Gauge_Conf const * const GC,
 void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC,
                                      Gauge_Conf const * const GC2,
                                      GParam const * const param);
-void compute_md5sum(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
-                    Gauge_Conf const * const GC,
-                    GParam const * const param);
+void compute_md5sum_conf(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
+                         Gauge_Conf const * const GC,
+                         GParam const * const param);
 void alloc_polycorr_stuff(Gauge_Conf *GC,
                           GParam const * const param);
 void free_polycorr_stuff(Gauge_Conf *GC,
@@ -78,6 +78,13 @@ void alloc_tube_conn_stuff(Gauge_Conf *GC,
                            GParam const * const param);
 void free_tube_conn_stuff(Gauge_Conf *GC,
                           GParam const * const param);
+void write_tube_conn_stuff_on_file(Gauge_Conf const * const GC,
+                                   GParam const * const param,
+                                   int iteration);
+void read_tube_conn_stuff_from_file(Gauge_Conf const * const GC,
+                                    GParam const * const param,
+                                    int *iteration);
+void compute_md5sum_tube_conn_stuff(char *res, Gauge_Conf const * const GC, GParam const * const param);
 void alloc_clover_array(Gauge_Conf *GC,
                         GParam const * const param);
 void end_clover_array(Gauge_Conf *GC,
@@ -161,6 +168,9 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
                                 FILE *datafilep);
+void perform_measures_tube_conn_long(Gauge_Conf *GC,
+                                     GParam const * const param,
+                                     FILE *datafilep);
 
 // in gauge_conf_multilevel.c
 void multihit(Gauge_Conf const * const GC,
@@ -201,6 +211,11 @@ void multilevel_tube_conn(Gauge_Conf * GC,
                           Geometry const * const geo,
                           GParam const * const param,
                           int dt);
+void multilevel_tube_conn_long(Gauge_Conf * GC,
+                               Geometry const * const geo,
+                               GParam const * const param,
+                               int dt,
+                               int iteration);
 
 // in gauge_conf_upd.c
 void calcstaples_wilson(Gauge_Conf const * const GC,

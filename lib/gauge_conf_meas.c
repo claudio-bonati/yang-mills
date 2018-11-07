@@ -986,4 +986,67 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
    }
 
 
+// print the value of the the string width with the
+// connected correlator that has been computed by multilevel
+void perform_measures_tube_conn_long(Gauge_Conf *GC,
+                                     GParam const * const param,
+                                     FILE *datafilep)
+   {
+   double risr, risi;
+   long r;
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      int i;
+      for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+         {
+         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
+         times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
+         times_equal_TensProd(&(GC->ml_polyplaqconn[0][r]), &(GC->ml_polycorr[0][i][r]) );
+         }
+      }
+
+   risr=0.0;
+   risi=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
+      }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
+   risr=0.0;
+   risi=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
+      }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
+   risr=0.0;
+   risi=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polyplaqconn[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaqconn[0][r]));
+      }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
+   fprintf(datafilep, "\n");
+   fflush(datafilep);
+   }
+
+
+
+
 #endif
