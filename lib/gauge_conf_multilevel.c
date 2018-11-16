@@ -76,7 +76,7 @@ void compute_local_poly(Gauge_Conf *GC,
   #endif
 
   #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS)
+  #pragma omp parallel for num_threads(NTHREADS) private(raux)
   #endif
   for(raux=0; raux<(param->d_space_vol*param->d_size[0]/param->d_ml_step[NLEVELS-1]); raux++)
      {
@@ -134,7 +134,7 @@ void update_for_multilevel(Gauge_Conf * GC,
       for(r=0; r<(param->d_volume)/2; r++)
          {
          int t;
-         long int rsp;
+         long rsp;
 
          si_to_sisp_and_t(&rsp, &t, geo, r);
          if(t % param->d_ml_step[level]!=0 || dir==0)
@@ -149,7 +149,7 @@ void update_for_multilevel(Gauge_Conf * GC,
       for(r=(param->d_volume)/2; r<(param->d_volume); r++)
          {
          int t;
-         long int rsp;
+         long rsp;
 
          si_to_sisp_and_t(&rsp, &t, geo, r);
          if(t % param->d_ml_step[level]!=0 || dir==0)
@@ -174,7 +174,7 @@ void update_for_multilevel(Gauge_Conf * GC,
          for(r=0; r<(param->d_volume)/2; r++)
             {
             int t;
-            long int rsp;
+            long rsp;
 
             si_to_sisp_and_t(&rsp, &t, geo, r);
             if(t % param->d_ml_step[level]!=0 || dir==0)
@@ -189,7 +189,7 @@ void update_for_multilevel(Gauge_Conf * GC,
          for(r=(param->d_volume)/2; r<(param->d_volume); r++)
             {
             int t;
-            long int rsp;
+            long rsp;
 
             si_to_sisp_and_t(&rsp, &t, geo, r);
             if(t % param->d_ml_step[level]!=0 || dir==0)
@@ -221,7 +221,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
                          int dt)
   {
   int upd, level;
-  long int raux;
+  long raux;
 
   // remember that d_size[0] >= d_ml_step[0]>d_ml_step[1]> d_ml_step[2] ...
 
@@ -314,7 +314,7 @@ void multilevel_polycorr(Gauge_Conf * GC,
             long r = raux/(param->d_size[0]/param->d_ml_step[level]);
             int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
 
-            r1=sisp_and_t_to_si(geo, r, 0);
+            r1=sisp_and_t_to_si(geo, r, 0); // r is a 3d index, r1 is the 4d index value of (r,t=0)
             for(j=0; j<param->d_dist_poly; j++)
                {
                r1=nnp(geo, r1, 1);
@@ -441,7 +441,7 @@ void multilevel_polycorr_long(Gauge_Conf * GC,
                               int iteration)
   {
   int upd;
-  long int raux;
+  long raux;
 
   if(dt!=param->d_ml_step[0])
     {
@@ -584,7 +584,7 @@ void compute_local_poly_and_plaq(Gauge_Conf *GC,
   #endif
 
   #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS)
+  #pragma omp parallel for num_threads(NTHREADS) private(raux)
   #endif
   for(raux=0; raux<(param->d_space_vol*param->d_size[0]/param->d_ml_step[NLEVELS-1]); raux++)
      {
@@ -636,7 +636,7 @@ void multilevel_tube_disc(Gauge_Conf * GC,
                           int dt)
   {
   int upd, level;
-  long int raux;
+  long raux;
 
   // remember that d_size[0] >= d_ml_step[0]>d_ml_step[1]> d_ml_step[2] ...
 
@@ -908,7 +908,7 @@ void compute_local_poly_plaq_and_plaqconn(Gauge_Conf *GC,
   #endif
 
   #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS)
+  #pragma omp parallel for num_threads(NTHREADS) private(raux)
   #endif
   for(raux=0; raux<(param->d_space_vol*param->d_size[0]/param->d_ml_step[NLEVELS-1]); raux++)
      {
@@ -1006,7 +1006,7 @@ void multilevel_tube_conn(Gauge_Conf * GC,
                           int dt)
   {
   int upd, level;
-  long int raux;
+  long raux;
 
   // remember that d_size[0] >= d_ml_step[0]>d_ml_step[1]> d_ml_step[2] ...
 
@@ -1278,7 +1278,7 @@ void multilevel_tube_conn_long(Gauge_Conf * GC,
                                int iteration)
   {
   int upd;
-  long int raux;
+  long raux;
 
   if(dt!=param->d_ml_step[0])
     {
@@ -1307,7 +1307,7 @@ void multilevel_tube_conn_long(Gauge_Conf * GC,
     }
 
   // perform the update
-  for(upd=0; upd< param->d_ml_upd[0]; upd++)
+  for(upd=0; upd < param->d_ml_upd[0]; upd++)
      {
      // update on level zero
      update_for_multilevel(GC, geo, param, 0);
@@ -1318,7 +1318,7 @@ void multilevel_tube_conn_long(Gauge_Conf * GC,
        compute_local_poly_plaq_and_plaqconn(GC, geo, param);
 
        // compute the tensor products
-       // and update ml_polycorr[level], ml_polyplaq[level] and ml_polyplaqconn[level]
+       // and update ml_polycorr[0], ml_polyplaq[0] and ml_polyplaqconn[0]
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(raux)
        #endif

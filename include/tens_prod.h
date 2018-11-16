@@ -209,6 +209,14 @@ inline void times_TensProd(TensProd * restrict A,
 // A*=B
 inline void times_equal_TensProd(TensProd * restrict A, TensProd const * const restrict B)
   {
+  #ifdef DEBUG
+  if(A==B )
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
   TensProd tmp __attribute__((aligned(DOUBLE_ALIGN)));
 
   equal_TensProd(&tmp, A);

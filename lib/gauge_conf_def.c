@@ -399,7 +399,7 @@ void alloc_polycorr_stuff(Gauge_Conf *GC,
          {
          for(j=0; j<(param->d_size[0]/param->d_ml_step[i]); j++)
             {
-            err=posix_memalign((void**)&(GC->ml_polycorr[i][j]), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(TensProd));
+            err=posix_memalign((void**)&(GC->ml_polycorr[i][j]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(TensProd));
             if(err!=0)
               {
               fprintf(stderr, "Problems in allocating ml_polycorr[%d][%d] (%s, %d)\n", i, j, __FILE__, __LINE__);
@@ -647,7 +647,7 @@ void alloc_tube_disc_stuff(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)&(GC->ml_polyplaq[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(TensProd));
+       err=posix_memalign((void**)&(GC->ml_polyplaq[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(TensProd));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polyplaq[%d] (%s, %d)\n", i, __FILE__, __LINE__);
@@ -701,7 +701,7 @@ void alloc_tube_conn_stuff(Gauge_Conf *GC,
     {
     for(i=0; i<NLEVELS; i++)
        {
-       err=posix_memalign((void**)&(GC->ml_polyplaqconn[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(TensProd));
+       err=posix_memalign((void**)&(GC->ml_polyplaqconn[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(TensProd));
        if(err!=0)
          {
          fprintf(stderr, "Problems in allocating ml_polyplaqconn[%d] (%s, %d)\n", i, __FILE__, __LINE__);
@@ -962,19 +962,6 @@ void compute_md5sum_tube_conn_stuff(char *res, Gauge_Conf const * const GC, GPar
     (void) param;
   #endif
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // allocate the clovers arrays
