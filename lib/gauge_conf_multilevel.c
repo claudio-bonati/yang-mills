@@ -61,7 +61,7 @@ void compute_local_poly(Gauge_Conf *GC,
   int num_hit;
   long raux;
 
-  if(param->d_dist_poly>1 && param->d_size[1]-param->d_dist_poly>1) // Polyakov loops are separated along the "1" direction
+  if(param->d_dist_poly >1 && (param->d_size[1]-param->d_dist_poly) >1) // Polyakov loops are separated along the "1" direction
     {
     num_hit=param->d_multihit;
     }
@@ -137,7 +137,7 @@ void update_for_multilevel(Gauge_Conf * GC,
          long rsp;
 
          si_to_sisp_and_t(&rsp, &t, geo, r);
-         if(t % param->d_ml_step[level]!=0 || dir==0)
+         if((t % param->d_ml_step[level])!=0 || dir==0)
            {
            heatbath(GC, geo, param, r, dir);
            }
@@ -152,7 +152,7 @@ void update_for_multilevel(Gauge_Conf * GC,
          long rsp;
 
          si_to_sisp_and_t(&rsp, &t, geo, r);
-         if(t % param->d_ml_step[level]!=0 || dir==0)
+         if((t % param->d_ml_step[level])!=0 || dir==0)
            {
            heatbath(GC, geo, param, r, dir);
            }
@@ -177,7 +177,7 @@ void update_for_multilevel(Gauge_Conf * GC,
             long rsp;
 
             si_to_sisp_and_t(&rsp, &t, geo, r);
-            if(t % param->d_ml_step[level]!=0 || dir==0)
+            if((t % param->d_ml_step[level])!=0 || dir==0)
               {
               overrelaxation(GC, geo, param, r, dir);
               }
@@ -192,7 +192,7 @@ void update_for_multilevel(Gauge_Conf * GC,
             long rsp;
 
             si_to_sisp_and_t(&rsp, &t, geo, r);
-            if(t % param->d_ml_step[level]!=0 || dir==0)
+            if((t % param->d_ml_step[level])!=0 || dir==0)
               {
               overrelaxation(GC, geo, param, r, dir);
               }

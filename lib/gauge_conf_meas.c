@@ -646,16 +646,14 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
                        geo,
                        param,
                        param->d_size[0]);
-
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r)
-   #endif
-   for(r=0; r<param->d_space_vol; r++)
+   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
       {
-      int j;
-      for(j=1; j<param->d_size[0]/param->d_ml_step[0]; j++)
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<param->d_space_vol; r++)
          {
-         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][j][r]) );
+         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          }
       }
 
@@ -710,19 +708,19 @@ void perform_measures_polycorr(Gauge_Conf *GC,
    #ifndef OPT_MULTILEVEL
      double ris;
      long r;
+     int i;
 
      multilevel_polycorr(GC,
                 geo,
                 param,
                 param->d_size[0]);
 
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r)
-     #endif
-     for(r=0; r<param->d_space_vol; r++)
+     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
         {
-        int i;
-        for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r)
+        #endif
+        for(r=0; r<param->d_space_vol; r++)
            {
            times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
            }
@@ -770,13 +768,12 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
    fprintf(datafilep, "Multilevel optimization: ");
    fprintf(datafilep, "the smaller the value the better the update\n");
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r)
-   #endif
-   for(r=0; r<param->d_space_vol; r++)
+   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
       {
-      int i;
-      for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          }
@@ -838,14 +835,14 @@ void perform_measures_polycorr_long(Gauge_Conf *GC,
    #else
      double ris;
      long r;
+     int i;
 
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r)
-     #endif
-     for(r=0; r<param->d_space_vol; r++)
+     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
         {
-        int i;
-        for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r)
+        #endif
+        for(r=0; r<param->d_space_vol; r++)
            {
            times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
            }
@@ -873,19 +870,19 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
    {
    double risr, risi;
    long r;
+   int i;
 
    multilevel_tube_disc(GC,
                         geo,
                         param,
                         param->d_size[0]);
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r)
-   #endif
-   for(r=0; r<param->d_space_vol; r++)
+   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
       {
-      int i;
-      for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
@@ -928,19 +925,19 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
    {
    double risr, risi;
    long r;
+   int i;
 
    multilevel_tube_conn(GC,
                         geo,
                         param,
                         param->d_size[0]);
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r)
-   #endif
-   for(r=0; r<param->d_space_vol; r++)
+   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
       {
-      int i;
-      for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
@@ -994,14 +991,14 @@ void perform_measures_tube_conn_long(Gauge_Conf *GC,
    {
    double risr, risi;
    long r;
+   int i;
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r)
-   #endif
-   for(r=0; r<param->d_space_vol; r++)
+   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
       {
-      int i;
-      for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<param->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
@@ -1045,8 +1042,5 @@ void perform_measures_tube_conn_long(Gauge_Conf *GC,
    fprintf(datafilep, "\n");
    fflush(datafilep);
    }
-
-
-
 
 #endif
