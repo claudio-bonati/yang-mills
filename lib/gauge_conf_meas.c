@@ -370,59 +370,79 @@ double topcharge(Gauge_Conf const * const GC,
    double ris;
    long r;
 
-   if(STDIM !=4)
+   if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
      {
-     fprintf(stderr, "Wrong number of dimension! (%d instead of 4) (%s, %d)\n", STDIM, __FILE__, __LINE__);
+     fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
 
-   ris=0.0;
+   #if (STDIM==4 && NCOLOR>1)
+     ris=0.0;
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+     #endif
+     for(r=0; r<(param->d_volume); r++)
+        {
+        GAUGE_GROUP aux1, aux2, aux3;
+        double real1, real2, loc_charge;
+        const double chnorm=1.0/(128.0*PI*PI);
+        int i, dir[4][3], sign;
+
+        dir[0][0] = 0;
+        dir[0][1] = 0;
+        dir[0][2] = 0;
+
+        dir[1][0] = 1;
+        dir[1][1] = 2;
+        dir[1][2] = 3;
+
+        dir[2][0] = 2;
+        dir[2][1] = 1;
+        dir[2][2] = 1;
+
+        dir[3][0] = 3;
+        dir[3][1] = 3;
+        dir[3][2] = 2;
+
+        sign=-1;
+        loc_charge=0.0;
+
+        for(i=0; i<3; i++)
+           {
+           clover(GC, geo, param, r, dir[0][i], dir[1][i], &aux1);
+           clover(GC, geo, param, r, dir[2][i], dir[3][i], &aux2);
+
+           times_dag2(&aux3, &aux2, &aux1); // aux3=aux2*(aux1^{dag})
+           real1=retr(&aux3)*NCOLOR;
+
+           times(&aux3, &aux2, &aux1); // aux3=aux2*aux1
+           real2=retr(&aux3)*NCOLOR;
+
+           loc_charge+=((double) sign*(real1-real2));
+           sign=-sign;
+           }
+        ris+=(loc_charge*chnorm);
+        }
    #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
-      GAUGE_GROUP aux1, aux2, aux3;
-      double real1, real2, loc_charge;
-      const double chnorm=1.0/(128.0*PI*PI);
-      int i, dir[4][3], sign;
 
-      dir[0][0] = 0;
-      dir[0][1] = 0;
-      dir[0][2] = 0;
+   #if (STDIM==2 && NCOLOR==1)
+     ris=0.0;
 
-      dir[1][0] = 1;
-      dir[1][1] = 2;
-      dir[1][2] = 3;
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+     #endif
+     for(r=0; r<(param->d_volume); r++)
+        {
+        GAUGE_GROUP u1matrix;
+        double angle;
 
-      dir[2][0] = 2;
-      dir[2][1] = 1;
-      dir[2][2] = 1;
+        plaquettep_matrix(GC, geo, param, r, 0, 1, &u1matrix);
+        angle=atan2(cimag(u1matrix.comp), creal(u1matrix.comp))/PI2;
 
-      dir[3][0] = 3;
-      dir[3][1] = 3;
-      dir[3][2] = 2;
-
-      sign=-1;
-      loc_charge=0.0;
-
-      for(i=0; i<3; i++)
-         {
-         clover(GC, geo, param, r, dir[0][i], dir[1][i], &aux1);
-         clover(GC, geo, param, r, dir[2][i], dir[3][i], &aux2);
-
-         times_dag2(&aux3, &aux2, &aux1); // aux3=aux2*(aux1^{dag})
-         real1=retr(&aux3)*NCOLOR;
-
-         times(&aux3, &aux2, &aux1); // aux3=aux2*aux1
-         real2=retr(&aux3)*NCOLOR;
-
-         loc_charge+=((double) sign*(real1-real2));
-         sign=-sign;
-         }
-      ris+=(loc_charge*chnorm);
-      }
+        ris+=angle;
+        }
+   #endif
 
    return ris;
    }
@@ -453,7 +473,11 @@ void topcharge_cooling(Gauge_Conf const * const GC,
         charge[iter]=ris;
 
         plaquette(&helperconf, geo, param, &plaqs, &plaqt);
-        meanplaq[iter]=0.5*(plaqs+plaqt); // this is in 4d: 3 spatial and 3 temporal plaquettes
+        #if(STDIM==4)
+          meanplaq[iter]=0.5*(plaqs+plaqt);
+        #else
+          meanplaq[iter]=plaqt;
+        #endif
         }
 
      free_gauge_conf(&helperconf, param); 
@@ -469,7 +493,11 @@ void topcharge_cooling(Gauge_Conf const * const GC,
      for(iter=0; iter<(param->d_coolrepeat); iter++)
         {
         charge[iter]=ris;
-        meanplaq[iter]=0.5*(plaqs+plaqt);
+        #if(STDIM==4)
+          meanplaq[iter]=0.5*(plaqs+plaqt);
+        #else
+          meanplaq[iter]=plaqt;
+        #endif
         }
      } 
    }
@@ -480,52 +508,49 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                GParam const * const param,
                                FILE *datafilep)
    {
-   #if STDIM==4
-   int i, err;
-   double plaqs, plaqt, polyre, polyim, *charge, *meanplaq, charge_nocooling;
+   #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
+     int i, err;
+     double plaqs, plaqt, polyre, polyim, *charge, *meanplaq, charge_nocooling;
 
-   plaquette(GC, geo, param, &plaqs, &plaqt);
-   polyakov(GC, geo, param, &polyre, &polyim);
-   charge_nocooling=topcharge(GC, geo, param);
+     plaquette(GC, geo, param, &plaqs, &plaqt);
+     polyakov(GC, geo, param, &polyre, &polyim);
+     charge_nocooling=topcharge(GC, geo, param);
 
-   fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim, charge_nocooling);
+     fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim, charge_nocooling);
 
-   err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
+     err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
 
-   topcharge_cooling(GC, geo, param, charge, meanplaq);
-   for(i=0; i<param->d_coolrepeat; i++)
-      {
-      fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
-      }
-   fprintf(datafilep, "\n");
+     topcharge_cooling(GC, geo, param, charge, meanplaq);
+     for(i=0; i<param->d_coolrepeat; i++)
+        {
+        fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
+        }
+     fprintf(datafilep, "\n");
 
-   fflush(datafilep);
+     fflush(datafilep);
 
-   free(charge);
-   free(meanplaq);
-
+     free(charge);
+     free(meanplaq);
    #else
+     double plaqs, plaqt, polyre, polyim;
 
-   double plaqs, plaqt, polyre, polyim;
+     plaquette(GC, geo, param, &plaqs, &plaqt);
+     polyakov(GC, geo, param, &polyre, &polyim);
 
-   plaquette(GC, geo, param, &plaqs, &plaqt);
-   polyakov(GC, geo, param, &polyre, &polyim);
-
-   fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
-   fprintf(datafilep, "\n");
-   fflush(datafilep);
-
+     fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+     fprintf(datafilep, "\n");
+     fflush(datafilep);
    #endif
    }
 
