@@ -361,88 +361,101 @@ void polyakov(Gauge_Conf const * const GC,
    }
 
 
-// compute the topological charge
+// compute the local topological charge at point r
 // see readme for more details
-double topcharge(Gauge_Conf const * const GC,
-                 Geometry const * const geo,
-                 GParam const * const param)
+double loc_topcharge(Gauge_Conf const * const GC,
+                     Geometry const * const geo,
+                     GParam const * const param,
+                     long r)
    {
-   double ris;
-   long r;
-
    if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
      {
      fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
 
+   double ris;
+
    #if (STDIM==4 && NCOLOR>1)
-     ris=0.0;
+     GAUGE_GROUP aux1, aux2, aux3;
+     double real1, real2, loc_charge;
+     const double chnorm=1.0/(128.0*PI*PI);
+     int i, dir[4][3], sign;
 
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
-     #endif
-     for(r=0; r<(param->d_volume); r++)
+     dir[0][0] = 0;
+     dir[0][1] = 0;
+     dir[0][2] = 0;
+
+     dir[1][0] = 1;
+     dir[1][1] = 2;
+     dir[1][2] = 3;
+
+     dir[2][0] = 2;
+     dir[2][1] = 1;
+     dir[2][2] = 1;
+
+     dir[3][0] = 3;
+     dir[3][1] = 3;
+     dir[3][2] = 2;
+
+     sign=-1;
+     loc_charge=0.0;
+
+     for(i=0; i<3; i++)
         {
-        GAUGE_GROUP aux1, aux2, aux3;
-        double real1, real2, loc_charge;
-        const double chnorm=1.0/(128.0*PI*PI);
-        int i, dir[4][3], sign;
+        clover(GC, geo, param, r, dir[0][i], dir[1][i], &aux1);
+        clover(GC, geo, param, r, dir[2][i], dir[3][i], &aux2);
 
-        dir[0][0] = 0;
-        dir[0][1] = 0;
-        dir[0][2] = 0;
+        times_dag2(&aux3, &aux2, &aux1); // aux3=aux2*(aux1^{dag})
+        real1=retr(&aux3)*NCOLOR;
 
-        dir[1][0] = 1;
-        dir[1][1] = 2;
-        dir[1][2] = 3;
+        times(&aux3, &aux2, &aux1); // aux3=aux2*aux1
+        real2=retr(&aux3)*NCOLOR;
 
-        dir[2][0] = 2;
-        dir[2][1] = 1;
-        dir[2][2] = 1;
-
-        dir[3][0] = 3;
-        dir[3][1] = 3;
-        dir[3][2] = 2;
-
-        sign=-1;
-        loc_charge=0.0;
-
-        for(i=0; i<3; i++)
-           {
-           clover(GC, geo, param, r, dir[0][i], dir[1][i], &aux1);
-           clover(GC, geo, param, r, dir[2][i], dir[3][i], &aux2);
-
-           times_dag2(&aux3, &aux2, &aux1); // aux3=aux2*(aux1^{dag})
-           real1=retr(&aux3)*NCOLOR;
-
-           times(&aux3, &aux2, &aux1); // aux3=aux2*aux1
-           real2=retr(&aux3)*NCOLOR;
-
-           loc_charge+=((double) sign*(real1-real2));
-           sign=-sign;
-           }
-        ris+=(loc_charge*chnorm);
+        loc_charge+=((double) sign*(real1-real2));
+        sign=-sign;
         }
+     ris=(loc_charge*chnorm);
    #endif
 
    #if (STDIM==2 && NCOLOR==1)
-     ris=0.0;
+     GAUGE_GROUP u1matrix;
+     double angle;
 
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
-     #endif
-     for(r=0; r<(param->d_volume); r++)
-        {
-        GAUGE_GROUP u1matrix;
-        double angle;
+     plaquettep_matrix(GC, geo, param, r, 0, 1, &u1matrix);
+     angle=atan2(cimag(u1matrix.comp), creal(u1matrix.comp))/PI2;
 
-        plaquettep_matrix(GC, geo, param, r, 0, 1, &u1matrix);
-        angle=atan2(cimag(u1matrix.comp), creal(u1matrix.comp))/PI2;
-
-        ris+=angle;
-        }
+     ris=angle;
    #endif
+
+   return ris;
+   }
+
+
+// compute the topological charge
+// see readme for more details
+double topcharge(Gauge_Conf const * const GC,
+                 Geometry const * const geo,
+                 GParam const * const param)
+   {
+   if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
+     {
+     fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   double ris;
+   long r;
+
+   ris=0.0;
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      ris+=loc_topcharge(GC, geo, param, r);
+      }
 
    return ris;
    }
@@ -456,6 +469,12 @@ void topcharge_cooling(Gauge_Conf const * const GC,
                        double *charge,
                        double *meanplaq)
    {
+   if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
+     {
+     fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
    if(param->d_coolsteps>0)  // if using cooling
      {  
      Gauge_Conf helperconf; 
@@ -503,6 +522,102 @@ void topcharge_cooling(Gauge_Conf const * const GC,
    }
 
 
+// compute the correlator of the local topological charge
+// after "ncool" cooling steps up to spatial distance "dist"
+void loc_topcharge_corr(Gauge_Conf const * const GC,
+                    Geometry const * const geo,
+                    GParam const * const param,
+                    int ncool,
+                    int dist,
+                    double *ris)
+   {
+   if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
+     {
+     fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   double *topch;
+   long r;
+   int err, i;
+
+   err=posix_memalign((void**) &(topch), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating memory! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   // compute the local topological charge
+   if(ncool>0)
+     {
+     Gauge_Conf helperconf;
+
+     // helperconf is a copy of GC
+     init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+
+     // cool helperconf
+     cooling(&helperconf, geo, param, ncool);
+
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r)
+     #endif
+     for(r=0; r<param->d_volume; r++)
+        {
+        topch[r]=loc_topcharge(&helperconf, geo, param, r);
+        }
+
+     // free helperconf
+     free_gauge_conf(&helperconf, param);
+     }
+   else
+     {
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r)
+     #endif
+     for(r=0; r<param->d_volume; r++)
+        {
+        topch[r]=loc_topcharge(GC, geo, param, r);
+        }
+     }
+
+   // compute correlators
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(i)
+   #endif
+   for(i=0; i<dist; i++)
+      {
+      double aux;
+      long r1, r2;
+      int j, dir;
+
+      ris[i]=0.0;
+
+      for(r1=0; r1<param->d_volume; r1++)
+         {
+         aux=0.0;
+
+         for(dir=1; dir<STDIM; dir++)
+            {
+            r2=r1;
+            for(j=0; j<i; j++)
+               {
+               r2=nnp(geo, r2, dir);
+               }
+            aux+=topch[r2];
+            }
+         aux/=(double)(STDIM-1);
+
+         ris[i]+=aux*topch[r1];
+         }
+      ris[i]*=param->d_inv_vol;
+      }
+
+   // free memory
+   free(topch);
+   }
+
+
 void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
@@ -542,7 +657,9 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
 
      free(charge);
      free(meanplaq);
+
    #else
+
      double plaqs, plaqt, polyre, polyim;
 
      plaquette(GC, geo, param, &plaqs, &plaqt);
