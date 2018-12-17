@@ -676,6 +676,11 @@ void update_with_trace_def(Gauge_Conf * GC,
      exit(EXIT_FAILURE);
      }
 
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      a[r]=0;
+      }
+
    // heatbath on spatial links
    for(dir=1; dir<STDIM; dir++)
       {
@@ -713,7 +718,7 @@ void update_with_trace_def(Gauge_Conf * GC,
       for(r=0; r<(param->d_space_vol)/2; r++)
          {
          long r4=sisp_and_t_to_si(geo, r, t);
-         a[r]=metropolis_with_tracedef(GC, geo, param, r4, 0);
+         a[r]+=metropolis_with_tracedef(GC, geo, param, r4, 0);
          }
 
       #ifdef OPENMP_MODE
@@ -722,7 +727,7 @@ void update_with_trace_def(Gauge_Conf * GC,
       for(r=(param->d_space_vol)/2; r<(param->d_space_vol); r++)
          {
          long r4=sisp_and_t_to_si(geo, r, t);
-         a[r]=metropolis_with_tracedef(GC, geo, param, r4, 0);
+         a[r]+=metropolis_with_tracedef(GC, geo, param, r4, 0);
          }
       }
 
