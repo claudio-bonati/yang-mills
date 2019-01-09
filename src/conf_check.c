@@ -188,9 +188,6 @@ int main (int argc, char **argv)
         }
       }
 
-    // initialize function_pointers
-    init_function_pointers();
-
     // get spacetime dim
     getspacetimedim(infile, &dim);
 

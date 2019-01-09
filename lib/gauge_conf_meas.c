@@ -370,6 +370,10 @@ double loc_topcharge(Gauge_Conf const * const GC,
    {
    if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
      {
+     (void) GC;
+     (void) geo;
+     (void) param;
+     (void) r;
      fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }

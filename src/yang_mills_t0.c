@@ -48,9 +48,6 @@ void real_main(char *in_file)
     // open data_file
     datafilep=fopen(param.d_data_file, "a");
 
-    // initialize function_pointers
-    init_function_pointers();
-
     // initialize geometry
     init_indexing_lexeo();
     init_geometry(&geo, &param);

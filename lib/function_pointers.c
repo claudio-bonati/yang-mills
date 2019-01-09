@@ -11,130 +11,164 @@
 #include"../include/u1.h"
 #include"../include/u1_upd.h"
 
-void init_function_pointers(void)
-  {
-  #if NCOLOR == 1
+#if NCOLOR == 1
 
-  one  = &one_U1;
-  zero = &zero_U1;
-  equal     = &equal_U1;
-  equal_dag = &equal_dag_U1;
-  plus_equal     = &plus_equal_U1;
-  plus_equal_dag = &plus_equal_dag_U1;
-  minus_equal     = &minus_equal_U1;
-  minus_equal_times_real  = &minus_equal_times_real_U1;
-  minus_equal_dag = &minus_equal_dag_U1;
-  lin_comb       = &lin_comb_U1;
-  lin_comb_dag1  = &lin_comb_dag1_U1;
-  lin_comb_dag2  = &lin_comb_dag2_U1;
-  lin_comb_dag12 = &lin_comb_dag12_U1;
-  times_equal_real = &times_equal_real_U1;
-  times_equal_complex = &times_equal_complex_U1;
-  times_equal     = &times_equal_U1;
-  times_equal_dag = &times_equal_dag_U1;
-  times       = &times_U1;
-  times_dag1  = &times_dag1_U1;
-  times_dag2  = &times_dag2_U1;
-  times_dag12 = &times_dag12_U1;
-  rand_matrix = &rand_matrix_U1;
-  norm = &norm_U1;
-  retr = &retr_U1;
-  imtr = &imtr_U1;
-  unitarize = &unitarize_U1;
-  ta = &ta_U1;
-  taexp = &taexp_U1;
-  print_on_screen = &print_on_screen_U1;
-  print_on_file   = &print_on_file_U1;
-  print_on_binary_file_bigen   = &print_on_binary_file_bigen_U1;
-  read_from_file   = &read_from_file_U1;
-  read_from_binary_file_bigen   = &read_from_binary_file_bigen_U1;
-  TensProd_init=&TensProd_init_U1;
-  single_heatbath = &single_heatbath_U1;
-  single_overrelaxation = &single_overrelaxation_U1;
-  cool = &cool_U1;
+void (*one)(GAUGE_GROUP *A)  = &one_U1;
+void (*zero)(GAUGE_GROUP *A) = &zero_U1;
 
-  #elif NCOLOR == 2
+void (*equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &equal_U1;
+void (*equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &equal_dag_U1;
 
-  one  = &one_Su2;
-  zero = &zero_Su2;
-  equal     = &equal_Su2;
-  equal_dag = &equal_dag_Su2;
-  plus_equal     = &plus_equal_Su2;
-  plus_equal_dag = &plus_equal_dag_Su2;
-  minus_equal     = &minus_equal_Su2;
-  minus_equal_times_real  = &minus_equal_times_real_Su2;
-  minus_equal_dag = &minus_equal_dag_Su2;
-  lin_comb       = &lin_comb_Su2;
-  lin_comb_dag1  = &lin_comb_dag1_Su2;
-  lin_comb_dag2  = &lin_comb_dag2_Su2;
-  lin_comb_dag12 = &lin_comb_dag12_Su2;
-  times_equal_real = &times_equal_real_Su2;
-  times_equal_complex = &times_equal_complex_Su2;
-  times_equal     = &times_equal_Su2;
-  times_equal_dag = &times_equal_dag_Su2;
-  times       = &times_Su2;
-  times_dag1  = &times_dag1_Su2;
-  times_dag2  = &times_dag2_Su2;
-  times_dag12 = &times_dag12_Su2;
-  rand_matrix = &rand_matrix_Su2;
-  norm = &norm_Su2;
-  retr = &retr_Su2;
-  imtr = &imtr_Su2;
-  unitarize = &unitarize_Su2;
-  ta = &ta_Su2;
-  taexp = &taexp_Su2;
-  print_on_screen = &print_on_screen_Su2;
-  print_on_file   = &print_on_file_Su2;
-  print_on_binary_file_bigen   = &print_on_binary_file_bigen_Su2;
-  read_from_file   = &read_from_file_Su2;
-  read_from_binary_file_bigen   = &read_from_binary_file_bigen_Su2;
-  TensProd_init=&TensProd_init_Su2;
-  single_heatbath = &single_heatbath_Su2;
-  single_overrelaxation = &single_overrelaxation_Su2;
-  cool = &cool_Su2;
+void (*plus_equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &plus_equal_U1;
+void (*plus_equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &plus_equal_dag_U1;
 
-  #else
+void (*minus_equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &minus_equal_U1;
+void (*minus_equal_times_real)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, double r) = &minus_equal_times_real_U1;
+void (*minus_equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &minus_equal_dag_U1;
 
-  one  = &one_SuN;
-  zero = &zero_SuN;
-  equal     = &equal_SuN;
-  equal_dag = &equal_dag_SuN;
-  plus_equal     = &plus_equal_SuN;
-  plus_equal_dag = &plus_equal_dag_SuN;
-  minus_equal     = &minus_equal_SuN;
-  minus_equal_times_real= &minus_equal_times_real_SuN;
-  minus_equal_dag = &minus_equal_dag_SuN;
-  lin_comb       = &lin_comb_SuN;
-  lin_comb_dag1  = &lin_comb_dag1_SuN;
-  lin_comb_dag2  = &lin_comb_dag2_SuN;
-  lin_comb_dag12 = &lin_comb_dag12_SuN;
-  times_equal_real = &times_equal_real_SuN;
-  times_equal_complex = &times_equal_complex_SuN;
-  times_equal     = &times_equal_SuN;
-  times_equal_dag = &times_equal_dag_SuN;
-  times       = &times_SuN;
-  times_dag1  = &times_dag1_SuN;
-  times_dag2  = &times_dag2_SuN;
-  times_dag12 = &times_dag12_SuN;
-  rand_matrix = &rand_matrix_SuN;
-  norm = &norm_SuN;
-  retr = &retr_SuN;
-  imtr = &imtr_SuN;
-  unitarize = &unitarize_SuN;
-  ta = &ta_SuN;
-  taexp = &taexp_SuN;
-  print_on_screen = &print_on_screen_SuN;
-  print_on_file   = &print_on_file_SuN;
-  print_on_binary_file_bigen   = &print_on_binary_file_bigen_SuN;
-  read_from_file   = &read_from_file_SuN;
-  read_from_binary_file_bigen   = &read_from_binary_file_bigen_SuN;
-  TensProd_init=&TensProd_init_SuN;
-  single_heatbath = &single_heatbath_SuN;
-  single_overrelaxation = &single_overrelaxation_SuN;
-  cool = &cool_SuN;
+void (*lin_comb)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_U1;
+void (*lin_comb_dag1)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_dag1_U1;
+void (*lin_comb_dag2)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_dag2_U1;
+void (*lin_comb_dag12)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_dag12_U1;
 
-  #endif
-  }
+void (*times_equal_real)(GAUGE_GROUP *A, double r) = &times_equal_real_U1;
+void (*times_equal_complex)(GAUGE_GROUP *A, double complex r) = &times_equal_complex_U1;
+void (*times_equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &times_equal_U1;
+void (*times_equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const *B) = &times_equal_dag_U1;
+
+void (*times)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_U1;
+void (*times_dag1)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_dag1_U1;
+void (*times_dag2)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_dag2_U1;
+void (*times_dag12)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_dag12_U1;
+
+void (*rand_matrix)(GAUGE_GROUP *A) = &rand_matrix_U1;
+
+double (*norm)(GAUGE_GROUP const * const A) = &norm_U1;
+
+double (*retr)(GAUGE_GROUP const * const A) = &retr_U1;
+double (*imtr)(GAUGE_GROUP const * const A) = &imtr_U1;
+
+void (*unitarize)(GAUGE_GROUP *A) = &unitarize_U1;
+void (*ta)(GAUGE_GROUP *A) = &ta_U1;
+void (*taexp)(GAUGE_GROUP *A) = &taexp_U1;
+
+void (*print_on_screen)(GAUGE_GROUP const * const A) = &print_on_screen_U1;
+void (*print_on_file)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_file_U1;
+void (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_binary_file_bigen_U1;
+void (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_U1;
+void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_U1;
+
+void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_U1;
+void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_U1;
+void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_U1;
+void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_U1;
+
+#elif NCOLOR == 2
+
+void (*one)(GAUGE_GROUP *A)  = &one_Su2;
+void (*zero)(GAUGE_GROUP *A) = &zero_Su2;
+
+void (*equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &equal_Su2;
+void (*equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &equal_dag_Su2;
+
+void (*plus_equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &plus_equal_Su2;
+void (*plus_equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &plus_equal_dag_Su2;
+
+void (*minus_equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &minus_equal_Su2;
+void (*minus_equal_times_real)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, double r) = &minus_equal_times_real_Su2;
+void (*minus_equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &minus_equal_dag_Su2;
+
+void (*lin_comb)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_Su2;
+void (*lin_comb_dag1)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_dag1_Su2;
+void (*lin_comb_dag2)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_dag2_Su2;
+void (*lin_comb_dag12)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_dag12_Su2;
+
+void (*times_equal_real)(GAUGE_GROUP *A, double r) = &times_equal_real_Su2;
+void (*times_equal_complex)(GAUGE_GROUP *A, double complex r) = &times_equal_complex_Su2;
+void (*times_equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &times_equal_Su2;
+void (*times_equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const *B) = &times_equal_dag_Su2;
+
+void (*times)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_Su2;
+void (*times_dag1)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_dag1_Su2;
+void (*times_dag2)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_dag2_Su2;
+void (*times_dag12)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_dag12_Su2;
+
+void (*rand_matrix)(GAUGE_GROUP *A) = &rand_matrix_Su2;
+
+double (*norm)(GAUGE_GROUP const * const A) = &norm_Su2;
+
+double (*retr)(GAUGE_GROUP const * const A) = &retr_Su2;
+double (*imtr)(GAUGE_GROUP const * const A) = &imtr_Su2;
+
+void (*unitarize)(GAUGE_GROUP *A) = &unitarize_Su2;
+void (*ta)(GAUGE_GROUP *A) = &ta_Su2;
+void (*taexp)(GAUGE_GROUP *A) = &taexp_Su2;
+
+void (*print_on_screen)(GAUGE_GROUP const * const A) = &print_on_screen_Su2;
+void (*print_on_file)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_file_Su2;
+void (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_binary_file_bigen_Su2;
+void (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_Su2;
+void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_Su2;
+
+void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_Su2;
+void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_Su2;
+void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_Su2;
+void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_Su2;
+
+#else
+
+void (*one)(GAUGE_GROUP *A)  = &one_SuN;
+void (*zero)(GAUGE_GROUP *A) = &zero_SuN;
+
+void (*equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &equal_SuN;
+void (*equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &equal_dag_SuN;
+
+void (*plus_equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &plus_equal_SuN;
+void (*plus_equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &plus_equal_dag_SuN;
+
+void (*minus_equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &minus_equal_SuN;
+void (*minus_equal_times_real)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, double r) = &minus_equal_times_real_SuN;
+void (*minus_equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &minus_equal_dag_SuN;
+
+void (*lin_comb)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_SuN;
+void (*lin_comb_dag1)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_dag1_SuN;
+void (*lin_comb_dag2)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_dag2_SuN;
+void (*lin_comb_dag12)(GAUGE_GROUP *A, double b, GAUGE_GROUP const * const B, double c, GAUGE_GROUP const * const C) = &lin_comb_dag12_SuN;
+
+void (*times_equal_real)(GAUGE_GROUP *A, double r) = &times_equal_real_SuN;
+void (*times_equal_complex)(GAUGE_GROUP *A, double complex r) = &times_equal_complex_SuN;
+void (*times_equal)(GAUGE_GROUP *A, GAUGE_GROUP const * const B) = &times_equal_SuN;
+void (*times_equal_dag)(GAUGE_GROUP *A, GAUGE_GROUP const *B) = &times_equal_dag_SuN;
+
+void (*times)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_SuN;
+void (*times_dag1)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_dag1_SuN;
+void (*times_dag2)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_dag2_SuN;
+void (*times_dag12)(GAUGE_GROUP *A, GAUGE_GROUP const * const B, GAUGE_GROUP const * const C) = &times_dag12_SuN;
+
+void (*rand_matrix)(GAUGE_GROUP *A) = &rand_matrix_SuN;
+
+double (*norm)(GAUGE_GROUP const * const A) = &norm_SuN;
+
+double (*retr)(GAUGE_GROUP const * const A) = &retr_SuN;
+double (*imtr)(GAUGE_GROUP const * const A) = &imtr_SuN;
+
+void (*unitarize)(GAUGE_GROUP *A) = &unitarize_SuN;
+void (*ta)(GAUGE_GROUP *A) = &ta_SuN;
+void (*taexp)(GAUGE_GROUP *A) = &taexp_SuN;
+
+void (*print_on_screen)(GAUGE_GROUP const * const A) = &print_on_screen_SuN;
+void (*print_on_file)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_file_SuN;
+void (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_binary_file_bigen_SuN;
+void (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_SuN;
+void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_SuN;
+
+void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_SuN;
+void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_SuN;
+void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_SuN;
+void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_SuN;
+
+#endif
+
 
 
 #endif

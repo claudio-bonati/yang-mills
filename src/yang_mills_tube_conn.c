@@ -52,9 +52,6 @@ void real_main(char *in_file)
     // open data_file
     init_data_file(&datafilep, &param);
 
-    // initialize function_pointers
-    init_function_pointers();
-
     // initialize geometry
     init_indexing_lexeo();
     init_geometry(&geo, &param);
