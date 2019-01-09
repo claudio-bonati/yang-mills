@@ -12,6 +12,9 @@ bin_PROGRAMS = conf_check \
                yang_mills_tube_disc \
                yang_mills_tracedef 
 
+align = ./include/aligncheck.h \
+        ./lib/aligncheck.c
+
 dSFMT = ./include/dSFMT-common.h \
         ./include/dSFMT.h \
         ./include/dSFMT-params11213.h \
@@ -49,31 +52,28 @@ random = ./include/myrngparam.h \
          ./include/random.h \
          ./lib/random.c 
 
-su2 = ./include/aligncheck.h \
-      ./include/su2.h \
+su2 = ./include/su2.h \
       ./include/su2_upd.h \
       ./lib/su2.c \
       ./lib/su2_upd.c 
 
-sun = ./include/aligncheck.h \
-      ./include/sun_aux.h \
+sun = ./include/sun_aux.h \
       ./include/sun.h \
       ./include/sun_upd.h \
       ./lib/sun_aux.c \
       ./lib/sun.c \
       ./lib/sun_upd.c 
 
-tens_prod = ./include/aligncheck.h \
-            ./include/tens_prod.h \
+tens_prod = ./include/tens_prod.h \
             ./lib/tens_prod.c
 
-u1 = ./include/aligncheck.h \
-     ./include/u1.h \
+u1 = ./include/u1.h \
      ./include/u1_upd.h \
      ./lib/u1.c \
      ./lib/u1_upd.c
 
 conf_check_SOURCES=./src/conf_check.c \
+                   $(align) \
                    $(dSFMT) \
                    $(endian) \
                    $(funcpoint) \
@@ -84,10 +84,12 @@ conf_check_SOURCES=./src/conf_check.c \
                    $(u1) 
 
 debug_rng_SOURCES=./src/debug_rng.c \
+                  $(align) \
                   $(dSFMT) \
                   $(random)
 
 debug_su2_SOURCES=./src/debug_su2.c \
+                  $(align) \
                   $(dSFMT) \
                   $(endian) \
                   $(gparam) \
@@ -96,6 +98,7 @@ debug_su2_SOURCES=./src/debug_su2.c \
                   $(su2)
 
 debug_sun_SOURCES=./src/debug_sun.c \
+                  $(align) \
                   $(dSFMT) \
                   $(endian) \
                   $(gparam) \
@@ -105,6 +108,7 @@ debug_sun_SOURCES=./src/debug_sun.c \
                   $(sun)
 
 debug_u1_SOURCES=./src/debug_u1.c \
+                  $(align) \
                   $(dSFMT) \
                   $(endian) \
                   $(gparam) \
@@ -113,6 +117,7 @@ debug_u1_SOURCES=./src/debug_u1.c \
                   $(u1)
 
 yang_mills_local_SOURCES=./src/yang_mills_local.c \
+                          $(align) \
                           $(dSFMT)  \
                           $(endian) \
                           $(funcpoint) \
@@ -127,6 +132,7 @@ yang_mills_local_SOURCES=./src/yang_mills_local.c \
                           $(u1) 
 
 yang_mills_polycorr_SOURCES=./src/yang_mills_polycorr.c \
+                             $(align) \
                              $(dSFMT)  \
                              $(endian) \
                              $(funcpoint) \
@@ -141,6 +147,7 @@ yang_mills_polycorr_SOURCES=./src/yang_mills_polycorr.c \
                              $(u1) 
 
 yang_mills_polycorr_long_SOURCES=./src/yang_mills_polycorr_long.c \
+                                  $(align) \
                                   $(dSFMT)  \
                                   $(endian) \
                                   $(funcpoint) \
@@ -155,6 +162,7 @@ yang_mills_polycorr_long_SOURCES=./src/yang_mills_polycorr_long.c \
                                   $(u1) 
 
 yang_mills_t0_SOURCES=./src/yang_mills_t0.c \
+                       $(align) \
                        $(dSFMT)  \
                        $(endian) \
                        $(funcpoint) \
@@ -169,6 +177,7 @@ yang_mills_t0_SOURCES=./src/yang_mills_t0.c \
                        $(u1) 
 
 yang_mills_tube_conn_SOURCES=./src/yang_mills_tube_conn.c \
+                             $(align) \
                              $(dSFMT)  \
                              $(endian) \
                              $(funcpoint) \
@@ -183,6 +192,7 @@ yang_mills_tube_conn_SOURCES=./src/yang_mills_tube_conn.c \
                              $(u1) 
 
 yang_mills_tube_conn_long_SOURCES=./src/yang_mills_tube_conn_long.c \
+                                  $(align) \
                                   $(dSFMT)  \
                                   $(endian) \
                                   $(funcpoint) \
@@ -197,6 +207,7 @@ yang_mills_tube_conn_long_SOURCES=./src/yang_mills_tube_conn_long.c \
                                   $(u1) 
      
 yang_mills_tube_disc_SOURCES=./src/yang_mills_tube_disc.c \
+                             $(align) \
                              $(dSFMT)  \
                              $(endian) \
                              $(funcpoint) \
@@ -211,6 +222,7 @@ yang_mills_tube_disc_SOURCES=./src/yang_mills_tube_disc.c \
                              $(u1) 
 
 yang_mills_tracedef_SOURCES=./src/yang_mills_tracedef.c \
+                            $(align) \
                             $(dSFMT)  \
                             $(endian) \
                             $(funcpoint) \

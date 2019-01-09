@@ -6,7 +6,7 @@
 
 #include"../include/macro.h"
 
-static inline void is_aligned(const void * p, size_t byte_align, char* file, int line)
+inline void is_aligned(const void * p, size_t byte_align, char* file, int line)
   {
   if( (unsigned long)p % byte_align != 0)
     {
