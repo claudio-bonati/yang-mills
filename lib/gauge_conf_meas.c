@@ -361,6 +361,118 @@ void polyakov(Gauge_Conf const * const GC,
    }
 
 
+// compute the mean Polyakov loop and its powers (trace of) in the presence of trace deformation
+void polyakov_with_tracedef(Gauge_Conf const * const GC,
+                            Geometry const * const geo,
+                            GParam const * const param,
+                            double *repoly,
+                            double *impoly)
+   {
+   long rsp;
+   double **rep, **imp;
+   int j, err;
+   long i;
+
+   for(j=0;j<(int)floor(NCOLOR/2);j++)
+      {
+      repoly[j]=0.0;
+      impoly[j]=0.0;
+      }
+
+   err=posix_memalign((void**)&rep, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double*));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   err=posix_memalign((void**)&imp, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double*));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   for(i=0; i<param->d_space_vol; i++)
+      {
+      err=posix_memalign((void**)&(rep[i]), (size_t)DOUBLE_ALIGN, (size_t) (int)floor(NCOLOR/2) * sizeof(double));
+      if(err!=0)
+        {
+        fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
+      err=posix_memalign((void**)&(imp[i]), (size_t)DOUBLE_ALIGN, (size_t) (int)floor(NCOLOR/2) * sizeof(double));
+      if(err!=0)
+        {
+        fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
+      }
+
+   for(i=0; i<param->d_space_vol; i++)
+      {
+      for(j=0; j<(int)floor(NCOLOR/2); j++)
+         {
+         rep[i][j] = 0.0;
+         imp[i][j] = 0.0;
+         }
+      }
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(rsp)
+   #endif
+   for(rsp=0; rsp<param->d_space_vol; rsp++)
+      {
+      long r;
+      int k;
+      GAUGE_GROUP matrix, matrix2;
+
+      r=sisp_and_t_to_si(geo, rsp, 0);
+
+      one(&matrix);
+      for(k=0; k<param->d_size[0]; k++)
+         {
+         times_equal(&matrix, &(GC->lattice[r][0]));
+         r=nnp(geo, r, 0);
+         }
+
+       rep[rsp][0] = retr(&matrix);
+       imp[rsp][0] = imtr(&matrix);
+
+       equal(&matrix2, &matrix);
+
+      for(k=1; k<(int)floor(NCOLOR/2.0); k++)
+         {
+         times_equal(&matrix2, &matrix);
+         rep[rsp][k] = retr(&matrix2);
+         imp[rsp][k] = imtr(&matrix2);
+         }
+      }
+
+    for(j=0; j<(int)floor(NCOLOR/2); j++)
+       {
+       for(i=0; i<param->d_space_vol; i++)
+          {
+          repoly[j] += rep[i][j];
+          impoly[j] += imp[i][j];
+          }
+       }
+
+   for(j=0; j<(int)floor(NCOLOR/2.0); j++)
+      {
+      repoly[j] *= param->d_inv_space_vol;
+      impoly[j] *= param->d_inv_space_vol;
+      }
+
+   for(i=0; i<param->d_space_vol; i++)
+      {
+      free(rep[i]);
+      free(imp[i]);
+      }
+   free(rep);
+   free(imp);
+   }
+
+
 // compute the local topological charge at point r
 // see readme for more details
 double loc_topcharge(Gauge_Conf const * const GC,
@@ -672,6 +784,70 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
      fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
      fprintf(datafilep, "\n");
      fflush(datafilep);
+   #endif
+   }
+
+
+// perform local observables in the case of trace deformation, it computes all the order parameters
+void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
+                                             Geometry const * const geo,
+                                             GParam const * const param,
+                                             FILE *datafilep)
+   {
+   #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
+
+     int i, err;
+     double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1]; // +1 just to avoid warning if NCOLOR=1
+     double *charge, *meanplaq, charge_nocooling;
+
+     plaquette(GC, geo, param, &plaqs, &plaqt);
+     polyakov_with_tracedef(GC, geo, param, polyre, polyim);
+     charge_nocooling=topcharge(GC, geo, param);
+
+     fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+
+     for(i=0; i<(int)floor(NCOLOR/2); i++)
+        {
+        fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
+        }
+     fprintf(datafilep, "%.12g ", charge_nocooling);
+
+     err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+
+     topcharge_cooling(GC, geo, param, charge, meanplaq);
+     for(i=0; i<param->d_coolrepeat; i++)
+        {
+        fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
+        }
+     fprintf(datafilep, "\n");
+
+     fflush(datafilep);
+
+     free(charge);
+     free(meanplaq);
+
+   #else
+
+     double plaqs, plaqt, polyre, polyim;
+
+     plaquette(GC, geo, param, &plaqs, &plaqt);
+     polyakov(GC, geo, param, &polyre, &polyim);
+
+     fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+     fprintf(datafilep, "\n");
+     fflush(datafilep);
+
    #endif
    }
 

@@ -132,6 +132,11 @@ void polyakov(Gauge_Conf const * const GC,
               GParam const * const param,
               double *repoly,
               double *impoly);
+void polyakov_with_tracedef(Gauge_Conf const * const GC,
+                            Geometry const * const geo,
+                            GParam const * const param,
+                            double *repoly,
+                            double *impoly);
 double loc_topcharge(Gauge_Conf const * const GC,
                      Geometry const * const geo,
                      GParam const * const param,
@@ -149,6 +154,10 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
                                FILE *datafilep);
+void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
+                                             Geometry const * const geo,
+                                             GParam const * const param,
+                                             FILE *datafilep);
 void optimize_multihit_polycorr(Gauge_Conf *GC,
                        Geometry const * const geo,
                        GParam const * const param,
