@@ -1,22 +1,84 @@
-direzione 0 = tempo
+******************************************************************************
+************ PROGRAM FOR SIMULATION OF LATTICE YANG-MILLS THEORIES ***********
+******************************************************************************
 
-nell'input i numeri che seguono size sono "tempo x1 x2 ..."
 
-roba che comincia con # e' un commento nell'imput file
+** ACTION
+*****************************************************
+The action used is the standard Wilson action, which for the SU(N) group can be
+written as the sum of
 
-con la macro DEBUG si attivano un mucchio di controlli
-altre macro utili sono OPT_MULTIHIT e OPT_MULTILEVEL
+-beta*(1/N)Re(Tr(paquette))
 
-i loop di Polyakov sono separati nella direzione 1 e la direzione trasversale per il tubo e' la 2
+and possibly a theta therm. If --enable-imaginary-theta is used during
+configuration an imaginary theta term is used of the form
 
-il livello 0 del multilevel e' quello che corrisponde allo step piu' grande
+-theta_im*Top_charge
+
+where the simplest discretization with definite parity of the topological
+charge is used (see later "A note on the topological charge" for more details).
+
+In yang_mills_tracedef a trace deformation is also added to the action, of the
+form
+
+sum_{i=0}^{N/2} h_i|Tr(polyakov^{i+1})/N|^2
+
+The update is performed by means of heatbath and overrelaxation updates (and in
+some case also Metropolis updates) implemented a la Cabibbo-Marinari.
+
+
+** OTHER CONFIGURE PARAMETERS
+*****************************************************
+
+The choice of the gauge group happens at configuration time through the macro
+N_c (N_c=1, 2, ... are available, with N_c=1 corresponding to the U(1) gauge
+theory). As an example, to simulate the SU(5) gauge theory the program has to
+be configured using
+
+./configure N_c=5
+
+Space-time dimension is fixed by the configure macro ST_dim (ST_dim>1) and the
+number of levels to be used in the multilevel algorithm is fixed by Num_levels.
+Finally the configure option 
+
+--enable-use-openmp
+
+enable OpenMP use, the number of threads to be used is fixed by the configure
+macro Num_threads. 
+
+After the configuration, the compilation is performed as usual by
+make
+
+Defining the macro DEBUG several sanity checks are activated, while the macros
+OPT_MULTIHIT and OPT_MULTILEVEL can be used to optimize the number of multihit
+steps and the number of updates to be used in the multilevel algorithm.
+
+
+** INPUT FILE AND SOME CONVENTIONS
+*****************************************************
+
+A template input file is created when calling executables without input file
+and everything following # (up to carriage return) in the input file is
+interpreted as a comment.
+
+Some conventions used in the code are the following:
+
+time is direction 0 and the numbers follosing "size" in the imput are in the
+order "time space1 space2 ..."
+
+when computing Polyakov loop correlators, Polyakov loops are separated along
+direction 1 and, when computing flux tube profiles, the transverse direction is
+direction 2 
+
+level 0 of the multilevel is the one corresponding to the largest
+timeslice.
 
 
 ** A NOTE ON THE TOPOLOGICAL CHARGE
 *********************************************************
 
 Topology for the general group: in the continuum the topological charge is
-defined by
+defined in 4 space-time dimensions by
 
 Q=\frac{1}{64 \pi^2} \int \epsilon_{\mu\nu\rho\sigma} 
    F_{\mu\nu}^a F_{\rho\sigma}^a d^x
@@ -73,4 +135,4 @@ thus
               of \epsilon_{\mu\nu\rho\sigma} 
               ReTr(Q_{\mu\nu}[Q_{\rho\sigma}-Q_{\rho\sigma}^{dag}]) ]
 
-This is the expression used in the code, with \epsilon_{0123}=-1 
+This is the expression used in the code. 

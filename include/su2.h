@@ -20,6 +20,10 @@ typedef struct Su2 {
 
 inline void init_Su2(Su2 * restrict A, double vec[4])
   {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]=vec[0];
   A->comp[1]=vec[1];
   A->comp[2]=vec[2];
@@ -30,6 +34,10 @@ inline void init_Su2(Su2 * restrict A, double vec[4])
 // A=1
 inline void one_Su2(Su2 * restrict A)
   {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]=1.0;
   A->comp[1]=0.0;
   A->comp[2]=0.0;
@@ -40,6 +48,10 @@ inline void one_Su2(Su2 * restrict A)
 // A=0
 inline void zero_Su2(Su2 * restrict A)
   {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]=0.0;
   A->comp[1]=0.0;
   A->comp[2]=0.0;
@@ -56,6 +68,11 @@ inline void equal_Su2(Su2 * restrict A, Su2 const * const restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   A->comp[0]=B->comp[0];
@@ -76,6 +93,11 @@ inline void equal_dag_Su2(Su2 * restrict A, Su2 const * const restrict B)
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]= B->comp[0];
   A->comp[1]=-B->comp[1];
   A->comp[2]=-B->comp[2];
@@ -92,6 +114,11 @@ inline void plus_equal_Su2(Su2 * restrict A, Su2 const * const restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   A->comp[0]+=B->comp[0];
@@ -112,6 +139,11 @@ inline void plus_equal_dag_Su2(Su2 * restrict A, Su2 const * const restrict B)
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]+=B->comp[0];
   A->comp[1]-=B->comp[1];
   A->comp[2]-=B->comp[2];
@@ -128,6 +160,11 @@ inline void minus_equal_Su2(Su2 * restrict A, Su2 const * const restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   A->comp[0]-=B->comp[0];
@@ -148,6 +185,11 @@ inline void minus_equal_times_real_Su2(Su2 * restrict A, Su2 const * const restr
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]-=(r*B->comp[0]);
   A->comp[1]-=(r*B->comp[1]);
   A->comp[2]-=(r*B->comp[2]);
@@ -164,6 +206,11 @@ inline void minus_equal_dag_Su2(Su2 * restrict A, Su2 const * const restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   A->comp[0]-=B->comp[0];
@@ -186,6 +233,12 @@ inline void lin_comb_Su2(Su2 * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]= b*B->comp[0] + c*C->comp[0];
   A->comp[1]= b*B->comp[1] + c*C->comp[1];
   A->comp[2]= b*B->comp[2] + c*C->comp[2];
@@ -204,6 +257,12 @@ inline void lin_comb_dag1_Su2(Su2 * restrict A,
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(C->comp), DOUBLE_ALIGN);
   #endif
 
   A->comp[0]=  b*B->comp[0] + c*C->comp[0];
@@ -226,6 +285,12 @@ inline void lin_comb_dag2_Su2(Su2 * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]= b*B->comp[0] + c*C->comp[0];
   A->comp[1]= b*B->comp[1] - c*C->comp[1];
   A->comp[2]= b*B->comp[2] - c*C->comp[2];
@@ -246,6 +311,12 @@ inline void lin_comb_dag12_Su2(Su2 * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]=  b*B->comp[0] + c*C->comp[0];
   A->comp[1]= -b*B->comp[1] - c*C->comp[1];
   A->comp[2]= -b*B->comp[2] - c*C->comp[2];
@@ -256,6 +327,10 @@ inline void lin_comb_dag12_Su2(Su2 * restrict A,
 // A*=r
 inline void times_equal_real_Su2(Su2 * restrict A, double r)
   {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]*=r;
   A->comp[1]*=r;
   A->comp[2]*=r;
@@ -273,6 +348,11 @@ inline void times_equal_complex_Su2(Su2 * restrict A, double complex r)
     exit(EXIT_FAILURE);
     }
   #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]*=creal(r);
   A->comp[1]*=creal(r);
   A->comp[2]*=creal(r);
@@ -289,6 +369,11 @@ inline void times_equal_Su2(Su2 * restrict A, Su2 const * const restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   register double a0, a1, a2, a3;
@@ -314,6 +399,11 @@ inline void times_equal_dag_Su2(Su2 * restrict A, Su2 const * const restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   register double a0, a1, a2, a3;
@@ -343,6 +433,12 @@ inline void times_Su2(Su2 * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]= B->comp[0]*C->comp[0] - B->comp[1]*C->comp[1] - B->comp[2]*C->comp[2] - B->comp[3]*C->comp[3];
   A->comp[1]= B->comp[0]*C->comp[1] + B->comp[1]*C->comp[0] - B->comp[2]*C->comp[3] + B->comp[3]*C->comp[2];
   A->comp[2]= B->comp[0]*C->comp[2] + B->comp[2]*C->comp[0] + B->comp[1]*C->comp[3] - B->comp[3]*C->comp[1];
@@ -361,6 +457,12 @@ inline void times_dag1_Su2(Su2 * restrict A,
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(C->comp), DOUBLE_ALIGN);
   #endif
 
   A->comp[0]= B->comp[0]*C->comp[0] + B->comp[1]*C->comp[1] + B->comp[2]*C->comp[2] + B->comp[3]*C->comp[3];
@@ -383,6 +485,12 @@ inline void times_dag2_Su2(Su2 * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]=  B->comp[0]*C->comp[0] + B->comp[1]*C->comp[1] + B->comp[2]*C->comp[2] + B->comp[3]*C->comp[3];
   A->comp[1]= -B->comp[0]*C->comp[1] + B->comp[1]*C->comp[0] + B->comp[2]*C->comp[3] - B->comp[3]*C->comp[2];
   A->comp[2]= -B->comp[0]*C->comp[2] + B->comp[2]*C->comp[0] - B->comp[1]*C->comp[3] + B->comp[3]*C->comp[1];
@@ -403,6 +511,12 @@ inline void times_dag12_Su2(Su2 * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   A->comp[0]=  B->comp[0]*C->comp[0] - B->comp[1]*C->comp[1] - B->comp[2]*C->comp[2] - B->comp[3]*C->comp[3];
   A->comp[1]= -B->comp[0]*C->comp[1] - B->comp[1]*C->comp[0] - B->comp[2]*C->comp[3] + B->comp[3]*C->comp[2];
   A->comp[2]= -B->comp[0]*C->comp[2] - B->comp[2]*C->comp[0] + B->comp[1]*C->comp[3] - B->comp[3]*C->comp[1];
@@ -421,6 +535,10 @@ void rand_matrix_p0_Su2(double p0, Su2 *A);
 // sqrt of the determinant
 inline double sqrtdet_Su2(Su2 const * const restrict A)
   {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   return sqrt(A->comp[0]*A->comp[0] + A->comp[1]*A->comp[1]
              + A->comp[2]*A->comp[2] + A->comp[3]*A->comp[3]);
   }
@@ -429,6 +547,10 @@ inline double sqrtdet_Su2(Su2 const * const restrict A)
 // l2 norm of the matrix
 inline double norm_Su2(Su2 const * const restrict A)
   {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   return sqrtdet_Su2(A);
   }
 
@@ -451,6 +573,10 @@ inline double imtr_Su2(Su2 const * const restrict A)
 // unitarize the matrix
 inline void unitarize_Su2(Su2 * restrict A)
   {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   double p;
 
   p=A->comp[0]*A->comp[0] + A->comp[1]*A->comp[1] + A->comp[2]*A->comp[2] + A->comp[3]*A->comp[3];
@@ -473,6 +599,10 @@ inline void ta_Su2(Su2 * restrict A)
 // exponential of the traceless antihermitian part
 inline void taexp_Su2(Su2 * restrict A)
   {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   double v1, v2, v3, norm, s;
 
   // comp[0] is neglected since we consider the ta part
@@ -539,6 +669,12 @@ inline void TensProd_init_Su2(TensProd * restrict TP, Su2 const * const restrict
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A1->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(A2->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(TP->comp), DOUBLE_ALIGN);
   #endif
 
   int i, j, k, l;

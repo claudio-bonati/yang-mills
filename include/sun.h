@@ -18,6 +18,10 @@ typedef struct SuN {
 // A=1
 inline void one_SuN(SuN * restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -35,6 +39,10 @@ inline void one_SuN(SuN * restrict A)
 // A=0
 inline void zero_SuN(SuN * restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -55,6 +63,11 @@ inline void equal_SuN(SuN * restrict A, SuN const * const restrict B)
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -73,6 +86,11 @@ inline void equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   int i, j;
@@ -98,6 +116,11 @@ inline void plus_equal_SuN(SuN * restrict A, SuN const * const restrict B)
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -116,6 +139,11 @@ inline void plus_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   int i, j;
@@ -141,6 +169,11 @@ inline void minus_equal_SuN(SuN * restrict A, SuN const * const restrict B)
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -161,6 +194,11 @@ inline void minus_equal_times_real_SuN(SuN * restrict A, SuN const * const restr
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -179,6 +217,11 @@ inline void minus_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   int i, j;
@@ -206,6 +249,12 @@ inline void lin_comb_SuN(SuN * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -226,6 +275,12 @@ inline void lin_comb_dag1_SuN(SuN * restrict A,
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(C->comp), DOUBLE_ALIGN);
   #endif
 
   int i, j;
@@ -253,6 +308,12 @@ inline void lin_comb_dag2_SuN(SuN * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   int i, j;
 
   for(i=0; i<NCOLOR; i++)
@@ -278,6 +339,12 @@ inline void lin_comb_dag12_SuN(SuN * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   int i, j;
 
   for(i=0; i<NCOLOR; i++)
@@ -293,6 +360,10 @@ inline void lin_comb_dag12_SuN(SuN * restrict A,
 // A*=r
 inline void times_equal_real_SuN(SuN * restrict A, double r)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -305,6 +376,10 @@ inline void times_equal_real_SuN(SuN * restrict A, double r)
 // A*=r
 inline void times_equal_complex_SuN(SuN * restrict A, double complex r)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
@@ -323,6 +398,11 @@ inline void times_equal_SuN(SuN * restrict A, SuN const * const restrict B)
    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
    exit(EXIT_FAILURE);
    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   int i, j, k;
@@ -358,6 +438,11 @@ inline void times_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
    exit(EXIT_FAILURE);
    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
   int i, j, k;
@@ -397,6 +482,12 @@ inline void times_SuN(SuN * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   int i, j, k;
   double complex sum;
 
@@ -426,6 +517,12 @@ inline void times_dag1_SuN(SuN * restrict A,
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(C->comp), DOUBLE_ALIGN);
   #endif
 
   int i, j, k;
@@ -459,6 +556,12 @@ inline void times_dag2_SuN(SuN * restrict A,
     }
   #endif
 
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(C->comp), DOUBLE_ALIGN);
+  #endif
+
   int i, j, k;
   double complex sum;
 
@@ -488,6 +591,12 @@ inline void times_dag12_SuN(SuN * restrict A,
     fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(C->comp), DOUBLE_ALIGN);
   #endif
 
   int i, j, k;
@@ -521,6 +630,10 @@ void rand_algebra_gauss_matrix_SuN(SuN *A);
 // l2 norm of the matrix
 inline double norm_SuN(SuN const * const restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
   double aux, ris;
 
@@ -537,6 +650,10 @@ inline double norm_SuN(SuN const * const restrict A)
 // real part of the trace /N
 inline double retr_SuN(SuN const * const restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
   double ris;
   double complex tr;
@@ -554,6 +671,10 @@ inline double retr_SuN(SuN const * const restrict A)
 // imaginary part of the trace /N
 inline double imtr_SuN(SuN const * const restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
   double ris;
   double complex tr;
@@ -575,6 +696,10 @@ void LU_SuN(SuN const * const A, SuN *ris, int *sign);
 // determinant
 inline complex double det_SuN(SuN const * const restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   #if NCOLOR==3
     complex double ris=0.0+0.0*I;
 
@@ -623,6 +748,10 @@ void unitarize_SuN(SuN *A);
 // takes the traceless antihermitian part
 inline void ta_SuN(SuN * restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   SuN aux, aux1;
   double complex trace;
   int i;
@@ -651,6 +780,10 @@ inline void ta_SuN(SuN * restrict A)
 // eponential of the traceless antihermitian part
 inline void taexp_SuN(SuN * restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   SuN aux, uno, ris;
 
   equal_SuN(&aux, A);
@@ -690,6 +823,10 @@ inline void taexp_SuN(SuN * restrict A)
 // return 0 if matrix is traceless antihermitian, 1 otherwise
 inline int ta_check_SuN(SuN const * const restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   double complex aux;
   int i, j, ris;
 
@@ -719,6 +856,10 @@ inline int ta_check_SuN(SuN const * const restrict A)
 // exponential of a TA matrix
 inline void exp_of_ta_SuN(SuN * restrict A)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
   // we use
   // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
 
@@ -804,7 +945,11 @@ inline void TensProd_init_SuN(TensProd * restrict TP, SuN const * const restrict
     }
   #endif
 
-
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(A2->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(TP->comp), DOUBLE_ALIGN);
+  #endif
 
   int i, j, k, l;
 
