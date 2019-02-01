@@ -7,6 +7,7 @@
 
 #include"macro.h"
 #include"tens_prod.h"
+#include"tens_prod_adj.h"
 
 typedef struct U1 {
      double complex comp __attribute__((aligned(DOUBLE_ALIGN)));
@@ -550,6 +551,20 @@ inline void TensProd_init_U1(TensProd * restrict TP, U1 const * const restrict A
 
   TP->comp[0][0][0][0]=conj(A1->comp)*A2->comp;
   }
+
+
+// initialize tensor product in the adjoint representation
+// using two matrices in the fundamental representation
+inline void TensProdAdj_init_U1(TensProdAdj * restrict TP, U1 const * const restrict A1, U1 const * const restrict A2)
+  {
+  (void) TP;
+  (void) A1;
+  (void) A2;
+
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+  }
+
 
 #endif // U1_H
 

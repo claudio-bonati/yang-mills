@@ -13,6 +13,7 @@
 
 // function to access matrix elements
 #define m(X,Y) ((X)*NCOLOR + (Y))
+#define madj(X,Y) ((X)*(NCOLOR*NCOLOR -1) + (Y))
 
 #define MIN_VALUE 1.0e-13
 

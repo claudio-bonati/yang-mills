@@ -307,5 +307,9 @@ void read_from_binary_file_bigen_U1(FILE *fp, U1 *A)
 void TensProd_init_U1(TensProd *TP, U1 const * const A1, U1 const * const A2);
 
 
+// initialize tensor product in the adjoint representation
+// using two matrices in the fundamental representation
+void TensProdAdj_init_U1(TensProdAdj * restrict TP, U1 const * const restrict A1, U1 const * const restrict A2);
+
 
 #endif

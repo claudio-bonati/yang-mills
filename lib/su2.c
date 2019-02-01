@@ -333,4 +333,13 @@ void read_from_binary_file_bigen_Su2(FILE *fp, Su2 * restrict A)
 // initialize tensor product
 void TensProd_init_Su2(TensProd *TP, Su2 const * const A1, Su2 const * const A2);
 
+
+// convert the fundamental representation matrix B to the adjoint representation matrix A
+void fund_to_adj_Su2(Su2Adj * restrict A, Su2 const * const restrict B);
+
+
+// initialize tensor product in the adjoint representation
+// using two matrices in the fundamental representation
+void TensProdAdj_init_Su2(TensProdAdj * restrict TP, Su2 const * const restrict A1, Su2 const * const restrict A2);
+
 #endif

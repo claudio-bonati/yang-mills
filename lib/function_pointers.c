@@ -8,6 +8,7 @@
 #include"../include/sun.h"
 #include"../include/sun_upd.h"
 #include"../include/tens_prod.h"
+#include"../include/tens_prod_adj.h"
 #include"../include/u1.h"
 #include"../include/u1_upd.h"
 
@@ -59,6 +60,8 @@ void (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_U1;
 void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_U1;
 
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_U1;
+void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProdAdj_init_U1;
+
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_U1;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_U1;
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_U1;
@@ -111,6 +114,8 @@ void (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_Su2;
 void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_Su2;
 
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_Su2;
+void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProdAdj_init_Su2;
+
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_Su2;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_Su2;
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_Su2;
@@ -163,6 +168,8 @@ void (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_SuN;
 void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_SuN;
 
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_SuN;
+void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProdAdj_init_SuN;
+
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_SuN;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_SuN;
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_SuN;

@@ -7,15 +7,19 @@
 
 #include"macro.h"
 #include"tens_prod.h"
-
+#include"tens_prod_adj.h"
 //
 // An Su2 matrix is represented as comp[0]+i\sum_{j=1}^3 comp[j]\sigma_j where
 // sigma_j are Pauli matrices, comp[j] are real and \sum_{j=0}^3 comp[j]^2=1
 //
-
 typedef struct Su2 {
      double comp[4] __attribute__((aligned(DOUBLE_ALIGN)));
 } Su2;
+
+
+typedef struct Su2Adj {
+     double comp[9] __attribute__((aligned(DOUBLE_ALIGN)));
+} Su2Adj;
 
 
 inline void init_Su2(Su2 * restrict A, double vec[4])
@@ -711,5 +715,58 @@ inline void TensProd_init_Su2(TensProd * restrict TP, Su2 const * const restrict
   #undef m2
   }
 
+
+// convert the fundamental representation matrix B to the adjoint representation matrix A
+inline void fund_to_adj_Su2(Su2Adj * restrict A, Su2 const * const restrict B)
+  {
+  A->comp[0]= (pow(B->comp[0],2)+ pow(B->comp[1],2)-pow(B->comp[2],2)-pow(B->comp[3],2));
+  A->comp[1]= 2*(B->comp[0]*B->comp[3]+B->comp[1]*B->comp[2]);
+  A->comp[2]= 2*(-B->comp[0]*B->comp[2]+B->comp[1]*B->comp[3]);
+  A->comp[3]= 2*(-B->comp[0]*B->comp[3]+B->comp[1]*B->comp[2]);
+  A->comp[4]= (pow(B->comp[0],2)- pow(B->comp[1],2)+pow(B->comp[2],2)-pow(B->comp[3],2));
+  A->comp[5]= 2*(B->comp[0]*B->comp[1]+B->comp[2]*B->comp[3]);
+  A->comp[6]= 2*(B->comp[0]*B->comp[2]+B->comp[1]*B->comp[3]);
+  A->comp[7]= 2*(-B->comp[0]*B->comp[1]+B->comp[2]*B->comp[3]);
+  A->comp[8]= (pow(B->comp[0],2)- pow(B->comp[1],2)-pow(B->comp[2],2)+pow(B->comp[3],2));
+  }
+
+
+// initialize tensor product in the adjoint representation
+// using two matrices in the fundamental representation
+inline void TensProdAdj_init_Su2(TensProdAdj * restrict TP, Su2 const * const restrict A1, Su2 const * const restrict A2)
+  {
+  #ifdef DEBUG
+  if(A1==A2)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  int i, j, k, l;
+
+  #define m2adj(X,Y) ((X)*3 + (Y))
+
+  Su2Adj A1adj, A2adj;
+
+  fund_to_adj_Su2(&A1adj, A1);
+  fund_to_adj_Su2(&A2adj, A2);
+
+  for(i=0; i<3; i++)
+     {
+     for(j=0; j<3; j++)
+        {
+        for(k=0; k<3; k++)
+           {
+           for(l=0; l<3; l++)
+              {
+              TP->comp[i][j][k][l]=(A1adj.comp[m2adj(i,j)])*(A2adj.comp[m2adj(k,l)]);
+              }
+           }
+        }
+     }
+
+  #undef m2adj
+  }
 
 #endif

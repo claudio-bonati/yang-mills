@@ -7,6 +7,7 @@
 
 #include"macro.h"
 #include"tens_prod.h"
+#include"tens_prod_adj.h"
 
 typedef struct SuN {
    double complex comp[NCOLOR*NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
@@ -14,6 +15,19 @@ typedef struct SuN {
 //
 //  the element [i][j] can be obtained by matrix.comp[m(i,j)] with m(i,j) defined in macro.h
 //
+
+typedef struct SuNAdj {
+   #if NCOLOR!=1
+     double comp[(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1)] __attribute__((aligned(DOUBLE_ALIGN)));
+   #else // this will never be used, is defined just to avoid warnings
+     double comp[1] __attribute__((aligned(DOUBLE_ALIGN)));
+   #endif
+
+} SuNAdj;
+//
+//  the element [i][j] can be obtained by matrix.comp[madj(i,j)] with madj(i,j) defined in macro.h
+//
+
 
 // A=1
 inline void one_SuN(SuN * restrict A)
@@ -969,6 +983,28 @@ inline void TensProd_init_SuN(TensProd * restrict TP, SuN const * const restrict
   }
 
 
+// convert the fundamental representation matrix B to the adjoint representation matrix A
+inline void fund_to_adj_SuN(SuNAdj * restrict A, SuN const * const restrict B)
+  {
+  (void) A;
+  (void) B;
+
+  fprintf(stderr, "The function fund_to_adj_SuN still has to be written (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+  }
+
+
+// initialize tensor product in the adjoint representation
+// using two matrices in the fundamental representation
+inline void TensProdAdj_init_SuN(TensProdAdj * restrict TP, SuN const * const restrict A1, SuN const * const restrict A2)
+  {
+  (void) TP;
+  (void) A1;
+  (void) A2;
+
+  fprintf(stderr, "The function TensProd_adj_init_SuN still has to be written (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+  }
 
 
 #endif

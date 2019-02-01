@@ -6,7 +6,6 @@
 #include<stdlib.h>
 #include<string.h>
 
-#include"../include/aligncheck.h"
 #include"../include/endianness.h"
 #include"../include/macro.h"
 #include"../include/tens_prod.h"

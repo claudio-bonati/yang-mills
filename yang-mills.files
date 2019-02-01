@@ -61,3 +61,6 @@ src/yang_mills_tracedef.c
 src/yang_mills_tube_conn.c
 src/yang_mills_tube_conn_long.c
 lib/aligncheck.c
+include/tens_prod_adj.h
+lib/tens_prod_adj.c
+src/debug_su2_adj.c

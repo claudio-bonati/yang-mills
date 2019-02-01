@@ -77,10 +77,10 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = conf_check$(EXEEXT) debug_rng$(EXEEXT) \
-	debug_su2$(EXEEXT) debug_sun$(EXEEXT) debug_u1$(EXEEXT) \
-	yang_mills_local$(EXEEXT) yang_mills_polycorr$(EXEEXT) \
-	yang_mills_polycorr_long$(EXEEXT) yang_mills_t0$(EXEEXT) \
-	yang_mills_tube_conn$(EXEEXT) \
+	debug_su2$(EXEEXT) debug_su2_adj$(EXEEXT) debug_sun$(EXEEXT) \
+	debug_u1$(EXEEXT) yang_mills_local$(EXEEXT) \
+	yang_mills_polycorr$(EXEEXT) yang_mills_polycorr_long$(EXEEXT) \
+	yang_mills_t0$(EXEEXT) yang_mills_tube_conn$(EXEEXT) \
 	yang_mills_tube_conn_long$(EXEEXT) \
 	yang_mills_tube_disc$(EXEEXT) yang_mills_tracedef$(EXEEXT)
 subdir = .
@@ -127,6 +127,11 @@ am_debug_su2_OBJECTS = ./src/debug_su2.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_6) $(am__objects_7)
 debug_su2_OBJECTS = $(am_debug_su2_OBJECTS)
 debug_su2_LDADD = $(LDADD)
+am_debug_su2_adj_OBJECTS = ./src/debug_su2_adj.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7)
+debug_su2_adj_OBJECTS = $(am_debug_su2_adj_OBJECTS)
+debug_su2_adj_LDADD = $(LDADD)
 am_debug_sun_OBJECTS = ./src/debug_sun.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7) $(am__objects_8)
@@ -142,7 +147,8 @@ am__objects_10 = ./lib/gauge_conf_def.$(OBJEXT) \
 	./lib/gauge_conf_multilevel.$(OBJEXT) \
 	./lib/gauge_conf_upd.$(OBJEXT)
 am__objects_11 = ./lib/geometry.$(OBJEXT)
-am__objects_12 = ./lib/tens_prod.$(OBJEXT)
+am__objects_12 = ./lib/tens_prod.$(OBJEXT) \
+	./lib/tens_prod_adj.$(OBJEXT)
 am_yang_mills_local_OBJECTS = ./src/yang_mills_local.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	$(am__objects_4) $(am__objects_10) $(am__objects_11) \
@@ -234,14 +240,16 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
-	$(debug_su2_SOURCES) $(debug_sun_SOURCES) $(debug_u1_SOURCES) \
+	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
+	$(debug_sun_SOURCES) $(debug_u1_SOURCES) \
 	$(yang_mills_local_SOURCES) $(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_long_SOURCES) $(yang_mills_t0_SOURCES) \
 	$(yang_mills_tracedef_SOURCES) $(yang_mills_tube_conn_SOURCES) \
 	$(yang_mills_tube_conn_long_SOURCES) \
 	$(yang_mills_tube_disc_SOURCES)
 DIST_SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
-	$(debug_su2_SOURCES) $(debug_sun_SOURCES) $(debug_u1_SOURCES) \
+	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
+	$(debug_sun_SOURCES) $(debug_u1_SOURCES) \
 	$(yang_mills_local_SOURCES) $(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_long_SOURCES) $(yang_mills_t0_SOURCES) \
 	$(yang_mills_tracedef_SOURCES) $(yang_mills_tube_conn_SOURCES) \
@@ -436,7 +444,9 @@ sun = ./include/sun_aux.h \
       ./lib/sun_upd.c 
 
 tens_prod = ./include/tens_prod.h \
-            ./lib/tens_prod.c
+            ./include/tens_prod_adj.h \
+            ./lib/tens_prod.c \
+            ./lib/tens_prod_adj.c
 
 u1 = ./include/u1.h \
      ./include/u1_upd.h \
@@ -467,6 +477,15 @@ debug_su2_SOURCES = ./src/debug_su2.c \
                   ./include/macro.h \
                   $(random) \
                   $(su2)
+
+debug_su2_adj_SOURCES = ./src/debug_su2_adj.c \
+                      $(align) \
+                      $(dSFMT) \
+                      $(endian) \
+                      $(gparam) \
+                      ./include/macro.h \
+                      $(random) \
+                      $(su2) 
 
 debug_sun_SOURCES = ./src/debug_sun.c \
                   $(align) \
@@ -758,6 +777,12 @@ debug_rng$(EXEEXT): $(debug_rng_OBJECTS) $(debug_rng_DEPENDENCIES) $(EXTRA_debug
 debug_su2$(EXEEXT): $(debug_su2_OBJECTS) $(debug_su2_DEPENDENCIES) $(EXTRA_debug_su2_DEPENDENCIES) 
 	@rm -f debug_su2$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_su2_OBJECTS) $(debug_su2_LDADD) $(LIBS)
+./src/debug_su2_adj.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+debug_su2_adj$(EXEEXT): $(debug_su2_adj_OBJECTS) $(debug_su2_adj_DEPENDENCIES) $(EXTRA_debug_su2_adj_DEPENDENCIES) 
+	@rm -f debug_su2_adj$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(debug_su2_adj_OBJECTS) $(debug_su2_adj_LDADD) $(LIBS)
 ./src/debug_sun.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
@@ -783,6 +808,8 @@ debug_u1$(EXEEXT): $(debug_u1_OBJECTS) $(debug_u1_DEPENDENCIES) $(EXTRA_debug_u1
 ./lib/geometry.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/tens_prod.$(OBJEXT): lib/$(am__dirstamp) \
+	lib/$(DEPDIR)/$(am__dirstamp)
+./lib/tens_prod_adj.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
 
 yang_mills_local$(EXEEXT): $(yang_mills_local_OBJECTS) $(yang_mills_local_DEPENDENCIES) $(EXTRA_yang_mills_local_DEPENDENCIES) 
@@ -856,11 +883,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/sun_aux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/sun_upd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/tens_prod.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/tens_prod_adj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/u1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/u1_upd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/conf_check.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_rng.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2_adj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_sun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_u1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_local.Po@am__quote@

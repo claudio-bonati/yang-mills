@@ -1,6 +1,7 @@
 bin_PROGRAMS = conf_check \
                debug_rng \
                debug_su2 \
+               debug_su2_adj \
                debug_sun \
                debug_u1 \
                yang_mills_local \
@@ -65,7 +66,9 @@ sun = ./include/sun_aux.h \
       ./lib/sun_upd.c 
 
 tens_prod = ./include/tens_prod.h \
-            ./lib/tens_prod.c
+            ./include/tens_prod_adj.h \
+            ./lib/tens_prod.c \
+            ./lib/tens_prod_adj.c
 
 u1 = ./include/u1.h \
      ./include/u1_upd.h \
@@ -96,6 +99,15 @@ debug_su2_SOURCES=./src/debug_su2.c \
                   ./include/macro.h \
                   $(random) \
                   $(su2)
+
+debug_su2_adj_SOURCES=./src/debug_su2_adj.c \
+                      $(align) \
+                      $(dSFMT) \
+                      $(endian) \
+                      $(gparam) \
+                      ./include/macro.h \
+                      $(random) \
+                      $(su2) 
 
 debug_sun_SOURCES=./src/debug_sun.c \
                   $(align) \

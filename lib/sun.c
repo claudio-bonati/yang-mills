@@ -14,6 +14,7 @@
 #include"../include/sun.h"
 #include"../include/sun_upd.h"
 #include"../include/tens_prod.h"
+#include"../include/tens_prod_adj.h"
 
 // A=1
 void one_SuN(SuN *A);
@@ -607,6 +608,15 @@ void read_from_binary_file_bigen_SuN(FILE *fp, SuN *A)
 
 // initialize tensor product
 void TensProd_init_SuN(TensProd *TP, SuN const * const A1, SuN const * const A2);
+
+
+// convert the fundamental representation matrix B to the adjoint representation matrix A
+void fund_to_adj_SuN(SuNAdj * restrict A, SuN const * const restrict B);
+
+
+// initialize tensor product in the adjoint representation
+// using two matrices in the fundamental representation
+void TensProdAdj_init_SuN(TensProdAdj * restrict TP, SuN const * const restrict A1, SuN const * const restrict A2);
 
 
 #endif
