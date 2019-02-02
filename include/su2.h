@@ -747,7 +747,8 @@ inline void TensProdAdj_init_Su2(TensProdAdj * restrict TP, Su2 const * const re
 
   #define m2adj(X,Y) ((X)*3 + (Y))
 
-  Su2Adj A1adj, A2adj;
+  Su2Adj A1adj  __attribute__((aligned(DOUBLE_ALIGN)));
+  Su2Adj A2adj  __attribute__((aligned(DOUBLE_ALIGN)));
 
   fund_to_adj_Su2(&A1adj, A1);
   fund_to_adj_Su2(&A2adj, A2);

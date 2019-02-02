@@ -1070,6 +1070,240 @@ void perform_measures_polycorr(Gauge_Conf *GC,
    }
 
 
+// to optimize the number of hits to be used in multilevel for the adjoint representation
+void optimize_multihit_polycorradj(Gauge_Conf *GC,
+                                   Geometry const * const geo,
+                                   GParam const * const param,
+                                   FILE *datafilep)
+  {
+  const int max_hit=50;
+  const int dir=1;
+
+  int i, mh, t_tmp, err;
+  long r, r1, r2;
+  double poly_std, poly_average, diff_sec;
+  double complex tr;
+  double *poly_array;
+  time_t time1, time2;
+  GAUGE_GROUP matrix, tmp;
+
+  err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+
+  #ifdef THETA_MODE
+   compute_clovers(GC, geo, param, 0);
+  #endif
+
+  fprintf(datafilep, "Multihit optimization: \n");
+  for(mh=1; mh<max_hit; mh++)
+     {
+     time(&time1);
+
+     // polyakov loop in the adjoint representation computation
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        one(&matrix);
+        for(i=0; i<param->d_size[0]; i++)
+           {
+           multihit(GC,
+                    geo,
+                    param,
+                    sisp_and_t_to_si(geo, r, i),
+                    0,
+                    mh,
+                    &tmp);
+           times_equal(&matrix, &tmp);
+           }
+
+        //trace of the matix in the fundamental representation
+        tr=NCOLOR*(retr(&matrix)+I*imtr(&matrix));
+
+        //trace of the matrix in adjoint representation
+        poly_array[r]=(double)(tr*conj(tr))-1.0;
+        #if NCOLOR!=1
+          poly_array[r]/=(NCOLOR*NCOLOR-1);
+        #endif
+        }
+
+     // average correlator computation
+     poly_average=0.0;
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        r1=sisp_and_t_to_si(geo, r, 0);
+        for(i=0; i<param->d_dist_poly; i++)
+           {
+           r1=nnp(geo, r1, dir);
+           }
+        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
+        poly_average+=fabs(poly_array[r]*poly_array[r2]);
+        }
+     poly_average*=param->d_inv_space_vol;
+
+     // std computation
+     poly_std=0.0;
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        r1=sisp_and_t_to_si(geo, r, 0);
+        for(i=0; i<param->d_dist_poly; i++)
+           {
+           r1=nnp(geo, r1, dir);
+           }
+        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
+        poly_std += pow(fabs(poly_array[r]*poly_array[r2])-poly_average, 2.0);
+        }
+     poly_std*=param->d_inv_space_vol;
+     poly_std*=param->d_inv_space_vol;
+
+     time(&time2);
+     diff_sec = difftime(time2, time1);
+
+     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_average*poly_average*mh, poly_std*mh, diff_sec);
+
+     fflush(datafilep);
+     }
+
+  free(poly_array);
+  }
+
+
+// to optimize the multilevel (adjoint representation)
+void optimize_multilevel_polycorradj(Gauge_Conf *GC,
+                                     Geometry const * const geo,
+                                     GParam const * const param,
+                                     FILE *datafilep)
+   {
+   int i, err;
+   long r;
+   double poly_std, poly_average;
+   double *poly_array;
+
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   fprintf(datafilep, "Multilevel optimization: ");
+   fprintf(datafilep, "the smaller the value the better the update\n");
+
+   (void) geo;
+   /*
+   multilevel_polycorradj(GC,
+                          geo,
+                          param,
+                          param->d_size[0]);
+   */
+
+   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
+         }
+      }
+
+   // averages
+   poly_average=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_array[r]=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
+      poly_average+=fabs(poly_array[r]);
+      }
+   poly_average*=param->d_inv_space_vol;
+
+   // fluctuations
+   poly_std=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_std+=pow(fabs(poly_array[r])-poly_average, 2.0);
+      }
+   poly_std*=param->d_inv_space_vol;
+   poly_std*=param->d_inv_space_vol;
+
+   // normalizations
+   poly_average*=poly_average;
+   for(i=0; i<NLEVELS; i++)
+      {
+      poly_average*=(double) param->d_ml_upd[i];
+      }
+   for(i=0; i<NLEVELS; i++)
+      {
+      poly_std*=(double) param->d_ml_upd[i];
+      }
+
+   fprintf(datafilep, "%.12g  %.12g ", poly_average, poly_std);
+   for(i=0; i<NLEVELS; i++)
+      {
+      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
+      }
+   fprintf(datafilep, "\n");
+   fflush(datafilep);
+
+   free(poly_array);
+   }
+
+
+// perform the computation of the polyakov loop correlator in the adjoint representation with the multilevel algorithm
+void perform_measures_polycorradj(Gauge_Conf *GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
+                                  FILE *datafilep)
+   {
+   #ifndef OPT_MULTIHIT
+   #ifndef OPT_MULTILEVEL
+     double ris;
+     long r;
+     int i;
+
+     (void) geo;
+/*
+     multilevel_polycorrag(GC,
+                geo,
+                param,
+                param->d_size[0]);
+*/
+
+     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+        {
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r)
+        #endif
+        for(r=0; r<param->d_space_vol; r++)
+           {
+           times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
+           }
+        }
+
+     ris=0.0;
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        ris+=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
+        }
+     ris*=param->d_inv_space_vol;
+
+     fprintf(datafilep, "%.12g\n", ris);
+     fflush(datafilep);
+   #endif
+   #endif
+
+   #ifdef OPT_MULTIHIT
+     optimize_multihit_polycorradj(GC, geo, param, datafilep);
+   #endif
+
+   #ifdef OPT_MULTILEVEL
+     optimize_multilevel_polycorradj(GC, geo, param, datafilep);
+   #endif
+   }
+
+
 // to optimize the multilevel
 void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
                                        GParam const * const param,

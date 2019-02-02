@@ -19,7 +19,7 @@ typedef struct TensProdAdj {
 
 
 // initialize to zero
-inline void zero_TensProd_adj(TensProdAdj * restrict A)
+inline void zero_TensProdAdj(TensProdAdj * restrict A)
  {
  int i0, i1, i2, i3;
 
@@ -40,7 +40,7 @@ inline void zero_TensProd_adj(TensProdAdj * restrict A)
 
 
 // initialize to one
-inline void one_TensProd_adj(TensProdAdj * restrict A)
+inline void one_TensProdAdj(TensProdAdj * restrict A)
  {
  int i0, i1, i2, i3;
 
@@ -69,7 +69,7 @@ inline void one_TensProd_adj(TensProdAdj * restrict A)
 
 
 // A=B
-inline void equal_TensProd_adj(TensProdAdj * restrict A, TensProdAdj const * const restrict B)
+inline void equal_TensProdAdj(TensProdAdj * restrict A, TensProdAdj const * const restrict B)
  {
  #ifdef DEBUG
  if(A==B)
@@ -98,7 +98,7 @@ inline void equal_TensProd_adj(TensProdAdj * restrict A, TensProdAdj const * con
 
 
 // A*=r
-inline void times_equal_real_TensProd_adj(TensProdAdj * restrict A, double r)
+inline void times_equal_real_TensProdAdj(TensProdAdj * restrict A, double r)
  {
  int i0, i1, i2, i3;
 
@@ -119,7 +119,7 @@ inline void times_equal_real_TensProd_adj(TensProdAdj * restrict A, double r)
 
 
 // A+=B
-inline void plus_equal_TensProd_adj(TensProdAdj * restrict A, TensProdAdj const * const restrict B)
+inline void plus_equal_TensProdAdj(TensProdAdj * restrict A, TensProdAdj const * const restrict B)
  {
  #ifdef DEBUG
  if(A==B)
@@ -148,7 +148,7 @@ inline void plus_equal_TensProd_adj(TensProdAdj * restrict A, TensProdAdj const 
 
 
 // A=B*C
-inline void times_TensProd_adj(TensProdAdj * restrict A,
+inline void times_TensProdAdj(TensProdAdj * restrict A,
                                TensProdAdj const * const restrict B,
                                TensProdAdj const * const restrict C)
  {
@@ -190,7 +190,7 @@ inline void times_TensProd_adj(TensProdAdj * restrict A,
 
 
 // A*=B
-inline void times_equal_TensProd_adj(TensProdAdj * restrict A, TensProdAdj const * const restrict B)
+inline void times_equal_TensProdAdj(TensProdAdj * restrict A, TensProdAdj const * const restrict B)
  {
  #ifdef DEBUG
  if(A==B )
@@ -202,12 +202,12 @@ inline void times_equal_TensProd_adj(TensProdAdj * restrict A, TensProdAdj const
 
  TensProdAdj tmp __attribute__((aligned(DOUBLE_ALIGN)));
 
- equal_TensProd_adj(&tmp, A);
- times_TensProd_adj(A, &tmp, B);
+ equal_TensProdAdj(&tmp, A);
+ times_TensProdAdj(A, &tmp, B);
  }
 
 
-inline double retr_TensProd_adj(TensProdAdj const * const restrict A)
+inline double retr_TensProdAdj(TensProdAdj const * const restrict A)
  {
  int i0, i1;
  double tr;
@@ -229,7 +229,7 @@ inline double retr_TensProd_adj(TensProdAdj const * const restrict A)
  }
 
 
-inline double imtr_TensProd_adj(TensProdAdj const * const restrict A)
+inline double imtr_TensProdAdj(TensProdAdj const * const restrict A)
  {
  (void) A; // just to avoid warning
 

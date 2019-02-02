@@ -14,6 +14,7 @@
 #include"su2.h"
 #include"sun.h"
 #include"tens_prod.h"
+#include"tens_prod_adj.h"
 #include"u1.h"
 
 
@@ -26,6 +27,9 @@ typedef struct Gauge_Conf {
   // for computing the polyakov loop correlator with multilevel
   TensProd ***ml_polycorr;   // [NLEVELS] [d_size[0]/d_ml_step[i]] [space_vol]
   GAUGE_GROUP **loc_poly;    // [d_size[0]/d_ml_step[NLEVELS-1]] [space_vol] auxilliary vector to be used in the multilevel
+
+  // for computing the polyakov loop correlator in the adjoint rep. with multilevel
+  TensProdAdj ***ml_polycorradj;   // [NLEVELS] [d_size[0]/d_ml_step[i]] [space_vol]
 
   // for the disconnected correlator for string width
   TensProd **ml_polyplaq;   // [NLEVELS] [only slice 0] [space_vol]
@@ -70,6 +74,10 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
 void compute_md5sum_polycorr(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                              Gauge_Conf const * const GC,
                              GParam const * const param);
+void alloc_polycorradj(Gauge_Conf *GC,
+                       GParam const * const param);
+void free_polycorradj(Gauge_Conf *GC,
+                      GParam const * const param);
 void alloc_tube_disc_stuff(Gauge_Conf *GC,
                            GParam const * const param);
 void free_tube_disc_stuff(Gauge_Conf *GC,
@@ -170,6 +178,18 @@ void perform_measures_polycorr(Gauge_Conf * GC,
                                Geometry const * const geo,
                                GParam const * const param,
                                FILE *datafilep);
+void optimize_multihit_polycorradj(Gauge_Conf *GC,
+                                   Geometry const * const geo,
+                                   GParam const * const param,
+                                   FILE *datafilep);
+void optimize_multilevel_polycorradj(Gauge_Conf *GC,
+                                     Geometry const * const geo,
+                                     GParam const * const param,
+                                     FILE *datafilep);
+void perform_measures_polycorradj(Gauge_Conf *GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
+                                  FILE *datafilep);
 void perform_measures_polycorr_long(Gauge_Conf * GC,
                                     GParam const * const param,
                                     FILE *datafilep);

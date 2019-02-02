@@ -629,6 +629,69 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
   }
 
 
+// allocate the ml_polycorradj arrays
+void alloc_polycorradj(Gauge_Conf *GC,
+                       GParam const * const param)
+  {
+  int i, j, err;
+
+  err=posix_memalign((void**)&(GC->ml_polycorradj), (size_t) DOUBLE_ALIGN, (size_t) NLEVELS * sizeof(TensProdAdj **));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating ml_polycorradj (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(i=0; i<NLEVELS; i++)
+       {
+       err=posix_memalign((void**)&(GC->ml_polycorradj[i]), (size_t) DOUBLE_ALIGN, (size_t) (param->d_size[0] / param->d_ml_step[i]) * sizeof(TensProdAdj *));
+       if(err!=0)
+         {
+         fprintf(stderr, "Problems in allocating ml_polycorradj[%d] (%s, %d)\n", i, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       else
+         {
+         for(j=0; j<(param->d_size[0]/param->d_ml_step[i]); j++)
+            {
+            err=posix_memalign((void**)&(GC->ml_polycorradj[i][j]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(TensProdAdj));
+            if(err!=0)
+              {
+              fprintf(stderr, "Problems in allocating ml_polycorrag[%d][%d] (%s, %d)\n", i, j, __FILE__, __LINE__);
+              exit(EXIT_FAILURE);
+              }
+            }
+         }
+       }
+    }
+  }
+
+
+// free the ml_polycorradj arrays
+void free_polycorradj(Gauge_Conf *GC,
+                      GParam const * const param)
+  {
+  int i, j;
+
+  for(i=0; i<NLEVELS; i++)
+     {
+     for(j=0; j<(param->d_size[0]/param->d_ml_step[i]); j++)
+        {
+        free(GC->ml_polycorradj[i][j]);
+        }
+     free(GC->ml_polycorradj[i]);
+     }
+  free(GC->ml_polycorradj);
+  }
+
+
+
+
+
+
+
+
 // allocate the ml_polycorr, polyplaq arrays and related stuff
 void alloc_tube_disc_stuff(Gauge_Conf *GC,
                            GParam const * const param)
