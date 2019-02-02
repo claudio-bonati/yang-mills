@@ -64,3 +64,5 @@ lib/aligncheck.c
 include/tens_prod_adj.h
 lib/tens_prod_adj.c
 src/debug_su2_adj.c
+src/yang_mills_polycorradj.c
+lib/tmp.c

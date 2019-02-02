@@ -167,9 +167,9 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              GParam const * const param,
                                              FILE *datafilep);
 void optimize_multihit_polycorr(Gauge_Conf *GC,
-                       Geometry const * const geo,
-                       GParam const * const param,
-                       FILE *datafilep);
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                FILE *datafilep);
 void optimize_multilevel_polycorr(Gauge_Conf *GC,
                                   Geometry const * const geo,
                                   GParam const * const param,
@@ -230,7 +230,10 @@ void multilevel_polycorr(Gauge_Conf *GC,
                           Geometry const * const geo,
                           GParam const * const param,
                           int dt);
-
+void multilevel_polycorradj(Gauge_Conf * GC,
+                            Geometry const * const geo,
+                            GParam const * const param,
+                            int dt);
 void multilevel_polycorr_long(Gauge_Conf * GC,
                               Geometry const * const geo,
                               GParam const * const param,

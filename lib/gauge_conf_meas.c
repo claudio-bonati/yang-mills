@@ -880,6 +880,8 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
   #endif
 
   fprintf(datafilep, "Multihit optimization: \n");
+  fprintf(datafilep, "the smaller the value the better the multihit\n");
+
   for(mh=1; mh<max_hit; mh++)
      {
      time(&time1);
@@ -934,7 +936,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
      time(&time2);
      diff_sec = difftime(time2, time1);
 
-     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_average*poly_average*mh, poly_std*mh, diff_sec);
+     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_std*poly_std*mh, poly_std*mh, diff_sec);
 
      fflush(datafilep);
      }
@@ -1099,6 +1101,8 @@ void optimize_multihit_polycorradj(Gauge_Conf *GC,
   #endif
 
   fprintf(datafilep, "Multihit optimization: \n");
+  fprintf(datafilep, "the smaller the value the better the multihit\n");
+
   for(mh=1; mh<max_hit; mh++)
      {
      time(&time1);
@@ -1123,8 +1127,8 @@ void optimize_multihit_polycorradj(Gauge_Conf *GC,
         tr=NCOLOR*(retr(&matrix)+I*imtr(&matrix));
 
         //trace of the matrix in adjoint representation
-        poly_array[r]=(double)(tr*conj(tr))-1.0;
-        #if NCOLOR!=1
+        poly_array[r]=cabs(tr*conj(tr))-1.0;
+        #if NCOLOR != 1
           poly_array[r]/=(NCOLOR*NCOLOR-1);
         #endif
         }
@@ -1161,7 +1165,7 @@ void optimize_multihit_polycorradj(Gauge_Conf *GC,
      time(&time2);
      diff_sec = difftime(time2, time1);
 
-     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_average*poly_average*mh, poly_std*mh, diff_sec);
+     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_std*poly_std*mh, poly_std*mh, diff_sec);
 
      fflush(datafilep);
      }
@@ -1191,13 +1195,10 @@ void optimize_multilevel_polycorradj(Gauge_Conf *GC,
    fprintf(datafilep, "Multilevel optimization: ");
    fprintf(datafilep, "the smaller the value the better the update\n");
 
-   (void) geo;
-   /*
    multilevel_polycorradj(GC,
                           geo,
                           param,
                           param->d_size[0]);
-   */
 
    for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
       {
@@ -1263,13 +1264,10 @@ void perform_measures_polycorradj(Gauge_Conf *GC,
      long r;
      int i;
 
-     (void) geo;
-/*
-     multilevel_polycorrag(GC,
-                geo,
-                param,
-                param->d_size[0]);
-*/
+     multilevel_polycorradj(GC,
+                            geo,
+                            param,
+                            param->d_size[0]);
 
      for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
         {
