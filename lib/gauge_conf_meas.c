@@ -863,7 +863,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
 
   int i, mh, t_tmp, err;
   long r, r1, r2;
-  double poly_std, poly_average, diff_sec;
+  double poly_corr, diff_sec;
   double complex *poly_array;
   time_t time1, time2;
   GAUGE_GROUP matrix, tmp;
@@ -905,7 +905,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
         }
 
      // average correlator computation
-     poly_average=0.0;
+     poly_corr=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
         r1=sisp_and_t_to_si(geo, r, 0);
@@ -914,29 +914,14 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
            r1=nnp(geo, r1, dir);
            }
         si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
-        poly_average+=cabs(poly_array[r]*conj(poly_array[r2]));
+        poly_corr+=cabs(poly_array[r]*conj(poly_array[r2]));
         }
-     poly_average*=param->d_inv_space_vol;
-
-     // std computation
-     poly_std=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        r1=sisp_and_t_to_si(geo, r, 0);
-        for(i=0; i<param->d_dist_poly; i++)
-           {
-           r1=nnp(geo, r1, dir);
-           }
-        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
-        poly_std += pow(cabs(poly_array[r]*conj(poly_array[r2]))-poly_average, 2.0);
-        }
-     poly_std*=param->d_inv_space_vol;
-     poly_std*=param->d_inv_space_vol;
+     poly_corr*=param->d_inv_space_vol;
 
      time(&time2);
      diff_sec = difftime(time2, time1);
 
-     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_std*poly_std*mh, poly_std*mh, diff_sec);
+     fprintf(datafilep, "%d  %.12g (time:%g)\n", mh, poly_corr*sqrt(mh), diff_sec);
 
      fflush(datafilep);
      }
@@ -953,7 +938,7 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
    {
    int i, err;
    long r;
-   double poly_std, poly_average;
+   double poly_corr;
    double complex *poly_array;
 
    err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
@@ -982,35 +967,22 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
       }
 
    // averages
-   poly_average=0.0;
+   poly_corr=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
       poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      poly_average+=cabs(poly_array[r]);
+      poly_corr+=cabs(poly_array[r]);
       }
-   poly_average*=param->d_inv_space_vol;
-
-   // fluctuations
-   poly_std=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_std+=pow(cabs(poly_array[r])-poly_average, 2.0);
-      }
-   poly_std*=param->d_inv_space_vol;
-   poly_std*=param->d_inv_space_vol;
+   poly_corr*=param->d_inv_space_vol;
 
    // normalizations
-   poly_average*=poly_average;
+   poly_corr*=poly_corr;
    for(i=0; i<NLEVELS; i++)
       {
-      poly_average*=(double) param->d_ml_upd[i];
-      }
-   for(i=0; i<NLEVELS; i++)
-      {
-      poly_std*=(double) param->d_ml_upd[i];
+      poly_corr*=(double) sqrt(param->d_ml_upd[i]);
       }
 
-   fprintf(datafilep, "%.12g  %.12g ", poly_average, poly_std);
+   fprintf(datafilep, "%.12g ", poly_corr);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
@@ -1083,7 +1055,7 @@ void optimize_multihit_polycorradj(Gauge_Conf *GC,
 
   int i, mh, t_tmp, err;
   long r, r1, r2;
-  double poly_std, poly_average, diff_sec;
+  double poly_corr, diff_sec;
   double complex tr;
   double *poly_array;
   time_t time1, time2;
@@ -1134,7 +1106,7 @@ void optimize_multihit_polycorradj(Gauge_Conf *GC,
         }
 
      // average correlator computation
-     poly_average=0.0;
+     poly_corr=0.0;
      for(r=0; r<param->d_space_vol; r++)
         {
         r1=sisp_and_t_to_si(geo, r, 0);
@@ -1143,29 +1115,14 @@ void optimize_multihit_polycorradj(Gauge_Conf *GC,
            r1=nnp(geo, r1, dir);
            }
         si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
-        poly_average+=fabs(poly_array[r]*poly_array[r2]);
+        poly_corr+=fabs(poly_array[r]*poly_array[r2]);
         }
-     poly_average*=param->d_inv_space_vol;
-
-     // std computation
-     poly_std=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        r1=sisp_and_t_to_si(geo, r, 0);
-        for(i=0; i<param->d_dist_poly; i++)
-           {
-           r1=nnp(geo, r1, dir);
-           }
-        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
-        poly_std += pow(fabs(poly_array[r]*poly_array[r2])-poly_average, 2.0);
-        }
-     poly_std*=param->d_inv_space_vol;
-     poly_std*=param->d_inv_space_vol;
+     poly_corr*=param->d_inv_space_vol;
 
      time(&time2);
      diff_sec = difftime(time2, time1);
 
-     fprintf(datafilep, "%d  %.12g  %.12g  (time:%g)\n", mh, poly_std*poly_std*mh, poly_std*mh, diff_sec);
+     fprintf(datafilep, "%d  %.12g  (time:%g)\n", mh, poly_corr*sqrt(mh), diff_sec);
 
      fflush(datafilep);
      }
@@ -1182,7 +1139,7 @@ void optimize_multilevel_polycorradj(Gauge_Conf *GC,
    {
    int i, err;
    long r;
-   double poly_std, poly_average;
+   double poly_corr;
    double *poly_array;
 
    err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
@@ -1212,35 +1169,22 @@ void optimize_multilevel_polycorradj(Gauge_Conf *GC,
       }
 
    // averages
-   poly_average=0.0;
+   poly_corr=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
       poly_array[r]=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
-      poly_average+=fabs(poly_array[r]);
+      poly_corr+=fabs(poly_array[r]);
       }
-   poly_average*=param->d_inv_space_vol;
-
-   // fluctuations
-   poly_std=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_std+=pow(fabs(poly_array[r])-poly_average, 2.0);
-      }
-   poly_std*=param->d_inv_space_vol;
-   poly_std*=param->d_inv_space_vol;
+   poly_corr*=param->d_inv_space_vol;
 
    // normalizations
-   poly_average*=poly_average;
+   poly_corr*=poly_corr;
    for(i=0; i<NLEVELS; i++)
       {
-      poly_average*=(double) param->d_ml_upd[i];
-      }
-   for(i=0; i<NLEVELS; i++)
-      {
-      poly_std*=(double) param->d_ml_upd[i];
+      poly_corr*=(double) sqrt(param->d_ml_upd[i]);
       }
 
-   fprintf(datafilep, "%.12g  %.12g ", poly_average, poly_std);
+   fprintf(datafilep, "%.12g ", poly_corr);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
@@ -1309,7 +1253,7 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
    {
    int i, err;
    long r;
-   double poly_std, poly_average;
+   double poly_corr;
    double complex *poly_array;
 
    err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
@@ -1334,38 +1278,23 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
       }
 
    // average
-   poly_average=0.0;
+   poly_corr=0.0;
    for(r=0; r<param->d_space_vol; r++)
       {
       poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      poly_average+=cabs(poly_array[r]);
+      poly_corr+=cabs(poly_array[r]);
       }
-   poly_average*=param->d_inv_space_vol;
-
-   // fluctuation
-   poly_std=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_std+=pow(cabs(poly_array[r])-poly_average, 2.0);
-      }
-   poly_std*=param->d_inv_space_vol;
-   poly_std*=param->d_inv_space_vol;
+   poly_corr*=param->d_inv_space_vol;
 
    // normalization
-   poly_average*=poly_average;
+   poly_corr*=poly_corr;
    for(i=0; i<NLEVELS; i++)
       {
-      poly_average*=(double) param->d_ml_upd[i];
+      poly_corr*=sqrt(param->d_ml_upd[i]);
       }
-   poly_average*=(double) param->d_ml_level0_repeat;
+   poly_corr*=sqrt(param->d_ml_level0_repeat);
 
-   for(i=0; i<NLEVELS; i++)
-      {
-      poly_std*=(double) param->d_ml_upd[i];
-      }
-   poly_std*=(double) param->d_ml_level0_repeat;
-
-   fprintf(datafilep, "%.12g  %.12g ", poly_average, poly_std);
+   fprintf(datafilep, "%.12g ", poly_corr);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
