@@ -976,17 +976,18 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
    poly_corr*=param->d_inv_space_vol;
 
    // normalizations
-   poly_corr*=poly_corr;
    for(i=0; i<NLEVELS; i++)
       {
-      poly_corr*=(double) sqrt(param->d_ml_upd[i]);
+      poly_corr*= sqrt(param->d_ml_upd[i]);
       }
+   poly_corr*=sqrt(param->d_multihit);
 
    fprintf(datafilep, "%.12g ", poly_corr);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
       }
+   fprintf(datafilep, "(1, %d) ", param->d_multihit);
    fprintf(datafilep, "\n");
    fflush(datafilep);
 
@@ -1178,17 +1179,18 @@ void optimize_multilevel_polycorradj(Gauge_Conf *GC,
    poly_corr*=param->d_inv_space_vol;
 
    // normalizations
-   poly_corr*=poly_corr;
    for(i=0; i<NLEVELS; i++)
       {
       poly_corr*=(double) sqrt(param->d_ml_upd[i]);
       }
+   poly_corr*=sqrt(param->d_multihit);
 
    fprintf(datafilep, "%.12g ", poly_corr);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
       }
+   fprintf(datafilep, "(1, %d) ", param->d_multihit);
    fprintf(datafilep, "\n");
    fflush(datafilep);
 
@@ -1287,18 +1289,19 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
    poly_corr*=param->d_inv_space_vol;
 
    // normalization
-   poly_corr*=poly_corr;
    for(i=0; i<NLEVELS; i++)
       {
       poly_corr*=sqrt(param->d_ml_upd[i]);
       }
    poly_corr*=sqrt(param->d_ml_level0_repeat);
+   poly_corr*=sqrt(param->d_multihit);
 
    fprintf(datafilep, "%.12g ", poly_corr);
    for(i=0; i<NLEVELS; i++)
       {
       fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
       }
+   fprintf(datafilep, "(1, %d) ", param->d_multihit);
    fprintf(datafilep, "(%d) ", param->d_ml_level0_repeat);
    fprintf(datafilep, "\n");
 
