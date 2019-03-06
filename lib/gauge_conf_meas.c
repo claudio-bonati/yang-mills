@@ -395,7 +395,7 @@ void polyakov_adj(Gauge_Conf const * const GC,
       tr=NCOLOR*retr(&matrix)+NCOLOR*imtr(&matrix)*I;
 
       #if NCOLOR==1
-        rep+=(cabs(tr)*cabs(tr)-1);
+        rep+=0.0;
       #else
         rep+=(cabs(tr)*cabs(tr)-1)/(NCOLOR*NCOLOR-1);
       #endif
