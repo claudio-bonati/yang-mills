@@ -140,6 +140,11 @@ void polyakov(Gauge_Conf const * const GC,
               GParam const * const param,
               double *repoly,
               double *impoly);
+void polyakov_adj(Gauge_Conf const * const GC,
+                  Geometry const * const geo,
+                  GParam const * const param,
+                  double *repoly,
+                  double *impoly);
 void polyakov_with_tracedef(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
