@@ -15,6 +15,7 @@
 #include"../include/geometry.h"
 #include"../include/gauge_conf.h"
 #include"../include/tens_prod.h"
+#include"../include/tens_prod_adj.h"
 
 void init_gauge_conf(Gauge_Conf *GC, GParam const * const param)
   {
@@ -686,10 +687,178 @@ void free_polycorradj(Gauge_Conf *GC,
   }
 
 
+// save ml_polycorradj[0] arrays on file
+void write_polycorradj_on_file(Gauge_Conf const * const GC,
+                               GParam const * const param,
+                               int iteration)
+  {
+  long i;
+  int j;
+  #ifdef HASH_MODE
+    char md5sum[2*MD5_DIGEST_LENGTH+1];
+  #else
+    char md5sum[2*STD_STRING_LENGTH+1]={0};
+  #endif
+  FILE *fp;
+
+  #ifdef HASH_MODE
+    compute_md5sum_polycorradj(md5sum, GC, param);
+  #endif
+
+  fp=fopen(param->d_ml_file, "w"); // open the configuration file
+  if(fp==NULL)
+    {
+    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    fprintf(fp, "%ld %d %s\n", param->d_space_vol, iteration, md5sum);
+    }
+  fclose(fp);
+
+  fp=fopen(param->d_ml_file, "ab"); // open the configuration file in binary mode
+  if(fp==NULL)
+    {
+    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
+       {
+       for(i=0; i<(param->d_space_vol); i++)
+          {
+          print_on_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          }
+       }
+
+    fclose(fp);
+    }
+  }
 
 
+// read ml_polycorradj[0] arrays from file
+void read_polycorradj_from_file(Gauge_Conf const * const GC,
+                                GParam const * const param,
+                                int *iteration)
+  {
+  long i, loc_space_vol;
+  int j;
+  FILE *fp;
+  #ifdef HASH_MODE
+    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
+    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
+  #else
+    char md5sum_old[2*STD_STRING_LENGTH+1]={0};
+  #endif
+
+  fp=fopen(param->d_ml_file, "r"); // open the multilevel file
+  if(fp==NULL)
+    {
+    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    i=fscanf(fp, "%ld %d %s\n", &loc_space_vol, iteration, md5sum_old);
+    if(i!=3)
+      {
+      fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+    if(loc_space_vol != param->d_space_vol)
+      {
+      fprintf(stderr, "Error: space_vol in the multilevel file %s is different from the one in the input (%s, %d)\n",
+              param->d_ml_file, __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+    }
+  fclose(fp);
+
+  fp=fopen(param->d_ml_file, "rb"); // open the multilevel file in binary mode
+  if(fp==NULL)
+    {
+    fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    // read again the header: loc_space_vol, iteration, hash
+    i=0;
+    while(i!='\n')
+         {
+         i=fgetc(fp);
+         }
+
+    for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
+       {
+       for(i=0; i<(param->d_space_vol); i++)
+          {
+          read_from_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          }
+       }
+
+    fclose(fp);
+    }
+
+  #ifdef HASH_MODE
+    // compute the new md5sum and check for consistency
+    compute_md5sum_polycorradj(md5sum_new, GC, param);
+    if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
+      {
+      fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
+      exit(EXIT_FAILURE);
+      }
+  #endif
+  }
 
 
+// compute the md5sum of the ml_polycorradj[0] arrays and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
+void compute_md5sum_polycorradj(char *res, Gauge_Conf const * const GC, GParam const * const param)
+  {
+  #ifdef HASH_MODE
+    MD5_CTX mdContext;
+    unsigned char c[MD5_DIGEST_LENGTH];
+    long i;
+    int j;
+    int n1, n2, n3, n4;
+
+    MD5_Init(&mdContext);
+
+    for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
+       {
+       for(i=0; i<(param->d_space_vol); i++)
+          {
+          for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
+             {
+             for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
+                {
+                for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
+                   {
+                   for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
+                      {
+                      MD5_Update(&mdContext, &((GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double));
+                      }
+                   }
+                }
+             }
+          }
+       }
+
+    MD5_Final(c, &mdContext);
+
+    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+       {
+       sprintf(&(res[2*i]), "%02x", c[i]);
+       }
+  #else
+    // just to avoid warning at compile time
+    (void) res;
+    (void) GC;
+    (void) param;
+  #endif
+  }
 
 
 // allocate the ml_polycorr, polyplaq arrays and related stuff
@@ -787,17 +956,15 @@ void alloc_tube_conn_stuff(Gauge_Conf *GC,
 void free_tube_conn_stuff(Gauge_Conf *GC,
                           GParam const * const param)
   {
-  int i, j;
+  int i;
+
+  free_polycorr_stuff(GC, param);
 
   for(i=0; i<NLEVELS; i++)
      {
-     for(j=0; j<(param->d_size[0]/param->d_ml_step[i]); j++)
-        {
-        free(GC->ml_polycorr[i][j]);
-        }
-     free(GC->ml_polycorr[i]);
+     free(GC->ml_polyplaqconn[i]);
      }
-  free(GC->ml_polycorr);
+  free(GC->ml_polyplaqconn);
 
   free(GC->loc_plaqconn);
   }

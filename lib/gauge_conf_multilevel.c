@@ -13,6 +13,7 @@
 #include"../include/gauge_conf.h"
 #include"../include/gparam.h"
 #include"../include/tens_prod.h"
+#include"../include/tens_prod_adj.h"
 
 void multihit(Gauge_Conf const * const GC,
               Geometry const * const geo,
@@ -654,7 +655,7 @@ void multilevel_polycorradj(Gauge_Conf * GC,
 
 
 
-// multilevel for polyakov orrelator to be used in long simulations
+// multilevel for polyakov correlator to be used in long simulations
 void multilevel_polycorr_long(Gauge_Conf * GC,
                               Geometry const * const geo,
                               GParam const * const param,
@@ -777,6 +778,134 @@ void multilevel_polycorr_long(Gauge_Conf * GC,
        int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
 
        times_equal_real_TensProd(&(GC->ml_polycorr[0][slice][r]), 1.0/((double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat) );
+       }
+    }
+  } // end of multilevel
+
+
+// multilevel for polyakov correlator in the adjoint representation to be used in long simulations
+void multilevel_polycorradj_long(Gauge_Conf * GC,
+                                 Geometry const * const geo,
+                                 GParam const * const param,
+                                 int dt,
+                                 int iteration)
+  {
+  int upd;
+  long raux;
+
+  if(dt!=param->d_ml_step[0])
+    {
+    fprintf(stderr, "'dt' has to be equal to ml_step[0] in multilevel_polycorradj_long (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+
+  // initialize ml_polycorr[0] to 0 if needed
+  if(iteration==0)
+    {
+    #ifdef OPENMP_MODE
+    #pragma omp parallel for num_threads(NTHREADS) private(raux)
+    #endif
+    for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+       {
+       long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+       int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+       zero_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]));
+       }
+    }
+
+  // perform the update
+  for(upd=0; upd< param->d_ml_upd[0]; upd++)
+     {
+     // update on level zero
+     update_for_multilevel(GC, geo, param, 0);
+
+     if(NLEVELS==1)
+       {
+       // compute Polyakov loop restricted to the slice
+       compute_local_poly(GC, geo, param);
+
+       // compute the tensor products
+       // and update ml_polycorradj[0]
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(raux)
+       #endif
+       for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+          {
+          TensProdAdj TP;
+          long r1, r2;
+          int j, t_tmp;
+
+          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+          r1=sisp_and_t_to_si(geo, r, 0);
+          for(j=0; j<param->d_dist_poly; j++)
+             {
+             r1=nnp(geo, r1, 1);
+             }
+          si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
+
+          TensProdAdj_init(&TP, &(GC->loc_poly[slice][r]), &(GC->loc_poly[slice][r2]) );
+          plus_equal_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]), &TP);
+          }
+       }
+     else  // NLEVELS>1
+       {
+       // initialyze ml_polycorr[1] to zero
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(raux)
+       #endif
+       for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[1]; raux++)
+          {
+          long r = raux/(param->d_size[0]/param->d_ml_step[1]);
+          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[1]) );
+
+          zero_TensProdAdj(&(GC->ml_polycorradj[1][slice][r]));
+          }
+
+       // call inner levels
+       // important: we have to call the "non long" version in inner levels
+       multilevel_polycorradj(GC,
+                              geo,
+                              param,
+                              param->d_ml_step[1]);
+
+       // update polycorradj[0] with polycorradj[1]
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(raux)
+       #endif
+       for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+          {
+          int j;
+          TensProdAdj TP;
+
+          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+          one_TensProdAdj(&TP);
+          for(j=0; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
+             {
+             times_equal_TensProdAdj(&TP, &(GC->ml_polycorradj[1][slice*param->d_ml_step[0]/param->d_ml_step[1]+j][r]));
+             }
+
+          plus_equal_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]), &TP);
+          }
+       }
+    } // end update
+
+  if(iteration==param->d_ml_level0_repeat-1) // iteration starts from zero
+    {
+    // normalize polycorr[0]
+    #ifdef OPENMP_MODE
+    #pragma omp parallel for num_threads(NTHREADS) private(raux)
+    #endif
+    for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+       {
+       long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+       int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+       times_equal_real_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]), 1.0/((double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat) );
        }
     }
   } // end of multilevel

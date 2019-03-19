@@ -8,6 +8,7 @@ bin_PROGRAMS = conf_check \
                yang_mills_polycorr \
                yang_mills_polycorr_long \
                yang_mills_polycorradj \
+               yang_mills_polycorradj_long \
                yang_mills_t0 \
                yang_mills_tube_conn \
                yang_mills_tube_conn_long \
@@ -188,6 +189,21 @@ yang_mills_polycorradj_SOURCES=./src/yang_mills_polycorradj.c \
                                 $(sun) \
                                 $(tens_prod) \
                                 $(u1) 
+
+yang_mills_polycorradj_long_SOURCES=./src/yang_mills_polycorradj_long.c \
+                                  $(align) \
+                                  $(dSFMT)  \
+                                  $(endian) \
+                                  $(funcpoint) \
+                                  $(gauge_conf) \
+                                  $(geometry) \
+                                  $(gparam) \
+                                  ./include/macro.h \
+                                  $(random) \
+                                  $(su2) \
+                                  $(sun) \
+                                  $(tens_prod) \
+                                  $(u1)
 
 yang_mills_t0_SOURCES=./src/yang_mills_t0.c \
                        $(align) \

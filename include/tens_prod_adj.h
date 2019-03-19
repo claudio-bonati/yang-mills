@@ -236,6 +236,16 @@ inline double imtr_TensProdAdj(TensProdAdj const * const restrict A)
  return 0;
  }
 
+void print_on_screen_TensProdAdj(TensProdAdj const * const A);
+void print_on_file_TensProdAdj(FILE *fp, TensProdAdj const * const A);
+void print_on_binary_file_noswap_TensProdAdj(FILE *fp, TensProdAdj const * const A);
+void print_on_binary_file_swap_TensProdAdj(FILE *fp, TensProdAdj const * const A);
+void print_on_binary_file_bigen_TensProdAdj(FILE *fp, TensProdAdj const * const A);
+void read_from_file_TensProdAdj(FILE *fp, TensProdAdj *A);
+void read_from_binary_file_noswap_TensProdAdj(FILE *fp, TensProdAdj *A);
+void read_from_binary_file_swap_TensProdAdj(FILE *fp, TensProdAdj *A);
+void read_from_binary_file_bigen_TensProdAdj(FILE *fp, TensProdAdj *A);
+
 
 #endif // TENS_PRODAG_H
 

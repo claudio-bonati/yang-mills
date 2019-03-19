@@ -13,6 +13,7 @@
 #include"../include/geometry.h"
 #include"../include/gauge_conf.h"
 #include"../include/tens_prod.h"
+#include"../include/tens_prod_adj.h"
 
 
 
@@ -395,6 +396,7 @@ void polyakov_adj(Gauge_Conf const * const GC,
       tr=NCOLOR*retr(&matrix)+NCOLOR*imtr(&matrix)*I;
 
       #if NCOLOR==1
+        (void) tr;
         rep+=0.0;
       #else
         rep+=(cabs(tr)*cabs(tr)-1)/(NCOLOR*NCOLOR-1);
@@ -410,7 +412,7 @@ void polyakov_adj(Gauge_Conf const * const GC,
 
 
 // compute the mean Polyakov loop and its powers (trace of) in the presence of trace deformation
-void polyakov_with_tracedef(Gauge_Conf const * const GC,
+void polyakov_for_tracedef(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             double *repoly,
@@ -689,11 +691,11 @@ void topcharge_cooling(Gauge_Conf const * const GC,
 // compute the correlator of the local topological charge
 // after "ncool" cooling steps up to spatial distance "dist"
 void loc_topcharge_corr(Gauge_Conf const * const GC,
-                    Geometry const * const geo,
-                    GParam const * const param,
-                    int ncool,
-                    int dist,
-                    double *ris)
+                        Geometry const * const geo,
+                        GParam const * const param,
+                        int ncool,
+                        int dist,
+                        double *ris)
    {
    if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
      {
@@ -849,7 +851,7 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
      double *charge, *meanplaq, charge_nocooling;
 
      plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov_with_tracedef(GC, geo, param, polyre, polyim);
+     polyakov_for_tracedef(GC, geo, param, polyre, polyim);
      charge_nocooling=topcharge(GC, geo, param);
 
      fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
@@ -1471,6 +1473,122 @@ void perform_measures_polycorr_long(Gauge_Conf *GC,
      for(r=0; r<param->d_space_vol; r++)
         {
         ris+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
+        }
+     ris*=param->d_inv_space_vol;
+
+     fprintf(datafilep, "%.12g\n", ris);
+     fflush(datafilep);
+   #endif
+   }
+
+
+
+// to optimize the multilevel
+void optimize_multilevel_polycorradj_long(Gauge_Conf *GC,
+                                          GParam const * const param,
+                                          FILE *datafilep)
+   {
+   int i, err;
+   long r;
+   double poly_corr, poly_corr_abs, poly_corr_fluct;
+   double *poly_array;
+
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   fprintf(datafilep, "Multilevel optimization: ");
+   fprintf(datafilep, "the smaller the value the better the update\n");
+
+   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
+         }
+      }
+
+   // average
+   poly_corr=0.0;
+   poly_corr_abs=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_array[r]=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
+
+      poly_corr+=poly_array[r];
+      poly_corr_abs+=fabs(poly_array[r]);
+      }
+   poly_corr*=param->d_inv_space_vol;
+   poly_corr_abs*=param->d_inv_space_vol;
+
+   // fluctuation
+   poly_corr_fluct=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      poly_corr_fluct+=fabs(poly_array[r]-poly_corr);
+      }
+   poly_corr_fluct*=param->d_inv_space_vol;
+
+   // normalization
+   for(i=0; i<NLEVELS; i++)
+      {
+      poly_corr_abs*=sqrt(param->d_ml_upd[i]);
+      poly_corr_fluct*=sqrt(param->d_ml_upd[i]);
+      }
+   poly_corr_abs*=sqrt(param->d_ml_level0_repeat);
+   poly_corr_fluct*=sqrt(param->d_ml_level0_repeat);
+
+   poly_corr_abs*=sqrt(param->d_multihit);
+   poly_corr_fluct*=sqrt(param->d_multihit);
+
+   fprintf(datafilep, "%.12g %.12g ", poly_corr_abs, poly_corr_fluct);
+   for(i=0; i<NLEVELS; i++)
+      {
+      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
+      }
+   fprintf(datafilep, "(1, %d) ", param->d_multihit);
+   fprintf(datafilep, "(%d) ", param->d_ml_level0_repeat);
+   fprintf(datafilep, "\n");
+
+   fflush(datafilep);
+
+   free(poly_array);
+   }
+
+
+// print the value of the polyakov loop correlator that has been computed by multilevel
+void perform_measures_polycorradj_long(Gauge_Conf *GC,
+                                       GParam const * const param,
+                                       FILE *datafilep)
+   {
+   #ifdef OPT_MULTILEVEL
+      optimize_multilevel_polycorradj_long(GC, param, datafilep);
+   #else
+     double ris;
+     long r;
+     int i;
+
+     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+        {
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r)
+        #endif
+        for(r=0; r<param->d_space_vol; r++)
+           {
+           times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
+           }
+        }
+
+     ris=0.0;
+     for(r=0; r<param->d_space_vol; r++)
+        {
+        ris+=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
         }
      ris*=param->d_inv_space_vol;
 
