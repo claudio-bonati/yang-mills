@@ -666,6 +666,25 @@ void alloc_polycorradj(Gauge_Conf *GC,
          }
        }
     }
+
+  err=posix_memalign((void**)&(GC->loc_polyadj), (size_t) DOUBLE_ALIGN, (size_t) (param->d_size[0]/param->d_ml_step[NLEVELS-1]) * sizeof(GAUGE_GROUP_ADJ *));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating loc_polyadj (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  else
+    {
+    for(i=0; i<param->d_size[0]/param->d_ml_step[NLEVELS-1]; i++)
+       {
+       err=posix_memalign((void**)&(GC->loc_polyadj[i]), (size_t) DOUBLE_ALIGN, (size_t) param->d_space_vol *sizeof(GAUGE_GROUP_ADJ));
+       if(err!=0)
+         {
+         fprintf(stderr, "Problems in allocating loc_polyadj (%s, %d)\n", __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
+       }
+    }
   }
 
 
@@ -684,6 +703,12 @@ void free_polycorradj(Gauge_Conf *GC,
      free(GC->ml_polycorradj[i]);
      }
   free(GC->ml_polycorradj);
+
+  for(i=0; i<param->d_size[0]/param->d_ml_step[NLEVELS-1]; i++)
+     {
+     free(GC->loc_polyadj[i]);
+     }
+  free(GC->loc_polyadj);
   }
 
 

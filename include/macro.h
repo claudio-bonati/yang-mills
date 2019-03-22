@@ -5,10 +5,13 @@
 
 #if NCOLOR == 1
   #define GAUGE_GROUP U1
+  #define GAUGE_GROUP_ADJ U1Adj
 #elif NCOLOR == 2
   #define GAUGE_GROUP Su2
+  #define GAUGE_GROUP_ADJ Su2Adj
 #else
   #define GAUGE_GROUP SuN
+  #define GAUGE_GROUP_Adj SuNAdj
 #endif
 
 // function to access matrix elements

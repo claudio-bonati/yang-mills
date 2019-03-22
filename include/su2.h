@@ -770,4 +770,179 @@ inline void TensProdAdj_init_Su2(TensProdAdj * restrict TP, Su2 const * const re
   #undef m2adj
   }
 
+
+// initialize tensor product in the adjoint representation
+// using two matrices in the adjoint representation
+inline void TensProdAdj_init_Su2Adj(TensProdAdj * restrict TP, Su2Adj const * const restrict A1, Su2Adj const * const restrict A2)
+  {
+  #ifdef DEBUG
+  if(A1==A2)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  int i, j, k, l;
+
+  #define m2adj(X,Y) ((X)*3 + (Y))
+
+  for(i=0; i<3; i++)
+     {
+     for(j=0; j<3; j++)
+        {
+        for(k=0; k<3; k++)
+           {
+           for(l=0; l<3; l++)
+              {
+              TP->comp[i][j][k][l]=(A1->comp[m2adj(i,j)])*(A2->comp[m2adj(k,l)]);
+              }
+           }
+        }
+     }
+
+  #undef m2adj
+  }
+
+
+// A=1
+inline void one_Su2Adj(Su2Adj * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<9; i++)
+     {
+     A->comp[i]=0.0;
+     }
+
+  #define m2adj(X,Y) ((X)*3 + (Y))
+
+  for(i=0; i<3; i++)
+     {
+     A->comp[m2adj(i,i)]=1.0;
+     }
+
+  #undef m2adj
+  }
+
+
+// A=0
+inline void zero_Su2Adj(Su2Adj * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<9; i++)
+     {
+     A->comp[i]=0.0;
+     }
+  }
+
+
+// A+=B
+inline void plus_equal_Su2Adj(Su2Adj * restrict A, Su2Adj const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  for(i=0; i<9; i++)
+     {
+     A->comp[i]+=B->comp[i];
+     }
+  }
+
+
+// A*=r
+inline void times_equal_real_Su2Adj(Su2Adj * restrict A, double r)
+  {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<9; i++)
+     {
+     A->comp[i]*=r;
+     }
+  }
+
+
+// A*=B
+inline void times_equal_Su2Adj(Su2Adj * restrict A, Su2Adj const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+   {
+   fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+   exit(EXIT_FAILURE);
+   }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j, k;
+  double aux[NCOLOR*NCOLOR-1] __attribute__((aligned(DOUBLE_ALIGN)));
+  double sum;
+
+  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+     {
+     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+        {
+        aux[j]=A->comp[madj(i,j)];
+        }
+
+     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+        {
+        sum=0.0;
+        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+           {
+           sum+=aux[k]*(B->comp[madj(k,j)]);
+           }
+        A->comp[madj(i,j)]=sum;
+        }
+     }
+  }
+
+
+// trace in the adjoint rep.
+inline double retr_Su2Adj(Su2Adj * restrict A)
+  {
+  int i;
+  double ris=0.0;
+
+  #define m2adj(X,Y) ((X)*3 + (Y))
+
+  for(i=0; i<3; i++)
+     {
+     ris+=A->comp[m2adj(i,i)];
+     }
+
+  #undef m2adj
+
+  return ris/3.0;
+  }
+
+
 #endif

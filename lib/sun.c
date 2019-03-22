@@ -619,4 +619,31 @@ void fund_to_adj_SuN(SuNAdj * restrict A, SuN const * const restrict B);
 void TensProdAdj_init_SuN(TensProdAdj * restrict TP, SuN const * const restrict A1, SuN const * const restrict A2);
 
 
+// initialize tensor product in the adjoint representation
+// using two matrices in the adjoint representation
+void TensProdAdj_init_SuNAdj(TensProdAdj * restrict TP, SuNAdj const * const restrict A1, SuNAdj const * const restrict A2);
+
+
+// A=1
+void one_SuNAdj(SuNAdj * restrict A);
+
+
+// A=0
+void zero_SuNAdj(SuNAdj * restrict A);
+
+
+// A+=B
+void plus_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restrict B);
+
+
+// A*=r
+void times_equal_real_SuNAdj(SuNAdj * restrict A, double r);
+
+// A*=B
+void times_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restrict B);
+
+// trace in the adjoint rep.
+double retr_SuNAdj(SuNAdj * restrict A);
+
+
 #endif

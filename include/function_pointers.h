@@ -85,8 +85,18 @@ void (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A);
 void (*read_from_file)(FILE *fp, GAUGE_GROUP *A);
 void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A);
 
+void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B);
+
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2);
 void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2);
+void (*TensProdAdj_initadj)(TensProdAdj *TP, GAUGE_GROUP_ADJ const * const A1, GAUGE_GROUP_ADJ const * const A2);
+
+void (*one_adj)(GAUGE_GROUP_ADJ * restrict A);
+void (*zero_adj)(GAUGE_GROUP_ADJ * restrict A);
+void (*plus_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B);
+void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r);
+void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B);
+double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A);
 
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param);
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple);

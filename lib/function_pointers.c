@@ -59,8 +59,18 @@ void (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &pri
 void (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_U1;
 void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_U1;
 
+void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_U1;
+
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_U1;
 void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProdAdj_init_U1;
+void (*TensProdAdj_initadj)(TensProdAdj *TP, GAUGE_GROUP_ADJ const * const A1, GAUGE_GROUP_ADJ const * const A2) = &TensProdAdj_init_U1Adj;
+
+void (*one_adj)(GAUGE_GROUP_ADJ * restrict A)=&one_U1Adj;
+void (*zero_adj)(GAUGE_GROUP_ADJ * restrict A)=&zero_U1Adj;
+void (*plus_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&plus_equal_U1Adj;
+void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r)=&times_equal_real_U1Adj;
+void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&times_equal_U1Adj;
+double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A)=&retr_U1Adj;
 
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_U1;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_U1;
@@ -113,8 +123,18 @@ void (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &pri
 void (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_Su2;
 void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_Su2;
 
+void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_Su2;
+
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_Su2;
 void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProdAdj_init_Su2;
+void (*TensProdAdj_initadj)(TensProdAdj *TP, GAUGE_GROUP_ADJ const * const A1, GAUGE_GROUP_ADJ const * const A2) = &TensProdAdj_init_Su2Adj;
+
+void (*one_adj)(GAUGE_GROUP_ADJ * restrict A)=&one_Su2Adj;
+void (*zero_adj)(GAUGE_GROUP_ADJ * restrict A)=&zero_Su2Adj;
+void (*plus_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&plus_equal_Su2Adj;
+void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r)=&times_equal_real_Su2Adj;
+void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&times_equal_Su2Adj;
+double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A)=&retr_Su2Adj;
 
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_Su2;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_Su2;
@@ -167,8 +187,18 @@ void (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &pri
 void (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_SuN;
 void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_SuN;
 
+void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_SuN;
+
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_SuN;
 void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProdAdj_init_SuN;
+void (*TensProdAdj_initadj)(TensProdAdj *TP, GAUGE_GROUP_ADJ const * const A1, GAUGE_GROUP_ADJ const * const A2) = &TensProdAdj_init_SuNAdj;
+
+void (*one_adj)(GAUGE_GROUP_ADJ * restrict A)=&one_SuNAdj;
+void (*zero_adj)(GAUGE_GROUP_ADJ * restrict A)=&zero_SuNAdj;
+void (*plus_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&plus_equal_SuNAdj;
+void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r)=&times_equal_real_SuNAdj;
+void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&times_equal_SuNAdj;
+double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A)=&retr_SuNAdj;
 
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_SuN;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_SuN;

@@ -1142,10 +1142,9 @@ void optimize_multihit_polycorradj(Gauge_Conf *GC,
   int i, mh, t_tmp, err;
   long r, r1, r2;
   double poly_corr, poly_corr_abs, poly_corr_fluct, diff_sec;
-  double complex tr;
   double *poly_array;
   time_t time1, time2;
-  GAUGE_GROUP matrix, tmp;
+  GAUGE_GROUP_ADJ matrix, tmp;
 
   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
   if(err!=0)
@@ -1168,27 +1167,21 @@ void optimize_multihit_polycorradj(Gauge_Conf *GC,
      // polyakov loop in the adjoint representation computation
      for(r=0; r<param->d_space_vol; r++)
         {
-        one(&matrix);
+        one_adj(&matrix);
         for(i=0; i<param->d_size[0]; i++)
            {
-           multihit(GC,
-                    geo,
-                    param,
-                    sisp_and_t_to_si(geo, r, i),
-                    0,
-                    mh,
-                    &tmp);
-           times_equal(&matrix, &tmp);
+           multihitadj(GC,
+                       geo,
+                       param,
+                       sisp_and_t_to_si(geo, r, i),
+                       0,
+                       mh,
+                       &tmp);
+           times_equal_adj(&matrix, &tmp);
            }
 
         //trace of the matix in the fundamental representation
-        tr=NCOLOR*(retr(&matrix)+I*imtr(&matrix));
-
-        //trace of the matrix in adjoint representation
-        poly_array[r]=cabs(tr*conj(tr))-1.0;
-        #if NCOLOR != 1
-          poly_array[r]/=(NCOLOR*NCOLOR-1);
-        #endif
+        poly_array[r]=retr_adj(&matrix);
         }
 
      // average correlator computation

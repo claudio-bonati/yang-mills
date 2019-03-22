@@ -342,4 +342,34 @@ void fund_to_adj_Su2(Su2Adj * restrict A, Su2 const * const restrict B);
 // using two matrices in the fundamental representation
 void TensProdAdj_init_Su2(TensProdAdj * restrict TP, Su2 const * const restrict A1, Su2 const * const restrict A2);
 
+
+// initialize tensor product in the adjoint representation
+// using two matrices in the adjoint representation
+void TensProdAdj_init_Su2Adj(TensProdAdj * restrict TP, Su2Adj const * const restrict A1, Su2Adj const * const restrict A2);
+
+
+// A=1
+void one_Su2Adj(Su2Adj * restrict A);
+
+
+// A=0
+void zero_Su2Adj(Su2Adj * restrict A);
+
+
+// A+=B
+void plus_equal_Su2Adj(Su2Adj * restrict A, Su2Adj const * const restrict B);
+
+
+// A*=r
+void times_equal_real_Su2Adj(Su2Adj * restrict A, double r);
+
+
+// A*=B
+void times_equal_Su2Adj(Su2Adj * restrict A, Su2Adj const * const restrict B);
+
+
+// trace in the adjoint rep.
+double retr_Su2Adj(Su2Adj * restrict A);
+
+
 #endif

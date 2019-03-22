@@ -14,6 +14,12 @@ typedef struct U1 {
 } U1;
 
 
+typedef struct U1Adj {
+     double comp __attribute__((aligned(DOUBLE_ALIGN)));
+} U1Adj;
+// defined just to avoid errors at compile time
+
+
 // initialize
 inline void init_U1(U1 * restrict A, double complex vec)
   {
@@ -532,6 +538,7 @@ void read_from_binary_file_swap_U1(FILE *fp, U1 *A);
 void read_from_binary_file_bigen_U1(FILE *fp, U1 *A);
 
 
+
 // initialize tensor product
 inline void TensProd_init_U1(TensProd * restrict TP, U1 const * const restrict A1, U1 const * const restrict A2)
   {
@@ -553,6 +560,17 @@ inline void TensProd_init_U1(TensProd * restrict TP, U1 const * const restrict A
   }
 
 
+// convert the fundamental representation matrix B to the adjoint representation matrix A
+inline void fund_to_adj_U1(U1Adj * restrict A, U1 const * const restrict B)
+  {
+  (void) A;
+  (void) B;
+
+  fprintf(stderr, "The function fund_to_adj_U1 still has to be written (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+  }
+
+
 // initialize tensor product in the adjoint representation
 // using two matrices in the fundamental representation
 inline void TensProdAdj_init_U1(TensProdAdj * restrict TP, U1 const * const restrict A1, U1 const * const restrict A2)
@@ -563,6 +581,71 @@ inline void TensProdAdj_init_U1(TensProdAdj * restrict TP, U1 const * const rest
 
   fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
   exit(EXIT_FAILURE);
+  }
+
+
+// initialize tensor product in the adjoint representation
+// using two matrices in the adjoint representation
+inline void TensProdAdj_init_U1Adj(TensProdAdj * restrict TP, U1Adj const * const restrict A1, U1Adj const * const restrict A2)
+  {
+  (void) TP;
+  (void) A1;
+  (void) A2;
+
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+  }
+
+
+// A=1
+inline void zero_U1Adj(U1Adj * restrict A)
+  {
+  A->comp=1.0;
+  }
+
+
+// A=0
+inline void one_U1Adj(U1Adj * restrict A)
+  {
+  A->comp=0.0;
+  }
+
+
+// A+=B
+inline void plus_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  A->comp += B->comp;
+  }
+
+
+// A*=r
+inline void times_equal_real_U1Adj(U1Adj * restrict A, double r)
+  {
+  A->comp *=r;
+  }
+
+
+// A*=B
+inline void times_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B)
+  {
+  (void) A;
+  (void) B;
+  }
+
+
+// trace in the adjoint rep.
+inline double retr_U1Adj(U1Adj * restrict A)
+  {
+  (void) A;
+  return 0.0;
   }
 
 

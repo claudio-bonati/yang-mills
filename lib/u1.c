@@ -312,4 +312,32 @@ void TensProd_init_U1(TensProd *TP, U1 const * const A1, U1 const * const A2);
 void TensProdAdj_init_U1(TensProdAdj * restrict TP, U1 const * const restrict A1, U1 const * const restrict A2);
 
 
+// initialize tensor product in the adjoint representation
+// using two matrices in the adjoint representation
+void TensProdAdj_init_U1Adj(TensProdAdj * restrict TP, U1Adj const * const restrict A1, U1Adj const * const restrict A2);
+
+
+// A=1
+void one_U1Adj(U1Adj * restrict A);
+
+
+// A=0
+void zero_U1Adj(U1Adj * restrict A);
+
+
+// A+=B
+void plus_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B);
+
+
+// A*=r
+void times_equal_real_U1Adj(U1Adj * restrict A, double r);
+
+
+// A*=B
+void times_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B);
+
+
+// trace in the adjoint rep.
+double retr_U1Adj(U1Adj * restrict A);
+
 #endif

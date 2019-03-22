@@ -10,8 +10,6 @@
 #include"../include/su2.h"
 #include"../include/su2_upd.h"
 
-#define m2adj(X,Y) ((X)*3 + (Y))
-
 int main()
   {
   unsigned int seme=0;
@@ -19,7 +17,6 @@ int main()
   Su2 B1, B2;
   Su2Adj A1;
 
-  int i;
   double risth, ris;
 
   // initialize random seed
@@ -43,11 +40,7 @@ int main()
   // shoud be trace
   risth=pow(2.0*retr_Su2(&B1),2.0)-1;
 
-  ris=0.0;
-  for(i=0; i<2*2-1; i++)
-     {
-     ris+=A1.comp[m2adj(i,i)];
-     }
+  ris=3*retr_Su2Adj(&A1);
 
   if(fabs(risth-ris) <=MIN_VALUE)
     {
@@ -63,7 +56,5 @@ int main()
 
   return EXIT_SUCCESS;
   }
-
-#undef m2adj
 
 #endif

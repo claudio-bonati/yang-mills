@@ -54,6 +54,49 @@ void multihit(Gauge_Conf const * const GC,
   }
 
 
+void multihitadj(Gauge_Conf const * const GC,
+                 Geometry const * const geo,
+                 GParam const * const param,
+                 long r,
+                 int dir,
+                 int num_hit,
+                 GAUGE_GROUP_ADJ *G)
+  {
+  if(num_hit>0)
+    {
+    int i;
+    const double inv_num_hit = 1.0/(double) num_hit;
+    GAUGE_GROUP staple, partial;
+    GAUGE_GROUP_ADJ partial_adj;
+
+    zero_adj(G);
+    equal(&partial, &(GC->lattice[r][dir]));
+    #ifndef THETA_MODE
+      calcstaples_wilson(GC, geo, param, r, dir, &staple);
+    #else
+      // compute_clovers in direction "dir" HAS TO BE CALLED BEFORE!
+      calcstaples_with_topo(GC, geo, param, r, dir, &staple);
+    #endif
+
+    for(i=0; i<num_hit; i++)
+       {
+       single_heatbath(&partial, &staple, param);
+       fund_to_adj(&partial_adj, &partial);
+
+       plus_equal_adj(G, &partial_adj);
+
+       unitarize(&partial);
+       }
+
+    times_equal_real_adj(G, inv_num_hit);
+    }
+  else
+    {
+    fund_to_adj(G, &(GC->lattice[r][dir]));
+    }
+  }
+
+
 // compute polyakov loop on a single slice
 void compute_local_poly(Gauge_Conf *GC,
                         Geometry const * const geo,
@@ -102,6 +145,57 @@ void compute_local_poly(Gauge_Conf *GC,
         }
      }
   }
+
+
+// compute polyakov loop on a single slice (adjoint rep.)
+void compute_local_polyadj(Gauge_Conf *GC,
+                           Geometry const * const geo,
+                           GParam const * const param)
+  {
+  int num_hit;
+  long raux;
+
+  if(param->d_dist_poly >1 && (param->d_size[1]-param->d_dist_poly) >1) // Polyakov loops are separated along the "1" direction
+    {
+    num_hit=param->d_multihit;
+    }
+  else
+    {
+    num_hit=0;
+    }
+
+  #ifdef THETA_MODE
+  // clovers are eventually needed by the multihit
+  compute_clovers(GC, geo, param, 0);
+  #endif
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(raux)
+  #endif
+  for(raux=0; raux<(param->d_space_vol*param->d_size[0]/param->d_ml_step[NLEVELS-1]); raux++)
+     {
+     int i, t;
+     GAUGE_GROUP_ADJ matrix;
+
+     const long r = raux/(param->d_size[0]/param->d_ml_step[NLEVELS-1]);
+     const int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[NLEVELS-1]) );
+
+     one_adj(&(GC->loc_polyadj[slice][r]));
+     for(i=0; i<param->d_ml_step[NLEVELS-1]; i++)
+        {
+        t=slice*(param->d_ml_step[NLEVELS-1])+i;
+        multihitadj(GC,
+                    geo,
+                    param,
+                    sisp_and_t_to_si(geo, r, t),
+                    0,
+                    num_hit,
+                    &matrix);
+        times_equal_adj(&(GC->loc_polyadj[slice][r]), &matrix);
+        }
+     }
+  }
+
 
 
 // perform a complete update on the given level
@@ -518,7 +612,7 @@ void multilevel_polycorradj(Gauge_Conf * GC,
          update_for_multilevel(GC, geo, param, level);
 
          // compute Polyakov loop restricted to the slice
-         compute_local_poly(GC, geo, param);
+         compute_local_polyadj(GC, geo, param);
 
          // compute the tensor products
          // and update ml_polycorradj[level]
@@ -542,7 +636,7 @@ void multilevel_polycorradj(Gauge_Conf * GC,
             si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
 
             //compute tensor product of matrices in adjoint representation
-            TensProdAdj_init(&TP, &(GC->loc_poly[slice][r]), &(GC->loc_poly[slice][r2]) );
+            TensProdAdj_initadj(&TP, &(GC->loc_polyadj[slice][r]), &(GC->loc_polyadj[slice][r2]) );
 
             plus_equal_TensProdAdj(&(GC->ml_polycorradj[level][slice][r]), &TP);
             }
@@ -823,7 +917,7 @@ void multilevel_polycorradj_long(Gauge_Conf * GC,
      if(NLEVELS==1)
        {
        // compute Polyakov loop restricted to the slice
-       compute_local_poly(GC, geo, param);
+       compute_local_polyadj(GC, geo, param);
 
        // compute the tensor products
        // and update ml_polycorradj[0]
@@ -846,7 +940,7 @@ void multilevel_polycorradj_long(Gauge_Conf * GC,
              }
           si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
 
-          TensProdAdj_init(&TP, &(GC->loc_poly[slice][r]), &(GC->loc_poly[slice][r2]) );
+          TensProdAdj_initadj(&TP, &(GC->loc_polyadj[slice][r]), &(GC->loc_polyadj[slice][r2]) );
           plus_equal_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]), &TP);
           }
        }

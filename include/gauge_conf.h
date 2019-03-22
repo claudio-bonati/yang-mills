@@ -30,6 +30,7 @@ typedef struct Gauge_Conf {
 
   // for computing the polyakov loop correlator in the adjoint rep. with multilevel
   TensProdAdj ***ml_polycorradj;   // [NLEVELS] [d_size[0]/d_ml_step[i]] [space_vol]
+  GAUGE_GROUP_ADJ **loc_polyadj;    // [d_size[0]/d_ml_step[NLEVELS-1]] [space_vol] auxilliary vector to be used in the multilevel
 
   // for the disconnected correlator for string width
   TensProd **ml_polyplaq;   // [NLEVELS] [only slice 0] [space_vol]
@@ -246,9 +247,19 @@ void multihit(Gauge_Conf const * const GC,
               int dir,
               int num_hit,
               GAUGE_GROUP *G);
+void multihitadj(Gauge_Conf const * const GC,
+                 Geometry const * const geo,
+                 GParam const * const param,
+                 long r,
+                 int dir,
+                 int num_hit,
+                 GAUGE_GROUP_ADJ *G);
 void compute_local_poly(Gauge_Conf *GC,
                         Geometry const * const geo,
                         GParam const * const param);
+void compute_local_polyadj(Gauge_Conf *GC,
+                           Geometry const * const geo,
+                           GParam const * const param);
 void update_for_multilevel(Gauge_Conf * GC,
                            Geometry const * const geo,
                            GParam const * const param,

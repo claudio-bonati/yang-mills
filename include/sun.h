@@ -1007,4 +1007,153 @@ inline void TensProdAdj_init_SuN(TensProdAdj * restrict TP, SuN const * const re
   }
 
 
+// initialize tensor product in the adjoint representation
+// using two matrices in the adjoint representation
+inline void TensProdAdj_init_SuNAdj(TensProdAdj * restrict TP, SuNAdj const * const restrict A1, SuNAdj const * const restrict A2)
+  {
+  (void) TP;
+  (void) A1;
+  (void) A2;
+
+  fprintf(stderr, "The function TensProd_adj_init_SuNAdj still has to be written (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+  }
+
+
+// A=1
+inline void one_SuNAdj(SuNAdj * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1); i++)
+     {
+     A->comp[i]=0.0;
+     }
+
+  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+     {
+     A->comp[madj(i,i)]=1.0;
+     }
+  }
+
+
+// A=0
+inline void zero_SuNAdj(SuNAdj * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1); i++)
+     {
+     A->comp[i]=0.0;
+     }
+  }
+
+
+// A+=B
+inline void plus_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  for(i=0; i<(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1); i++)
+     {
+     A->comp[i]+=B->comp[i];
+     }
+  }
+
+
+// A*=r
+inline void times_equal_real_SuNAdj(SuNAdj * restrict A, double r)
+  {
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1); i++)
+     {
+     A->comp[i]*=r;
+     }
+  }
+
+
+// A*=B
+inline void times_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+   {
+   fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+   exit(EXIT_FAILURE);
+   }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j, k;
+  double aux[NCOLOR*NCOLOR-1] __attribute__((aligned(DOUBLE_ALIGN)));
+  double sum;
+
+  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+     {
+     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+        {
+        aux[j]=A->comp[madj(i,j)];
+        }
+
+     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+        {
+        sum=0.0;
+        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+           {
+           sum+=aux[k]*(B->comp[madj(k,j)]);
+           }
+        A->comp[madj(i,j)]=sum;
+        }
+     }
+  }
+
+
+// trace in the adjoint rep.
+inline double retr_SuNAdj(SuNAdj * restrict A)
+  {
+  int i;
+  double ris=0.0;
+
+  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+     {
+     ris+=A->comp[madj(i,i)];
+     }
+
+  #if NCOLOR!=1
+    ris/=(NCOLOR*NCOLOR-1);
+  #endif
+
+  return ris;
+  }
+
+
 #endif
