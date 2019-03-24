@@ -903,26 +903,31 @@ inline void times_equal_Su2Adj(Su2Adj * restrict A, Su2Adj const * const restric
   #endif
 
   int i, j, k;
-  double aux[NCOLOR*NCOLOR-1] __attribute__((aligned(DOUBLE_ALIGN)));
+  double aux[3] __attribute__((aligned(DOUBLE_ALIGN)));
   double sum;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  #define m2adj(X,Y) ((X)*3 + (Y))
+
+  for(i=0; i<3; i++)
      {
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+     for(j=0; j<3; j++)
         {
-        aux[j]=A->comp[madj(i,j)];
+        aux[j]=A->comp[m2adj(i,j)];
         }
 
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+     for(j=0; j<3; j++)
         {
         sum=0.0;
-        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+        for(k=0; k<3; k++)
            {
-           sum+=aux[k]*(B->comp[madj(k,j)]);
+           sum+=aux[k]*(B->comp[m2adj(k,j)]);
            }
-        A->comp[madj(i,j)]=sum;
+        A->comp[m2adj(i,j)]=sum;
         }
      }
+
+  #undef m2adj
+
   }
 
 

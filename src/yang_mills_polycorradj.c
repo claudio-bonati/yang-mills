@@ -60,7 +60,6 @@ void real_main(char *in_file)
     init_gauge_conf(&GC, &param);
 
     // initialize ml_polycorr arrays
-    alloc_polycorr_stuff(&GC, &param); // this is needed for the loc_poly array
     alloc_polycorradj(&GC, &param);
 
     // montecarlo
@@ -107,7 +106,6 @@ void real_main(char *in_file)
     free_gauge_conf(&GC, &param);
 
     // free ml_polycorr
-    free_polycorr_stuff(&GC, &param);
     free_polycorradj(&GC, &param);
 
     // free geometry
