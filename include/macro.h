@@ -11,7 +11,7 @@
   #define GAUGE_GROUP_ADJ Su2Adj
 #else
   #define GAUGE_GROUP SuN
-  #define GAUGE_GROUP_Adj SuNAdj
+  #define GAUGE_GROUP_ADJ SuNAdj
 #endif
 
 // function to access matrix elements
