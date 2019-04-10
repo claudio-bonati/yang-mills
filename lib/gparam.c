@@ -136,7 +136,7 @@ void readinput(char *in_file, GParam *param)
                      param->d_h[i]=temp_d;
                      }
                   }
-           else if(strncmp(str, "theta", 4)==0)
+           else if(strncmp(str, "theta", 5)==0)
                   {
                   err=fscanf(input, "%lf", &temp_d);
                   if(err!=1)
