@@ -983,7 +983,7 @@ void free_tube_conn_stuff(Gauge_Conf *GC,
   {
   int i;
 
-  free_polycorr_stuff(GC, param);
+  free_tube_disc_stuff(GC, param);
 
   for(i=0; i<NLEVELS; i++)
      {
