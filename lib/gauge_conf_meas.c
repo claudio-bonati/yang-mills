@@ -1693,6 +1693,55 @@ void perform_measures_tube_disc_long(Gauge_Conf *GC,
    }
 
 
+// perform the computation of the string width in the adjoint representation with the
+// disconnected correlator using the multilevel algorithm
+void perform_measures_tubeadj_disc(Gauge_Conf *GC,
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                FILE *datafilep)
+   {
+   double ris;
+   long r;
+   int i;
+
+   multilevel_tubeadj_disc(GC,
+                           geo,
+                           param,
+                           param->d_size[0]);
+
+   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
+         times_equal_TensProdAdj(&(GC->ml_polyplaqadj[0][r]), &(GC->ml_polycorradj[0][i][r]) );
+         }
+      }
+
+   ris=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      ris+=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
+      }
+   ris*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", ris, 0.0);
+
+   ris=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      ris+=retr_TensProdAdj(&(GC->ml_polyplaqadj[0][r]));
+      }
+   ris*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", ris, 0.0);
+
+   fprintf(datafilep, "\n");
+   fflush(datafilep);
+   }
+
+
 // perform the computation of the string width with the
 // connected correlator using the multilevel algorithm
 void perform_measures_tube_conn(Gauge_Conf *GC,

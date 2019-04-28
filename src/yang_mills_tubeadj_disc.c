@@ -1,5 +1,5 @@
-#ifndef YM_POLYCORRADJ_C
-#define YM_POLYCORRADJ_C
+#ifndef YM_TUBEADJ_DISC_C
+#define YM_TUBEADJ_DISC_C
 
 #include"../include/macro.h"
 
@@ -41,7 +41,7 @@ void real_main(char *in_file)
        {
        if(tmp!= param.d_size[count])
          {
-         fprintf(stderr, "When using yang_mills_polycorradj all the spatial sizes have to be of equal length.\n");
+         fprintf(stderr, "When using yang_mills_tubeadj_disc all the spatial sizes have to be of equal length.\n");
          exit(EXIT_FAILURE);
          }
        }
@@ -59,8 +59,8 @@ void real_main(char *in_file)
     // initialize gauge configuration
     init_gauge_conf(&GC, &param);
 
-    // initialize ml_polycorradj arrays
-    alloc_polycorradj(&GC, &param);
+    // allocate ml_polycorr and ml_polyplaq arrays
+    alloc_tubeadj_disc_stuff(&GC, &param);
 
     // montecarlo
     time(&time1);
@@ -71,7 +71,7 @@ void real_main(char *in_file)
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {
-         perform_measures_polycorradj(&GC, &geo, &param, datafilep);
+         perform_measures_tubeadj_disc(&GC, &geo, &param, datafilep);
          }
 
        // save configuration for backup
@@ -100,13 +100,13 @@ void real_main(char *in_file)
       }
 
     // print simulation details
-    print_parameters_polycorr(&param, time1, time2);
+    print_parameters_tube_disc(&param, time1, time2);
 
     // free gauge configuration
     free_gauge_conf(&GC, &param);
 
-    // free ml_polycorradj
-    free_polycorradj(&GC, &param);
+    // free ml_polycorr and ml_polyplaq
+    free_tubeadj_disc_stuff(&GC, &param);
 
     // free geometry
     free_geometry(&geo, &param);
@@ -144,6 +144,8 @@ void print_template_input(void)
     fprintf(fp, "ml_step          2   # timeslices for multilevel (from largest to smallest)\n");
     fprintf(fp, "ml_upd           10  # number of updates for various levels\n");
     fprintf(fp, "dist_poly        2   # distance between the polyakov loop\n");
+    fprintf(fp, "transv_dist      2   # transverse distance from the polyakov correlator\n");
+    fprintf(fp, "plaq_dir         1 0 # plaquette orientation for flux tube\n");
     fprintf(fp,"\n");
     fprintf(fp, "#output files\n");
     fprintf(fp, "conf_file  conf.dat\n");
@@ -173,7 +175,6 @@ int main (int argc, char **argv)
       printf("\n");
       printf("\tINT_ALIGN: %s\n", QUOTEME(INT_ALIGN));
       printf("\tDOUBLE_ALIGN: %s\n", QUOTEME(DOUBLE_ALIGN));
-      printf("\n");
 
       #ifdef DEBUG
         printf("\n\tDEBUG mode\n");
@@ -187,13 +188,6 @@ int main (int argc, char **argv)
         printf("\n\tusing imaginary theta\n");
       #endif
 
-      #ifdef OPT_MULTIHIT
-        printf("\tcompiled for multihit optimization\n");
-      #endif
-
-      #ifdef OPT_MULTILEVEL
-        printf("\tcompiled for multilevel optimization\n");
-      #endif
 
       printf("\n");
 
@@ -228,3 +222,4 @@ int main (int argc, char **argv)
     }
 
 #endif
+

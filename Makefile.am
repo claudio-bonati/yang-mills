@@ -10,11 +10,12 @@ bin_PROGRAMS = conf_check \
                yang_mills_polycorradj \
                yang_mills_polycorradj_long \
                yang_mills_t0 \
+               yang_mills_tracedef \
                yang_mills_tube_conn \
                yang_mills_tube_conn_long \
                yang_mills_tube_disc \
                yang_mills_tube_disc_long \
-               yang_mills_tracedef 
+               yang_mills_tubeadj_disc
 
 align = ./include/aligncheck.h \
         ./lib/aligncheck.c
@@ -221,6 +222,21 @@ yang_mills_t0_SOURCES=./src/yang_mills_t0.c \
                        $(tens_prod) \
                        $(u1) 
 
+yang_mills_tracedef_SOURCES=./src/yang_mills_tracedef.c \
+                            $(align) \
+                            $(dSFMT)  \
+                            $(endian) \
+                            $(funcpoint) \
+                            $(gauge_conf) \
+                            $(geometry) \
+                            $(gparam) \
+                            ./include/macro.h \
+                            $(random) \
+                            $(su2) \
+                            $(sun) \
+                            $(tens_prod) \
+                            $(u1) 
+
 yang_mills_tube_conn_SOURCES=./src/yang_mills_tube_conn.c \
                              $(align) \
                              $(dSFMT)  \
@@ -250,7 +266,7 @@ yang_mills_tube_conn_long_SOURCES=./src/yang_mills_tube_conn_long.c \
                                   $(sun) \
                                   $(tens_prod) \
                                   $(u1) 
-     
+
 yang_mills_tube_disc_SOURCES=./src/yang_mills_tube_disc.c \
                              $(align) \
                              $(dSFMT)  \
@@ -265,7 +281,7 @@ yang_mills_tube_disc_SOURCES=./src/yang_mills_tube_disc.c \
                              $(sun) \
                              $(tens_prod) \
                              $(u1) 
-
+ 
 yang_mills_tube_disc_long_SOURCES=./src/yang_mills_tube_disc_long.c \
                                   $(align) \
                                   $(dSFMT)  \
@@ -280,22 +296,22 @@ yang_mills_tube_disc_long_SOURCES=./src/yang_mills_tube_disc_long.c \
                                   $(sun) \
                                   $(tens_prod) \
                                   $(u1) 
-     
-yang_mills_tracedef_SOURCES=./src/yang_mills_tracedef.c \
-                            $(align) \
-                            $(dSFMT)  \
-                            $(endian) \
-                            $(funcpoint) \
-                            $(gauge_conf) \
-                            $(geometry) \
-                            $(gparam) \
-                            ./include/macro.h \
-                            $(random) \
-                            $(su2) \
-                            $(sun) \
-                            $(tens_prod) \
-                            $(u1) 
 
+yang_mills_tubeadj_disc_SOURCES=./src/yang_mills_tubeadj_disc.c \
+                                $(align) \
+                                $(dSFMT)  \
+                                $(endian) \
+                                $(funcpoint) \
+                                $(gauge_conf) \
+                                $(geometry) \
+                                $(gparam) \
+                                ./include/macro.h \
+                                $(random) \
+                                $(su2) \
+                                $(sun) \
+                                $(tens_prod) \
+                                $(u1) 
+   
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -Werror -pedantic -Wconversion @OPENMP_CFLAGS@
 
 CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in 

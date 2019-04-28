@@ -34,6 +34,7 @@ typedef struct Gauge_Conf {
 
   // for the disconnected correlator for string width
   TensProd **ml_polyplaq;   // [NLEVELS] [only slice 0] [space_vol]
+  TensProdAdj **ml_polyplaqadj;   // [NLEVELS] [only slice 0] [space_vol]  for the adjoint case
   double complex *loc_plaq;  // [only slice 0] [space_vol] auxilliary vector to be used in the multilevel
 
   // for the connected correlator for string width
@@ -105,6 +106,11 @@ void compute_md5sum_tube_disc_stuff(char *res,     // the lenght is 2*MD5_DIGEST
                                     Gauge_Conf const * const GC,
                                     GParam const * const param);
 
+void alloc_tubeadj_disc_stuff(Gauge_Conf *GC,
+                           GParam const * const param);
+void free_tubeadj_disc_stuff(Gauge_Conf *GC,
+                          GParam const * const param);
+
 void alloc_tube_conn_stuff(Gauge_Conf *GC,
                            GParam const * const param);
 void free_tube_conn_stuff(Gauge_Conf *GC,
@@ -115,7 +121,9 @@ void write_tube_conn_stuff_on_file(Gauge_Conf const * const GC,
 void read_tube_conn_stuff_from_file(Gauge_Conf const * const GC,
                                     GParam const * const param,
                                     int *iteration);
-void compute_md5sum_tube_conn_stuff(char *res, Gauge_Conf const * const GC, GParam const * const param);
+void compute_md5sum_tube_conn_stuff(char *res,  // the lenght is 2*MD5_DIGEST_LENGTH
+                                    Gauge_Conf const * const GC,
+                                    GParam const * const param);
 
 void alloc_clover_array(Gauge_Conf *GC,
                         GParam const * const param);
@@ -245,6 +253,15 @@ void perform_measures_tube_disc_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep);
 
+void compute_local_polyadj_and_plaq(Gauge_Conf *GC,
+                                    Geometry const * const geo,
+                                    GParam const * const param);
+void perform_measures_tubeadj_disc(Gauge_Conf *GC,
+                                   Geometry const * const geo,
+                                   GParam const * const param,
+                                   FILE *datafilep);
+
+
 void perform_measures_tube_conn(Gauge_Conf *GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
@@ -311,6 +328,13 @@ void multilevel_tube_disc_long(Gauge_Conf * GC,
                                GParam const * const param,
                                int dt,
                                int iteration);
+
+void multilevel_tubeadj_disc(Gauge_Conf *GC,
+                             Geometry const * const geo,
+                             GParam const * const param,
+                             int dt);
+
+
 
 void compute_local_poly_plaq_and_plaqconn(Gauge_Conf *GC,
                                           Geometry const * const geo,
