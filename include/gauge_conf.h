@@ -95,6 +95,16 @@ void alloc_tube_disc_stuff(Gauge_Conf *GC,
                            GParam const * const param);
 void free_tube_disc_stuff(Gauge_Conf *GC,
                           GParam const * const param);
+void write_tube_disc_stuff_on_file(Gauge_Conf const * const GC,
+                                   GParam const * const param,
+                                   int iteration);
+void read_tube_disc_stuff_from_file(Gauge_Conf const * const GC,
+                                    GParam const * const param,
+                                    int *iteration);
+void compute_md5sum_tube_disc_stuff(char *res,     // the lenght is 2*MD5_DIGEST_LENGTH
+                                    Gauge_Conf const * const GC,
+                                    GParam const * const param);
+
 void alloc_tube_conn_stuff(Gauge_Conf *GC,
                            GParam const * const param);
 void free_tube_conn_stuff(Gauge_Conf *GC,
@@ -213,12 +223,12 @@ void perform_measures_polycorradj(Gauge_Conf *GC,
                                   GParam const * const param,
                                   FILE *datafilep);
 
-void perform_measures_polycorr_long(Gauge_Conf * GC,
-                                    GParam const * const param,
-                                    FILE *datafilep);
 void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
                                        GParam const * const param,
                                        FILE *datafilep);
+void perform_measures_polycorr_long(Gauge_Conf * GC,
+                                    GParam const * const param,
+                                    FILE *datafilep);
 
 void optimize_multilevel_polycorradj_long(Gauge_Conf *GC,
                                           GParam const * const param,
@@ -231,6 +241,10 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
                                 FILE *datafilep);
+void perform_measures_tube_disc_long(Gauge_Conf *GC,
+                                     GParam const * const param,
+                                     FILE *datafilep);
+
 void perform_measures_tube_conn(Gauge_Conf *GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
@@ -254,16 +268,18 @@ void multihitadj(Gauge_Conf const * const GC,
                  int dir,
                  int num_hit,
                  GAUGE_GROUP_ADJ *G);
+
+void update_for_multilevel(Gauge_Conf * GC,
+                           Geometry const * const geo,
+                           GParam const * const param,
+                           int level);
+
 void compute_local_poly(Gauge_Conf *GC,
                         Geometry const * const geo,
                         GParam const * const param);
 void compute_local_polyadj(Gauge_Conf *GC,
                            Geometry const * const geo,
                            GParam const * const param);
-void update_for_multilevel(Gauge_Conf * GC,
-                           Geometry const * const geo,
-                           GParam const * const param,
-                           int level);
 void multilevel_polycorr(Gauge_Conf *GC,
                           Geometry const * const geo,
                           GParam const * const param,
@@ -282,6 +298,7 @@ void multilevel_polycorradj_long(Gauge_Conf * GC,
                                  GParam const * const param,
                                  int dt,
                                  int iteration);
+
 void compute_local_poly_and_plaq(Gauge_Conf *GC,
                                  Geometry const * const geo,
                                  GParam const * const param);
@@ -289,6 +306,12 @@ void multilevel_tube_disc(Gauge_Conf *GC,
                           Geometry const * const geo,
                           GParam const * const param,
                           int dt);
+void multilevel_tube_disc_long(Gauge_Conf * GC,
+                               Geometry const * const geo,
+                               GParam const * const param,
+                               int dt,
+                               int iteration);
+
 void compute_local_poly_plaq_and_plaqconn(Gauge_Conf *GC,
                                           Geometry const * const geo,
                                           GParam const * const param);

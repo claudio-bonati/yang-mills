@@ -67,3 +67,4 @@ src/debug_su2_adj.c
 src/yang_mills_polycorradj.c
 lib/tmp.c
 src/yang_mills_polycorradj_long.c
+src/yang_mills_tube_disc_long.c

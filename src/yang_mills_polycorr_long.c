@@ -165,8 +165,6 @@ void print_template_input(void)
     fprintf(fp, "beta 5.705\n");
     fprintf(fp, "theta 1.5\n");
     fprintf(fp,"\n");
-    fprintf(fp, "sample    10\n");
-    fprintf(fp, "thermal   0\n");
     fprintf(fp, "overrelax 5\n");
     fprintf(fp, "measevery 1\n");
     fprintf(fp,"\n");

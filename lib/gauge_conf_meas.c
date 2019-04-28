@@ -16,7 +16,6 @@
 #include"../include/tens_prod_adj.h"
 
 
-
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
 double plaquettep(Gauge_Conf const * const GC,
                   Geometry const * const geo,
@@ -408,7 +407,6 @@ void polyakov_adj(Gauge_Conf const * const GC,
    *repoly=rep*param->d_inv_space_vol;
    *impoly=imp*param->d_inv_space_vol;
    }
-
 
 
 // compute the mean Polyakov loop and its powers (trace of) in the presence of trace deformation
@@ -1606,6 +1604,55 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
                         geo,
                         param,
                         param->d_size[0]);
+
+   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<param->d_space_vol; r++)
+         {
+         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
+         times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
+         }
+      }
+
+   risr=0.0;
+   risi=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
+      }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
+   risr=0.0;
+   risi=0.0;
+   for(r=0; r<param->d_space_vol; r++)
+      {
+      risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
+      risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
+      }
+   risr*=param->d_inv_space_vol;
+   risi*=param->d_inv_space_vol;
+   fprintf(datafilep, "%.12g %.12g ", risr, risi);
+
+   fprintf(datafilep, "\n");
+   fflush(datafilep);
+   }
+
+
+// perform the computation of the string width with the
+// disconnected correlator that has been computed by multilevel (long version)
+void perform_measures_tube_disc_long(Gauge_Conf *GC,
+                                     GParam const * const param,
+                                     FILE *datafilep)
+   {
+   double risr, risi;
+   long r;
+   int i;
 
    for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
       {
