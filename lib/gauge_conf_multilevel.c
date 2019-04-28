@@ -1809,6 +1809,166 @@ void multilevel_tubeadj_disc(Gauge_Conf * GC,
   } // end of multilevel
 
 
+// multilevel for flux width computation in the adjoint
+// representation using the disconnected correlator
+// to be used in long simulations
+void multilevel_tubeadj_disc_long(Gauge_Conf * GC,
+                                  Geometry const * const geo,
+                                  GParam const * const param,
+                                  int dt,
+                                  int iteration)
+  {
+  int upd;
+  long raux;
+
+  if(dt!=param->d_ml_step[0])
+    {
+    fprintf(stderr, "'dt' has to be equal to ml_step[0] in multilevel_tubeadj_disc_long (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+
+  // initialyze ml_polycorradj[0] and ml_polyplaqadj[0] to 0 if needed
+  if(iteration==0)
+    {
+    #ifdef OPENMP_MODE
+    #pragma omp parallel for num_threads(NTHREADS) private(raux)
+    #endif
+    for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+       {
+       long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+       int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+       zero_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]));
+       if(slice==0)
+         {
+         zero_TensProdAdj(&(GC->ml_polyplaqadj[0][r]));
+         }
+       }
+    }
+
+  // perform the update
+  for(upd=0; upd < param->d_ml_upd[0]; upd++)
+     {
+     // update on level zero
+     update_for_multilevel(GC, geo, param, 0);
+
+     if(NLEVELS==1)
+       {
+       // compute the adjoing Polyakov loop and plaquette restricted to the slice
+       compute_local_polyadj_and_plaq(GC, geo, param);
+
+       // compute the tensor products
+       // and update ml_polycorradj[0] and ml_polyplaqadj[0]
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(raux)
+       #endif
+       for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+          {
+          TensProdAdj TP;
+          long r1, r2;
+          int j, t_tmp;
+
+          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+          r1=sisp_and_t_to_si(geo, r, 0);
+          for(j=0; j<param->d_dist_poly; j++)
+             {
+             r1=nnp(geo, r1, 1);
+             }
+          si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
+
+          TensProdAdj_initadj(&TP, &(GC->loc_polyadj[slice][r]), &(GC->loc_polyadj[slice][r2]) );
+          plus_equal_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]), &TP);
+
+          if(slice==0)
+            {
+            times_equal_real_TensProdAdj(&TP, creal(GC->loc_plaq[r]));  // only the real part of the plaquette can contribute
+                                                                        // since the trace is real in the adjoint representation
+            plus_equal_TensProdAdj(&(GC->ml_polyplaqadj[0][r]), &TP);
+            }
+          }
+       }
+     else  // NLEVELS>1
+       {
+       // initialyze ml_polycorradj[1] and ml_polyplaqadj[1] to 0
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(raux)
+       #endif
+       for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[1]; raux++)
+          {
+          long r = raux/(param->d_size[0]/param->d_ml_step[1]);
+          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[1]) );
+
+          zero_TensProdAdj(&(GC->ml_polycorradj[1][slice][r]));
+          if(slice==0)
+            {
+            zero_TensProdAdj(&(GC->ml_polyplaqadj[1][r]));
+            }
+          }
+
+       // call inner levels
+       // important: we have to call the "non long" version in inner levels
+       multilevel_tubeadj_disc(GC,
+                               geo,
+                               param,
+                               param->d_ml_step[1]);
+
+       // update polycorradj[0] with polycorradj[1]
+       // and analogously for polyplaqadj
+       #ifdef OPENMP_MODE
+       #pragma omp parallel for num_threads(NTHREADS) private(raux)
+       #endif
+       for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+          {
+          int j;
+          TensProdAdj TP;
+
+          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+          one_TensProdAdj(&TP);
+          for(j=0; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
+             {
+             times_equal_TensProdAdj(&TP, &(GC->ml_polycorradj[1][slice*param->d_ml_step[0]/param->d_ml_step[1]+j][r]));
+             }
+          plus_equal_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]), &TP);
+
+          if(slice==0)
+            {
+            equal_TensProdAdj(&TP, &(GC->ml_polyplaqadj[1][r]));
+            for(j=0; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
+               {
+               times_equal_TensProdAdj(&TP, &(GC->ml_polycorradj[1][slice*param->d_ml_step[0]/param->d_ml_step[1]+j][r]));
+               }
+            plus_equal_TensProdAdj(&(GC->ml_polyplaqadj[0][r]), &TP);
+            }
+          }
+       }
+    } // end update
+
+  if(iteration==param->d_ml_level0_repeat-1) // iteration starts from zero
+    {
+    // normalize polycorradj[level] and polyplaqadj[level]
+    #ifdef OPENMP_MODE
+    #pragma omp parallel for num_threads(NTHREADS) private(raux)
+    #endif
+    for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+       {
+       long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+       int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+       times_equal_real_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]), 1.0/((double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat) );
+
+       if(slice==0)
+         {
+         times_equal_real_TensProdAdj(&(GC->ml_polyplaqadj[0][r]), 1.0/((double) param->d_ml_upd[0] * (double) param->d_ml_level0_repeat) );
+         }
+       }
+    }
+  } // end of multilevel
+
+
 // compute polyakov loop, plaquette and connected plaquette on a single slice
 void compute_local_poly_plaq_and_plaqconn(Gauge_Conf *GC,
                                           Geometry const * const geo,
@@ -1918,7 +2078,6 @@ void compute_local_poly_plaq_and_plaqconn(Gauge_Conf *GC,
           r4=nnp(geo, r4, 0);
           }
        }// end of if(slice==0)
-
      }
   }
 

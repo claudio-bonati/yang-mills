@@ -15,7 +15,8 @@ bin_PROGRAMS = conf_check \
                yang_mills_tube_conn_long \
                yang_mills_tube_disc \
                yang_mills_tube_disc_long \
-               yang_mills_tubeadj_disc
+               yang_mills_tubeadj_disc \
+               yang_mills_tubeadj_disc_long
 
 align = ./include/aligncheck.h \
         ./lib/aligncheck.c
@@ -311,6 +312,21 @@ yang_mills_tubeadj_disc_SOURCES=./src/yang_mills_tubeadj_disc.c \
                                 $(sun) \
                                 $(tens_prod) \
                                 $(u1) 
+
+yang_mills_tubeadj_disc_long_SOURCES=./src/yang_mills_tubeadj_disc_long.c \
+                                     $(align) \
+                                     $(dSFMT)  \
+                                     $(endian) \
+                                     $(funcpoint) \
+                                     $(gauge_conf) \
+                                     $(geometry) \
+                                     $(gparam) \
+                                     ./include/macro.h \
+                                     $(random) \
+                                     $(su2) \
+                                     $(sun) \
+                                     $(tens_prod) \
+                                     $(u1) 
    
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -Werror -pedantic -Wconversion @OPENMP_CFLAGS@
 
