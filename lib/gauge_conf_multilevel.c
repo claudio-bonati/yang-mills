@@ -1294,7 +1294,7 @@ void multilevel_tube_disc(Gauge_Conf * GC,
             if(slice==0)
               {
               equal_TensProd(&TP, &(GC->ml_polyplaq[level+1][r]));
-              for(j=0; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
+              for(j=1; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
                  {
                  times_equal_TensProd(&TP, &(GC->ml_polycorr[level+1][slice*param->d_ml_step[level]/param->d_ml_step[level+1]+j][r]));
                  }
@@ -1451,7 +1451,7 @@ void multilevel_tube_disc_long(Gauge_Conf * GC,
           if(slice==0)
             {
             equal_TensProd(&TP, &(GC->ml_polyplaq[1][r]));
-            for(j=0; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
+            for(j=1; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
                {
                times_equal_TensProd(&TP, &(GC->ml_polycorr[1][slice*param->d_ml_step[0]/param->d_ml_step[1]+j][r]));
                }
@@ -1777,7 +1777,7 @@ void multilevel_tubeadj_disc(Gauge_Conf * GC,
             if(slice==0)
               {
               equal_TensProdAdj(&TP, &(GC->ml_polyplaqadj[level+1][r]));
-              for(j=0; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
+              for(j=1; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
                  {
                  times_equal_TensProdAdj(&TP, &(GC->ml_polycorradj[level+1][slice*param->d_ml_step[level]/param->d_ml_step[level+1]+j][r]));
                  }
@@ -1937,7 +1937,7 @@ void multilevel_tubeadj_disc_long(Gauge_Conf * GC,
           if(slice==0)
             {
             equal_TensProdAdj(&TP, &(GC->ml_polyplaqadj[1][r]));
-            for(j=0; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
+            for(j=1; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
                {
                times_equal_TensProdAdj(&TP, &(GC->ml_polycorradj[1][slice*param->d_ml_step[0]/param->d_ml_step[1]+j][r]));
                }
@@ -2313,14 +2313,14 @@ void multilevel_tube_conn(Gauge_Conf * GC,
             if(slice==0)
               {
               equal_TensProd(&TP, &(GC->ml_polyplaq[level+1][r]));
-              for(j=0; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
+              for(j=1; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
                  {
                  times_equal_TensProd(&TP, &(GC->ml_polycorr[level+1][slice*param->d_ml_step[level]/param->d_ml_step[level+1]+j][r]));
                  }
               plus_equal_TensProd(&(GC->ml_polyplaq[level][r]), &TP);
 
               equal_TensProd(&TP, &(GC->ml_polyplaqconn[level+1][r]));
-              for(j=0; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
+              for(j=1; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
                  {
                  times_equal_TensProd(&TP, &(GC->ml_polycorr[level+1][slice*param->d_ml_step[level]/param->d_ml_step[level+1]+j][r]));
                  }
@@ -2483,14 +2483,14 @@ void multilevel_tube_conn_long(Gauge_Conf * GC,
           if(slice==0)
             {
             equal_TensProd(&TP, &(GC->ml_polyplaq[1][r]));
-            for(j=0; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
+            for(j=1; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
                {
                times_equal_TensProd(&TP, &(GC->ml_polycorr[1][slice*param->d_ml_step[0]/param->d_ml_step[1]+j][r]));
                }
             plus_equal_TensProd(&(GC->ml_polyplaq[0][r]), &TP);
 
             equal_TensProd(&TP, &(GC->ml_polyplaqconn[1][r]));
-            for(j=0; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
+            for(j=1; j<param->d_ml_step[0]/param->d_ml_step[1]; j++)
                {
                times_equal_TensProd(&TP, &(GC->ml_polycorr[1][slice*param->d_ml_step[0]/param->d_ml_step[1]+j][r]));
                }
