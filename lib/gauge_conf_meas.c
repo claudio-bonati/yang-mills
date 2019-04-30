@@ -538,7 +538,7 @@ double loc_topcharge(Gauge_Conf const * const GC,
      exit(EXIT_FAILURE);
      }
 
-   double ris;
+   double ris=0.0; // initialized just to avoid compiler warnings
 
    #if (STDIM==4 && NCOLOR>1)
      GAUGE_GROUP aux1, aux2, aux3;
