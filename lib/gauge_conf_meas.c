@@ -887,13 +887,19 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
 
    #else
 
-     double plaqs, plaqt, polyre, polyim;
+     int i;
+     double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1];   // +1 just to avoid warning if NCOLOR=1
 
      plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov(GC, geo, param, &polyre, &polyim);
+     polyakov_for_tracedef(GC, geo, param, polyre, polyim);
 
-     fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+     fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+     for(i=0; i<(int)floor(NCOLOR/2); i++)
+        {
+        fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
+        }
      fprintf(datafilep, "\n");
+
      fflush(datafilep);
 
    #endif
