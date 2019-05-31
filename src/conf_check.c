@@ -3,9 +3,7 @@
 
 #include"../include/macro.h"
 
-#ifdef HASH_MODE
-  #include<openssl/md5.h>
-#endif
+#include<openssl/md5.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -87,11 +85,8 @@ void computehash(char *infile, int dim, long volume, char *hash)
     FILE *fp;
     long r;
     int j, err;
-
-    #ifdef HASH_MODE
-      MD5_CTX mdContext;
-      unsigned char c[MD5_DIGEST_LENGTH];
-    #endif
+    MD5_CTX mdContext;
+    unsigned char c[MD5_DIGEST_LENGTH];
 
     // open the configuration file in binary
     fp=fopen(infile, "rb");
@@ -110,9 +105,7 @@ void computehash(char *infile, int dim, long volume, char *hash)
            }
 
       // read the configuration & compute md5sum
-      #ifdef HASH_MODE
-        MD5_Init(&mdContext);
-      #endif
+      MD5_Init(&mdContext);
       for(r=0; r<volume; r++)
          {
          for(j=0; j<dim; j++)
@@ -123,32 +116,26 @@ void computehash(char *infile, int dim, long volume, char *hash)
               fprintf(stderr, "Error in reading the file %s (%s, %d)\n", infile, __FILE__, __LINE__);
               exit(EXIT_FAILURE);
               }
-            #ifdef HASH_MODE
-              #if NCOLOR==1
-                MD5_Update(&mdContext, &(link.comp), sizeof(double complex));
-              #elif NCOLOR==2
-                for(int k=0; k<4; k++)
-                   {
-                   MD5_Update(&mdContext, &(link.comp[k]), sizeof(double));
-                   }
-              #else
-                for(int k=0; k<NCOLOR*NCOLOR; k++)
-                   {
-                   MD5_Update(&mdContext, &(link.comp[k]), sizeof(double complex));
-                   }
-              #endif
+            #if NCOLOR==1
+              MD5_Update(&mdContext, &(link.comp), sizeof(double complex));
+            #elif NCOLOR==2
+              for(int k=0; k<4; k++)
+                 {
+                 MD5_Update(&mdContext, &(link.comp[k]), sizeof(double));
+                 }
+            #else
+              for(int k=0; k<NCOLOR*NCOLOR; k++)
+                 {
+                 MD5_Update(&mdContext, &(link.comp[k]), sizeof(double complex));
+                 }
             #endif
             }
          }
-      #ifdef HASH_MODE
-        MD5_Final(c, &mdContext);
-        for(r = 0; r < MD5_DIGEST_LENGTH; r++)
-           {
-           sprintf(&(hash[2*r]), "%02x", c[r]);
-           }
-      #else
-        *hash='0';
-      #endif
+      MD5_Final(c, &mdContext);
+      for(r = 0; r < MD5_DIGEST_LENGTH; r++)
+         {
+         sprintf(&(hash[2*r]), "%02x", c[r]);
+         }
 
       fclose(fp);
       }
@@ -162,13 +149,8 @@ int main (int argc, char **argv)
     int dim, *sides, error;
     long volumel;
 
-    #ifdef HASH_MODE
-      char md5sum_old[2*MD5_DIGEST_LENGTH+1];
-      char md5sum_new[2*MD5_DIGEST_LENGTH+1];
-    #else
-      char md5sum_old[2*STD_STRING_LENGTH+1]={0};
-      char md5sum_new[2*STD_STRING_LENGTH+1]={0};
-    #endif
+    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
+    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
 
     if(argc != 2)
       {
@@ -220,14 +202,12 @@ int main (int argc, char **argv)
     // compute the hash
     computehash(infile, dim, volumel, md5sum_new);
 
-    #ifdef HASH_MODE
     // check md5sum computed and stored
     if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
       {
       fprintf(stderr, "The computed md5sum %s does not match the stored %s for the file %s\n", md5sum_new, md5sum_old, infile);
       return EXIT_FAILURE;
       }
-    #endif
 
     free(sides);
 

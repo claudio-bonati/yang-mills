@@ -4,9 +4,7 @@
 #include"macro.h"
 
 #include<complex.h>
-#ifdef HASH_MODE
-  #include<openssl/md5.h>
-#endif
+#include<openssl/md5.h>
 #include<stdio.h>
 
 #include"gparam.h"

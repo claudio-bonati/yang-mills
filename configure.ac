@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([yang_mills], [0.7.5], [claudio.bonati82@gmail.com])
+AC_INIT([yang_mills], [0.7.6], [claudio.bonati82@gmail.com])
 AM_INIT_AUTOMAKE(subdir-objects)
 AC_CONFIG_SRCDIR([./include/macro.h])
 AC_CONFIG_HEADERS([config.h])
@@ -30,12 +30,7 @@ AC_CHECK_HEADERS([limits.h], [], [AC_MSG_ERROR([Required header limits.h not fou
 
 AC_CHECK_HEADERS([math.h], [], [AC_MSG_ERROR([Required header math.h not found.])])
 
-AC_CHECK_HEADERS([openssl/md5.h], [has_md5=yes], 
-     [AC_MSG_WARN([
-   *****
-   openssl/md5.h not found. It will not be possible to asign an hash to a configuration.
-   *****
-     ])])
+AC_CHECK_HEADERS([openssl/md5.h], [], [AC_MSG_ERROR([Required openssl/md5.h not found.])])
 
 AC_CHECK_HEADERS([stdio.h], [], [AC_MSG_ERROR([Required header stdio.h not found.])])
 
@@ -45,16 +40,9 @@ AC_CHECK_HEADERS([time.h], [], [AC_MSG_ERROR([Required header time.h not found.]
 
 
 # Checks for libraries.
-AC_SEARCH_LIBS([MD5_Init], [crypto], [has_crypto=yes], 
-     [AC_MSG_WARN([
-   *****
-   crypto library not found. It will not be possible to asign an hash to a configuration.
-   *****
-     ])])
+AC_SEARCH_LIBS([MD5_Init], [crypto], [], [AC_MSG_ERROR([Required crypto library not found.])])
 
-AC_SEARCH_LIBS([sqrt], [m], [], 
-     [AC_MSG_FAILURE([Required c mathematical library not found.])])
-
+AC_SEARCH_LIBS([sqrt], [m], [], [AC_MSG_ERROR([Required c mathematical library not found.])]) 
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
@@ -99,10 +87,6 @@ AC_ARG_VAR(ST_dim, spacetime dimensionality (default 4))
 
 
 ### DEFINE & CO
-if test x${has_md5}x${has_crypto} = xyesxyes; then
-  AC_DEFINE(HASH_MODE,, [Activate the computation of the hash function of the configuration])
-fi
-
 if test x${use_openmp} = xyes; then
   AC_DEFINE(OPENMP_MODE,, [Enable the use of openmp])
 fi

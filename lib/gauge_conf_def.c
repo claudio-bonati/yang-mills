@@ -3,9 +3,7 @@
 
 #include"../include/macro.h"
 
-#ifdef HASH_MODE
-  #include<openssl/md5.h>
-#endif
+#include<openssl/md5.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -93,12 +91,8 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
   int err, mu;
   long lex, si;
   GAUGE_GROUP matrix;
-  #ifdef HASH_MODE
-    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
-    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum_new[2*MD5_DIGEST_LENGTH+1];
+  char md5sum_old[2*MD5_DIGEST_LENGTH+1];
 
   fp=fopen(param->d_conf_file, "r"); // open the configuration file
   if(fp==NULL)
@@ -178,15 +172,13 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
        }
     fclose(fp);
 
-    #ifdef HASH_MODE
-      // compute the new md5sum and check for consistency
-      compute_md5sum_conf(md5sum_new, GC, param);
-      if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
-        {
-        fprintf(stderr, "The computed md5sum %s does not match the stored %s for the file %s (%s, %d)\n", md5sum_new, md5sum_old, param->d_conf_file, __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
-        }
-    #endif
+    // compute the new md5sum and check for consistency
+    compute_md5sum_conf(md5sum_new, GC, param);
+    if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
+      {
+      fprintf(stderr, "The computed md5sum %s does not match the stored %s for the file %s (%s, %d)\n", md5sum_new, md5sum_old, param->d_conf_file, __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
     }
   }
 
@@ -214,16 +206,10 @@ void write_conf_on_file_with_name(Gauge_Conf const * const GC,
   {
   long si, lex;
   int i, mu, err;
-  #ifdef HASH_MODE
-    char md5sum[2*MD5_DIGEST_LENGTH+1];
-  #else
-     char md5sum[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum[2*MD5_DIGEST_LENGTH+1];
   FILE *fp;
 
-  #ifdef HASH_MODE
-    compute_md5sum_conf(md5sum, GC, param);
-  #endif
+  compute_md5sum_conf(md5sum, GC, param);
 
   fp=fopen(namefile, "w"); // open the configuration file
   if(fp==NULL)
@@ -339,48 +325,41 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
 // compute the md5sum of the configuration and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
 void compute_md5sum_conf(char *res, Gauge_Conf const * const GC, GParam const * const param)
   {
-  #ifdef HASH_MODE
-    MD5_CTX mdContext;
-    unsigned char c[MD5_DIGEST_LENGTH];
-    long si, lex;
-    GAUGE_GROUP matrix;
-    int mu, k;
+  MD5_CTX mdContext;
+  unsigned char c[MD5_DIGEST_LENGTH];
+  long si, lex;
+  GAUGE_GROUP matrix;
+  int mu, k;
 
-    MD5_Init(&mdContext);
-    for(lex=0; lex<param->d_volume; lex++)
-       {
-       si=lex_to_si(lex, param);
-       for(mu=0; mu<STDIM; mu++)
-          {
-          equal(&matrix, &(GC->lattice[si][mu]));
+  MD5_Init(&mdContext);
+  for(lex=0; lex<param->d_volume; lex++)
+     {
+     si=lex_to_si(lex, param);
+     for(mu=0; mu<STDIM; mu++)
+        {
+        equal(&matrix, &(GC->lattice[si][mu]));
 
-          #if NCOLOR==1
-            MD5_Update(&mdContext, &(matrix.comp), sizeof(double complex));
-          #elif NCOLOR==2
-            for(k=0; k<4; k++)
-               {
-               MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double));
-               }
-          #else
-            for(k=0; k<NCOLOR*NCOLOR; k++)
-               {
-               MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double complex));
-               }
-          #endif
-          }
-       }
-    MD5_Final(c, &mdContext);
+        #if NCOLOR==1
+          MD5_Update(&mdContext, &(matrix.comp), sizeof(double complex));
+        #elif NCOLOR==2
+          for(k=0; k<4; k++)
+             {
+             MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double));
+             }
+        #else
+          for(k=0; k<NCOLOR*NCOLOR; k++)
+             {
+             MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double complex));
+             }
+        #endif
+        }
+     }
+  MD5_Final(c, &mdContext);
 
-    for(k = 0; k < MD5_DIGEST_LENGTH; k++)
-       {
-       sprintf(&(res[2*k]), "%02x", c[k]);
-       }
-  #else
-    // just to avoid warning at compile time
-    (void) res;
-    (void) GC;
-    (void) param;
-  #endif
+  for(k = 0; k < MD5_DIGEST_LENGTH; k++)
+     {
+     sprintf(&(res[2*k]), "%02x", c[k]);
+     }
   }
 
 
@@ -473,16 +452,10 @@ void write_polycorr_on_file(Gauge_Conf const * const GC,
   {
   long i;
   int j, err;
-  #ifdef HASH_MODE
-    char md5sum[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum[2*MD5_DIGEST_LENGTH+1];
   FILE *fp;
 
-  #ifdef HASH_MODE
-    compute_md5sum_polycorr(md5sum, GC, param);
-  #endif
+  compute_md5sum_polycorr(md5sum, GC, param);
 
   fp=fopen(param->d_ml_file, "w"); // open the configuration file
   if(fp==NULL)
@@ -530,12 +503,8 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
   long i, loc_space_vol;
   int j, err;
   FILE *fp;
-  #ifdef HASH_MODE
-    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
-    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum_new[2*MD5_DIGEST_LENGTH+1];
+  char md5sum_old[2*MD5_DIGEST_LENGTH+1];
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
   if(fp==NULL)
@@ -591,62 +560,53 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
     fclose(fp);
     }
 
-  #ifdef HASH_MODE
-    // compute the new md5sum and check for consistency
-    compute_md5sum_polycorr(md5sum_new, GC, param);
-    if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
-      {
-      fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
-      exit(EXIT_FAILURE);
-      }
-  #endif
+  // compute the new md5sum and check for consistency
+  compute_md5sum_polycorr(md5sum_new, GC, param);
+  if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
+    {
+    fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
+    exit(EXIT_FAILURE);
+    }
   }
 
 
 // compute the md5sum of the ml_polycorr[0] arrays and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
 void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam const * const param)
   {
-  #ifdef HASH_MODE
-    MD5_CTX mdContext;
-    unsigned char c[MD5_DIGEST_LENGTH];
-    long i;
-    int j;
-    int n1, n2, n3, n4;
+  MD5_CTX mdContext;
+  unsigned char c[MD5_DIGEST_LENGTH];
+  long i;
+  int j;
+  int n1, n2, n3, n4;
 
-    MD5_Init(&mdContext);
+  MD5_Init(&mdContext);
 
-    for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
-       {
-       for(i=0; i<(param->d_space_vol); i++)
-          {
-          for(n1=0; n1<NCOLOR; n1++)
-             {
-             for(n2=0; n2<NCOLOR; n2++)
-                {
-                for(n3=0; n3<NCOLOR; n3++)
-                   {
-                   for(n4=0; n4<NCOLOR; n4++)
-                      {
-                      MD5_Update(&mdContext, &((GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                      }
-                   }
-                }
-             }
-          }
-       }
+  for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
+     {
+     for(i=0; i<(param->d_space_vol); i++)
+        {
+        for(n1=0; n1<NCOLOR; n1++)
+           {
+           for(n2=0; n2<NCOLOR; n2++)
+              {
+              for(n3=0; n3<NCOLOR; n3++)
+                 {
+                 for(n4=0; n4<NCOLOR; n4++)
+                    {
+                    MD5_Update(&mdContext, &((GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                    }
+                 }
+              }
+           }
+        }
+     }
 
-    MD5_Final(c, &mdContext);
+  MD5_Final(c, &mdContext);
 
-    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
-       {
-       sprintf(&(res[2*i]), "%02x", c[i]);
-       }
-  #else
-    // just to avoid warning at compile time
-    (void) res;
-    (void) GC;
-    (void) param;
-  #endif
+  for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+     {
+     sprintf(&(res[2*i]), "%02x", c[i]);
+     }
   }
 
 
@@ -739,16 +699,10 @@ void write_polycorradj_on_file(Gauge_Conf const * const GC,
   {
   long i;
   int j, err;
-  #ifdef HASH_MODE
-    char md5sum[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum[2*MD5_DIGEST_LENGTH+1];
   FILE *fp;
 
-  #ifdef HASH_MODE
-    compute_md5sum_polycorradj(md5sum, GC, param);
-  #endif
+  compute_md5sum_polycorradj(md5sum, GC, param);
 
   fp=fopen(param->d_ml_file, "w"); // open the configuration file
   if(fp==NULL)
@@ -796,12 +750,8 @@ void read_polycorradj_from_file(Gauge_Conf const * const GC,
   long i, loc_space_vol;
   int j, err;
   FILE *fp;
-  #ifdef HASH_MODE
-    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
-    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum_new[2*MD5_DIGEST_LENGTH+1];
+  char md5sum_old[2*MD5_DIGEST_LENGTH+1];
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
   if(fp==NULL)
@@ -857,62 +807,53 @@ void read_polycorradj_from_file(Gauge_Conf const * const GC,
     fclose(fp);
     }
 
-  #ifdef HASH_MODE
-    // compute the new md5sum and check for consistency
-    compute_md5sum_polycorradj(md5sum_new, GC, param);
-    if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
-      {
-      fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
-      exit(EXIT_FAILURE);
-      }
-  #endif
+  // compute the new md5sum and check for consistency
+  compute_md5sum_polycorradj(md5sum_new, GC, param);
+  if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
+    {
+    fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
+    exit(EXIT_FAILURE);
+    }
   }
 
 
 // compute the md5sum of the ml_polycorradj[0] arrays and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
 void compute_md5sum_polycorradj(char *res, Gauge_Conf const * const GC, GParam const * const param)
   {
-  #ifdef HASH_MODE
-    MD5_CTX mdContext;
-    unsigned char c[MD5_DIGEST_LENGTH];
-    long i;
-    int j;
-    int n1, n2, n3, n4;
+  MD5_CTX mdContext;
+  unsigned char c[MD5_DIGEST_LENGTH];
+  long i;
+  int j;
+  int n1, n2, n3, n4;
 
-    MD5_Init(&mdContext);
+  MD5_Init(&mdContext);
 
-    for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
-       {
-       for(i=0; i<(param->d_space_vol); i++)
-          {
-          for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
-             {
-             for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
-                {
-                for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
-                   {
-                   for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
-                      {
-                      MD5_Update(&mdContext, &((GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double));
-                      }
-                   }
-                }
-             }
-          }
-       }
+  for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
+     {
+     for(i=0; i<(param->d_space_vol); i++)
+        {
+        for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
+           {
+           for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
+              {
+              for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
+                 {
+                 for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
+                    {
+                    MD5_Update(&mdContext, &((GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double));
+                    }
+                 }
+              }
+           }
+        }
+     }
 
-    MD5_Final(c, &mdContext);
+  MD5_Final(c, &mdContext);
 
-    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
-       {
-       sprintf(&(res[2*i]), "%02x", c[i]);
-       }
-  #else
-    // just to avoid warning at compile time
-    (void) res;
-    (void) GC;
-    (void) param;
-  #endif
+  for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+     {
+     sprintf(&(res[2*i]), "%02x", c[i]);
+     }
   }
 
 
@@ -977,16 +918,10 @@ void write_tube_disc_stuff_on_file(Gauge_Conf const * const GC,
   {
   long i;
   int j, err;
-  #ifdef HASH_MODE
-    char md5sum[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum[2*MD5_DIGEST_LENGTH+1];
   FILE *fp;
 
-  #ifdef HASH_MODE
-    compute_md5sum_tube_disc_stuff(md5sum, GC, param);
-  #endif
+  compute_md5sum_tube_disc_stuff(md5sum, GC, param);
 
   fp=fopen(param->d_ml_file, "w"); // open the configuration file
   if(fp==NULL)
@@ -1043,12 +978,8 @@ void read_tube_disc_stuff_from_file(Gauge_Conf const * const GC,
   long i, loc_space_vol;
   int j, err;
   FILE *fp;
-  #ifdef HASH_MODE
-    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
-    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum_new[2*MD5_DIGEST_LENGTH+1];
+  char md5sum_old[2*MD5_DIGEST_LENGTH+1];
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
   if(fp==NULL)
@@ -1113,79 +1044,70 @@ void read_tube_disc_stuff_from_file(Gauge_Conf const * const GC,
     fclose(fp);
     }
 
-  #ifdef HASH_MODE
-    // compute the new md5sum and check for consistency
-    compute_md5sum_tube_disc_stuff(md5sum_new, GC, param);
-    if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
-      {
-      fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
-      exit(EXIT_FAILURE);
-      }
-  #endif
+  // compute the new md5sum and check for consistency
+  compute_md5sum_tube_disc_stuff(md5sum_new, GC, param);
+  if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
+    {
+    fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
+    exit(EXIT_FAILURE);
+    }
   }
 
 
 // compute the md5sum of the ml_polycorr[0] and ml_polyplaq[0] arrays and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
 void compute_md5sum_tube_disc_stuff(char *res, Gauge_Conf const * const GC, GParam const * const param)
   {
-  #ifdef HASH_MODE
-    MD5_CTX mdContext;
-    unsigned char c[MD5_DIGEST_LENGTH];
-    long i;
-    int j;
-    int n1, n2, n3, n4;
+  MD5_CTX mdContext;
+  unsigned char c[MD5_DIGEST_LENGTH];
+  long i;
+  int j;
+  int n1, n2, n3, n4;
 
-    MD5_Init(&mdContext);
+  MD5_Init(&mdContext);
 
-    for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
-       {
-       for(i=0; i<(param->d_space_vol); i++)
-          {
-          for(n1=0; n1<NCOLOR; n1++)
-             {
-             for(n2=0; n2<NCOLOR; n2++)
-                {
-                for(n3=0; n3<NCOLOR; n3++)
-                   {
-                   for(n4=0; n4<NCOLOR; n4++)
-                      {
-                      MD5_Update(&mdContext, &((GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                      }
-                   }
-                }
-             }
-          }
-       }
+  for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
+     {
+     for(i=0; i<(param->d_space_vol); i++)
+        {
+        for(n1=0; n1<NCOLOR; n1++)
+           {
+           for(n2=0; n2<NCOLOR; n2++)
+              {
+              for(n3=0; n3<NCOLOR; n3++)
+                 {
+                 for(n4=0; n4<NCOLOR; n4++)
+                    {
+                    MD5_Update(&mdContext, &((GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                    }
+                 }
+              }
+           }
+        }
+     }
 
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       for(n1=0; n1<NCOLOR; n1++)
-          {
-          for(n2=0; n2<NCOLOR; n2++)
-             {
-             for(n3=0; n3<NCOLOR; n3++)
-                {
-                for(n4=0; n4<NCOLOR; n4++)
-                   {
-                   MD5_Update(&mdContext, &((GC->ml_polyplaq[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                   }
-                }
-             }
-          }
-       }
+  for(i=0; i<(param->d_space_vol); i++)
+     {
+     for(n1=0; n1<NCOLOR; n1++)
+        {
+        for(n2=0; n2<NCOLOR; n2++)
+           {
+           for(n3=0; n3<NCOLOR; n3++)
+              {
+              for(n4=0; n4<NCOLOR; n4++)
+                 {
+                 MD5_Update(&mdContext, &((GC->ml_polyplaq[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                 }
+              }
+           }
+        }
+     }
 
-    MD5_Final(c, &mdContext);
+  MD5_Final(c, &mdContext);
 
-    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
-       {
-       sprintf(&(res[2*i]), "%02x", c[i]);
-       }
-  #else
-    // just to avoid warning at compile time
-    (void) res;
-    (void) GC;
-    (void) param;
-  #endif
+  for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+     {
+     sprintf(&(res[2*i]), "%02x", c[i]);
+     }
   }
 
 
@@ -1250,16 +1172,10 @@ void write_tubeadj_disc_stuff_on_file(Gauge_Conf const * const GC,
   {
   long i;
   int j, err;
-  #ifdef HASH_MODE
-    char md5sum[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum[2*MD5_DIGEST_LENGTH+1];
   FILE *fp;
 
-  #ifdef HASH_MODE
-    compute_md5sum_tubeadj_disc_stuff(md5sum, GC, param);
-  #endif
+  compute_md5sum_tubeadj_disc_stuff(md5sum, GC, param);
 
   fp=fopen(param->d_ml_file, "w"); // open the configuration file
   if(fp==NULL)
@@ -1316,12 +1232,8 @@ void read_tubeadj_disc_stuff_from_file(Gauge_Conf const * const GC,
   long i, loc_space_vol;
   int j, err;
   FILE *fp;
-  #ifdef HASH_MODE
-    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
-    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum_new[2*MD5_DIGEST_LENGTH+1];
+  char md5sum_old[2*MD5_DIGEST_LENGTH+1];
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
   if(fp==NULL)
@@ -1387,15 +1299,13 @@ void read_tubeadj_disc_stuff_from_file(Gauge_Conf const * const GC,
     fclose(fp);
     }
 
-  #ifdef HASH_MODE
-    // compute the new md5sum and check for consistency
-    compute_md5sum_tubeadj_disc_stuff(md5sum_new, GC, param);
-    if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
-      {
-      fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
-      exit(EXIT_FAILURE);
-      }
-  #endif
+  // compute the new md5sum and check for consistency
+  compute_md5sum_tubeadj_disc_stuff(md5sum_new, GC, param);
+  if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
+    {
+    fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
+    exit(EXIT_FAILURE);
+    }
   }
 
 
@@ -1403,64 +1313,57 @@ void read_tubeadj_disc_stuff_from_file(Gauge_Conf const * const GC,
 // and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
 void compute_md5sum_tubeadj_disc_stuff(char *res, Gauge_Conf const * const GC, GParam const * const param)
   {
-  #ifdef HASH_MODE
-    MD5_CTX mdContext;
-    unsigned char c[MD5_DIGEST_LENGTH];
-    long i;
-    int j;
-    int n1, n2, n3, n4;
+  MD5_CTX mdContext;
+  unsigned char c[MD5_DIGEST_LENGTH];
+  long i;
+  int j;
+  int n1, n2, n3, n4;
 
-    MD5_Init(&mdContext);
+  MD5_Init(&mdContext);
 
-    for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
-       {
-       for(i=0; i<(param->d_space_vol); i++)
-          {
-          for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
-             {
-             for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
-                {
-                for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
-                   {
-                   for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
-                      {
-                      MD5_Update(&mdContext, &((GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double));
-                      }
-                   }
-                }
-             }
-          }
-       }
+  for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
+     {
+     for(i=0; i<(param->d_space_vol); i++)
+        {
+        for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
+           {
+           for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
+              {
+              for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
+                 {
+                 for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
+                    {
+                    MD5_Update(&mdContext, &((GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double));
+                    }
+                 }
+              }
+           }
+        }
+     }
 
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
-          {
-          for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
-             {
-             for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
-                {
-                for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
-                   {
-                   MD5_Update(&mdContext, &((GC->ml_polyplaqadj[0][i]).comp[n1][n2][n3][n4]), sizeof(double));
-                   }
-                }
-             }
-          }
-       }
+  for(i=0; i<(param->d_space_vol); i++)
+     {
+     for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
+        {
+        for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
+           {
+           for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
+              {
+              for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
+                 {
+                 MD5_Update(&mdContext, &((GC->ml_polyplaqadj[0][i]).comp[n1][n2][n3][n4]), sizeof(double));
+                 }
+              }
+           }
+        }
+     }
 
-    MD5_Final(c, &mdContext);
+  MD5_Final(c, &mdContext);
 
-    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
-       {
-       sprintf(&(res[2*i]), "%02x", c[i]);
-       }
-  #else
-    // just to avoid warning at compile time
-    (void) res;
-    (void) GC;
-    (void) param;
-  #endif
+  for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+     {
+     sprintf(&(res[2*i]), "%02x", c[i]);
+     }
   }
 
 
@@ -1526,16 +1429,10 @@ void write_tube_conn_stuff_on_file(Gauge_Conf const * const GC,
   {
   long i;
   int j, err;
-  #ifdef HASH_MODE
-    char md5sum[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum[2*MD5_DIGEST_LENGTH+1];
   FILE *fp;
 
-  #ifdef HASH_MODE
-    compute_md5sum_tube_conn_stuff(md5sum, GC, param);
-  #endif
+  compute_md5sum_tube_conn_stuff(md5sum, GC, param);
 
   fp=fopen(param->d_ml_file, "w"); // open the configuration file
   if(fp==NULL)
@@ -1601,12 +1498,8 @@ void read_tube_conn_stuff_from_file(Gauge_Conf const * const GC,
   long i, loc_space_vol;
   int j, err;
   FILE *fp;
-  #ifdef HASH_MODE
-    char md5sum_new[2*MD5_DIGEST_LENGTH+1];
-    char md5sum_old[2*MD5_DIGEST_LENGTH+1];
-  #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
-  #endif
+  char md5sum_new[2*MD5_DIGEST_LENGTH+1];
+  char md5sum_old[2*MD5_DIGEST_LENGTH+1];
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
   if(fp==NULL)
@@ -1680,96 +1573,87 @@ void read_tube_conn_stuff_from_file(Gauge_Conf const * const GC,
     fclose(fp);
     }
 
-  #ifdef HASH_MODE
-    // compute the new md5sum and check for consistency
-    compute_md5sum_tube_conn_stuff(md5sum_new, GC, param);
-    if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
-      {
-      fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
-      exit(EXIT_FAILURE);
-      }
-  #endif
+  // compute the new md5sum and check for consistency
+  compute_md5sum_tube_conn_stuff(md5sum_new, GC, param);
+  if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
+    {
+    fprintf(stderr, "The computed md5sum %s of the multilevel file does not match the stored %s\n", md5sum_new, md5sum_old);
+    exit(EXIT_FAILURE);
+    }
   }
 
 
 // compute the md5sum of the ml_polycorr[0], ml_polyplaq[0] and ml_polyplaqconn[0] arrays and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
 void compute_md5sum_tube_conn_stuff(char *res, Gauge_Conf const * const GC, GParam const * const param)
   {
-  #ifdef HASH_MODE
-    MD5_CTX mdContext;
-    unsigned char c[MD5_DIGEST_LENGTH];
-    long i;
-    int j;
-    int n1, n2, n3, n4;
+  MD5_CTX mdContext;
+  unsigned char c[MD5_DIGEST_LENGTH];
+  long i;
+  int j;
+  int n1, n2, n3, n4;
 
-    MD5_Init(&mdContext);
+  MD5_Init(&mdContext);
 
-    for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
-       {
-       for(i=0; i<(param->d_space_vol); i++)
-          {
-          for(n1=0; n1<NCOLOR; n1++)
-             {
-             for(n2=0; n2<NCOLOR; n2++)
-                {
-                for(n3=0; n3<NCOLOR; n3++)
-                   {
-                   for(n4=0; n4<NCOLOR; n4++)
-                      {
-                      MD5_Update(&mdContext, &((GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                      }
-                   }
-                }
-             }
-          }
-       }
+  for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
+     {
+     for(i=0; i<(param->d_space_vol); i++)
+        {
+        for(n1=0; n1<NCOLOR; n1++)
+           {
+           for(n2=0; n2<NCOLOR; n2++)
+              {
+              for(n3=0; n3<NCOLOR; n3++)
+                 {
+                 for(n4=0; n4<NCOLOR; n4++)
+                    {
+                    MD5_Update(&mdContext, &((GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                    }
+                 }
+              }
+           }
+        }
+     }
 
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       for(n1=0; n1<NCOLOR; n1++)
-          {
-          for(n2=0; n2<NCOLOR; n2++)
-             {
-             for(n3=0; n3<NCOLOR; n3++)
-                {
-                for(n4=0; n4<NCOLOR; n4++)
-                   {
-                   MD5_Update(&mdContext, &((GC->ml_polyplaq[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                   }
-                }
-             }
-          }
-       }
+  for(i=0; i<(param->d_space_vol); i++)
+     {
+     for(n1=0; n1<NCOLOR; n1++)
+        {
+        for(n2=0; n2<NCOLOR; n2++)
+           {
+           for(n3=0; n3<NCOLOR; n3++)
+              {
+              for(n4=0; n4<NCOLOR; n4++)
+                 {
+                 MD5_Update(&mdContext, &((GC->ml_polyplaq[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                 }
+              }
+           }
+        }
+     }
 
-    for(i=0; i<(param->d_space_vol); i++)
-       {
-       for(n1=0; n1<NCOLOR; n1++)
-          {
-          for(n2=0; n2<NCOLOR; n2++)
-             {
-             for(n3=0; n3<NCOLOR; n3++)
-                {
-                for(n4=0; n4<NCOLOR; n4++)
-                   {
-                   MD5_Update(&mdContext, &((GC->ml_polyplaqconn[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
-                   }
-                }
-             }
-          }
-       }
+  for(i=0; i<(param->d_space_vol); i++)
+     {
+     for(n1=0; n1<NCOLOR; n1++)
+        {
+        for(n2=0; n2<NCOLOR; n2++)
+           {
+           for(n3=0; n3<NCOLOR; n3++)
+              {
+              for(n4=0; n4<NCOLOR; n4++)
+                 {
+                 MD5_Update(&mdContext, &((GC->ml_polyplaqconn[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                 }
+              }
+           }
+        }
+     }
 
-    MD5_Final(c, &mdContext);
+  MD5_Final(c, &mdContext);
 
-    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
-       {
-       sprintf(&(res[2*i]), "%02x", c[i]);
-       }
-  #else
-    // just to avoid warning at compile time
-    (void) res;
-    (void) GC;
-    (void) param;
-  #endif
+  for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+     {
+     sprintf(&(res[2*i]), "%02x", c[i]);
+     }
   }
 
 
