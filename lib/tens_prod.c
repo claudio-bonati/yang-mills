@@ -68,7 +68,7 @@ void print_on_screen_TensProd(TensProd const * const A)
   }
 
 
-void print_on_file_TensProd(FILE *fp, TensProd const * const A)
+int print_on_file_TensProd(FILE *fp, TensProd const * const A)
   {
   int i, j, k, l, err;
 
@@ -84,17 +84,19 @@ void print_on_file_TensProd(FILE *fp, TensProd const * const A)
               if(err!=2)
                 {
                 fprintf(stderr, "Problem in writing on file a TensProd (%s, %d)\n", __FILE__, __LINE__);
-                exit(EXIT_FAILURE);
+                return 1;
                 }
               }
            }
         }
      }
   fprintf(fp, "\n");
+
+  return 0;
   }
 
 
-void print_on_binary_file_noswap_TensProd(FILE *fp, TensProd const * const A)
+int print_on_binary_file_noswap_TensProd(FILE *fp, TensProd const * const A)
   {
   int i, j, k, l;
   size_t err;
@@ -115,22 +117,24 @@ void print_on_binary_file_noswap_TensProd(FILE *fp, TensProd const * const A)
               if(err!=1)
                 {
                 fprintf(stderr, "Problem in binary writing on file a TensProd (%s, %d)\n", __FILE__, __LINE__);
-                exit(EXIT_FAILURE);
+                return 1;
                 }
               err=fwrite(&im, sizeof(double), 1, fp);
               if(err!=1)
                 {
                 fprintf(stderr, "Problem in binary writing on file a TensProd (%s, %d)\n", __FILE__, __LINE__);
-                exit(EXIT_FAILURE);
+                return 1;
                 }
               }
            }
         }
      }
+
+  return 0;
   }
 
 
-void print_on_binary_file_swap_TensProd(FILE *fp, TensProd const * const A)
+int print_on_binary_file_swap_TensProd(FILE *fp, TensProd const * const A)
   {
   int i, j, k, l;
   size_t err;
@@ -154,35 +158,41 @@ void print_on_binary_file_swap_TensProd(FILE *fp, TensProd const * const A)
               if(err!=1)
                 {
                 fprintf(stderr, "Problem in binary writing on file a TensProd (%s, %d)\n", __FILE__, __LINE__);
-                exit(EXIT_FAILURE);
+                return 1;
                 }
               err=fwrite(&im, sizeof(double), 1, fp);
               if(err!=1)
                 {
                 fprintf(stderr, "Problem in binary writing on file a TensProd (%s, %d)\n", __FILE__, __LINE__);
-                exit(EXIT_FAILURE);
+                return 1;
                 }
               }
            }
         }
      }
+
+  return 0;
   }
 
 
-void print_on_binary_file_bigen_TensProd(FILE *fp, TensProd const * const A)
+int print_on_binary_file_bigen_TensProd(FILE *fp, TensProd const * const A)
   {
+  int err;
+
   if(endian()==0) // little endian machine
     {
-    print_on_binary_file_swap_TensProd(fp, A);
+    err=print_on_binary_file_swap_TensProd(fp, A);
     }
   else
     {
-    print_on_binary_file_noswap_TensProd(fp, A);
+    err=print_on_binary_file_noswap_TensProd(fp, A);
     }
+
+  return err;
   }
 
 
-void read_from_file_TensProd(FILE *fp, TensProd *A)
+int read_from_file_TensProd(FILE *fp, TensProd *A)
   {
   int i, j, k, l, err;
   double re, im;
@@ -199,17 +209,18 @@ void read_from_file_TensProd(FILE *fp, TensProd *A)
               if(err!=2)
                 {
                 fprintf(stderr, "Problems reading TensProd from file (%s, %d)\n", __FILE__, __LINE__);
-                exit(EXIT_FAILURE);
+                return 1;
                 }
               A->comp[i][j][k][l]=re+I*im;
               }
            }
         }
      }
+  return 0;
   }
 
 
-void read_from_binary_file_noswap_TensProd(FILE *fp, TensProd *A)
+int read_from_binary_file_noswap_TensProd(FILE *fp, TensProd *A)
   {
   int i, j, k, l;
   size_t err;
@@ -231,7 +242,7 @@ void read_from_binary_file_noswap_TensProd(FILE *fp, TensProd *A)
               if(err!=2)
                {
                fprintf(stderr, "Problems in binary reading TensProd file (%s, %d)\n", __FILE__, __LINE__);
-               exit(EXIT_FAILURE);
+               return 1;
                }
 
               aux[0]=re;
@@ -243,10 +254,12 @@ void read_from_binary_file_noswap_TensProd(FILE *fp, TensProd *A)
            }
         }
      }
+
+  return 0;
   }
 
 
-void read_from_binary_file_swap_TensProd(FILE *fp, TensProd *A)
+int read_from_binary_file_swap_TensProd(FILE *fp, TensProd *A)
   {
   int i, j, k, l;
   size_t err;
@@ -268,7 +281,7 @@ void read_from_binary_file_swap_TensProd(FILE *fp, TensProd *A)
               if(err!=2)
                {
                fprintf(stderr, "Problems in binary reading TensProd file (%s, %d)\n", __FILE__, __LINE__);
-               exit(EXIT_FAILURE);
+               return 1;
                }
 
               SwapBytesDouble(&re);
@@ -282,19 +295,24 @@ void read_from_binary_file_swap_TensProd(FILE *fp, TensProd *A)
            }
         }
      }
+  return 0;
   }
 
 
-void read_from_binary_file_bigen_TensProd(FILE *fp, TensProd *A)
+int read_from_binary_file_bigen_TensProd(FILE *fp, TensProd *A)
   {
+  int err;
+
   if(endian()==0) // little endian machine
     {
-    read_from_binary_file_swap_TensProd(fp, A);
+    err=read_from_binary_file_swap_TensProd(fp, A);
     }
   else
     {
-    read_from_binary_file_noswap_TensProd(fp, A);
+    err=read_from_binary_file_noswap_TensProd(fp, A);
     }
+
+  return err;
   }
 
 #endif

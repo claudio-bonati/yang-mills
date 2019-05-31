@@ -267,14 +267,14 @@ inline double imtr_TensProd(TensProd const * const restrict A)
 
 
 void print_on_screen_TensProd(TensProd const * const A);
-void print_on_file_TensProd(FILE *fp, TensProd const * const A);
-void print_on_binary_file_noswap_TensProd(FILE *fp, TensProd const * const A);
-void print_on_binary_file_swap_TensProd(FILE *fp, TensProd const * const A);
-void print_on_binary_file_bigen_TensProd(FILE *fp, TensProd const * const A);
-void read_from_file_TensProd(FILE *fp, TensProd *A);
-void read_from_binary_file_noswap_TensProd(FILE *fp, TensProd *A);
-void read_from_binary_file_swap_TensProd(FILE *fp, TensProd *A);
-void read_from_binary_file_bigen_TensProd(FILE *fp, TensProd *A);
+int print_on_file_TensProd(FILE *fp, TensProd const * const A);
+int print_on_binary_file_noswap_TensProd(FILE *fp, TensProd const * const A);
+int print_on_binary_file_swap_TensProd(FILE *fp, TensProd const * const A);
+int print_on_binary_file_bigen_TensProd(FILE *fp, TensProd const * const A);
+int read_from_file_TensProd(FILE *fp, TensProd *A);
+int read_from_binary_file_noswap_TensProd(FILE *fp, TensProd *A);
+int read_from_binary_file_swap_TensProd(FILE *fp, TensProd *A);
+int read_from_binary_file_bigen_TensProd(FILE *fp, TensProd *A);
 
 #endif // TENS_PROD_H
 

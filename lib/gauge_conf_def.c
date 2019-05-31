@@ -472,7 +472,7 @@ void write_polycorr_on_file(Gauge_Conf const * const GC,
                             int iteration)
   {
   long i;
-  int j;
+  int j, err;
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
@@ -508,7 +508,12 @@ void write_polycorr_on_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          err=print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in writing the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
 
@@ -523,7 +528,7 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
                              int *iteration)
   {
   long i, loc_space_vol;
-  int j;
+  int j, err;
   FILE *fp;
   #ifdef HASH_MODE
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
@@ -574,7 +579,12 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          err=read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
 
@@ -728,7 +738,7 @@ void write_polycorradj_on_file(Gauge_Conf const * const GC,
                                int iteration)
   {
   long i;
-  int j;
+  int j, err;
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
@@ -764,7 +774,12 @@ void write_polycorradj_on_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          print_on_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          err=print_on_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in writing the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
 
@@ -779,7 +794,7 @@ void read_polycorradj_from_file(Gauge_Conf const * const GC,
                                 int *iteration)
   {
   long i, loc_space_vol;
-  int j;
+  int j, err;
   FILE *fp;
   #ifdef HASH_MODE
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
@@ -830,7 +845,12 @@ void read_polycorradj_from_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          read_from_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          err=read_from_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in opening the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
 
@@ -956,7 +976,7 @@ void write_tube_disc_stuff_on_file(Gauge_Conf const * const GC,
                                    int iteration)
   {
   long i;
-  int j;
+  int j, err;
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
@@ -992,12 +1012,22 @@ void write_tube_disc_stuff_on_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          err=print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in writing the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq[0][i]));
+       err=print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq[0][i]));
+       if(err!=0)
+         {
+         fprintf(stderr, "Error in writing the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
        }
 
     fclose(fp);
@@ -1011,7 +1041,7 @@ void read_tube_disc_stuff_from_file(Gauge_Conf const * const GC,
                                     int *iteration)
   {
   long i, loc_space_vol;
-  int j;
+  int j, err;
   FILE *fp;
   #ifdef HASH_MODE
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
@@ -1062,12 +1092,22 @@ void read_tube_disc_stuff_from_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          err=read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq[0][i]));
+       err=read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq[0][i]));
+       if(err!=0)
+         {
+         fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
        }
 
     fclose(fp);
@@ -1209,7 +1249,7 @@ void write_tubeadj_disc_stuff_on_file(Gauge_Conf const * const GC,
                                    int iteration)
   {
   long i;
-  int j;
+  int j, err;
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
@@ -1245,12 +1285,22 @@ void write_tubeadj_disc_stuff_on_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          print_on_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          err=print_on_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in writing the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       print_on_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polyplaqadj[0][i]));
+       err=print_on_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polyplaqadj[0][i]));
+       if(err!=0)
+         {
+         fprintf(stderr, "Error in writing the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
        }
 
     fclose(fp);
@@ -1260,11 +1310,11 @@ void write_tubeadj_disc_stuff_on_file(Gauge_Conf const * const GC,
 
 // read ml_polycorradj[0]and ml_polyplaqadj[0] arrays from file
 void read_tubeadj_disc_stuff_from_file(Gauge_Conf const * const GC,
-                                    GParam const * const param,
-                                    int *iteration)
+                                       GParam const * const param,
+                                       int *iteration)
   {
   long i, loc_space_vol;
-  int j;
+  int j, err;
   FILE *fp;
   #ifdef HASH_MODE
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
@@ -1315,12 +1365,22 @@ void read_tubeadj_disc_stuff_from_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          read_from_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          err=read_from_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polycorradj[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in writing the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       read_from_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polyplaqadj[0][i]));
+       err=read_from_binary_file_bigen_TensProdAdj(fp, &(GC->ml_polyplaqadj[0][i]));
+       if(err!=0)
+         {
+         fprintf(stderr, "Error in writing the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
        }
 
 
@@ -1465,7 +1525,7 @@ void write_tube_conn_stuff_on_file(Gauge_Conf const * const GC,
                                    int iteration)
   {
   long i;
-  int j;
+  int j, err;
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
@@ -1501,16 +1561,31 @@ void write_tube_conn_stuff_on_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          err=print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq[0][i]));
+       err=print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq[0][i]));
+       if(err!=0)
+         {
+         fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaqconn[0][i]));
+       err=print_on_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaqconn[0][i]));
+       if(err!=0)
+         {
+         fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
        }
 
     fclose(fp);
@@ -1524,7 +1599,7 @@ void read_tube_conn_stuff_from_file(Gauge_Conf const * const GC,
                                     int *iteration)
   {
   long i, loc_space_vol;
-  int j;
+  int j, err;
   FILE *fp;
   #ifdef HASH_MODE
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
@@ -1575,16 +1650,31 @@ void read_tube_conn_stuff_from_file(Gauge_Conf const * const GC,
        {
        for(i=0; i<(param->d_space_vol); i++)
           {
-          read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          err=read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polycorr[0][j][i]));
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq[0][i]));
+       err=read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaq[0][i]));
+       if(err!=0)
+         {
+         fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
        }
     for(i=0; i<(param->d_space_vol); i++)
        {
-       read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaqconn[0][i]));
+       err=read_from_binary_file_bigen_TensProd(fp, &(GC->ml_polyplaqconn[0][i]));
+       if(err!=0)
+         {
+         fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_ml_file, __FILE__, __LINE__);
+         exit(EXIT_FAILURE);
+         }
        }
 
     fclose(fp);
