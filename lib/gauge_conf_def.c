@@ -97,7 +97,7 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
     char md5sum_old[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={0};
+    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
   #endif
 
   fp=fopen(param->d_conf_file, "r"); // open the configuration file
@@ -476,7 +476,7 @@ void write_polycorr_on_file(Gauge_Conf const * const GC,
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum[2*STD_STRING_LENGTH+1]={0};
+    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
   #endif
   FILE *fp;
 
@@ -529,7 +529,7 @@ void read_polycorr_from_file(Gauge_Conf const * const GC,
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
     char md5sum_old[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={0};
+    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
   #endif
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
@@ -732,7 +732,7 @@ void write_polycorradj_on_file(Gauge_Conf const * const GC,
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum[2*STD_STRING_LENGTH+1]={0};
+    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
   #endif
   FILE *fp;
 
@@ -785,7 +785,7 @@ void read_polycorradj_from_file(Gauge_Conf const * const GC,
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
     char md5sum_old[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={0};
+    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
   #endif
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
@@ -960,7 +960,7 @@ void write_tube_disc_stuff_on_file(Gauge_Conf const * const GC,
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum[2*STD_STRING_LENGTH+1]={0};
+    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
   #endif
   FILE *fp;
 
@@ -1017,7 +1017,7 @@ void read_tube_disc_stuff_from_file(Gauge_Conf const * const GC,
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
     char md5sum_old[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={0};
+    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
   #endif
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
@@ -1213,7 +1213,7 @@ void write_tubeadj_disc_stuff_on_file(Gauge_Conf const * const GC,
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum[2*STD_STRING_LENGTH+1]={0};
+    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
   #endif
   FILE *fp;
 
@@ -1270,7 +1270,7 @@ void read_tubeadj_disc_stuff_from_file(Gauge_Conf const * const GC,
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
     char md5sum_old[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={0};
+    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
   #endif
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
@@ -1469,7 +1469,7 @@ void write_tube_conn_stuff_on_file(Gauge_Conf const * const GC,
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum[2*STD_STRING_LENGTH+1]={0};
+    char md5sum[2*STD_STRING_LENGTH+1]={'0'};
   #endif
   FILE *fp;
 
@@ -1530,7 +1530,7 @@ void read_tube_conn_stuff_from_file(Gauge_Conf const * const GC,
     char md5sum_new[2*MD5_DIGEST_LENGTH+1];
     char md5sum_old[2*MD5_DIGEST_LENGTH+1];
   #else
-    char md5sum_old[2*STD_STRING_LENGTH+1]={0};
+    char md5sum_old[2*STD_STRING_LENGTH+1]={'0'};
   #endif
 
   fp=fopen(param->d_ml_file, "r"); // open the multilevel file
