@@ -29,6 +29,9 @@ typedef struct SuNAdj {
 //
 
 
+// ***************** for SuN
+
+
 // A=1
 inline void one_SuN(SuN * restrict A)
   {
@@ -917,35 +920,35 @@ void print_on_screen_SuN(SuN const * const A);
 
 
 // print on file
-void print_on_file_SuN(FILE *fp, SuN const * const A);
+int print_on_file_SuN(FILE *fp, SuN const * const A);
 
 
 // print on binary file without changing endiannes
-void print_on_binary_file_noswap_SuN(FILE *fp, SuN const * const A);
+int print_on_binary_file_noswap_SuN(FILE *fp, SuN const * const A);
 
 
 // print on binary file changing endiannes
-void print_on_binary_file_swap_SuN(FILE *fp, SuN const * const A);
+int print_on_binary_file_swap_SuN(FILE *fp, SuN const * const A);
 
 
 // print on binary file in bigendian
-void print_on_binary_file_bigen_SuN(FILE *fp, SuN const * const A);
+int print_on_binary_file_bigen_SuN(FILE *fp, SuN const * const A);
 
 
 // read from file
-void read_from_file_SuN(FILE *fp, SuN *A);
+int read_from_file_SuN(FILE *fp, SuN *A);
 
 
 // read from binary file without changing endiannes
-void read_from_binary_file_noswap_SuN(FILE *fp, SuN *A);
+int read_from_binary_file_noswap_SuN(FILE *fp, SuN *A);
 
 
 // read from binary file changing endianness
-void read_from_binary_file_swap_SuN(FILE *fp, SuN *A);
+int read_from_binary_file_swap_SuN(FILE *fp, SuN *A);
 
 
 // read from binary file written in bigendian
-void read_from_binary_file_bigen_SuN(FILE *fp, SuN *A);
+int read_from_binary_file_bigen_SuN(FILE *fp, SuN *A);
 
 
 // initialize tensor product
@@ -981,6 +984,10 @@ inline void TensProd_init_SuN(TensProd * restrict TP, SuN const * const restrict
         }
      }
   }
+
+
+// ***************** for SuNAdj
+
 
 
 // convert the fundamental representation matrix B to the adjoint representation matrix A
@@ -1113,27 +1120,32 @@ inline void times_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restric
   __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
-  int i, j, k;
-  double aux[NCOLOR*NCOLOR-1] __attribute__((aligned(DOUBLE_ALIGN)));
-  double sum;
+  #if NCOLOR!=1  // just to avoid warnings
+    int i, j, k;
+    double aux[NCOLOR*NCOLOR-1] __attribute__((aligned(DOUBLE_ALIGN)));
+    double sum;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
-     {
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
-        {
-        aux[j]=A->comp[madj(i,j)];
-        }
+    for(i=0; i<NCOLOR*NCOLOR-1; i++)
+       {
+       for(j=0; j<NCOLOR*NCOLOR-1; j++)
+          {
+          aux[j]=A->comp[madj(i,j)];
+          }
 
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
-        {
-        sum=0.0;
-        for(k=0; k<NCOLOR*NCOLOR-1; k++)
-           {
-           sum+=aux[k]*(B->comp[madj(k,j)]);
-           }
-        A->comp[madj(i,j)]=sum;
-        }
-     }
+       for(j=0; j<NCOLOR*NCOLOR-1; j++)
+          {
+          sum=0.0;
+          for(k=0; k<NCOLOR*NCOLOR-1; k++)
+             {
+             sum+=aux[k]*(B->comp[madj(k,j)]);
+             }
+          A->comp[madj(i,j)]=sum;
+          }
+       }
+  #else
+    (void) A;
+    (void) B;
+  #endif
   }
 
 

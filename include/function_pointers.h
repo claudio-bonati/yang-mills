@@ -80,10 +80,10 @@ void (*ta)(GAUGE_GROUP *A);
 void (*taexp)(GAUGE_GROUP *A);
 
 void (*print_on_screen)(GAUGE_GROUP const * const A);
-void (*print_on_file)(FILE *fp, GAUGE_GROUP const * const A);
-void (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A);
-void (*read_from_file)(FILE *fp, GAUGE_GROUP *A);
-void (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A);
+int  (*print_on_file)(FILE *fp, GAUGE_GROUP const * const A);
+int  (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A);
+int  (*read_from_file)(FILE *fp, GAUGE_GROUP *A);
+int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A);
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B);
 

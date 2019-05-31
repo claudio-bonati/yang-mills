@@ -83,38 +83,47 @@ void getsizeandhash(char *infile, int *sides, char *hash)
 // compute the hash
 void computehash(char *infile, int dim, long volume, char *hash)
     {
-    #ifdef HASH_MODE
-      GAUGE_GROUP link;
-      FILE *fp;
-      long r;
-      int j;
+    GAUGE_GROUP link;
+    FILE *fp;
+    long r;
+    int j, err;
 
+    #ifdef HASH_MODE
       MD5_CTX mdContext;
       unsigned char c[MD5_DIGEST_LENGTH];
+    #endif
 
-      // open the configuration file in binary
-      fp=fopen(infile, "rb");
-      if(fp==NULL)
-        {
-        fprintf(stderr, "Error in opening the file %s (%s, %d)\n", infile, __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
-        }
-      else
-        {
-        // read again the header:
-        j=0;
-        while(j!='\n')
-             {
-             j=fgetc(fp);
-             }
-
-        // read the configuration & compute md5sum
-        MD5_Init(&mdContext);
-        for(r=0; r<volume; r++)
+    // open the configuration file in binary
+    fp=fopen(infile, "rb");
+    if(fp==NULL)
+      {
+      fprintf(stderr, "Error in opening the file %s (%s, %d)\n", infile, __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+    else
+      {
+      // read again the header:
+      j=0;
+      while(j!='\n')
            {
-           for(j=0; j<dim; j++)
+           j=fgetc(fp);
+           }
+
+      // read the configuration & compute md5sum
+      #ifdef HASH_MODE
+        MD5_Init(&mdContext);
+      #endif
+      for(r=0; r<volume; r++)
+         {
+         for(j=0; j<dim; j++)
+            {
+            err=read_from_binary_file_bigen(fp, &link);
+            if(err!=0)
               {
-              read_from_binary_file_bigen(fp, &link);
+              fprintf(stderr, "Error in reading the file %s (%s, %d)\n", infile, __FILE__, __LINE__);
+              exit(EXIT_FAILURE);
+              }
+            #ifdef HASH_MODE
               #if NCOLOR==1
                 MD5_Update(&mdContext, &(link.comp), sizeof(double complex));
               #elif NCOLOR==2
@@ -128,23 +137,21 @@ void computehash(char *infile, int dim, long volume, char *hash)
                    MD5_Update(&mdContext, &(link.comp[k]), sizeof(double complex));
                    }
               #endif
-              }
-           }
+            #endif
+            }
+         }
+      #ifdef HASH_MODE
         MD5_Final(c, &mdContext);
         for(r = 0; r < MD5_DIGEST_LENGTH; r++)
            {
            sprintf(&(hash[2*r]), "%02x", c[r]);
            }
+      #else
+        *hash='0';
+      #endif
 
-        fclose(fp);
-        }
-    #else
-      // just to avoid compile time warnings
-      (void) infile;
-      (void) dim;
-      (void) volume;
-      *hash='0';
-    #endif
+      fclose(fp);
+      }
     }
 
 
@@ -153,13 +160,14 @@ int main (int argc, char **argv)
     {
     char infile[STD_STRING_LENGTH];
     int dim, *sides, error;
+    long volumel;
 
     #ifdef HASH_MODE
-      long volumel;
       char md5sum_old[2*MD5_DIGEST_LENGTH+1];
       char md5sum_new[2*MD5_DIGEST_LENGTH+1];
     #else
       char md5sum_old[2*STD_STRING_LENGTH+1]={0};
+      char md5sum_new[2*STD_STRING_LENGTH+1]={0};
     #endif
 
     if(argc != 2)
@@ -202,7 +210,6 @@ int main (int argc, char **argv)
     // get lattice size and initial hash
     getsizeandhash(infile, sides, md5sum_old);
 
-    #ifdef HASH_MODE
     // total volume
     volumel=1;
     for(int i=0; i<dim; i++)
@@ -213,10 +220,11 @@ int main (int argc, char **argv)
     // compute the hash
     computehash(infile, dim, volumel, md5sum_new);
 
+    #ifdef HASH_MODE
     // check md5sum computed and stored
     if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
       {
-      fprintf(stderr, "The configuration %s is corrupted!\n", infile);
+      fprintf(stderr, "The computed md5sum %s does not match the stored %s for the file %s\n", md5sum_new, md5sum_old, infile);
       return EXIT_FAILURE;
       }
     #endif

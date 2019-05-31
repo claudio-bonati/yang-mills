@@ -166,7 +166,12 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
        si=lex_to_si(lex, param);
        for(mu=0; mu<STDIM; mu++)
           {
-          read_from_binary_file_bigen(fp, &matrix);
+          err=read_from_binary_file_bigen(fp, &matrix);
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in reading the file %s (%s, %d)\n", param->d_conf_file, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
 
           equal(&(GC->lattice[si][mu]), &matrix);
           }
@@ -178,7 +183,7 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
       compute_md5sum_conf(md5sum_new, GC, param);
       if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
         {
-        fprintf(stderr, "The computed md5sum %s does not match the stored %s (%s, %d)\n", md5sum_new, md5sum_old, __FILE__, __LINE__);
+        fprintf(stderr, "The computed md5sum %s does not match the stored %s for the file %s (%s, %d)\n", md5sum_new, md5sum_old, param->d_conf_file, __FILE__, __LINE__);
         exit(EXIT_FAILURE);
         }
     #endif
@@ -208,11 +213,11 @@ void write_conf_on_file_with_name(Gauge_Conf const * const GC,
                             char const * const namefile)
   {
   long si, lex;
-  int i, mu;
+  int i, mu, err;
   #ifdef HASH_MODE
     char md5sum[2*MD5_DIGEST_LENGTH+1];
   #else
-     char md5sum[2*STD_STRING_LENGTH+1]={0};
+     char md5sum[2*STD_STRING_LENGTH+1]={'0'};
   #endif
   FILE *fp;
 
@@ -250,7 +255,12 @@ void write_conf_on_file_with_name(Gauge_Conf const * const GC,
        si=lex_to_si(lex, param);
        for(mu=0; mu<STDIM; mu++)
           {
-          print_on_binary_file_bigen(fp, &(GC->lattice[si][mu]) );
+          err=print_on_binary_file_bigen(fp, &(GC->lattice[si][mu]) );
+          if(err!=0)
+            {
+            fprintf(stderr, "Error in writing the file %s (%s, %d)\n", namefile, __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+            }
           }
        }
     fclose(fp);

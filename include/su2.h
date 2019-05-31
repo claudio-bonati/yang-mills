@@ -8,6 +8,7 @@
 #include"macro.h"
 #include"tens_prod.h"
 #include"tens_prod_adj.h"
+
 //
 // An Su2 matrix is represented as comp[0]+i\sum_{j=1}^3 comp[j]\sigma_j where
 // sigma_j are Pauli matrices, comp[j] are real and \sum_{j=0}^3 comp[j]^2=1
@@ -20,6 +21,9 @@ typedef struct Su2 {
 typedef struct Su2Adj {
      double comp[9] __attribute__((aligned(DOUBLE_ALIGN)));
 } Su2Adj;
+
+
+// ***************** for Su2
 
 
 inline void init_Su2(Su2 * restrict A, double vec[4])
@@ -633,35 +637,35 @@ void print_on_screen_Su2(Su2 const * const A);
 
 
 // print on file
-void print_on_file_Su2(FILE *fp, Su2 const * const A);
+int print_on_file_Su2(FILE *fp, Su2 const * const A);
 
 
 // print on binary file without changing endiannes
-void print_on_binary_file_noswap_Su2(FILE *fp, Su2 const * const A);
+int print_on_binary_file_noswap_Su2(FILE *fp, Su2 const * const A);
 
 
 // print on binary file changing endiannes
-void print_on_binary_file_swap_Su2(FILE *fp, Su2 const * const A);
+int print_on_binary_file_swap_Su2(FILE *fp, Su2 const * const A);
 
 
 // print on binary file in big endian format
-void print_on_binary_file_bigen_Su2(FILE *fp, Su2 const * const A);
+int print_on_binary_file_bigen_Su2(FILE *fp, Su2 const * const A);
 
 
 // read from file
-void read_from_file_Su2(FILE *fp, Su2 *A);
+int read_from_file_Su2(FILE *fp, Su2 *A);
 
 
 // read from binary file without changing endiannes
-void read_from_binary_file_noswap_Su2(FILE *fp, Su2 *A);
+int read_from_binary_file_noswap_Su2(FILE *fp, Su2 *A);
 
 
 // read from binary file changing endiannes
-void read_from_binary_file_swap_Su2(FILE *fp, Su2 *A);
+int read_from_binary_file_swap_Su2(FILE *fp, Su2 *A);
 
 
 // read from binary file written in big endian
-void read_from_binary_file_bigen_Su2(FILE *fp, Su2 *A);
+int read_from_binary_file_bigen_Su2(FILE *fp, Su2 *A);
 
 
 // initialize tensor product
@@ -714,6 +718,11 @@ inline void TensProd_init_Su2(TensProd * restrict TP, Su2 const * const restrict
 
   #undef m2
   }
+
+
+
+// ***************** for Su2Adj
+
 
 
 // convert the fundamental representation matrix B to the adjoint representation matrix A

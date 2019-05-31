@@ -16,6 +16,10 @@
 // sigma_j are Pauli matrices, comp[j] are real and \sum_{j=0}^3 comp[j]^2=1
 //
 
+
+// ***************** for Su2
+
+
 void init_Su2(Su2 *A, double vec[4]);
 
 // A=1
@@ -193,36 +197,47 @@ void print_on_screen_Su2(Su2 const * const restrict A)
 
 
 // print on file
-void print_on_file_Su2(FILE *fp, Su2 const * const restrict A)
+int print_on_file_Su2(FILE *fp, Su2 const * const restrict A)
   {
   int err;
+
   err=fprintf(fp, "%.16lf %.16lf %.16lf %.16lf\n", A->comp[0], A->comp[1], A->comp[2], A->comp[3]);
+
   if(err<0)
     {
     fprintf(stderr, "Problem in writing on a file a Su2 matrix (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
+    }
+  else
+    {
+    return 0;
     }
   }
 
 
 // print on binary file without changing endiannes
-void print_on_binary_file_noswap_Su2(FILE *fp, Su2 const * const restrict A)
+int print_on_binary_file_noswap_Su2(FILE *fp, Su2 const * const restrict A)
   {
   size_t err=0;
   err+=fwrite(&(A->comp[0]), sizeof(double), 1, fp);
   err+=fwrite(&(A->comp[1]), sizeof(double), 1, fp);
   err+=fwrite(&(A->comp[2]), sizeof(double), 1, fp);
   err+=fwrite(&(A->comp[3]), sizeof(double), 1, fp);
+
   if(err!=4)
     {
     fprintf(stderr, "Problem in binary writing on a file a Su2 matrix (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
+    }
+  else
+    {
+    return 0;
     }
   }
 
 
 // print on binary file changing endiannes
-void print_on_binary_file_swap_Su2(FILE *fp, Su2 const * const restrict A)
+int print_on_binary_file_swap_Su2(FILE *fp, Su2 const * const restrict A)
   {
   double tmp;
   size_t err=0;
@@ -242,43 +257,55 @@ void print_on_binary_file_swap_Su2(FILE *fp, Su2 const * const restrict A)
   tmp=A->comp[3];
   SwapBytesDouble(&tmp);
   err+=fwrite(&(tmp), sizeof(double), 1, fp);
+
   if(err!=4)
     {
     fprintf(stderr, "Problem in binary writing on a file a Su2 matrix (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
+    }
+  else
+    {
+    return 0;
     }
   }
 
 
 // print on binary file in big endian format
-void print_on_binary_file_bigen_Su2(FILE *fp, Su2 const * const restrict A)
+int print_on_binary_file_bigen_Su2(FILE *fp, Su2 const * const restrict A)
   {
+  int err;
+
   if(endian()==0) // little endian machine
     {
-    print_on_binary_file_swap_Su2(fp, A);
+    err=print_on_binary_file_swap_Su2(fp, A);
     }
   else
     {
-    print_on_binary_file_noswap_Su2(fp, A);
+    err=print_on_binary_file_noswap_Su2(fp, A);
     }
+  return err;
   }
 
 
 // read from file
-void read_from_file_Su2(FILE *fp, Su2 * restrict A)
+int read_from_file_Su2(FILE *fp, Su2 * restrict A)
   {
   int err=fscanf(fp, "%lg %lg %lg %lg", &(A->comp[0]), &(A->comp[1]), &(A->comp[2]), &(A->comp[3]));
 
   if(err!=4)
     {
     fprintf(stderr, "Problems reading Su2 matrix from file (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
+    }
+  else
+    {
+    return 0;
     }
   }
 
 
 // read from binary file without changing endiannes
-void read_from_binary_file_noswap_Su2(FILE *fp, Su2 * restrict A)
+int read_from_binary_file_noswap_Su2(FILE *fp, Su2 * restrict A)
   {
   size_t err=0;
   err+=fread(&(A->comp[0]), sizeof(double), 1, fp);
@@ -289,13 +316,17 @@ void read_from_binary_file_noswap_Su2(FILE *fp, Su2 * restrict A)
   if(err!=4)
     {
     fprintf(stderr, "Problems reading Su2 matrix from file (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
+    }
+  else
+    {
+    return 0;
     }
   }
 
 
 // read from binary file changing endiannes
-void read_from_binary_file_swap_Su2(FILE *fp, Su2 * restrict A)
+int read_from_binary_file_swap_Su2(FILE *fp, Su2 * restrict A)
   {
   size_t err=0;
   err+=fread(&(A->comp[0]), sizeof(double), 1, fp);
@@ -306,32 +337,43 @@ void read_from_binary_file_swap_Su2(FILE *fp, Su2 * restrict A)
   if(err!=4)
     {
     fprintf(stderr, "Problems reading Su2 matrix from file (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
     }
 
   SwapBytesDouble((void *)&(A->comp[0]));
   SwapBytesDouble((void *)&(A->comp[1]));
   SwapBytesDouble((void *)&(A->comp[2]));
   SwapBytesDouble((void *)&(A->comp[3]));
+
+  return 0;
   }
 
 
 // read from binary file written in big endian
-void read_from_binary_file_bigen_Su2(FILE *fp, Su2 * restrict A)
+int read_from_binary_file_bigen_Su2(FILE *fp, Su2 * restrict A)
   {
+  int err;
+
   if(endian()==0) // little endian machine
     {
-    read_from_binary_file_swap_Su2(fp, A);
+    err=read_from_binary_file_swap_Su2(fp, A);
     }
   else
     {
-    read_from_binary_file_noswap_Su2(fp, A);
+    err=read_from_binary_file_noswap_Su2(fp, A);
     }
+
+  return err;
   }
 
 
 // initialize tensor product
 void TensProd_init_Su2(TensProd *TP, Su2 const * const A1, Su2 const * const A2);
+
+
+
+// ***************** for Su2Adj
+
 
 
 // convert the fundamental representation matrix B to the adjoint representation matrix A

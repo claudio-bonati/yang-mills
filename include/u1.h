@@ -20,6 +20,10 @@ typedef struct U1Adj {
 // defined just to avoid errors at compile time
 
 
+
+// ***************** for U1
+
+
 // initialize
 inline void init_U1(U1 * restrict A, double complex vec)
   {
@@ -507,36 +511,35 @@ void print_on_screen_U1(U1 const * const A);
 
 
 // print on file
-void print_on_file_U1(FILE *fp, U1 const * const A);
+int print_on_file_U1(FILE *fp, U1 const * const A);
 
 
 // print on binary file without changing endiannes
-void print_on_binary_file_noswap_U1(FILE *fp, U1 const * const A);
+int print_on_binary_file_noswap_U1(FILE *fp, U1 const * const A);
 
 
 // print on binary file changing endiannes
-void print_on_binary_file_swap_U1(FILE *fp, U1 const * const A);
+int print_on_binary_file_swap_U1(FILE *fp, U1 const * const A);
 
 
 // print on binary file in big endian format
-void print_on_binary_file_bigen_U1(FILE *fp, U1 const * const A);
+int print_on_binary_file_bigen_U1(FILE *fp, U1 const * const A);
 
 
 // read from file
-void read_from_file_U1(FILE *fp, U1 *A);
+int read_from_file_U1(FILE *fp, U1 *A);
 
 
 // read from binary file without changing endiannes
-void read_from_binary_file_noswap_U1(FILE *fp, U1 *A);
+int read_from_binary_file_noswap_U1(FILE *fp, U1 *A);
 
 
 // read from binary file changing endiannes
-void read_from_binary_file_swap_U1(FILE *fp, U1 *A);
+int read_from_binary_file_swap_U1(FILE *fp, U1 *A);
 
 
 // read from binary file written in big endian
-void read_from_binary_file_bigen_U1(FILE *fp, U1 *A);
-
+int read_from_binary_file_bigen_U1(FILE *fp, U1 *A);
 
 
 // initialize tensor product
@@ -558,6 +561,11 @@ inline void TensProd_init_U1(TensProd * restrict TP, U1 const * const restrict A
 
   TP->comp[0][0][0][0]=conj(A1->comp)*A2->comp;
   }
+
+
+
+// ***************** for U1Adj
+
 
 
 // convert the fundamental representation matrix B to the adjoint representation matrix A

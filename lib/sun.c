@@ -16,6 +16,11 @@
 #include"../include/tens_prod.h"
 #include"../include/tens_prod_adj.h"
 
+
+// ***************** for SuN
+
+
+
 // A=1
 void one_SuN(SuN *A);
 
@@ -406,7 +411,7 @@ void print_on_screen_SuN(SuN const * const A)
 
 
 // print on file
-void print_on_file_SuN(FILE *fp, SuN const * const A)
+int print_on_file_SuN(FILE *fp, SuN const * const A)
   {
   int i, j, err;
  
@@ -418,16 +423,18 @@ void print_on_file_SuN(FILE *fp, SuN const * const A)
         if(err<0)
           {
           fprintf(stderr, "Problem in writing on file a SuN matrix (%s, %d)\n", __FILE__, __LINE__);
-          exit(EXIT_FAILURE);
+          return 1;
           }
         }
      }
   fprintf(fp, "\n");
+
+  return 0;
   }
 
 
 // print on binary file without changing endiannes
-void print_on_binary_file_noswap_SuN(FILE *fp, SuN const * const A)
+int print_on_binary_file_noswap_SuN(FILE *fp, SuN const * const A)
   {
   int i, j;
   size_t err;
@@ -444,21 +451,23 @@ void print_on_binary_file_noswap_SuN(FILE *fp, SuN const * const A)
         if(err!=1)
           {
           fprintf(stderr, "Problem in binary writing on file a SuN matrix (%s, %d)\n", __FILE__, __LINE__);
-          exit(EXIT_FAILURE);
+          return 1;
           }
         err=fwrite(&im, sizeof(double), 1, fp);
         if(err!=1)
           {
           fprintf(stderr, "Problem in binary writing on file a SuN matrix (%s, %d)\n", __FILE__, __LINE__);
-          exit(EXIT_FAILURE);
+          return 1;
           }
         }
      }
+
+  return 0;
   }
 
 
 // print on binary file changing endiannes
-void print_on_binary_file_swap_SuN(FILE *fp, SuN const * const A)
+int print_on_binary_file_swap_SuN(FILE *fp, SuN const * const A)
   {
   int i, j;
   size_t err;
@@ -478,35 +487,41 @@ void print_on_binary_file_swap_SuN(FILE *fp, SuN const * const A)
         if(err!=1)
           {
           fprintf(stderr, "Problem in binary writing on file a SuN matrix (%s, %d)\n", __FILE__, __LINE__);
-          exit(EXIT_FAILURE);
+          return 1;
           }
         err=fwrite(&im, sizeof(double), 1, fp);
         if(err!=1)
           {
           fprintf(stderr, "Problem in binary writing on file a SuN matrix (%s, %d)\n", __FILE__, __LINE__);
-          exit(EXIT_FAILURE);
+          return 1;
           }
         }
      }
+
+  return 0;
   }
 
 
 // print on binary file in bigendian
-void print_on_binary_file_bigen_SuN(FILE *fp, SuN const * const A)
+int print_on_binary_file_bigen_SuN(FILE *fp, SuN const * const A)
   {
+  int err;
+
   if(endian()==0) // little endian machine
     {
-    print_on_binary_file_swap_SuN(fp, A);
+    err=print_on_binary_file_swap_SuN(fp, A);
     }
   else
     {
-     print_on_binary_file_noswap_SuN(fp, A);
+    err=print_on_binary_file_noswap_SuN(fp, A);
     }
+
+  return err;
   }
 
 
 // read from file
-void read_from_file_SuN(FILE *fp, SuN *A)
+int read_from_file_SuN(FILE *fp, SuN *A)
   {
   int i, j, err;
   double re, im;
@@ -519,16 +534,17 @@ void read_from_file_SuN(FILE *fp, SuN *A)
         if(err!=2)
           {
           fprintf(stderr, "Problems reading SuN matrix from file (%s, %d)\n", __FILE__, __LINE__);
-          exit(EXIT_FAILURE);
+          return 1;
           }
         A->comp[m(i,j)]=re+im*I; 
         }
      }
+  return 0;
   }
 
 
 // read from binary file without changing endiannes
-void read_from_binary_file_noswap_SuN(FILE *fp, SuN *A)
+int read_from_binary_file_noswap_SuN(FILE *fp, SuN *A)
   {
   size_t err;
   int i, j;
@@ -554,13 +570,15 @@ void read_from_binary_file_noswap_SuN(FILE *fp, SuN *A)
   if(err!=2*NCOLOR*NCOLOR)
     {
     fprintf(stderr, "Problems reading SuN matrix from file (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
     }
+
+  return 0;
   }
  
 
 // read from binary file changing endianness
-void read_from_binary_file_swap_SuN(FILE *fp, SuN *A)
+int read_from_binary_file_swap_SuN(FILE *fp, SuN *A)
   {
   int i, j;
   size_t err;
@@ -577,7 +595,7 @@ void read_from_binary_file_swap_SuN(FILE *fp, SuN *A)
         if(err!=2)
          {
          fprintf(stderr, "Problems reading SuN matrix from file (%s, %d)\n", __FILE__, __LINE__);
-         exit(EXIT_FAILURE);
+         return 1;
          }
 
         SwapBytesDouble(&re);
@@ -589,25 +607,35 @@ void read_from_binary_file_swap_SuN(FILE *fp, SuN *A)
         // equivalent to A->comp[m(i,j)]=re+im*I;
         }
      }
+  return 0;
   }
 
 
 // read from binary file written in bigendian
-void read_from_binary_file_bigen_SuN(FILE *fp, SuN *A)
+int read_from_binary_file_bigen_SuN(FILE *fp, SuN *A)
   {
+  int err;
+
   if(endian()==0) // little endian machine
     {
-    read_from_binary_file_swap_SuN(fp, A);
+    err=read_from_binary_file_swap_SuN(fp, A);
     }
   else
     {
-    read_from_binary_file_noswap_SuN(fp, A);
+    err=read_from_binary_file_noswap_SuN(fp, A);
     }
+
+  return err;
   }
 
 
 // initialize tensor product
 void TensProd_init_SuN(TensProd *TP, SuN const * const A1, SuN const * const A2);
+
+
+
+// ***************** for SuNAdj
+
 
 
 // convert the fundamental representation matrix B to the adjoint representation matrix A

@@ -14,6 +14,9 @@
 #include"../include/u1.h"
 
 
+// ***************** for U1
+
+
 // initialize
 void init_U1(U1 *A, double complex vec);
 
@@ -163,20 +166,23 @@ void print_on_screen_U1(U1 const * const A)
 
 
 // print on file
-void print_on_file_U1(FILE *fp, U1 const * const A)
+int print_on_file_U1(FILE *fp, U1 const * const A)
   {
   int err;
+
   err=fprintf(fp, "%.16lf %.16lf\n", creal(A->comp), cimag(A->comp));
   if(err<0)
     {
     fprintf(stderr, "Problem in writing on a file a U1 matrix (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
     }
+
+  return 0;
   }
 
 
 // print on binary file without changing endiannes
-void print_on_binary_file_noswap_U1(FILE *fp, U1 const * const A)
+int print_on_binary_file_noswap_U1(FILE *fp, U1 const * const A)
   {
   size_t err=0;
   double re, im;
@@ -188,19 +194,21 @@ void print_on_binary_file_noswap_U1(FILE *fp, U1 const * const A)
   if(err!=1)
     {
     fprintf(stderr, "Problem in binary writing on a file a U1 matrix (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
     }
   err=fwrite(&im, sizeof(double), 1, fp);
   if(err!=1)
     {
     fprintf(stderr, "Problem in binary writing on a file a U1 matrix (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
     }
+
+  return 0;
   }
 
 
 // print on binary file changing endiannes
-void print_on_binary_file_swap_U1(FILE *fp, U1 const * const A)
+int print_on_binary_file_swap_U1(FILE *fp, U1 const * const A)
   {
   double tmp;
   size_t err=0;
@@ -216,27 +224,33 @@ void print_on_binary_file_swap_U1(FILE *fp, U1 const * const A)
   if(err!=2)
     {
     fprintf(stderr, "Problem in binary writing on a file a U1 matrix (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
     }
+
+  return 0;
   }
 
 
 // print on binary file in big endian format
-void print_on_binary_file_bigen_U1(FILE *fp, const U1 * const A)
+int print_on_binary_file_bigen_U1(FILE *fp, const U1 * const A)
   {
+  int err;
+
   if(endian()==0) // little endian machine
     {
-    print_on_binary_file_swap_U1(fp, A);
+    err=print_on_binary_file_swap_U1(fp, A);
     }
   else
     {
-    print_on_binary_file_noswap_U1(fp, A);
+    err=print_on_binary_file_noswap_U1(fp, A);
     }
+
+  return err;
   }
 
 
 // read from file
-void read_from_file_U1(FILE *fp, U1 *A)
+int read_from_file_U1(FILE *fp, U1 *A)
   {
   double re, im;
   int err;
@@ -245,14 +259,16 @@ void read_from_file_U1(FILE *fp, U1 *A)
   if(err!=2)
     {
     fprintf(stderr, "Problems reading U1 matrix from file (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
     }
   A->comp=re+im*I;
+
+  return 0;
   }
 
 
 // read from binary file without changing endiannes
-void read_from_binary_file_noswap_U1(FILE *fp, U1 *A)
+int read_from_binary_file_noswap_U1(FILE *fp, U1 *A)
   {
   double re, im;
   size_t err=0;
@@ -261,14 +277,16 @@ void read_from_binary_file_noswap_U1(FILE *fp, U1 *A)
   if(err!=2)
     {
     fprintf(stderr, "Problems reading U1 matrix from file (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
     }
   A->comp=re+I*im;
+
+  return 0;
   }
 
 
 // read from binary file changing endiannes
-void read_from_binary_file_swap_U1(FILE *fp, U1 *A)
+int read_from_binary_file_swap_U1(FILE *fp, U1 *A)
   {
   double re, im;
   size_t err=0;
@@ -279,32 +297,45 @@ void read_from_binary_file_swap_U1(FILE *fp, U1 *A)
   if(err!=2)
     {
     fprintf(stderr, "Problems reading U1 matrix from file (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
+    return 1;
     }
 
   SwapBytesDouble((void *)&re);
   SwapBytesDouble((void *)&im);
 
   A->comp=re+I*im;
+
+  return 0;
   }
 
 
 // read from binary file written in big endian
-void read_from_binary_file_bigen_U1(FILE *fp, U1 *A)
+int read_from_binary_file_bigen_U1(FILE *fp, U1 *A)
   {
+  int err;
+
   if(endian()==0) // little endian machine
     {
-    read_from_binary_file_swap_U1(fp, A);
+    err=read_from_binary_file_swap_U1(fp, A);
     }
   else
     {
-    read_from_binary_file_noswap_U1(fp, A);
+    err=read_from_binary_file_noswap_U1(fp, A);
     }
+
+  return err;
   }
 
 
 // initialize tensor product
 void TensProd_init_U1(TensProd *TP, U1 const * const A1, U1 const * const A2);
+
+
+
+// ***************** for U1Adj
+
+// convert the fundamental representation matrix B to the adjoint representation matrix A
+void fund_to_adj_U1(U1Adj * restrict A, U1 const * const restrict B);
 
 
 // initialize tensor product in the adjoint representation
