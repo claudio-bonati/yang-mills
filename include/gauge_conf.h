@@ -368,6 +368,12 @@ void calcstaples_wilson(Gauge_Conf const * const GC,
                         long r,
                         int i,
                         GAUGE_GROUP *M);
+void calcstaples_wilson_nosum(Gauge_Conf const * const GC,
+                              Geometry const * const geo,
+                              GParam const * const gparam,
+                              long r,
+                              int i,
+                              GAUGE_GROUP *M);
 void calcstaples_tracedef(Gauge_Conf const * const GC,
                           Geometry const * const geo,
                           GParam const * const param,
@@ -384,6 +390,13 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
                            long r,
                            int i,
                            GAUGE_GROUP *M);
+void calcstaples_with_topo_nosum(Gauge_Conf const * const GC,
+                                 Geometry const * const geo,
+                                 GParam const * const param,
+                                 long r,
+                                 int i,
+                                 GAUGE_GROUP *M);
+
 void heatbath(Gauge_Conf * GC,
               Geometry const * const geo,
               GParam const * const param,
@@ -404,6 +417,12 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
                              GParam const * const param,
                              long r,
                              int i);
+int metropolis_fundadj(Gauge_Conf *GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       long r,
+                       int i);
+
 void update(Gauge_Conf *GC,
             Geometry const * const geo,
             GParam const * const param);
@@ -411,6 +430,11 @@ void update_with_trace_def(Gauge_Conf *GC,
                            Geometry const * const geo,
                            GParam const * const param,
                            double *acc);
+void update_fundadj(Gauge_Conf *GC,
+                    Geometry const * const geo,
+                    GParam const * const param,
+                    double *acc);
+
 void cooling(Gauge_Conf *GC,
              Geometry const * const geo,
              GParam const * const param,

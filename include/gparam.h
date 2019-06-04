@@ -14,6 +14,7 @@ typedef struct GParam {
   double d_beta;
   double d_h[NCOLOR]; // parameters for the trace deformation
   double d_theta;
+  double d_adjbeta;
 
   // simulation details
   int d_sample;
@@ -69,6 +70,7 @@ void init_derived_constants(GParam *param);
 void init_data_file(FILE **dataf, GParam const * const param);
 
 void print_parameters_local(GParam const * const param, time_t time_start, time_t time_end);
+void print_parameters_local_fundadj(GParam const * const param, time_t time_start, time_t time_end, double acc);
 
 void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_end);
 void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t time_end);

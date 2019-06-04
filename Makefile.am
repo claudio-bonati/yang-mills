@@ -5,6 +5,7 @@ bin_PROGRAMS = conf_check \
                debug_sun \
                debug_u1 \
                yang_mills_local \
+               yang_mills_local_fundadj \
                yang_mills_polycorr \
                yang_mills_polycorr_long \
                yang_mills_polycorradj \
@@ -147,6 +148,21 @@ yang_mills_local_SOURCES=./src/yang_mills_local.c \
                           $(sun) \
                           $(tens_prod) \
                           $(u1) 
+
+yang_mills_local_fundadj_SOURCES=./src/yang_mills_local_fundadj.c \
+                                 $(align) \
+                                 $(dSFMT)  \
+                                 $(endian) \
+                                 $(funcpoint) \
+                                 $(gauge_conf) \
+                                 $(geometry) \
+                                 $(gparam) \
+                                 ./include/macro.h \
+                                 $(random) \
+                                 $(su2) \
+                                 $(sun) \
+                                 $(tens_prod) \
+                                 $(u1) 
 
 yang_mills_polycorr_SOURCES=./src/yang_mills_polycorr.c \
                              $(align) \

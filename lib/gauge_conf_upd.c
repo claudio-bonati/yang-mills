@@ -96,6 +96,112 @@ void calcstaples_wilson(Gauge_Conf const * const GC,
    }
 
 
+// compute the components of the staple in position r, direction i and save it in M[2*(STDIM-1)+1]
+// position 0 of M is not used. It is used in simulations at imaginary theta values
+void calcstaples_wilson_nosum(Gauge_Conf const * const GC,
+                              Geometry const * const geo,
+                              GParam const * const param,
+                              long r,
+                              int i,
+                              GAUGE_GROUP *M)
+  {
+  int j, l, count;
+  long k;
+  GAUGE_GROUP link1, link2, link3, link12, stap;
+
+  #ifdef DEBUG
+  if(r >= param->d_volume)
+    {
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  if(i >= STDIM)
+    {
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #else
+  (void) param; // just to avoid warnings
+  #endif
+
+  count=0;
+  zero(&M[count]); // M=0
+
+  for(l=i+1; l< i + STDIM; l++)
+     {
+     j = (l % STDIM);
+
+     count++;
+     zero(&M[count]); // M=0
+
+//
+//       i ^
+//         |   (1)
+//         +----->-----+
+//         |           |
+//                     |
+//         |           V (2)
+//                     |
+//         |           |
+//         +-----<-----+-->   j
+//       r     (3)
+//
+
+     equal(&link1, &(GC->lattice[nnp(geo, r, i)][j]));  // link1 = (1)
+     equal(&link2, &(GC->lattice[nnp(geo, r, j)][i]));  // link2 = (2)
+     equal(&link3, &(GC->lattice[r][j]));               // link3 = (3)
+
+     times_dag2(&link12, &link1, &link2);  // link12=link1*link2^{dag}
+     times_dag2(&stap, &link12, &link3);   // stap=link12*stap^{dag}
+
+     equal(&(M[count]), &stap);
+
+//
+//       i ^
+//         |   (1)
+//         |----<------+
+//         |           |
+//         |
+//     (2) V           |
+//         |
+//         |           |
+//         +------>----+--->j
+//        k     (3)    r
+//
+
+     count++;
+     zero(&M[count]); // M=0
+
+     k=nnm(geo, r, j);
+
+     equal(&link1, &(GC->lattice[nnp(geo, k, i)][j]));  // link1 = (1)
+     equal(&link2, &(GC->lattice[k][i]));               // link2 = (2)
+     equal(&link3, &(GC->lattice[k][j]));               // link3 = (3)
+
+     times_dag12(&link12, &link1, &link2); // link12=link1^{dag}*link2^{dag}
+     times(&stap, &link12, &link3);        // stap=link12*link3
+
+     equal(&(M[count]), &stap);
+     }
+
+   #ifdef DEBUG
+   GAUGE_GROUP helper;
+   int m;
+
+   calcstaples_wilson(GC, geo, param, r, i, &helper);
+   for(m=0; m<2*(STDIM-1)+1; m++)
+      {
+      minus_equal(&helper, &(M[m]));
+      }
+   if(norm(&helper)>MIN_VALUE)
+     {
+     fprintf(stderr, "Problems in calcstaples_wilson_nosum (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+   }
+
+
 // compute the staple for the trace deformed theory:
 // in practice a Polyakov loop without a link
 void calcstaples_tracedef(Gauge_Conf const * const GC,
@@ -345,6 +451,206 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
   }
 
 
+// compute the components of the staple in position r, direction i and save it in M[2*(STDIM-1)+1]
+// position 0 of M is the topological staple
+void calcstaples_with_topo_nosum(Gauge_Conf const * const GC,
+                                 Geometry const * const geo,
+                                 GParam const * const param,
+                                 long r,
+                                 int i,
+                                 GAUGE_GROUP *M)
+  {
+  #ifdef DEBUG
+  if(r >= param->d_volume)
+    {
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  if(i >= STDIM)
+    {
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifndef THETA_MODE
+  calcstaples_wilson_nosum(GC, geo, param, r, i, M);
+  #else
+
+  if(STDIM!=4)
+    {
+    fprintf(stderr, "Error: imaginary theta term can be used only in 4 dimensions! (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+
+  GAUGE_GROUP link1, link2, link3, link12, stap, topo_stap, aux;
+  const double coeff=(param->d_theta)*((double) NCOLOR)/(param->d_beta*128.0*PI*PI);
+  long k;
+  int j, l, count;
+  int i0, j0;
+  int sood1[4][4], sood2[4][4]; // signed ordered orthogonal directions
+
+  // the theta term is written as
+  // theta/(128 pi^2) \sum_{ind. perm.} ReTr(Q_{\mu\nu}(Q-Q^{dag})_{sood1[\mu][\nu] sood2[\mu][\nu]} )
+  // the independent permutations are 0123 0231 0312
+
+  sood1[0][1] = 2;
+  sood2[0][1] = 3;
+  sood1[1][0] = 3;
+  sood2[1][0] = 2;
+
+  sood1[0][2] = 3;
+  sood2[0][2] = 1;
+  sood1[2][0] = 1;
+  sood2[2][0] = 3;
+
+  sood1[0][3] = 1;
+  sood2[0][3] = 2;
+  sood1[3][0] = 2;
+  sood2[3][0] = 1;
+
+  sood1[1][2] = 0;
+  sood2[1][2] = 3;
+  sood1[2][1] = 3;
+  sood2[2][1] = 0;
+
+  sood1[1][3] = 2;
+  sood2[1][3] = 0;
+  sood1[3][1] = 0;
+  sood2[3][1] = 2;
+
+  sood1[2][3] = 0;
+  sood2[2][3] = 1;
+  sood1[3][2] = 1;
+  sood2[3][2] = 0;
+
+  zero(&topo_stap); // topo_stap=0
+
+  count=0;
+
+  for(l=i+1; l< i + STDIM; l++)
+     {
+     j = (l % STDIM);
+
+     count++;
+     zero(&(M[count]));
+
+     i0=sood1[i][j];
+     j0=sood2[i][j];
+
+//
+//       i ^
+//         |   (1)
+//     (b) +----->-----+ (c)
+//         |           |
+//                     |
+//         |           V (2)
+//                     |
+//         |           |
+//     (a) +-----<-----+-->   j
+//       r     (3)    (d)
+//
+
+     equal(&link1, &(GC->lattice[nnp(geo, r, i)][j]));  // link1 = (1)
+     equal(&link2, &(GC->lattice[nnp(geo, r, j)][i]));  // link2 = (2)
+     equal(&link3, &(GC->lattice[r][j]));               // link3 = (3)
+
+     times_dag2(&link12, &link1, &link2);  // link12=link1*link2^{dag}
+     times_dag2(&stap, &link12, &link3);   // stap=link12*stap^{dag}
+
+     equal(&(M[count]), &stap);
+
+     // clover insertion in (a)
+     times(&aux, &stap, &(GC->clover_array[r][i0][j0])); // stap*clover
+     plus_equal(&topo_stap, &aux);
+
+     // clover insertion in (b)
+     times(&aux, &(GC->clover_array[nnp(geo, r, i)][i0][j0]), &stap);  // clover*stap
+     plus_equal(&topo_stap, &aux);
+
+     // clover insertion in (c)
+     times(&aux, &link1, &(GC->clover_array[nnp(geo, nnp(geo, r, i), j)][i0][j0]));  // link1*clover
+     times_equal_dag(&aux, &link2);       // *=link2^{dag}
+     times_equal_dag(&aux, &link3);       // *=link3^{dag}
+     plus_equal(&topo_stap, &aux);
+
+     // clover insertion in (d)
+     times(&aux, &link12, &(GC->clover_array[nnp(geo, r, j)][i0][j0]));  // link1*link2*quadri
+     times_equal_dag(&aux, &link3);          // *=link3^{dag}
+
+     plus_equal(&topo_stap, &aux);
+
+//
+//       i ^
+//         |   (1)
+//     (d) +----<------+ (a)
+//         |           |
+//         |
+//     (2) V           |
+//         |
+//         |           | (b)
+//     (c) +------>----+--->j
+//        k     (3)    r
+//
+
+     count++;
+     zero(&(M[count]));
+
+     k=nnm(geo, r, j);
+
+     equal(&link1, &(GC->lattice[nnp(geo, k, i)][j]));  // link1 = (1)
+     equal(&link2, &(GC->lattice[k][i]));               // link2 = (2)
+     equal(&link3, &(GC->lattice[k][j]));               // link3 = (3)
+
+     times_dag12(&link12, &link1, &link2); // link12=link1^{dag}*link2^{dag}
+     times(&stap, &link12, &link3);        // stap=link12*link3
+
+     equal(&(M[count]), &stap);
+
+     // clover insertion in (a)
+     times(&aux, &(GC->clover_array[nnp(geo, r, i)][i0][j0]), &stap); // clover*stap
+     minus_equal(&topo_stap, &aux);
+
+     // clover insertion in (b)
+     times(&aux, &stap, &(GC->clover_array[r][i0][j0])); // stap*clover
+     minus_equal(&topo_stap, &aux);
+
+     // clover insertion in (c)
+     times(&aux, &link12, &(GC->clover_array[k][i0][j0])); // link1^{dag}*link2^{dag}*clover
+     times_equal(&aux, &link3);                            // *=link3
+     minus_equal(&topo_stap, &aux);
+
+     // clover insertion in (d)
+     times_dag1(&aux, &link1, &(GC->clover_array[nnp(geo, k, i)][i0][j0]));  // link1^{dag}*clover
+     times_equal_dag(&aux, &link2);            // *=link2^{dag}
+     times_equal(&aux, &link3);                // *=link3
+
+     minus_equal(&topo_stap, &aux);
+     }
+
+  times_equal_real(&topo_stap, coeff);
+  equal(&(M[0]), &topo_stap);
+  #endif
+
+
+  #ifdef DEBUG
+  GAUGE_GROUP helper;
+  int m;
+
+  calcstaples_with_topo(GC, geo, param, r, i, &helper);
+  for(m=0; m<2*(STDIM-1)+1; m++)
+     {
+     minus_equal(&helper, &(M[m]));
+     }
+  if(norm(&helper)>MIN_VALUE)
+    {
+    fprintf(stderr, "Problems in calcstaples_with_topo_nosum (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+  }
+
+
 // perform an update with heatbath
 void heatbath(Gauge_Conf *GC,
               Geometry const * const geo,
@@ -575,6 +881,100 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
   }
 
 
+// perform an update with metropolis
+// return 1 if the proposed update is accepted
+int metropolis_fundadj(Gauge_Conf *GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       long r,
+                       int i)
+  {
+  #ifdef DEBUG
+  if(r >= param->d_volume)
+    {
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  if(i >= STDIM)
+    {
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  GAUGE_GROUP stap[2*(STDIM-1)+1], new_link, tmp_matrix, rnd_matrix;
+  double action_new, action_old, re, im;
+  int acc, count;
+
+  #ifndef THETA_MODE
+    calcstaples_wilson_nosum(GC, geo, param, r, i, stap);
+  #else
+    calcstaples_with_topo_nosum(GC, geo, param, r, i, stap);
+  #endif
+
+  // compute old action
+  times(&tmp_matrix, &(GC->lattice[r][i]), &(stap[0]));
+  action_old=param->d_beta*(1.0-retr(&tmp_matrix));  // count=0 corresponds to theta term
+  for(count=1; count<2*(STDIM-1)+1; count++)
+     {
+     times(&tmp_matrix, &(GC->lattice[r][i]), &(stap[count]));
+     re=retr(&tmp_matrix);
+     im=imtr(&tmp_matrix);
+
+     action_old+=param->d_beta*(1.0-re);
+     #if NCOLOR!=1
+       action_old+=param->d_adjbeta*(1.0-(NCOLOR*NCOLOR*(re*re+im*im)-1.0)/(NCOLOR*NCOLOR-1));
+     #else
+       (void) im; // just to avoid warnings
+     #endif
+     }
+
+  // compute the new link
+  one(&tmp_matrix);
+  rand_matrix(&rnd_matrix);
+  times_equal_real(&rnd_matrix, param->d_epsilon_metro);
+  plus_equal(&rnd_matrix, &tmp_matrix);
+  unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
+  if(casuale()<0.5)
+    {
+    times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+    }
+  else
+    {
+    times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+    }
+
+  // new action
+  times(&tmp_matrix, &new_link, &(stap[0]));
+  action_new=param->d_beta*(1.0-retr(&tmp_matrix));   // count=0 corresponds to theta term
+  for(count=1; count<2*(STDIM-1)+1; count++)
+     {
+     times(&tmp_matrix, &new_link, &(stap[count]));
+     re=retr(&tmp_matrix);
+     im=imtr(&tmp_matrix);
+
+     action_new+=param->d_beta*(1.0-re);
+     #if NCOLOR!=1
+       action_new+=param->d_adjbeta*(1.0-(NCOLOR*NCOLOR*(re*re+im*im)-1.0)/(NCOLOR*NCOLOR-1));
+     #else
+       (void) im; // just to avoid warnings
+     #endif
+     }
+
+  if(casuale()< exp(action_old-action_new))
+    {
+    equal(&(GC->lattice[r][i]), &new_link);
+    acc=1;
+    }
+  else
+    {
+    acc=0;
+    }
+
+  return acc;
+  }
+
+
 // perform a complete update
 void update(Gauge_Conf * GC,
             Geometry const * const geo,
@@ -768,6 +1168,81 @@ void update_with_trace_def(Gauge_Conf * GC,
             }
          }
       }
+
+   // final unitarization
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      for(dir=0; dir<STDIM; dir++)
+         {
+         unitarize(&(GC->lattice[r][dir]));
+         }
+      }
+
+   free(a);
+
+   GC->update_index++;
+   }
+
+
+// perform a complete update with fundamental-adjoint action
+void update_fundadj(Gauge_Conf * GC,
+                   Geometry const * const geo,
+                   GParam const * const param,
+                   double *acc)
+   {
+   int err, *a;
+   long r, asum;
+   int dir;
+
+   err=posix_memalign((void**)&a, (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(int));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   for(r=0; r<param->d_volume; r++)
+      {
+      a[r]=0;
+      }
+
+   // metropolis
+   for(dir=0; dir<STDIM; dir++)
+      {
+      #ifdef THETA_MODE
+      compute_clovers(GC, geo, param, dir);
+      #endif
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<(param->d_volume)/2; r++)
+         {
+         a[r]+=metropolis_fundadj(GC, geo, param, r, dir);
+         }
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         {
+         a[r]+=metropolis_fundadj(GC, geo, param, r, dir);
+         }
+      }
+
+   asum=0;
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for reduction(+:asum) private(r)
+   #endif
+   for(r=0; r<param->d_volume; r++)
+      {
+      asum+=(long)a[r];
+      }
+
+   *acc=((double)asum)*param->d_inv_vol/STDIM;
 
    // final unitarization
    #ifdef OPENMP_MODE
