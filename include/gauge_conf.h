@@ -411,17 +411,20 @@ int metropolis(Gauge_Conf *GC,
                Geometry const * const geo,
                GParam const * const param,
                long r,
-               int i);
+               int i,
+               int numhits);
 int metropolis_with_tracedef(Gauge_Conf *GC,
                              Geometry const * const geo,
                              GParam const * const param,
                              long r,
-                             int i);
+                             int i,
+                             int numhits);
 int metropolis_fundadj(Gauge_Conf *GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        long r,
-                       int i);
+                       int i,
+                       int numhits);
 
 void update(Gauge_Conf *GC,
             Geometry const * const geo,

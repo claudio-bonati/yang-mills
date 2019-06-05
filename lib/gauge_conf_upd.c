@@ -722,7 +722,8 @@ int metropolis(Gauge_Conf *GC,
                Geometry const * const geo,
                GParam const * const param,
                long r,
-               int i)
+               int i,
+               int numhits)
   {
   #ifdef DEBUG
   if(r >= param->d_volume)
@@ -739,7 +740,7 @@ int metropolis(Gauge_Conf *GC,
 
   GAUGE_GROUP stap, new_link, tmp_matrix, rnd_matrix;
   double action_new, action_old;
-  int acc;
+  int acc, hits;
 
   #ifndef THETA_MODE
     calcstaples_wilson(GC, geo, param, r, i, &stap);
@@ -747,38 +748,43 @@ int metropolis(Gauge_Conf *GC,
     calcstaples_with_topo(GC, geo, param, r, i, &stap);
   #endif
 
-  // compute old action
-  times(&tmp_matrix, &(GC->lattice[r][i]), &stap);
-  action_old=param->d_beta*(1.0-retr(&tmp_matrix));
+  acc=0;
 
-  // compute the new link
-  one(&tmp_matrix);
-  rand_matrix(&rnd_matrix);
-  times_equal_real(&rnd_matrix, param->d_epsilon_metro);
-  plus_equal(&rnd_matrix, &tmp_matrix);
-  unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
-  if(casuale()<0.5)
-    {
-    times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
-    }
-  else
-    {
-    times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
-    }
+  for(hits=0; hits<numhits; hits++)
+     {
+     // compute old action
+     times(&tmp_matrix, &(GC->lattice[r][i]), &stap);
+     action_old=param->d_beta*(1.0-retr(&tmp_matrix));
 
-  // new action
-  times(&tmp_matrix, &new_link, &stap);
-  action_new=param->d_beta*(1.0-retr(&tmp_matrix));
+     // compute the new link
+     one(&tmp_matrix);
+     rand_matrix(&rnd_matrix);
+     times_equal_real(&rnd_matrix, param->d_epsilon_metro);
+     plus_equal(&rnd_matrix, &tmp_matrix);
+     unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
+     if(casuale()<0.5)
+       {
+       times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+       }
+     else
+       {
+       times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+       }
 
-  if(casuale()< exp(action_old-action_new))
-    {
-    equal(&(GC->lattice[r][i]), &new_link);
-    acc=1;
-    }
-  else
-    {
-    acc=0;
-    }
+     // new action
+     times(&tmp_matrix, &new_link, &stap);
+     action_new=param->d_beta*(1.0-retr(&tmp_matrix));
+
+     if(casuale()< exp(action_old-action_new))
+       {
+       equal(&(GC->lattice[r][i]), &new_link);
+       acc+=1;
+       }
+     else
+       {
+       acc+=0;
+       }
+     }
 
   return acc;
   }
@@ -790,7 +796,8 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
                              Geometry const * const geo,
                              GParam const * const param,
                              long r,
-                             int i)
+                             int i,
+                             int numhits)
   {
   #ifdef DEBUG
   if(r >= param->d_volume)
@@ -808,74 +815,80 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
   GAUGE_GROUP stap_w, stap_td, new_link, tmp_matrix, rnd_matrix, poly;
   double action_new, action_old;
   double rpart, ipart;
-  int j, acc;
+  int j, acc, hits;
 
-  // compute old action
   #ifndef THETA_MODE
     calcstaples_wilson(GC, geo, param, r, i, &stap_w);
   #else
     calcstaples_with_topo(GC, geo, param, r, i, &stap_w);
   #endif
-  times(&tmp_matrix, &(GC->lattice[r][i]), &stap_w);
-  action_old=param->d_beta*(1.0-retr(&tmp_matrix));
-  if(i==0) // just if we are updating a temporal link
-    {
-    // "staple" for trace deformation
-    calcstaples_tracedef(GC, geo, param, r, i, &stap_td);
 
-    // trace deformation contribution to action_old
-    times(&poly, &(GC->lattice[r][i]), &stap_td);
-    one(&tmp_matrix);
-    for(j=0; j<(int)floor(NCOLOR/2.0); j++)
+  acc=0;
+
+  for(hits=0; hits<numhits; hits++)
+     {
+     // compute old action
+     times(&tmp_matrix, &(GC->lattice[r][i]), &stap_w);
+     action_old=param->d_beta*(1.0-retr(&tmp_matrix));
+     if(i==0) // just if we are updating a temporal link
        {
-       times_equal(&tmp_matrix, &poly);
-       rpart=NCOLOR*retr(&tmp_matrix);
-       ipart=NCOLOR*imtr(&tmp_matrix);
-       action_old += param->d_h[j]*(rpart*rpart+ipart*ipart);
+       // "staple" for trace deformation
+       calcstaples_tracedef(GC, geo, param, r, i, &stap_td);
+
+       // trace deformation contribution to action_old
+       times(&poly, &(GC->lattice[r][i]), &stap_td);
+       one(&tmp_matrix);
+       for(j=0; j<(int)floor(NCOLOR/2.0); j++)
+          {
+          times_equal(&tmp_matrix, &poly);
+          rpart=NCOLOR*retr(&tmp_matrix);
+          ipart=NCOLOR*imtr(&tmp_matrix);
+          action_old += param->d_h[j]*(rpart*rpart+ipart*ipart);
+          }
        }
-    }
 
-  // compute the update to be proposed
-  one(&tmp_matrix);
-  rand_matrix(&rnd_matrix);
-  times_equal_real(&rnd_matrix, param->d_epsilon_metro);
-  plus_equal(&rnd_matrix, &tmp_matrix);
-  unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
-  if(casuale()<0.5)
-    {
-    times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
-    }
-  else
-    {
-    times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
-    }
-
-  // compute the new action
-  times(&tmp_matrix, &new_link, &stap_w);
-  action_new=param->d_beta*(1.0-retr(&tmp_matrix));
-  if(i==0) // just if we are updating a temporal link
-    {
-    // trace deformation contribution to action_new
-    times(&poly, &new_link, &stap_td);
-    one(&tmp_matrix);
-    for(j=0; j<(int)floor(NCOLOR/2.0); j++)
+     // compute the update to be proposed
+     one(&tmp_matrix);
+     rand_matrix(&rnd_matrix);
+     times_equal_real(&rnd_matrix, param->d_epsilon_metro);
+     plus_equal(&rnd_matrix, &tmp_matrix);
+     unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
+     if(casuale()<0.5)
        {
-       times_equal(&tmp_matrix, &poly);
-       rpart=NCOLOR*retr(&tmp_matrix);
-       ipart=NCOLOR*imtr(&tmp_matrix);
-       action_new += param->d_h[j]*(rpart*rpart+ipart*ipart);
+       times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
        }
-    }
+     else
+       {
+       times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+       }
 
-  if(casuale()< exp(action_old-action_new))
-    {
-    equal(&(GC->lattice[r][i]), &new_link);
-    acc=1;
-    }
-  else
-    {
-    acc=0;
-    }
+     // compute the new action
+     times(&tmp_matrix, &new_link, &stap_w);
+     action_new=param->d_beta*(1.0-retr(&tmp_matrix));
+     if(i==0) // just if we are updating a temporal link
+       {
+       // trace deformation contribution to action_new
+       times(&poly, &new_link, &stap_td);
+       one(&tmp_matrix);
+       for(j=0; j<(int)floor(NCOLOR/2.0); j++)
+          {
+          times_equal(&tmp_matrix, &poly);
+          rpart=NCOLOR*retr(&tmp_matrix);
+          ipart=NCOLOR*imtr(&tmp_matrix);
+          action_new += param->d_h[j]*(rpart*rpart+ipart*ipart);
+          }
+       }
+
+     if(casuale()< exp(action_old-action_new))
+       {
+       equal(&(GC->lattice[r][i]), &new_link);
+       acc+=1;
+       }
+     else
+       {
+       acc+=0;
+       }
+     }
 
   return acc;
   }
@@ -887,7 +900,8 @@ int metropolis_fundadj(Gauge_Conf *GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        long r,
-                       int i)
+                       int i,
+                       int numhits)
   {
   #ifdef DEBUG
   if(r >= param->d_volume)
@@ -904,7 +918,7 @@ int metropolis_fundadj(Gauge_Conf *GC,
 
   GAUGE_GROUP stap[2*(STDIM-1)+1], new_link, tmp_matrix, rnd_matrix;
   double action_new, action_old, re, im;
-  int acc, count;
+  int acc, count, hits;
 
   #ifndef THETA_MODE
     calcstaples_wilson_nosum(GC, geo, param, r, i, stap);
@@ -912,64 +926,69 @@ int metropolis_fundadj(Gauge_Conf *GC,
     calcstaples_with_topo_nosum(GC, geo, param, r, i, stap);
   #endif
 
-  // compute old action
-  times(&tmp_matrix, &(GC->lattice[r][i]), &(stap[0]));
-  action_old=param->d_beta*(1.0-retr(&tmp_matrix));  // count=0 corresponds to theta term
-  for(count=1; count<2*(STDIM-1)+1; count++)
+  acc=0;
+
+  for(hits=0; hits<numhits; hits++)
      {
-     times(&tmp_matrix, &(GC->lattice[r][i]), &(stap[count]));
-     re=retr(&tmp_matrix);
-     im=imtr(&tmp_matrix);
+     // compute old action
+     times(&tmp_matrix, &(GC->lattice[r][i]), &(stap[0]));
+     action_old=param->d_beta*(1.0-retr(&tmp_matrix));  // count=0 corresponds to theta term
+     for(count=1; count<2*(STDIM-1)+1; count++)
+        {
+        times(&tmp_matrix, &(GC->lattice[r][i]), &(stap[count]));
+        re=retr(&tmp_matrix);
+        im=imtr(&tmp_matrix);
 
-     action_old+=param->d_beta*(1.0-re);
-     #if NCOLOR!=1
-       action_old+=param->d_adjbeta*(1.0-(NCOLOR*NCOLOR*(re*re+im*im)-1.0)/(NCOLOR*NCOLOR-1));
-     #else
-       (void) im; // just to avoid warnings
-     #endif
+        action_old+=param->d_beta*(1.0-re);
+        #if NCOLOR!=1
+          action_old+=param->d_adjbeta*(1.0-(NCOLOR*NCOLOR*(re*re+im*im)-1.0)/(NCOLOR*NCOLOR-1));
+        #else
+          (void) im; // just to avoid warnings
+        #endif
+        }
+
+     // compute the new link
+     one(&tmp_matrix);
+     rand_matrix(&rnd_matrix);
+     times_equal_real(&rnd_matrix, param->d_epsilon_metro);
+     plus_equal(&rnd_matrix, &tmp_matrix);
+     unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
+     if(casuale()<0.5)
+       {
+       times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+       }
+     else
+       {
+       times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
+       }
+
+     // new action
+     times(&tmp_matrix, &new_link, &(stap[0]));
+     action_new=param->d_beta*(1.0-retr(&tmp_matrix));   // count=0 corresponds to theta term
+     for(count=1; count<2*(STDIM-1)+1; count++)
+        {
+        times(&tmp_matrix, &new_link, &(stap[count]));
+        re=retr(&tmp_matrix);
+        im=imtr(&tmp_matrix);
+
+        action_new+=param->d_beta*(1.0-re);
+        #if NCOLOR!=1
+          action_new+=param->d_adjbeta*(1.0-(NCOLOR*NCOLOR*(re*re+im*im)-1.0)/(NCOLOR*NCOLOR-1));
+        #else
+          (void) im; // just to avoid warnings
+        #endif
+        }
+
+     if(casuale()< exp(action_old-action_new))
+       {
+       equal(&(GC->lattice[r][i]), &new_link);
+       acc+=1;
+       }
+     else
+       {
+       acc+=0;
+       }
      }
-
-  // compute the new link
-  one(&tmp_matrix);
-  rand_matrix(&rnd_matrix);
-  times_equal_real(&rnd_matrix, param->d_epsilon_metro);
-  plus_equal(&rnd_matrix, &tmp_matrix);
-  unitarize(&rnd_matrix);   // rnd_matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
-  if(casuale()<0.5)
-    {
-    times(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
-    }
-  else
-    {
-    times_dag1(&new_link, &rnd_matrix, &(GC->lattice[r][i]));
-    }
-
-  // new action
-  times(&tmp_matrix, &new_link, &(stap[0]));
-  action_new=param->d_beta*(1.0-retr(&tmp_matrix));   // count=0 corresponds to theta term
-  for(count=1; count<2*(STDIM-1)+1; count++)
-     {
-     times(&tmp_matrix, &new_link, &(stap[count]));
-     re=retr(&tmp_matrix);
-     im=imtr(&tmp_matrix);
-
-     action_new+=param->d_beta*(1.0-re);
-     #if NCOLOR!=1
-       action_new+=param->d_adjbeta*(1.0-(NCOLOR*NCOLOR*(re*re+im*im)-1.0)/(NCOLOR*NCOLOR-1));
-     #else
-       (void) im; // just to avoid warnings
-     #endif
-     }
-
-  if(casuale()< exp(action_old-action_new))
-    {
-    equal(&(GC->lattice[r][i]), &new_link);
-    acc=1;
-    }
-  else
-    {
-    acc=0;
-    }
 
   return acc;
   }
@@ -1069,6 +1088,8 @@ void update_with_trace_def(Gauge_Conf * GC,
    long r, asum;
    int j, dir, t;
 
+   const int maxhits=5;
+
    err=posix_memalign((void**)&a, (size_t)INT_ALIGN, (size_t) param->d_space_vol * sizeof(int));
    if(err!=0)
      {
@@ -1118,7 +1139,7 @@ void update_with_trace_def(Gauge_Conf * GC,
       for(r=0; r<(param->d_space_vol)/2; r++)
          {
          long r4=sisp_and_t_to_si(geo, r, t);
-         a[r]+=metropolis_with_tracedef(GC, geo, param, r4, 0);
+         a[r]+=metropolis_with_tracedef(GC, geo, param, r4, 0, maxhits);
          }
 
       #ifdef OPENMP_MODE
@@ -1127,7 +1148,7 @@ void update_with_trace_def(Gauge_Conf * GC,
       for(r=(param->d_space_vol)/2; r<(param->d_space_vol); r++)
          {
          long r4=sisp_and_t_to_si(geo, r, t);
-         a[r]+=metropolis_with_tracedef(GC, geo, param, r4, 0);
+         a[r]+=metropolis_with_tracedef(GC, geo, param, r4, 0, maxhits);
          }
       }
 
@@ -1140,7 +1161,7 @@ void update_with_trace_def(Gauge_Conf * GC,
       asum+=(long)a[r];
       }
 
-   *acc=((double)asum)*param->d_inv_vol;
+   *acc=((double)asum)*param->d_inv_vol/(double)maxhits;
 
    // overrelax spatial links
    for(dir=1; dir<STDIM; dir++)
@@ -1196,6 +1217,7 @@ void update_fundadj(Gauge_Conf * GC,
    int err, *a;
    long r, asum;
    int dir;
+   const int maxhits=5;
 
    err=posix_memalign((void**)&a, (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(int));
    if(err!=0)
@@ -1221,7 +1243,7 @@ void update_fundadj(Gauge_Conf * GC,
       #endif
       for(r=0; r<(param->d_volume)/2; r++)
          {
-         a[r]+=metropolis_fundadj(GC, geo, param, r, dir);
+         a[r]+=metropolis_fundadj(GC, geo, param, r, dir, maxhits);
          }
 
       #ifdef OPENMP_MODE
@@ -1229,7 +1251,7 @@ void update_fundadj(Gauge_Conf * GC,
       #endif
       for(r=(param->d_volume)/2; r<(param->d_volume); r++)
          {
-         a[r]+=metropolis_fundadj(GC, geo, param, r, dir);
+         a[r]+=metropolis_fundadj(GC, geo, param, r, dir, maxhits);
          }
       }
 
@@ -1242,7 +1264,7 @@ void update_fundadj(Gauge_Conf * GC,
       asum+=(long)a[r];
       }
 
-   *acc=((double)asum)*param->d_inv_vol/STDIM;
+   *acc=((double)asum)*param->d_inv_vol/(double) STDIM/(double)maxhits;
 
    // final unitarization
    #ifdef OPENMP_MODE

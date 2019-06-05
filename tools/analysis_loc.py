@@ -48,8 +48,10 @@ if __name__=="__main__":
     return x*x
 
   # data acquisition
-  indata=np.loadtxt(infile, skiprows=50, dtype=np.float)
+  indata=np.loadtxt(infile, skiprows=1000, dtype=np.float)
   data=np.transpose(indata)     #column ordered
+
+  print(blocksize, end=' ')
 
   ris, err = jack.jackknife_for_primary(id, data[0], blocksize)
   print(ris, err, end=' ')
