@@ -417,6 +417,7 @@ LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 N_c = @N_c@
+N_higgs = @N_higgs@
 Num_levels = @Num_levels@
 Num_threads = @Num_threads@
 OBJEXT = @OBJEXT@

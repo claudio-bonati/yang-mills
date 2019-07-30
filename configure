@@ -628,6 +628,7 @@ LTLIBOBJS
 LIBOBJS
 CRYPTO_COMPILATION_FALSE
 CRYPTO_COMPILATION_TRUE
+N_higgs
 ST_dim
 Num_threads
 Num_levels
@@ -740,7 +741,8 @@ CPP
 N_c
 Num_levels
 Num_threads
-ST_dim'
+ST_dim
+N_higgs'
 
 
 # Initialize some variables set by options.
@@ -1389,6 +1391,7 @@ Some influential environment variables:
   Num_levels  the number of levels in multilevel (default 1)
   Num_threads number of threads to be used in OpenMP (default 1)
   ST_dim      spacetime dimensionality (default 4)
+  N_higgs     the number of Higgs fields (default 1)
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -4687,6 +4690,7 @@ fi
 
 
 
+
 ### DEFINE & CO
 if test x${use_openmp} = xyes; then
 
@@ -4805,6 +4809,31 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 fi
+
+if test x${N_higgs} = x; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:
+   *****
+   No chosen value for N_higgs: using the default N_higgs=1
+   *****
+   " >&5
+$as_echo "$as_me: WARNING:
+   *****
+   No chosen value for N_higgs: using the default N_higgs=1
+   *****
+   " >&2;}
+
+cat >>confdefs.h <<_ACEOF
+#define NHIGGS 1
+_ACEOF
+
+else
+
+cat >>confdefs.h <<_ACEOF
+#define NHIGGS ${N_higgs}
+_ACEOF
+
+fi
+
 
 
 ### CONDITIONALS

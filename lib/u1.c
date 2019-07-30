@@ -371,4 +371,54 @@ void times_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B);
 // trace in the adjoint rep.
 double retr_U1Adj(U1Adj * restrict A);
 
+
+// ***************** for U1Vecs
+
+
+// A=1
+void one_U1Vecs(U1Vecs * restrict A);
+
+
+// A=0
+void zero_U1Vecs(U1Vecs * restrict A);
+
+
+// *= with real number
+void times_equal_real_U1Vecs(U1Vecs * restrict A, double r);
+
+
+// norm
+double norm_U1Vecs(U1Vecs * restrict A);
+
+
+// random vector (not normalized)
+void rand_vec_U1Vecs(U1Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double p0, p1;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     p0=1.0-2.0*casuale();
+     p1=1.0-2.0*casuale();
+
+     A->comp[i] = p0 + p1*I;
+     }
+  }
+
+
+// the i-th component of v2 is multiplied by "matrix"
+// v1=matrix*v2
+void matrix_times_vector_U1Vecs(U1Vecs * restrict v1, U1 const * const restrict matrix, U1Vecs const * const restrict v2, int i);
+
+
+// tensor product of two vectors
+// Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
+void vector_tensor_vector_U1Vecs(U1 * restrict matrix, U1Vecs const * const restrict v1, U1Vecs const * const restrict v2);
+
+
 #endif

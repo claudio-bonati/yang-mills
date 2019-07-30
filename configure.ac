@@ -84,6 +84,7 @@ AC_ARG_VAR(Num_threads, number of threads to be used in OpenMP (default 1))
 
 AC_ARG_VAR(ST_dim, spacetime dimensionality (default 4))
 
+AC_ARG_VAR(N_higgs, the number of Higgs fields (default 1))
 
 
 ### DEFINE & CO
@@ -144,6 +145,18 @@ if test x${ST_dim} = x; then
 else
   AC_DEFINE_UNQUOTED(STDIM, ${ST_dim}, [Spacetime dimensionality])
 fi
+
+if test x${N_higgs} = x; then
+  AC_MSG_WARN([ 
+   *****
+   No chosen value for N_higgs: using the default N_higgs=1
+   ***** 
+   ])
+  AC_DEFINE_UNQUOTED(NHIGGS, 1, [Number of Higgs fields])
+else
+  AC_DEFINE_UNQUOTED(NHIGGS, ${N_higgs}, [Number of Higgs fields])
+fi
+
 
 
 ### CONDITIONALS

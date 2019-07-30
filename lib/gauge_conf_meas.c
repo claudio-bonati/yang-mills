@@ -292,83 +292,89 @@ void plaquette_fundadj(Gauge_Conf const * const GC,
                        double *plaqsa,
                        double *plaqta)
    {
-   long r;
-   double pfs, pft, pas, pat;
+   #if NCOLOR==1
+     fprintf(stderr, "Computing the adjoint plaquette in U(1) is meaningless (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
 
-   pfs=0.0;
-   pft=0.0;
-   pas=0.0;
-   pat=0.0;
+     // just to avoid warnings
+     (void) GC;
+     (void) geo;
+     (void) param;
+     (void) plaqsf;
+     (void) plaqtf;
+     (void) plaqsa;
+     (void) plaqta;
+   #else
+     long r;
+     double pfs, pft, pas, pat;
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : pfs) reduction(+ : pft) reduction(+ : pas) reduction(+ : pat)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
-      GAUGE_GROUP matrix;
-      double rtr, itr;
-      int i, j;
-
-      i=0;
-      for(j=1; j<STDIM; j++)
-         {
-         plaquettep_matrix(GC, geo, param, r, i, j, &matrix);
-
-         rtr=retr(&matrix);
-         itr=imtr(&matrix);
-
-         pft+=rtr;
-         #if NCOLOR!=1
-          pat+=(NCOLOR*NCOLOR*(rtr*rtr+itr*itr)-1)/(NCOLOR*NCOLOR-1);
-         #else
-          pat+=0;
-         #endif
-         }
-
-      for(i=1; i<STDIM; i++)
-         {
-         for(j=i+1; j<STDIM; j++)
-            {
-            plaquettep_matrix(GC, geo, param, r, i, j, &matrix);
-
-            rtr=retr(&matrix);
-            itr=imtr(&matrix);
-
-            pfs+=rtr;
-            #if NCOLOR!=1
-             pas+=(NCOLOR*NCOLOR*(rtr*rtr+itr*itr)-1)/(NCOLOR*NCOLOR-1);
-            #else
-             pas+=0;
-            #endif
-            }
-         }
-      }
-
-   if(STDIM>2)
-     {
-     pfs*=param->d_inv_vol;
-     pfs/=((double) (STDIM-1)*(STDIM-2)/2);
-
-     pas*=param->d_inv_vol;
-     pas/=((double) (STDIM-1)*(STDIM-2)/2);
-     }
-   else
-     {
      pfs=0.0;
+     pft=0.0;
      pas=0.0;
-     }
+     pat=0.0;
 
-   pft*=param->d_inv_vol;
-   pft/=((double) STDIM-1);
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : pfs) reduction(+ : pft) reduction(+ : pas) reduction(+ : pat)
+     #endif
+     for(r=0; r<(param->d_volume); r++)
+        {
+        GAUGE_GROUP matrix;
+        double rtr, itr;
+        int i, j;
 
-   pat*=param->d_inv_vol;
-   pat/=((double) STDIM-1);
+        i=0;
+        for(j=1; j<STDIM; j++)
+           {
+           plaquettep_matrix(GC, geo, param, r, i, j, &matrix);
 
-   *plaqsf=pfs;
-   *plaqtf=pft;
+           rtr=retr(&matrix);
+           itr=imtr(&matrix);
 
-   *plaqsa=pas;
-   *plaqta=pat;
+           pft+=rtr;
+           pat+=(NCOLOR*NCOLOR*(rtr*rtr+itr*itr)-1)/(NCOLOR*NCOLOR-1);
+           }
+
+        for(i=1; i<STDIM; i++)
+           {
+           for(j=i+1; j<STDIM; j++)
+              {
+              plaquettep_matrix(GC, geo, param, r, i, j, &matrix);
+
+              rtr=retr(&matrix);
+              itr=imtr(&matrix);
+
+              pfs+=rtr;
+              pas+=(NCOLOR*NCOLOR*(rtr*rtr+itr*itr)-1)/(NCOLOR*NCOLOR-1);
+              }
+           }
+        }
+
+     if(STDIM>2)
+       {
+       pfs*=param->d_inv_vol;
+       pfs/=((double) (STDIM-1)*(STDIM-2)/2);
+
+       pas*=param->d_inv_vol;
+       pas/=((double) (STDIM-1)*(STDIM-2)/2);
+       }
+     else
+       {
+       pfs=0.0;
+       pas=0.0;
+       }
+
+     pft*=param->d_inv_vol;
+     pft/=((double) STDIM-1);
+
+     pat*=param->d_inv_vol;
+     pat/=((double) STDIM-1);
+
+     *plaqsf=pfs;
+     *plaqtf=pft;
+
+     *plaqsa=pas;
+     *plaqta=pat;
+   #endif
    }
 
 

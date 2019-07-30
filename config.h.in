@@ -51,6 +51,9 @@
 /* Number of colors */
 #undef NCOLOR
 
+/* Number of Higgs fields */
+#undef NHIGGS
+
 /* Number of levels */
 #undef NLEVELS
 

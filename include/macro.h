@@ -4,14 +4,17 @@
 #include"../config.h"
 
 #if NCOLOR == 1
-  #define GAUGE_GROUP U1
+  #define GAUGE_GROUP     U1
   #define GAUGE_GROUP_ADJ U1Adj
+  #define GAUGE_VECS      U1Vecs
 #elif NCOLOR == 2
-  #define GAUGE_GROUP Su2
+  #define GAUGE_GROUP     Su2
   #define GAUGE_GROUP_ADJ Su2Adj
+  #define GAUGE_VECS      Su2Vecs
 #else
-  #define GAUGE_GROUP SuN
+  #define GAUGE_GROUP     SuN
   #define GAUGE_GROUP_ADJ SuNAdj
+  #define GAUGE_VECS      SuNVecs
 #endif
 
 // function to access matrix elements

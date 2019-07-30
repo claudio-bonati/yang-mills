@@ -19,6 +19,9 @@ typedef struct U1Adj {
 } U1Adj;
 // defined just to avoid errors at compile time
 
+typedef struct U1Vecs {
+     double complex comp[NHIGGS] __attribute__((aligned(DOUBLE_ALIGN)));
+} U1Vecs;
 
 
 // ***************** for U1
@@ -654,6 +657,109 @@ inline double retr_U1Adj(U1Adj * restrict A)
   {
   (void) A;
   return 0.0;
+  }
+
+
+// ***************** for U1Vecs
+
+
+// A=1
+inline void one_U1Vecs(U1Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     A->comp[i]=1.0;
+     }
+  }
+
+
+// A=0
+inline void zero_U1Vecs(U1Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     A->comp[i]=0.0;
+     }
+  }
+
+
+// *= with real number
+inline void times_equal_real_U1Vecs(U1Vecs * restrict A, double r)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     A->comp[i]*=r;
+     }
+  }
+
+
+// norm
+inline double norm_U1Vecs(U1Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double ris=0.0;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     ris+=fabs(A->comp[i])*fabs(A->comp[i]);
+     }
+
+  return ris;
+  }
+
+
+// random vector (not normalized)
+void rand_vec_U1Vecs(U1Vecs * restrict A);
+
+
+// the i-th component of v2 is multiplied by "matrix"
+// v1=matrix*v2
+inline void matrix_times_vector_U1Vecs(U1Vecs * restrict v1, U1 const * const restrict matrix, U1Vecs const * const restrict v2, int i)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  v1->comp[i]=(matrix->comp)*(v2->comp[i]);
+  }
+
+
+// tensor product of two vectors
+// Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
+inline void vector_tensor_vector_U1Vecs(U1 * restrict matrix, U1Vecs const * const restrict v1, U1Vecs const * const restrict v2)
+  {
+  int i;
+
+  zero_U1(matrix);
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     matrix->comp+=conj(v1->comp[i])*v2->comp[i];
+     }
   }
 
 
