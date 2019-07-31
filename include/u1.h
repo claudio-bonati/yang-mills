@@ -752,6 +752,12 @@ inline void matrix_times_vector_U1Vecs(U1Vecs * restrict v1, U1 const * const re
 // Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
 inline void vector_tensor_vector_U1Vecs(U1 * restrict matrix, U1Vecs const * const restrict v1, U1Vecs const * const restrict v2)
   {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
   int i;
 
   zero_U1(matrix);

@@ -414,4 +414,241 @@ void times_equal_Su2Adj(Su2Adj * restrict A, Su2Adj const * const restrict B);
 double retr_Su2Adj(Su2Adj * restrict A);
 
 
+// ***************** for Su2Vecs
+
+
+// A=1
+void one_Su2Vecs(Su2Vecs * restrict A);
+
+
+// A=0
+void zero_Su2Vecs(Su2Vecs * restrict A);
+
+
+// *= with real number
+void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r);
+
+
+// norm
+double norm_Su2Vecs(Su2Vecs * restrict A);
+
+
+// random vector (not normalized)
+void rand_vec_Su2Vecs(Su2Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double p0, p1;
+
+  for(i=0; i<4*NHIGGS; i++)
+     {
+     p0=1.0-2.0*casuale();
+     p1=1.0-2.0*casuale();
+
+     A->comp[i] = p0 + p1*I;
+     }
+  }
+
+
+// the i-th component of v2 is multiplied by "matrix"
+// v1=matrix*v2
+void matrix_times_vector_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2, int i);
+
+
+// tensor product of two vectors
+// Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
+void vector_tensor_vector_Su2Vecs(Su2 * restrict matrix, Su2Vecs const * const restrict v1, Su2Vecs const * const restrict v2);
+
+
+// print on file
+int print_on_file_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A)
+  {
+  int i, err;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     err=fprintf(fp, "%.16lf %.16lf %.16lf %.16lf\n", A->comp[4*i+0], A->comp[4*i+1], A->comp[4*i+2], A->comp[4*i+3]);
+
+     if(err<0)
+       {
+       fprintf(stderr, "Problem in writing on a file a Su2 vector (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     }
+
+  return 0;
+  }
+
+
+// print on binary file without changing endiannes
+int print_on_binary_file_noswap_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A)
+  {
+  int i;
+  size_t err;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     err =fwrite(&(A->comp[4*i+0]), sizeof(double), 1, fp);
+     err+=fwrite(&(A->comp[4*i+1]), sizeof(double), 1, fp);
+     err+=fwrite(&(A->comp[4*i+2]), sizeof(double), 1, fp);
+     err+=fwrite(&(A->comp[4*i+3]), sizeof(double), 1, fp);
+
+     if(err!=4)
+       {
+       fprintf(stderr, "Problem in binary writing on a file a Su2 vector (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     }
+
+  return 0;
+  }
+
+
+// print on binary file changing endiannes
+int print_on_binary_file_swap_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A)
+  {
+  int i;
+  double tmp;
+  size_t err;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     tmp=A->comp[4*i+0];
+     SwapBytesDouble(&tmp);
+     err=fwrite(&(tmp), sizeof(double), 1, fp);
+
+     tmp=A->comp[4*i+1];
+     SwapBytesDouble(&tmp);
+     err+=fwrite(&(tmp), sizeof(double), 1, fp);
+
+     tmp=A->comp[4*i+2];
+     SwapBytesDouble(&tmp);
+     err+=fwrite(&(tmp), sizeof(double), 1, fp);
+
+     tmp=A->comp[4*i+3];
+     SwapBytesDouble(&tmp);
+     err+=fwrite(&(tmp), sizeof(double), 1, fp);
+
+     if(err!=4)
+       {
+       fprintf(stderr, "Problem in binary writing on a file a Su2 vector (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     }
+
+  return 0;
+  }
+
+
+// print on binary file in big endian format
+int print_on_binary_file_bigen_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A)
+  {
+  int err;
+
+  if(endian()==0) // little endian machine
+    {
+    err=print_on_binary_file_swap_Su2Vecs(fp, A);
+    }
+  else
+    {
+    err=print_on_binary_file_noswap_Su2Vecs(fp, A);
+    }
+  return err;
+  }
+
+
+// read from file
+int read_from_file_Su2Vecs(FILE *fp, Su2Vecs * restrict A)
+  {
+  int i, err;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     err=fscanf(fp, "%lg %lg %lg %lg", &(A->comp[4*i+0]), &(A->comp[4*i+1]), &(A->comp[4*i+2]), &(A->comp[4*i+3]));
+
+     if(err!=4)
+       {
+       fprintf(stderr, "Problems reading Su2 vector from file (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     }
+
+  return 0;
+  }
+
+
+// read from binary file without changing endiannes
+int read_from_binary_file_noswap_Su2Vecs(FILE *fp, Su2Vecs * restrict A)
+  {
+  int i;
+  size_t err;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     err =fread(&(A->comp[4*i+0]), sizeof(double), 1, fp);
+     err+=fread(&(A->comp[4*i+1]), sizeof(double), 1, fp);
+     err+=fread(&(A->comp[4*i+2]), sizeof(double), 1, fp);
+     err+=fread(&(A->comp[4*i+3]), sizeof(double), 1, fp);
+
+     if(err!=4)
+       {
+       fprintf(stderr, "Problems reading Su2 vector from file (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     }
+
+  return 0;
+  }
+
+
+// read from binary file changing endiannes
+int read_from_binary_file_swap_Su2Vecs(FILE *fp, Su2Vecs * restrict A)
+  {
+  int i;
+  size_t err;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     err =fread(&(A->comp[4*i+0]), sizeof(double), 1, fp);
+     err+=fread(&(A->comp[4*i+1]), sizeof(double), 1, fp);
+     err+=fread(&(A->comp[4*i+2]), sizeof(double), 1, fp);
+     err+=fread(&(A->comp[4*i+3]), sizeof(double), 1, fp);
+
+     if(err!=4)
+       {
+       fprintf(stderr, "Problems reading Su2 vector from file (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+
+     SwapBytesDouble((void *)&(A->comp[4*i+0]));
+     SwapBytesDouble((void *)&(A->comp[4*i+1]));
+     SwapBytesDouble((void *)&(A->comp[4*i+2]));
+     SwapBytesDouble((void *)&(A->comp[4*i+3]));
+     }
+
+  return 0;
+  }
+
+
+// read from binary file written in big endian
+int read_from_binary_file_bigen_Su2Vecs(FILE *fp, Su2Vecs * restrict A)
+  {
+  int err;
+
+  if(endian()==0) // little endian machine
+    {
+    err=read_from_binary_file_swap_Su2Vecs(fp, A);
+    }
+  else
+    {
+    err=read_from_binary_file_noswap_Su2Vecs(fp, A);
+    }
+
+  return err;
+  }
+
+
 #endif

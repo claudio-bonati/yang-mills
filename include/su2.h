@@ -22,6 +22,18 @@ typedef struct Su2Adj {
      double comp[9] __attribute__((aligned(DOUBLE_ALIGN)));
 } Su2Adj;
 
+// a complex 2-vector \Phi = (\phi_1+i\phi_2, \phi_3+i\phi_4) can be conveniently rewritten as a 2x2 matrix \varphi
+// by using the auxilliary vector \tilde{\Phi}=i\sigma_2\Phi and
+// \varphi=( \tilde{\Phi} | \Phi ) = \phi_3 Id + i\sigma_1\phi_2 +i\sigma_2\phi_1-i\sigma_3\phi_4
+// It is not difficult to show that
+// \tilde{U\Phi} = U \tilde{\Phi}
+// U\varphi=(\tilde{U\Phi}| U\Phi )
+// 2 Re (\Phi_A^{\dag} U \Phi_B) = Tr (\varphi_A^{\dag} U \varphi_B)
+
+typedef struct Su2Vecs {
+     double comp[4*NHIGGS] __attribute__((aligned(DOUBLE_ALIGN)));
+} Su2Vecs;
+
 
 // ***************** for Su2
 
@@ -957,6 +969,167 @@ inline double retr_Su2Adj(Su2Adj * restrict A)
 
   return ris/3.0;
   }
+
+
+// ***************** for Su2Vecs
+
+// A=1
+inline void one_Su2Vecs(Su2Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<4*NHIGGS; i++)
+     {
+     A->comp[i]=1.0;
+     }
+  }
+
+
+// A=0
+inline void zero_Su2Vecs(Su2Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<4*NHIGGS; i++)
+     {
+     A->comp[i]=0.0;
+     }
+  }
+
+
+// *= with real number
+inline void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<4*NHIGGS; i++)
+     {
+     A->comp[i]*=r;
+     }
+  }
+
+
+// norm
+inline double norm_Su2Vecs(Su2Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double ris=0.0;
+
+  for(i=0; i<4*NHIGGS; i++)
+     {
+     ris+=fabs(A->comp[i])*fabs(A->comp[i]);
+     }
+
+  return ris;
+  }
+
+
+// random vector (not normalized)
+void rand_vec_Su2Vecs(Su2Vecs * restrict A);
+
+
+// the i-th component of v2 is multiplied by "matrix"
+// v1=matrix*v2
+inline void matrix_times_vector_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2, int i)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int j;
+  Su2 aux1, aux2;
+
+  for(j=0; j<4; j++)
+     {
+     aux2.comp[j]=v2->comp[4*i+j];
+     }
+
+  times_Su2(&aux1, matrix, &aux2);
+
+  for(j=0; j<4; j++)
+     {
+     v1->comp[j]=aux1.comp[4*i+j];
+     }
+  }
+
+
+// tensor product of two vectors
+// Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
+inline void vector_tensor_vector_Su2Vecs(Su2 * restrict matrix, Su2Vecs const * const restrict v1, Su2Vecs const * const restrict v2)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j;
+  Su2 aux1, aux2, aux3;
+
+  zero_Su2(matrix);
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<4; j++)
+        {
+        aux1.comp[j]=v1->comp[4*i+j];
+        aux2.comp[j]=v2->comp[4*i+j];
+        }
+     times_dag2_Su2(&aux3, &aux2, &aux1);
+     plus_equal_Su2(matrix, &aux3);
+     }
+  }
+
+
+// print on file
+int print_on_file_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A);
+
+
+// print on binary file without changing endiannes
+int print_on_binary_file_noswap_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A);
+
+
+// print on binary file changing endiannes
+int print_on_binary_file_swap_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A);
+
+
+// print on binary file in big endian format
+int print_on_binary_file_bigen_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A);
+
+
+// read from file
+int read_from_file_Su2Vecs(FILE *fp, Su2Vecs * restrict A);
+
+
+// read from binary file without changing endiannes
+int read_from_binary_file_noswap_Su2Vecs(FILE *fp, Su2Vecs * restrict A);
+
+
+// read from binary file changing endiannes
+int read_from_binary_file_swap_Su2Vecs(FILE *fp, Su2Vecs * restrict A);
+
+
+// read from binary file written in big endian
+int read_from_binary_file_bigen_Su2Vecs(FILE *fp, Su2Vecs * restrict A);
+
 
 
 #endif
