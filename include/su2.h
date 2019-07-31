@@ -1094,8 +1094,11 @@ inline void vector_tensor_vector_Su2Vecs(Su2 * restrict matrix, Su2Vecs const * 
         aux2.comp[j]=v2->comp[4*i+j];
         }
      times_dag2_Su2(&aux3, &aux2, &aux1);
+
      plus_equal_Su2(matrix, &aux3);
      }
+
+  times_equal_real_Su2(matrix, 0.5);
   }
 
 

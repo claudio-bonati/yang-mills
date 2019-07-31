@@ -28,6 +28,10 @@ typedef struct SuNAdj {
 //  the element [i][j] can be obtained by matrix.comp[madj(i,j)] with madj(i,j) defined in macro.h
 //
 
+typedef struct SuNVecs {
+   double complex comp[NCOLOR*NHIGGS] __attribute__((aligned(DOUBLE_ALIGN)));
+} SuNVecs;
+
 
 // ***************** for SuN
 
@@ -1166,6 +1170,166 @@ inline double retr_SuNAdj(SuNAdj * restrict A)
 
   return ris;
   }
+
+
+// ***************** for SuNVecs
+
+
+// A=1
+inline void one_SuNVecs(SuNVecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]=1.0;
+     }
+  }
+
+
+// A=0
+inline void zero_SuNVecs(SuNVecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]=0.0;
+     }
+  }
+
+
+// *= with real number
+inline void times_equal_real_SuNVecs(SuNVecs * restrict A, double r)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]*=r;
+     }
+  }
+
+
+// norm
+inline double norm_SuNVecs(SuNVecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double ris=0.0;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     ris+=fabs(A->comp[i])*fabs(A->comp[i]);
+     }
+
+  return ris;
+  }
+
+
+// random vector (not normalized)
+void rand_vec_SuNVecs(SuNVecs * restrict A);
+
+
+// the i-th component of v2 is multiplied by "matrix"
+// v1=matrix*v2
+inline void matrix_times_vector_SuNVecs(SuNVecs * restrict v1, SuN const * const restrict matrix, SuNVecs const * const restrict v2, int i)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int j, k;
+
+  for(j=0; j<NCOLOR; j++)
+     {
+     v1->comp[NCOLOR*i+j]=0;
+     }
+
+  for(j=0; j<NCOLOR; j++)
+     {
+     for(k=0; k<NCOLOR; k++)
+        {
+        v1->comp[NCOLOR*i+j] += matrix->comp[m(j,k)] * v2->comp[NCOLOR*i+k];
+        }
+     }
+  }
+
+
+// tensor product of two vectors
+// Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
+inline void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * const restrict v1, SuNVecs const * const restrict v2)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j, k;
+
+  zero_SuN(matrix);
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        for(k=0; k<NCOLOR; k++)
+           {
+           matrix->comp[m(j,k)]+=v2->comp[NCOLOR*i+j]*conj(v1->comp[NCOLOR*i+k]);
+           }
+        }
+     }
+  }
+
+
+// print on file
+int print_on_file_SuNVecs(FILE *fp, SuNVecs const * const A);
+
+
+// print on binary file without changing endiannes
+int print_on_binary_file_noswap_SuNVecs(FILE *fp, SuNVecs const * const A);
+
+
+// print on binary file changing endiannes
+int print_on_binary_file_swap_SuNVecs(FILE *fp, SuNVecs const * const A);
+
+
+// print on binary file in bigendian
+int print_on_binary_file_bigen_SuNVecs(FILE *fp, SuNVecs const * const A);
+
+
+// read from file
+int read_from_file_SuNVecs(FILE *fp, SuNVecs *A);
+
+
+// read from binary file without changing endiannes
+int read_from_binary_file_noswap_SuNVecs(FILE *fp, SuNVecs *A);
+
+
+// read from binary file changing endianness
+int read_from_binary_file_swap_SuNVecs(FILE *fp, SuNVecs *A);
+
+
+// read from binary file written in bigendian
+int read_from_binary_file_bigen_SuNVecs(FILE *fp, SuNVecs *A);
 
 
 #endif

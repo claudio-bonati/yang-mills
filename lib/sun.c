@@ -674,4 +674,270 @@ void times_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restrict B);
 double retr_SuNAdj(SuNAdj * restrict A);
 
 
+// ***************** for SuNVecs
+
+
+// A=1
+void one_SuNVecs(SuNVecs * restrict A);
+
+
+// A=0
+void zero_SuNVecs(SuNVecs * restrict A);
+
+
+// *= with real number
+void times_equal_real_SuNVecs(SuNVecs * restrict A, double r);
+
+
+// norm
+double norm_SuNVecs(SuNVecs * restrict A);
+
+
+// random vector (not normalized)
+void rand_vec_SuNVecs(SuNVecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double p0, p1;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     p0=1.0-2.0*casuale();
+     p1=1.0-2.0*casuale();
+
+     A->comp[i] = p0 + p1*I;
+     }
+  }
+
+
+// the i-th component of v2 is multiplied by "matrix"
+// v1=matrix*v2
+void matrix_times_vector_SuNVecs(SuNVecs * restrict v1, SuN const * const restrict matrix, SuNVecs const * const restrict v2, int i);
+
+
+// tensor product of two vectors
+// Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
+void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * const restrict v1, SuNVecs const * const restrict v2);
+
+
+// print on file
+int print_on_file_SuNVecs(FILE *fp, SuNVecs const * const A)
+  {
+  int i, j, err;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        err=fprintf(fp, "%.16f %.16f ", creal(A->comp[NCOLOR*i+j]), cimag(A->comp[NCOLOR*i+j]));
+        if(err<0)
+          {
+          fprintf(stderr, "Problem in writing on file a SuN vector (%s, %d)\n", __FILE__, __LINE__);
+          return 1;
+          }
+        }
+     }
+  fprintf(fp, "\n");
+
+  return 0;
+  }
+
+
+// print on binary file without changing endiannes
+int print_on_binary_file_noswap_SuNVecs(FILE *fp, SuNVecs const * const A)
+  {
+  int i, j;
+  size_t err;
+  double re, im;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        re=creal(A->comp[NCOLOR*i+j]);
+        im=cimag(A->comp[NCOLOR*i+j]);
+
+        err=fwrite(&re, sizeof(double), 1, fp);
+        if(err!=1)
+          {
+          fprintf(stderr, "Problem in binary writing on file a SuN vector (%s, %d)\n", __FILE__, __LINE__);
+          return 1;
+          }
+        err=fwrite(&im, sizeof(double), 1, fp);
+        if(err!=1)
+          {
+          fprintf(stderr, "Problem in binary writing on file a SuN vector (%s, %d)\n", __FILE__, __LINE__);
+          return 1;
+          }
+        }
+     }
+
+  return 0;
+  }
+
+
+// print on binary file changing endiannes
+int print_on_binary_file_swap_SuNVecs(FILE *fp, SuNVecs const * const A)
+  {
+  int i, j;
+  size_t err;
+  double re, im;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        re=creal(A->comp[NCOLOR*i+j]);
+        im=cimag(A->comp[NCOLOR*i+j]);
+
+        SwapBytesDouble(&re);
+        SwapBytesDouble(&im);
+
+        err=fwrite(&re, sizeof(double), 1, fp);
+        if(err!=1)
+          {
+          fprintf(stderr, "Problem in binary writing on file a SuN vector (%s, %d)\n", __FILE__, __LINE__);
+          return 1;
+          }
+        err=fwrite(&im, sizeof(double), 1, fp);
+        if(err!=1)
+          {
+          fprintf(stderr, "Problem in binary writing on file a SuN vector (%s, %d)\n", __FILE__, __LINE__);
+          return 1;
+          }
+        }
+     }
+
+  return 0;
+  }
+
+
+// print on binary file in bigendian
+int print_on_binary_file_bigen_SuNVecs(FILE *fp, SuNVecs const * const A)
+  {
+  int err;
+
+  if(endian()==0) // little endian machine
+    {
+    err=print_on_binary_file_swap_SuNVecs(fp, A);
+    }
+  else
+    {
+    err=print_on_binary_file_noswap_SuNVecs(fp, A);
+    }
+
+  return err;
+  }
+
+
+// read from file
+int read_from_file_SuNVecs(FILE *fp, SuNVecs *A)
+  {
+  int i, j, err;
+  double re, im;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        err=fscanf(fp, "%lg %lg", &re, &im);
+        if(err!=2)
+          {
+          fprintf(stderr, "Problems reading SuN vector from file (%s, %d)\n", __FILE__, __LINE__);
+          return 1;
+          }
+        A->comp[NCOLOR*i+j]=re+im*I;
+        }
+     }
+  return 0;
+  }
+
+
+// read from binary file without changing endiannes
+int read_from_binary_file_noswap_SuNVecs(FILE *fp, SuNVecs *A)
+  {
+  size_t err;
+  int i, j;
+  double re, im;
+  double aux[2];
+
+  err=0;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        err+=fread(&re, sizeof(double), 1, fp);
+        err+=fread(&im, sizeof(double), 1, fp);
+        aux[0]=re;
+        aux[1]=im;
+
+        memcpy((void *)&(A->comp[NCOLOR*i+j]), (void*)aux, sizeof(aux));
+        }
+     }
+
+  if(err!=2*NHIGGS*NCOLOR)
+    {
+    fprintf(stderr, "Problems reading SuN vector from file (%s, %d)\n", __FILE__, __LINE__);
+    return 1;
+    }
+
+  return 0;
+  }
+
+
+// read from binary file changing endianness
+int read_from_binary_file_swap_SuNVecs(FILE *fp, SuNVecs *A)
+  {
+  int i, j;
+  size_t err;
+  double re, im;
+  double aux[2];
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        err=0;
+        err+=fread(&re, sizeof(double), 1, fp);
+        err+=fread(&im, sizeof(double), 1, fp);
+        if(err!=2)
+         {
+         fprintf(stderr, "Problems reading SuN vector from file (%s, %d)\n", __FILE__, __LINE__);
+         return 1;
+         }
+
+        SwapBytesDouble(&re);
+        SwapBytesDouble(&im);
+        aux[0]=re;
+        aux[1]=im;
+
+        memcpy((void *)&(A->comp[NCOLOR*i+j]), (void*)aux, sizeof(aux));
+        }
+     }
+  return 0;
+  }
+
+
+// read from binary file written in bigendian
+int read_from_binary_file_bigen_SuNVecs(FILE *fp, SuNVecs *A)
+  {
+  int err;
+
+  if(endian()==0) // little endian machine
+    {
+    err=read_from_binary_file_swap_SuNVecs(fp, A);
+    }
+  else
+    {
+    err=read_from_binary_file_noswap_SuNVecs(fp, A);
+    }
+
+  return err;
+  }
+
+
 #endif
