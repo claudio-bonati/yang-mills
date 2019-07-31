@@ -763,5 +763,37 @@ inline void vector_tensor_vector_U1Vecs(U1 * restrict matrix, U1Vecs const * con
   }
 
 
+// print on file
+int print_on_file_U1Vecs(FILE *fp, U1Vecs const * const A);
+
+
+// print on binary file without changing endiannes
+int print_on_binary_file_noswap_U1Vecs(FILE *fp, U1Vecs const * const A);
+
+
+// print on binary file changing endiannes
+int print_on_binary_file_swap_U1Vecs(FILE *fp, U1Vecs const * const A);
+
+
+// print on binary file in big endian format
+int print_on_binary_file_bigen_U1Vecs(FILE *fp, const U1Vecs * const A);
+
+
+// read from file
+int read_from_file_U1Vecs(FILE *fp, U1Vecs *A);
+
+
+// read from binary file without changing endiannes
+int read_from_binary_file_noswap_U1Vecs(FILE *fp, U1Vecs *A);
+
+
+// read from binary file changing endiannes
+int read_from_binary_file_swap_U1Vecs(FILE *fp, U1Vecs *A);
+
+
+// read from binary file written in big endian
+int read_from_binary_file_bigen_U1Vecs(FILE *fp, U1Vecs *A);
+
+
 #endif // U1_H
 

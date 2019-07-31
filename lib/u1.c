@@ -421,4 +421,189 @@ void matrix_times_vector_U1Vecs(U1Vecs * restrict v1, U1 const * const restrict 
 void vector_tensor_vector_U1Vecs(U1 * restrict matrix, U1Vecs const * const restrict v1, U1Vecs const * const restrict v2);
 
 
+// print on file
+int print_on_file_U1Vecs(FILE *fp, U1Vecs const * const A)
+  {
+  int i, err;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     err=fprintf(fp, "%.16lf %.16lf\n", creal(A->comp[i]), cimag(A->comp[i]));
+     if(err<0)
+       {
+       fprintf(stderr, "Problem in writing on a file a U1 vector (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     }
+
+  return 0;
+  }
+
+
+// print on binary file without changing endiannes
+int print_on_binary_file_noswap_U1Vecs(FILE *fp, U1Vecs const * const A)
+  {
+  int i;
+  size_t err=0;
+  double re, im;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     re=creal(A->comp[i]);
+     im=cimag(A->comp[i]);
+
+     err=fwrite(&re, sizeof(double), 1, fp);
+     if(err!=1)
+       {
+       fprintf(stderr, "Problem in binary writing on a file a U1 vector (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     err=fwrite(&im, sizeof(double), 1, fp);
+     if(err!=1)
+       {
+       fprintf(stderr, "Problem in binary writing on a file a U1 vector (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     }
+
+  return 0;
+  }
+
+
+// print on binary file changing endiannes
+int print_on_binary_file_swap_U1Vecs(FILE *fp, U1Vecs const * const A)
+  {
+  int i;
+  double tmp;
+  size_t err=0;
+
+  for(i=0;i<NHIGGS; i++)
+     {
+     tmp=creal(A->comp[i]);
+     SwapBytesDouble(&tmp);
+     err+=fwrite(&(tmp), sizeof(double), 1, fp);
+
+     tmp=cimag(A->comp[i]);
+     SwapBytesDouble(&tmp);
+     err+=fwrite(&(tmp), sizeof(double), 1, fp);
+
+     if(err!=2)
+       {
+       fprintf(stderr, "Problem in binary writing on a file a U1 vector (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     }
+
+  return 0;
+  }
+
+
+// print on binary file in big endian format
+int print_on_binary_file_bigen_U1Vecs(FILE *fp, const U1Vecs * const A)
+  {
+  int err;
+
+  if(endian()==0) // little endian machine
+    {
+    err=print_on_binary_file_swap_U1Vecs(fp, A);
+    }
+  else
+    {
+    err=print_on_binary_file_noswap_U1Vecs(fp, A);
+    }
+
+  return err;
+  }
+
+
+// read from file
+int read_from_file_U1Vecs(FILE *fp, U1Vecs *A)
+  {
+  double re, im;
+  int i, err;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     err=fscanf(fp, "%lg %lg", &re, &im);
+     if(err!=2)
+       {
+       fprintf(stderr, "Problems reading U1 vector from file (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     A->comp[i]=re+im*I;
+     }
+
+  return 0;
+  }
+
+
+// read from binary file without changing endiannes
+int read_from_binary_file_noswap_U1Vecs(FILE *fp, U1Vecs *A)
+  {
+  int i;
+  double re, im;
+  size_t err=0;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     err+=fread(&re, sizeof(double), 1, fp);
+     err+=fread(&im, sizeof(double), 1, fp);
+     if(err!=2)
+       {
+       fprintf(stderr, "Problems reading U1 vector from file (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+     A->comp[i]=re+I*im;
+     }
+
+  return 0;
+  }
+
+
+// read from binary file changing endiannes
+int read_from_binary_file_swap_U1Vecs(FILE *fp, U1Vecs *A)
+  {
+  int i;
+  double re, im;
+  size_t err=0;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     err+=fread(&re, sizeof(double), 1, fp);
+     err+=fread(&im, sizeof(double), 1, fp);
+
+     if(err!=2)
+       {
+       fprintf(stderr, "Problems reading U1 vector from file (%s, %d)\n", __FILE__, __LINE__);
+       return 1;
+       }
+
+     SwapBytesDouble((void *)&re);
+     SwapBytesDouble((void *)&im);
+
+     A->comp[i]=re+I*im;
+     }
+
+  return 0;
+  }
+
+
+// read from binary file written in big endian
+int read_from_binary_file_bigen_U1Vecs(FILE *fp, U1Vecs *A)
+  {
+  int err;
+
+  if(endian()==0) // little endian machine
+    {
+    err=read_from_binary_file_swap_U1Vecs(fp, A);
+    }
+  else
+    {
+    err=read_from_binary_file_noswap_U1Vecs(fp, A);
+    }
+
+  return err;
+  }
+
+
 #endif
