@@ -10,4 +10,7 @@ void single_heatbath_aux_SuN(SuN *link, SuN const * const staple, double beta);
 void single_overrelaxation_SuN(SuN *link, SuN const * const staple);
 void cool_SuN(SuN *link, SuN const * const staple);
 
+void single_overrelaxation_SuNVecs(SuNVecs *restrict link, SuNVecs const * const staple);
+
+
 #endif

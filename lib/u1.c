@@ -383,12 +383,24 @@ void one_U1Vecs(U1Vecs * restrict A);
 void zero_U1Vecs(U1Vecs * restrict A);
 
 
+// A=B
+void equal_U1Vecs(U1Vecs * restrict A, U1Vecs const * const restrict B);
+
+
+// A -> A^{dag}
+void conjugate_U1Vecs(U1Vecs * restrict A);
+
+
+// A-=B
+void minus_equal_U1Vecs(U1Vecs * restrict A, U1Vecs const * const restrict B);
+
+
 // *= with real number
 void times_equal_real_U1Vecs(U1Vecs * restrict A, double r);
 
 
 // norm
-double norm_U1Vecs(U1Vecs * restrict A);
+double norm_U1Vecs(U1Vecs const * const restrict A);
 
 
 // normalize

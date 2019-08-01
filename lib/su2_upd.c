@@ -118,6 +118,7 @@ void single_overrelaxation_Su2(Su2 *link, Su2 const * const staple)
       }
     }
 
+
 // cooling
 void cool_Su2(Su2 *link, Su2 const * const staple)
     {
@@ -128,6 +129,24 @@ void cool_Su2(Su2 *link, Su2 const * const staple)
 
     equal_dag_Su2(link, &matrix1);  // link=matrix1^{dag}
     }
+
+
+void single_overrelaxation_Su2Vecs(Su2Vecs *restrict link, Su2Vecs const * const staple)
+  {
+  Su2Vecs newlink;
+  double norm, scalprod;
+
+  norm=norm_Su2Vecs(staple);
+  scalprod=re_scal_prod_Su2Vecs(link, staple);
+
+  equal_Su2Vecs(&newlink, staple);
+  times_equal_real_Su2Vecs(&newlink, 2.0*scalprod/norm/norm);
+  minus_equal_Su2Vecs(&newlink, link);
+
+  equal_Su2Vecs(link, &newlink);
+  }
+
+
 
 
 #endif

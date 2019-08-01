@@ -425,12 +425,24 @@ void one_Su2Vecs(Su2Vecs * restrict A);
 void zero_Su2Vecs(Su2Vecs * restrict A);
 
 
+// A=B
+void equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B);
+
+
+// A -> A^{dag}
+void conjugate_Su2Vecs(Su2Vecs * restrict A);
+
+
+// A-=B
+void minus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B);
+
+
 // *= with real number
 void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r);
 
 
 // norm
-double norm_Su2Vecs(Su2Vecs * restrict A);
+double norm_Su2Vecs(Su2Vecs const * const restrict A);
 
 
 // normalize

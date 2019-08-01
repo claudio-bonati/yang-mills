@@ -88,9 +88,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = conf_check$(EXEEXT) debug_rng$(EXEEXT) \
 	debug_su2$(EXEEXT) debug_su2_adj$(EXEEXT) debug_sun$(EXEEXT) \
-	debug_u1$(EXEEXT) yang_mills_local$(EXEEXT) \
-	yang_mills_local_fundadj$(EXEEXT) yang_mills_polycorr$(EXEEXT) \
-	yang_mills_polycorr_long$(EXEEXT) \
+	debug_u1$(EXEEXT) debug_vecs$(EXEEXT) \
+	yang_mills_local$(EXEEXT) yang_mills_local_fundadj$(EXEEXT) \
+	yang_mills_polycorr$(EXEEXT) yang_mills_polycorr_long$(EXEEXT) \
 	yang_mills_polycorradj$(EXEEXT) \
 	yang_mills_polycorradj_long$(EXEEXT) yang_mills_t0$(EXEEXT) \
 	yang_mills_tracedef$(EXEEXT) yang_mills_tube_conn$(EXEEXT) \
@@ -155,6 +155,12 @@ am_debug_u1_OBJECTS = ./src/debug_u1.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_6) $(am__objects_9)
 debug_u1_OBJECTS = $(am_debug_u1_OBJECTS)
 debug_u1_LDADD = $(LDADD)
+am_debug_vecs_OBJECTS = ./src/debug_vecs.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9)
+debug_vecs_OBJECTS = $(am_debug_vecs_OBJECTS)
+debug_vecs_LDADD = $(LDADD)
 am__objects_10 = ./lib/gauge_conf_def.$(OBJEXT) \
 	./lib/gauge_conf_meas.$(OBJEXT) \
 	./lib/gauge_conf_multilevel.$(OBJEXT) \
@@ -307,7 +313,7 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
-	$(debug_sun_SOURCES) $(debug_u1_SOURCES) \
+	$(debug_sun_SOURCES) $(debug_u1_SOURCES) $(debug_vecs_SOURCES) \
 	$(yang_mills_local_SOURCES) \
 	$(yang_mills_local_fundadj_SOURCES) \
 	$(yang_mills_polycorr_SOURCES) \
@@ -323,7 +329,7 @@ SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(yang_mills_tubeadj_disc_long_SOURCES)
 DIST_SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
-	$(debug_sun_SOURCES) $(debug_u1_SOURCES) \
+	$(debug_sun_SOURCES) $(debug_u1_SOURCES) $(debug_vecs_SOURCES) \
 	$(yang_mills_local_SOURCES) \
 	$(yang_mills_local_fundadj_SOURCES) \
 	$(yang_mills_polycorr_SOURCES) \
@@ -592,6 +598,18 @@ debug_u1_SOURCES = ./src/debug_u1.c \
                   ./include/macro.h \
                   $(random) \
                   $(u1)
+
+debug_vecs_SOURCES = ./src/debug_vecs.c \
+                   $(align) \
+                   $(dSFMT) \
+                   $(endian) \
+                   $(funcpoint) \
+                   $(gparam) \
+                   ./include/macro.h \
+                   $(random) \
+                   $(su2) \
+                   $(sun) \
+                   $(u1)
 
 yang_mills_local_SOURCES = ./src/yang_mills_local.c \
                           $(align) \
@@ -971,6 +989,12 @@ debug_sun$(EXEEXT): $(debug_sun_OBJECTS) $(debug_sun_DEPENDENCIES) $(EXTRA_debug
 debug_u1$(EXEEXT): $(debug_u1_OBJECTS) $(debug_u1_DEPENDENCIES) $(EXTRA_debug_u1_DEPENDENCIES) 
 	@rm -f debug_u1$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_u1_OBJECTS) $(debug_u1_LDADD) $(LIBS)
+./src/debug_vecs.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+debug_vecs$(EXEEXT): $(debug_vecs_OBJECTS) $(debug_vecs_DEPENDENCIES) $(EXTRA_debug_vecs_DEPENDENCIES) 
+	@rm -f debug_vecs$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(debug_vecs_OBJECTS) $(debug_vecs_LDADD) $(LIBS)
 ./src/yang_mills_local.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 ./lib/gauge_conf_def.$(OBJEXT): lib/$(am__dirstamp) \
@@ -1104,6 +1128,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2_adj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_sun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_u1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_vecs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_local.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_local_fundadj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr.Po@am__quote@

@@ -14,6 +14,7 @@
 #include"u1.h"
 #include"u1_upd.h"
 
+
 void (*one)(GAUGE_GROUP *A);         // A=1
 void (*zero)(GAUGE_GROUP *A);        // A=0
 
@@ -101,5 +102,35 @@ double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A);
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param);
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple);
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple);
+
+void (*one_vecs)(GAUGE_VECS * restrict A);
+void (*zero_vecs)(GAUGE_VECS * restrict A);
+
+void (*equal_vecs)(GAUGE_VECS * restrict A,
+                   GAUGE_VECS const * const restrict B);
+void (*conjugate_vecs)(GAUGE_VECS * restrict A);
+void (*minus_equal_vecs)(GAUGE_VECS * restrict A,
+                         GAUGE_VECS const * const restrict B);
+void (*times_equal_real_vecs)(GAUGE_VECS * restrict A, double r);
+double (*norm_vecs)(GAUGE_VECS const * const restrict A);
+void (*normalize_vecs)(GAUGE_VECS * restrict A);
+
+void (*rand_vecs)(GAUGE_VECS * restrict A);
+
+double (*re_scal_prod_vecs)(GAUGE_VECS const * const restrict v1,
+                            GAUGE_VECS const * const restrict v2);
+void (*matrix_times_vector_vecs)(GAUGE_VECS * restrict v1,
+                                 GAUGE_GROUP const * const restrict matrix,
+                                 GAUGE_VECS const * const restrict v2, int i);
+void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix,
+                                  GAUGE_VECS const * const restrict v1,
+                                  GAUGE_VECS const * const restrict v2);
+
+int (*print_on_file_vecs)(FILE *fp, GAUGE_VECS const * const A);
+int (*print_on_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS const * const A);
+int (*read_from_file_vecs)(FILE *fp, GAUGE_VECS *A);
+int (*read_from_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS *A);
+
+void (*single_overrelaxation_vecs)(GAUGE_VECS *restrict link, GAUGE_VECS const * const staple);
 
 #endif

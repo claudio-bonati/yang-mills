@@ -695,6 +695,56 @@ inline void zero_U1Vecs(U1Vecs * restrict A)
   }
 
 
+// A=B
+inline void equal_U1Vecs(U1Vecs * restrict A, U1Vecs const * const restrict B)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     A->comp[i]=B->comp[i];
+     }
+  }
+
+
+// A -> A^{dag}
+inline void conjugate_U1Vecs(U1Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     A->comp[i]=conj(A->comp[i]);
+     }
+  }
+
+
+// A-=B
+inline void minus_equal_U1Vecs(U1Vecs * restrict A, U1Vecs const * const restrict B)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     A->comp[i]-=B->comp[i];
+     }
+  }
+
+
 // *= with real number
 inline void times_equal_real_U1Vecs(U1Vecs * restrict A, double r)
   {
@@ -712,7 +762,7 @@ inline void times_equal_real_U1Vecs(U1Vecs * restrict A, double r)
 
 
 // norm
-inline double norm_U1Vecs(U1Vecs * restrict A)
+inline double norm_U1Vecs(U1Vecs const * const restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -723,7 +773,7 @@ inline double norm_U1Vecs(U1Vecs * restrict A)
 
   for(i=0; i<NHIGGS; i++)
      {
-     ris+=fabs(A->comp[i])*fabs(A->comp[i]);
+     ris+=cabs(A->comp[i])*cabs(A->comp[i]);
      }
 
   return sqrt(ris);
@@ -760,7 +810,7 @@ inline double re_scal_prod_U1Vecs(U1Vecs const * const restrict v1, U1Vecs const
 
   for(i=0; i<NHIGGS; i++)
      {
-     ris+=creal( conj(v1->comp[i])*v2->comp[i] );
+     ris+=creal( conj(v1->comp[i]) * v2->comp[i] );
      }
 
   return ris;
@@ -776,6 +826,8 @@ inline void matrix_times_vector_U1Vecs(U1Vecs * restrict v1, U1 const * const re
   __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
   __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
   #endif
+
+  equal_U1Vecs(v1, v2);
 
   v1->comp[i]=(matrix->comp)*(v2->comp[i]);
   }

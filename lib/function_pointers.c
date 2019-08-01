@@ -76,6 +76,30 @@ void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GPa
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_U1;
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_U1;
 
+void (*one_vecs)(GAUGE_VECS * restrict A)=&one_U1Vecs;
+void (*zero_vecs)(GAUGE_VECS * restrict A)=&zero_U1Vecs;
+
+void (*equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&equal_U1Vecs;
+void (*conjugate_vecs)(GAUGE_VECS * restrict A)=&conjugate_U1Vecs;
+void (*minus_equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&minus_equal_U1Vecs;
+void (*times_equal_real_vecs)(GAUGE_VECS * restrict A, double r)=&times_equal_real_U1Vecs;
+
+double (*norm_vecs)(GAUGE_VECS const * const restrict A)=&norm_U1Vecs;
+void (*normalize_vecs)(GAUGE_VECS * restrict A)=&normalize_U1Vecs;
+
+void (*rand_vecs)(GAUGE_VECS * restrict A)=&rand_vec_U1Vecs;
+
+double (*re_scal_prod_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&re_scal_prod_U1Vecs;
+void (*matrix_times_vector_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2, int i)=&matrix_times_vector_U1Vecs;
+void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix, GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&vector_tensor_vector_U1Vecs;
+
+int (*print_on_file_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_file_U1Vecs;
+int (*print_on_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_binary_file_bigen_U1Vecs;
+int (*read_from_file_vecs)(FILE *fp, GAUGE_VECS *A)=&read_from_file_U1Vecs;
+int (*read_from_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS *A)=&read_from_binary_file_bigen_U1Vecs;
+
+void (*single_overrelaxation_vecs)(GAUGE_VECS *restrict link, GAUGE_VECS const * const staple)=&single_overrelaxation_U1Vecs;
+
 #elif NCOLOR == 2
 
 void (*one)(GAUGE_GROUP *A)  = &one_Su2;
@@ -140,6 +164,30 @@ void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GPa
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_Su2;
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_Su2;
 
+void (*one_vecs)(GAUGE_VECS * restrict A)=&one_Su2Vecs;
+void (*zero_vecs)(GAUGE_VECS * restrict A)=&zero_Su2Vecs;
+
+void (*equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&equal_Su2Vecs;
+void (*conjugate_vecs)(GAUGE_VECS * restrict A)=&conjugate_Su2Vecs;
+void (*minus_equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&minus_equal_Su2Vecs;
+void (*times_equal_real_vecs)(GAUGE_VECS * restrict A, double r)=&times_equal_real_Su2Vecs;
+
+double (*norm_vecs)(GAUGE_VECS const * const restrict A)=&norm_Su2Vecs;
+void (*normalize_vecs)(GAUGE_VECS * restrict A)=&normalize_Su2Vecs;
+
+void (*rand_vecs)(GAUGE_VECS * restrict A)=&rand_vec_Su2Vecs;
+
+double (*re_scal_prod_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&re_scal_prod_Su2Vecs;
+void (*matrix_times_vector_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2, int i)=&matrix_times_vector_Su2Vecs;
+void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix, GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&vector_tensor_vector_Su2Vecs;
+
+int (*print_on_file_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_file_Su2Vecs;
+int (*print_on_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_binary_file_bigen_Su2Vecs;
+int (*read_from_file_vecs)(FILE *fp, GAUGE_VECS *A)=&read_from_file_Su2Vecs;
+int (*read_from_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS *A)=&read_from_binary_file_bigen_Su2Vecs;
+
+void (*single_overrelaxation_vecs)(GAUGE_VECS *restrict link, GAUGE_VECS const * const staple)=&single_overrelaxation_Su2Vecs;
+
 #else
 
 void (*one)(GAUGE_GROUP *A)  = &one_SuN;
@@ -203,6 +251,30 @@ double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A)=&retr_SuNAdj;
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_SuN;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_SuN;
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_SuN;
+
+void (*one_vecs)(GAUGE_VECS * restrict A)=&one_SuNVecs;
+void (*zero_vecs)(GAUGE_VECS * restrict A)=&zero_SuNVecs;
+
+void (*equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&equal_SuNVecs;
+void (*conjugate_vecs)(GAUGE_VECS * restrict A)=&conjugate_SuNVecs;
+void (*minus_equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&minus_equal_SuNVecs;
+void (*times_equal_real_vecs)(GAUGE_VECS * restrict A, double r)=&times_equal_real_SuNVecs;
+
+double (*norm_vecs)(GAUGE_VECS const * const restrict A)=&norm_SuNVecs;
+void (*normalize_vecs)(GAUGE_VECS * restrict A)=&normalize_SuNVecs;
+
+void (*rand_vecs)(GAUGE_VECS * restrict A)=&rand_vec_SuNVecs;
+
+double (*re_scal_prod_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&re_scal_prod_SuNVecs;
+void (*matrix_times_vector_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2, int i)=&matrix_times_vector_SuNVecs;
+void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix, GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&vector_tensor_vector_SuNVecs;
+
+int (*print_on_file_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_file_SuNVecs;
+int (*print_on_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_binary_file_bigen_SuNVecs;
+int (*read_from_file_vecs)(FILE *fp, GAUGE_VECS *A)=&read_from_file_SuNVecs;
+int (*read_from_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS *A)=&read_from_binary_file_bigen_SuNVecs;
+
+void (*single_overrelaxation_vecs)(GAUGE_VECS *restrict link, GAUGE_VECS const * const staple)=&single_overrelaxation_SuNVecs;
 
 #endif
 

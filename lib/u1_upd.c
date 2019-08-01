@@ -13,7 +13,7 @@
 
 
 // heatbath (see Moriarty Phys. Rev. D 25, p2185 (1982) )
-void single_heatbath_U1(U1 *link, U1 const * const staple, GParam const * const param)
+void single_heatbath_U1(U1 * restrict link, U1 const * const restrict staple, GParam const * const restrict param)
   {
   double alpha, theta, theta_staple, q, q_max, r1, r2, x;
 
@@ -51,7 +51,7 @@ void single_heatbath_U1(U1 *link, U1 const * const staple, GParam const * const 
   }
 
 
-void single_overrelaxation_U1(U1 *link, U1 const * const staple)
+void single_overrelaxation_U1(U1 * restrict link, U1 const * const restrict staple)
   {
   double p;
   U1 newlink, helper;
@@ -75,7 +75,7 @@ void single_overrelaxation_U1(U1 *link, U1 const * const staple)
   }
 
 
-void cool_U1(U1 *link, U1 const * const staple)
+void cool_U1(U1 * restrict link, U1 const * const restrict staple)
   {
   U1 aux;
 
@@ -83,6 +83,23 @@ void cool_U1(U1 *link, U1 const * const staple)
   unitarize_U1(&aux);
   equal_dag_U1(link, &aux);
   }
+
+
+void single_overrelaxation_U1Vecs(U1Vecs *restrict link, U1Vecs const * const staple)
+  {
+  U1Vecs newlink;
+  double norm, scalprod;
+
+  norm=norm_U1Vecs(staple);
+  scalprod=re_scal_prod_U1Vecs(link, staple);
+
+  equal_U1Vecs(&newlink, staple);
+  times_equal_real_U1Vecs(&newlink, 2.0*scalprod/norm/norm);
+  minus_equal_U1Vecs(&newlink, link);
+
+  equal_U1Vecs(link, &newlink);
+  }
+
 
 
 /*

@@ -1005,6 +1005,57 @@ inline void zero_Su2Vecs(Su2Vecs * restrict A)
   }
 
 
+// A=B
+inline void equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<4*NHIGGS; i++)
+     {
+     A->comp[i]=B->comp[i];
+     }
+  }
+
+
+// A -> A^{dag}
+inline void conjugate_Su2Vecs(Su2Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     A->comp[4*i+1]=-A->comp[4*i+1];
+     A->comp[4*i+3]=-A->comp[4*i+3];
+     }
+  }
+
+
+// A-=B
+inline void minus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<4*NHIGGS; i++)
+     {
+     A->comp[i]-=B->comp[i];
+     }
+  }
+
+
 // *= with real number
 inline void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r)
   {
@@ -1022,7 +1073,7 @@ inline void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r)
 
 
 // norm
-inline double norm_Su2Vecs(Su2Vecs * restrict A)
+inline double norm_Su2Vecs(Su2Vecs const * const restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1078,8 +1129,8 @@ inline double re_scal_prod_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs co
         }
 
      times_equal_dag_Su2(&aux2, &aux1);
-     ris+=0.5*retr_Su2(&aux2);  // 0.5 is due to the different normalization of matrices and vectors
-                                // see text above the definition of Su2Vecs
+     ris+=retr_Su2(&aux2);  // the 0.5 that is due to the different normalization of matrices and vectors
+                            // (see text above the definition of Su2Vecs) is not needed sing retr = trace/2
      }
 
   return ris;
@@ -1099,6 +1150,8 @@ inline void matrix_times_vector_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const
   int j;
   Su2 aux1, aux2;
 
+  equal_Su2Vecs(v1, v2);
+
   for(j=0; j<4; j++)
      {
      aux2.comp[j]=v2->comp[4*i+j];
@@ -1108,7 +1161,7 @@ inline void matrix_times_vector_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const
 
   for(j=0; j<4; j++)
      {
-     v1->comp[j]=aux1.comp[4*i+j];
+     v1->comp[4*i+j]=aux1.comp[j];
      }
   }
 

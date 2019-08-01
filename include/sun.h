@@ -1207,6 +1207,56 @@ inline void zero_SuNVecs(SuNVecs * restrict A)
   }
 
 
+// A=B
+inline void equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]=B->comp[i];
+     }
+  }
+
+
+// A -> A^{\dag}
+inline void conjugate_SuNVecs(SuNVecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]=conj(A->comp[i]);
+     }
+  }
+
+
+// A-=B
+inline void minus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]-=B->comp[i];
+     }
+  }
+
+
 // *= with real number
 inline void times_equal_real_SuNVecs(SuNVecs * restrict A, double r)
   {
@@ -1224,7 +1274,7 @@ inline void times_equal_real_SuNVecs(SuNVecs * restrict A, double r)
 
 
 // norm
-inline double norm_SuNVecs(SuNVecs * restrict A)
+inline double norm_SuNVecs(SuNVecs const * const restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1235,7 +1285,7 @@ inline double norm_SuNVecs(SuNVecs * restrict A)
 
   for(i=0; i<NCOLOR*NHIGGS; i++)
      {
-     ris+=fabs(A->comp[i])*fabs(A->comp[i]);
+     ris+=cabs(A->comp[i])*cabs(A->comp[i]);
      }
 
   return sqrt(ris);
@@ -1290,6 +1340,8 @@ inline void matrix_times_vector_SuNVecs(SuNVecs * restrict v1, SuN const * const
   #endif
 
   int j, k;
+
+  equal_SuNVecs(v1, v2);
 
   for(j=0; j<NCOLOR; j++)
      {

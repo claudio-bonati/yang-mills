@@ -685,12 +685,23 @@ void one_SuNVecs(SuNVecs * restrict A);
 void zero_SuNVecs(SuNVecs * restrict A);
 
 
+// A=B
+void equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B);
+
+
+// A -> A^{\dag}
+void conjugate_SuNVecs(SuNVecs * restrict A);
+
+// A-=B
+void minus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B);
+
+
 // *= with real number
 void times_equal_real_SuNVecs(SuNVecs * restrict A, double r);
 
 
 // norm
-double norm_SuNVecs(SuNVecs * restrict A);
+double norm_SuNVecs(SuNVecs const * const restrict A);
 
 
 // normalize
