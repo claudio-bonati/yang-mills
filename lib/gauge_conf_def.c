@@ -201,8 +201,8 @@ void free_gauge_conf(Gauge_Conf *GC, GParam const * const param)
 
 // save a configuration in ILDG-like format
 void write_conf_on_file_with_name(Gauge_Conf const * const GC,
-                            GParam const * const param,
-                            char const * const namefile)
+                                  GParam const * const param,
+                                  char const * const namefile)
   {
   long si, lex;
   int i, mu, err;

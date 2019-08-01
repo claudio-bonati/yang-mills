@@ -1238,12 +1238,45 @@ inline double norm_SuNVecs(SuNVecs * restrict A)
      ris+=fabs(A->comp[i])*fabs(A->comp[i]);
      }
 
-  return ris;
+  return sqrt(ris);
   }
 
 
-// random vector (not normalized)
+// normalize
+inline void normalize_SuNVecs(SuNVecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  double norm=norm_SuNVecs(A);
+
+  times_equal_real_SuNVecs(A, 1.0/norm);
+  }
+
+
+// random vector (normalized)
 void rand_vec_SuNVecs(SuNVecs * restrict A);
+
+
+// real part of the scalar product re(v_1^{\dag}v_2)
+inline double re_scal_prod_SuNVecs(SuNVecs const * const restrict v1, SuNVecs const * const restrict v2)
+  {
+   #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double ris=0.0;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     ris+=creal( conj(v1->comp[i]) * v2->comp[i] );
+     }
+
+  return ris;
+  }
 
 
 // the i-th component of v2 is multiplied by "matrix"

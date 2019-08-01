@@ -693,7 +693,11 @@ void times_equal_real_SuNVecs(SuNVecs * restrict A, double r);
 double norm_SuNVecs(SuNVecs * restrict A);
 
 
-// random vector (not normalized)
+// normalize
+void normalize_SuNVecs(SuNVecs * restrict A);
+
+
+// random vector (normalized)
 void rand_vec_SuNVecs(SuNVecs * restrict A)
   {
   #ifdef __INTEL_COMPILER
@@ -710,7 +714,12 @@ void rand_vec_SuNVecs(SuNVecs * restrict A)
 
      A->comp[i] = p0 + p1*I;
      }
+
+  normalize_SuNVecs(A);
   }
+
+// real part of the scalar product re(v_1^{\dag}v_2)
+double re_scal_prod_SuNVecs(SuNVecs const * const restrict v1, SuNVecs const * const restrict v2);
 
 
 // the i-th component of v2 is multiplied by "matrix"

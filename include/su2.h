@@ -1036,12 +1036,54 @@ inline double norm_Su2Vecs(Su2Vecs * restrict A)
      ris+=fabs(A->comp[i])*fabs(A->comp[i]);
      }
 
-  return ris;
+  return sqrt(ris);
   }
 
 
-// random vector (not normalized)
+// normalize
+inline void normalize_Su2Vecs(Su2Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  double norm=norm_Su2Vecs(A);
+
+  times_equal_real_Su2Vecs(A, 1.0/norm);
+  }
+
+
+// random vector (normalized)
 void rand_vec_Su2Vecs(Su2Vecs * restrict A);
+
+
+// real part of the scalar product re(v_1^{\dag}v_2)
+inline double re_scal_prod_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs const * const restrict v2)
+  {
+   #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j;
+  Su2 aux1, aux2;
+  double ris=0.0;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<4; j++)
+        {
+        aux1.comp[j]=v1->comp[4*i+j];
+        aux2.comp[j]=v2->comp[4*i+j];
+        }
+
+     times_equal_dag_Su2(&aux2, &aux1);
+     ris+=0.5*retr_Su2(&aux2);  // 0.5 is due to the different normalization of matrices and vectors
+                                // see text above the definition of Su2Vecs
+     }
+
+  return ris;
+  }
 
 
 // the i-th component of v2 is multiplied by "matrix"
@@ -1098,7 +1140,8 @@ inline void vector_tensor_vector_Su2Vecs(Su2 * restrict matrix, Su2Vecs const * 
      plus_equal_Su2(matrix, &aux3);
      }
 
-  times_equal_real_Su2(matrix, 0.5);
+  times_equal_real_Su2(matrix, 0.5);   // 0.5 is due to the different normalization of matrices and vectors
+                                       // see text above the definition of Su2Vecs
   }
 
 

@@ -726,12 +726,45 @@ inline double norm_U1Vecs(U1Vecs * restrict A)
      ris+=fabs(A->comp[i])*fabs(A->comp[i]);
      }
 
-  return ris;
+  return sqrt(ris);
   }
 
 
-// random vector (not normalized)
+// normalize
+inline void normalize_U1Vecs(U1Vecs * restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  double norm=norm_U1Vecs(A);
+
+  times_equal_real_U1Vecs(A, 1./norm);
+  }
+
+
+// random vector (normalized)
 void rand_vec_U1Vecs(U1Vecs * restrict A);
+
+
+// real part of the scalar product re(v_1^{\dag}v_2)
+inline double re_scal_prod_U1Vecs(U1Vecs const * const restrict v1, U1Vecs const * const restrict v2)
+  {
+   #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double ris=0.0;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     ris+=creal( conj(v1->comp[i])*v2->comp[i] );
+     }
+
+  return ris;
+  }
 
 
 // the i-th component of v2 is multiplied by "matrix"
