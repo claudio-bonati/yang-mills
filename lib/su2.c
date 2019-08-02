@@ -461,14 +461,12 @@ void rand_vec_Su2Vecs(Su2Vecs * restrict A)
   #endif
 
   int i;
-  double p0, p1;
+  double p0;
 
   for(i=0; i<4*NHIGGS; i++)
      {
      p0=1.0-2.0*casuale();
-     p1=1.0-2.0*casuale();
-
-     A->comp[i] = p0 + p1*I;
+     A->comp[i] = p0;
      }
 
   normalize_Su2Vecs(A);
