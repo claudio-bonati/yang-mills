@@ -5,7 +5,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#include"../include/gparam.h"
 #include"../include/macro.h"
 #include"../include/random.h"
 #include"../include/su2.h"
@@ -14,8 +13,7 @@
 int main(void)
   {
   unsigned int seme=0;
-  double energy;
-  GParam param;
+  double energy, beta;
   
   Su2 M, N, L, T, mI;
    
@@ -23,7 +21,7 @@ int main(void)
   initrand(seme);
 
   // fix a value for d_beta
-  param.d_beta=2.3;
+  beta=2.3;
     
   printf("\n*******************************\n");
   printf("PROGRAM FOR THE DEBUG OF SU(2)\n");
@@ -57,7 +55,8 @@ int main(void)
   plus_equal_Su2(&N, &L); // N+=L,  M in SU(2), N no   (M=link, N=staple)
 
   // heatbath
-  single_heatbath_Su2(&M, &N, &param);
+  times_equal_real_Su2(&N, beta);
+  single_heatbath_Su2(&M, &N);
   printf("  Heatbath ...");
   times_dag2_Su2(&T, &M, &M);
   plus_equal_Su2(&T, &mI);

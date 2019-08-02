@@ -72,7 +72,7 @@ void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r)=&times_equa
 void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&times_equal_U1Adj;
 double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A)=&retr_U1Adj;
 
-void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_U1;
+void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_heatbath_U1;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_U1;
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_U1;
 
@@ -160,7 +160,7 @@ void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r)=&times_equa
 void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&times_equal_Su2Adj;
 double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A)=&retr_Su2Adj;
 
-void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_Su2;
+void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_heatbath_Su2;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_Su2;
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_Su2;
 
@@ -248,7 +248,7 @@ void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r)=&times_equa
 void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&times_equal_SuNAdj;
 double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A)=&retr_SuNAdj;
 
-void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param) = &single_heatbath_SuN;
+void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_heatbath_SuN;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_SuN;
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &cool_SuN;
 

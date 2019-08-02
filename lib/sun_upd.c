@@ -15,7 +15,11 @@
 
 // Pseudo-heatbath by Cabibbo-Marinari (Phys. Lett. B 119, p.387 (1982)) in the implementation by
 // Kennedy, Pendleton (Phys. Lett. B 156, p.393 (1985))
-void single_heatbath_SuN(SuN *link, SuN const * const staple, GParam const * const param)
+//
+// generate link according to the distibution \exp[-(1/N_c)ReTr(link*staple)]
+// the coupling is inside the staple
+//
+void single_heatbath_SuN(SuN *link, SuN const * const staple)
     {
     SuN aux;
     Su2 u, v, w;
@@ -32,7 +36,7 @@ void single_heatbath_SuN(SuN *link, SuN const * const staple, GParam const * con
           times_equal_SuN(&aux, link); // aux=staple*link
           ennetodue(&aux, i, j, &xi, &u);
 
-          xi*=(param->d_beta)*2.0/((double) NCOLOR);
+          xi*=2.0/((double) NCOLOR);
 
           if(xi>MIN_VALUE)
             {

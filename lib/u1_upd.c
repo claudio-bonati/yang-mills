@@ -5,7 +5,6 @@
 #include<math.h>
 #include<stdio.h>
 
-#include"../include/gparam.h"
 #include"../include/macro.h"
 #include"../include/random.h"
 #include"../include/u1.h"
@@ -13,11 +12,15 @@
 
 
 // heatbath (see Moriarty Phys. Rev. D 25, p2185 (1982) )
-void single_heatbath_U1(U1 * restrict link, U1 const * const restrict staple, GParam const * const restrict param)
+//
+// generate link according to the distibution \exp[-(1/N_c)ReTr(link*staple)]
+// the coupling is inside the staple
+//
+void single_heatbath_U1(U1 * restrict link, U1 const * const restrict staple)
   {
   double alpha, theta, theta_staple, q, q_max, r1, r2, x;
 
-  alpha=param->d_beta * norm_U1(staple);
+  alpha=norm_U1(staple);
 
   if(alpha>MIN_VALUE)
     {

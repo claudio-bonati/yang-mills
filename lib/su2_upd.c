@@ -68,13 +68,16 @@ void randheat_Su2(double k, double *out)
 
 
 // heatbath
-void single_heatbath_Su2(Su2 *link, Su2 const * const staple, GParam const * const param)
+//
+// generate link according to the distibution \exp[-(1/N_c)ReTr(link*staple)]
+// the coupling is inside the staple
+//
+void single_heatbath_Su2(Su2 *link, Su2 const * const staple)
     {
     double p, p0;
     Su2 matrix1, matrix2;
 
     equal_Su2(&matrix1, staple);                    // matrix1=staple
-    times_equal_real_Su2(&matrix1, param->d_beta);  // matrix1*=d_beta
 
     p=sqrtdet_Su2(&matrix1);
     if(p>MIN_VALUE)

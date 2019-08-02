@@ -5,7 +5,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#include"../include/gparam.h"
 #include"../include/macro.h"
 #include"../include/random.h"
 #include"../include/u1.h"
@@ -14,8 +13,7 @@
 int main(void)
   {
   unsigned int seme=0;
-  double energy;
-  GParam param;
+  double energy, beta;
 
   U1 M, N, L, T, mI;
 
@@ -23,7 +21,7 @@ int main(void)
   initrand(seme);
 
   // fix a value for d_beta
-  param.d_beta=0.9;
+  beta=0.9;
 
   printf("\n******************************\n");
   printf("PROGRAM FOR THE DEBUG OF U(1)\n");
@@ -57,7 +55,8 @@ int main(void)
   plus_equal_U1(&N, &L); // N+=L,  M in U(1), N no   (M=link, N=staple)
 
   // heatbath
-  single_heatbath_U1(&M, &N, &param);
+  times_equal_real_U1(&N, beta);
+  single_heatbath_U1(&M, &N);
   printf("  Heatbath ...");
   times_dag2_U1(&T, &M, &M);
   plus_equal_U1(&T, &mI);

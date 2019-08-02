@@ -99,7 +99,7 @@ void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r);
 void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B);
 double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A);
 
-void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple, GParam const * const param);
+void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple);
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple);
 void (*cool)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple);
 

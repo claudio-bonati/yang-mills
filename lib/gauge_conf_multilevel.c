@@ -38,9 +38,11 @@ void multihit(Gauge_Conf const * const GC,
       calcstaples_with_topo(GC, geo, param, r, dir, &staple);
     #endif
 
+    times_equal_real(&staple, param->d_beta);
+
     for(i=0; i<num_hit; i++)
        {
-       single_heatbath(&partial, &staple, param);
+       single_heatbath(&partial, &staple);
        plus_equal(G, &partial);
 
        unitarize(&partial);
@@ -78,9 +80,11 @@ void multihitadj(Gauge_Conf const * const GC,
       calcstaples_with_topo(GC, geo, param, r, dir, &staple);
     #endif
 
+    times_equal_real(&staple, param->d_beta);
+
     for(i=0; i<num_hit; i++)
        {
-       single_heatbath(&partial, &staple, param);
+       single_heatbath(&partial, &staple);
        fund_to_adj(&partial_adj, &partial);
 
        plus_equal_adj(G, &partial_adj);

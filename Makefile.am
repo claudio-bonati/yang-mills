@@ -111,7 +111,6 @@ debug_su2_adj_SOURCES=./src/debug_su2_adj.c \
                       $(align) \
                       $(dSFMT) \
                       $(endian) \
-                      $(gparam) \
                       ./include/macro.h \
                       $(random) \
                       $(su2) 
@@ -120,7 +119,6 @@ debug_sun_SOURCES=./src/debug_sun.c \
                   $(align) \
                   $(dSFMT) \
                   $(endian) \
-                  $(gparam) \
                   ./include/macro.h \
                   $(random) \
                   $(su2) \

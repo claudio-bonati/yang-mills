@@ -679,7 +679,8 @@ void heatbath(Gauge_Conf *GC,
     calcstaples_with_topo(GC, geo, param, r, i, &stap);
   #endif
 
-  single_heatbath(&(GC->lattice[r][i]), &stap, param);
+  times_equal_real(&stap, param->d_beta);
+  single_heatbath(&(GC->lattice[r][i]), &stap);
   }
 
 

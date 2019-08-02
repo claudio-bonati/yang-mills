@@ -4,7 +4,6 @@
 #include<math.h>
 #include<stdlib.h>
 
-#include"../include/gparam.h"
 #include"../include/macro.h"
 #include"../include/random.h"
 #include"../include/sun.h"
@@ -14,8 +13,7 @@
 int main(void)
   {
   unsigned int seme=0;
-  double energy;
-  GParam param;
+  double energy, beta;
   
   SuN M, N, L, T;
    
@@ -23,7 +21,7 @@ int main(void)
   initrand(seme);
 
   // fix a value for d_beta
-  param.d_beta=2.3;
+  beta=6.0;
     
   printf("\n*******************************\n");
   printf("PROGRAM FOR THE DEBUG OF SU(N)\n");
@@ -55,7 +53,8 @@ int main(void)
   plus_equal_SuN(&N, &L); // N+=L,  M in SU(N), N no   (M=link, N=staple)
 
   // heatbath
-  single_heatbath_SuN(&M, &N, &param);
+  times_equal_real_SuN(&N, beta);
+  single_heatbath_SuN(&M, &N);
   printf("  Heatbath ...");
   if(scheck_SuN(&M) == 0)
     {

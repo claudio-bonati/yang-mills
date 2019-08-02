@@ -142,12 +142,12 @@ debug_su2_OBJECTS = $(am_debug_su2_OBJECTS)
 debug_su2_LDADD = $(LDADD)
 am_debug_su2_adj_OBJECTS = ./src/debug_su2_adj.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
-	$(am__objects_5) $(am__objects_6) $(am__objects_7)
+	$(am__objects_6) $(am__objects_7)
 debug_su2_adj_OBJECTS = $(am_debug_su2_adj_OBJECTS)
 debug_su2_adj_LDADD = $(LDADD)
 am_debug_sun_OBJECTS = ./src/debug_sun.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8)
+	$(am__objects_2) $(am__objects_3) $(am__objects_6) \
+	$(am__objects_7) $(am__objects_8)
 debug_sun_OBJECTS = $(am_debug_sun_OBJECTS)
 debug_sun_LDADD = $(LDADD)
 am_debug_u1_OBJECTS = ./src/debug_u1.$(OBJEXT) $(am__objects_1) \
@@ -575,7 +575,6 @@ debug_su2_adj_SOURCES = ./src/debug_su2_adj.c \
                       $(align) \
                       $(dSFMT) \
                       $(endian) \
-                      $(gparam) \
                       ./include/macro.h \
                       $(random) \
                       $(su2) 
@@ -584,7 +583,6 @@ debug_sun_SOURCES = ./src/debug_sun.c \
                   $(align) \
                   $(dSFMT) \
                   $(endian) \
-                  $(gparam) \
                   ./include/macro.h \
                   $(random) \
                   $(su2) \
