@@ -8,7 +8,7 @@
 The action used is the standard Wilson action, which for the SU(N) group can be
 written as the sum of
 
--beta*(1/N)Re(Tr(paquette))
+-beta*(1/N)\sum_{plaquettes} Re(Tr(paquette))
 
 and possibly a theta therm. If --enable-imaginary-theta is used during
 configuration an imaginary theta term is used of the form
@@ -21,16 +21,24 @@ charge is used (see later "A note on the topological charge" for more details).
 In yang_mills_tracedef a trace deformation is also added to the action, of the
 form
 
-sum_{i=0}^{N/2} h_i|Tr(polyakov^{i+1})/N|^2
+\sum_{sites} \sum_{i=0}^{N/2} h_i|Tr(polyakov^{i+1})/N|^2
 
 The update is performed by means of heatbath and overrelaxation updates (and in
 some case also Metropolis updates) implemented a la Cabibbo-Marinari.
 
 In yang_mills_local_fundadj the action is
 
--beta*(1/N)Re(Tr(paquette)) -adjbeta*(1/(N*N-1))Tr_adj(paquette)
+-beta*(1/N)\sum_{plaquettes} Re(Tr(paquette)) 
+-adjbeta*(1/(N*N-1))\sum_{plaquettes} Tr_adj(paquette)
 
-and Tr_adj=|Tr|^2-1. 
+and Tr_adj=|Tr|^2-1.
+
+In yang_mills_higgs the action is 
+
+-beta*(1/N)\sum_{plaquettes} Re(Tr(paquette)) 
+-higgs_beta\sum_{r, mu}\sum_{i=1}^{N_higgs} ReTr([H_r^{(i)}]^{\dag} U_{r, mu} H_{r+mu}^{(i)} )
+
+where the sum on mu is just on positive orientations.
 
 
 ** OTHER CONFIGURE PARAMETERS

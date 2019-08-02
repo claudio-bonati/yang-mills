@@ -1677,7 +1677,7 @@ int metropolis_for_higgs(Gauge_Conf *GC,
   acc=0;
   for(i=0; i<NHIGGS; i++)
      {
-     old_energy=NCOLOR*NCOLOR*param->d_higgs_beta*re_scal_prod_vecs(&(GC->higgs[r]), &staple);
+     old_energy=-NCOLOR*param->d_higgs_beta*re_scal_prod_vecs(&(GC->higgs[r]), &staple);
 
      j=(int)(NHIGGS*casuale() - MIN_VALUE);
 
@@ -1696,7 +1696,7 @@ int metropolis_for_higgs(Gauge_Conf *GC,
 
      matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
 
-     new_energy=NCOLOR*NCOLOR*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
+     new_energy=-NCOLOR*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
 
      if(casuale()< exp(old_energy-new_energy))
        {
