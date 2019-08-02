@@ -1970,4 +1970,22 @@ void perform_measures_tube_conn_long(Gauge_Conf *GC,
    fflush(datafilep);
    }
 
+
+void perform_measures_higgs(Gauge_Conf const * const GC,
+                            Geometry const * const geo,
+                            GParam const * const param,
+                            FILE *datafilep)
+   {
+   double plaqs, plaqt, polyre, polyim;
+
+   plaquette(GC, geo, param, &plaqs, &plaqt);
+   polyakov(GC, geo, param, &polyre, &polyim);
+
+   fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+   fprintf(datafilep, "\n");
+   fflush(datafilep);
+   }
+
+
+
 #endif

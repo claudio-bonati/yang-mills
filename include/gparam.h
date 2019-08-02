@@ -15,6 +15,7 @@ typedef struct GParam {
   double d_h[NCOLOR]; // parameters for the trace deformation
   double d_theta;
   double d_adjbeta;
+  double d_higgs_beta;
 
   // simulation details
   int d_sample;
@@ -48,6 +49,7 @@ typedef struct GParam {
 
   // output file names
   char d_conf_file[STD_STRING_LENGTH];
+  char d_higgs_conf_file[STD_STRING_LENGTH];
   char d_data_file[STD_STRING_LENGTH];
   char d_log_file[STD_STRING_LENGTH];
   char d_ml_file[STD_STRING_LENGTH];
@@ -84,5 +86,7 @@ void print_parameters_tube_disc_long(GParam * param, time_t time_start, time_t t
 
 void print_parameters_tube_conn(GParam * param, time_t time_start, time_t time_end);
 void print_parameters_tube_conn_long(GParam * param, time_t time_start, time_t time_end);
+
+void print_parameters_higgs(GParam const * const param, time_t time_start, time_t time_end, double acc);
 
 #endif

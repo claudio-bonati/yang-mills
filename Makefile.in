@@ -89,8 +89,9 @@ POST_UNINSTALL = :
 bin_PROGRAMS = conf_check$(EXEEXT) debug_rng$(EXEEXT) \
 	debug_su2$(EXEEXT) debug_su2_adj$(EXEEXT) debug_sun$(EXEEXT) \
 	debug_u1$(EXEEXT) debug_vecs$(EXEEXT) \
-	yang_mills_local$(EXEEXT) yang_mills_local_fundadj$(EXEEXT) \
-	yang_mills_polycorr$(EXEEXT) yang_mills_polycorr_long$(EXEEXT) \
+	yang_mills_higgs$(EXEEXT) yang_mills_local$(EXEEXT) \
+	yang_mills_local_fundadj$(EXEEXT) yang_mills_polycorr$(EXEEXT) \
+	yang_mills_polycorr_long$(EXEEXT) \
 	yang_mills_polycorradj$(EXEEXT) \
 	yang_mills_polycorradj_long$(EXEEXT) yang_mills_t0$(EXEEXT) \
 	yang_mills_tracedef$(EXEEXT) yang_mills_tube_conn$(EXEEXT) \
@@ -168,6 +169,13 @@ am__objects_10 = ./lib/gauge_conf_def.$(OBJEXT) \
 am__objects_11 = ./lib/geometry.$(OBJEXT)
 am__objects_12 = ./lib/tens_prod.$(OBJEXT) \
 	./lib/tens_prod_adj.$(OBJEXT)
+am_yang_mills_higgs_OBJECTS = ./src/yang_mills_higgs.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
+	$(am__objects_4) $(am__objects_10) $(am__objects_11) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_12) $(am__objects_9)
+yang_mills_higgs_OBJECTS = $(am_yang_mills_higgs_OBJECTS)
+yang_mills_higgs_LDADD = $(LDADD)
 am_yang_mills_local_OBJECTS = ./src/yang_mills_local.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	$(am__objects_4) $(am__objects_10) $(am__objects_11) \
@@ -314,7 +322,7 @@ am__v_CCLD_1 =
 SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
 	$(debug_sun_SOURCES) $(debug_u1_SOURCES) $(debug_vecs_SOURCES) \
-	$(yang_mills_local_SOURCES) \
+	$(yang_mills_higgs_SOURCES) $(yang_mills_local_SOURCES) \
 	$(yang_mills_local_fundadj_SOURCES) \
 	$(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_long_SOURCES) \
@@ -330,7 +338,7 @@ SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 DIST_SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
 	$(debug_sun_SOURCES) $(debug_u1_SOURCES) $(debug_vecs_SOURCES) \
-	$(yang_mills_local_SOURCES) \
+	$(yang_mills_higgs_SOURCES) $(yang_mills_local_SOURCES) \
 	$(yang_mills_local_fundadj_SOURCES) \
 	$(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_long_SOURCES) \
@@ -609,6 +617,21 @@ debug_vecs_SOURCES = ./src/debug_vecs.c \
                    $(sun) \
                    $(u1)
 
+yang_mills_higgs_SOURCES = ./src/yang_mills_higgs.c \
+                          $(align) \
+                          $(dSFMT)  \
+                          $(endian) \
+                          $(funcpoint) \
+                          $(gauge_conf) \
+                          $(geometry) \
+                          $(gparam) \
+                          ./include/macro.h \
+                          $(random) \
+                          $(su2) \
+                          $(sun) \
+                          $(tens_prod) \
+                          $(u1) 
+
 yang_mills_local_SOURCES = ./src/yang_mills_local.c \
                           $(align) \
                           $(dSFMT)  \
@@ -820,7 +843,7 @@ yang_mills_tubeadj_disc_long_SOURCES = ./src/yang_mills_tubeadj_disc_long.c \
                                      $(u1) 
 
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -Werror -pedantic -Wconversion @OPENMP_CFLAGS@
-CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in 
+CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in higgs_conf.dat* 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -993,7 +1016,7 @@ debug_u1$(EXEEXT): $(debug_u1_OBJECTS) $(debug_u1_DEPENDENCIES) $(EXTRA_debug_u1
 debug_vecs$(EXEEXT): $(debug_vecs_OBJECTS) $(debug_vecs_DEPENDENCIES) $(EXTRA_debug_vecs_DEPENDENCIES) 
 	@rm -f debug_vecs$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_vecs_OBJECTS) $(debug_vecs_LDADD) $(LIBS)
-./src/yang_mills_local.$(OBJEXT): src/$(am__dirstamp) \
+./src/yang_mills_higgs.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 ./lib/gauge_conf_def.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
@@ -1009,6 +1032,12 @@ debug_vecs$(EXEEXT): $(debug_vecs_OBJECTS) $(debug_vecs_DEPENDENCIES) $(EXTRA_de
 	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/tens_prod_adj.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
+
+yang_mills_higgs$(EXEEXT): $(yang_mills_higgs_OBJECTS) $(yang_mills_higgs_DEPENDENCIES) $(EXTRA_yang_mills_higgs_DEPENDENCIES) 
+	@rm -f yang_mills_higgs$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(yang_mills_higgs_OBJECTS) $(yang_mills_higgs_LDADD) $(LIBS)
+./src/yang_mills_local.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 
 yang_mills_local$(EXEEXT): $(yang_mills_local_OBJECTS) $(yang_mills_local_DEPENDENCIES) $(EXTRA_yang_mills_local_DEPENDENCIES) 
 	@rm -f yang_mills_local$(EXEEXT)
@@ -1127,6 +1156,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_sun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_u1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_vecs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_higgs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_local.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_local_fundadj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr.Po@am__quote@

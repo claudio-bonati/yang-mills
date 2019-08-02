@@ -437,6 +437,10 @@ void conjugate_Su2Vecs(Su2Vecs * restrict A);
 void minus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B);
 
 
+// A+=B
+void plus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B);
+
+
 // *= with real number
 void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r);
 

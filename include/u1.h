@@ -745,6 +745,23 @@ inline void minus_equal_U1Vecs(U1Vecs * restrict A, U1Vecs const * const restric
   }
 
 
+// A+=B
+inline void plus_equal_U1Vecs(U1Vecs * restrict A, U1Vecs const * const restrict B)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     A->comp[i]+=B->comp[i];
+     }
+  }
+
+
 // *= with real number
 inline void times_equal_real_U1Vecs(U1Vecs * restrict A, double r)
   {

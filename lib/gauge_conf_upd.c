@@ -1517,6 +1517,352 @@ void ape_smearing(Gauge_Conf *GC,
   }
 
 
+// perform an update with heatbath in the higgs theory
+void heatbath_with_higgs(Gauge_Conf *GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         long r,
+                         int i)
+  {
+  #ifdef DEBUG
+  if(r >= param->d_volume)
+    {
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  if(i >= STDIM)
+    {
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  GAUGE_GROUP stap1, stap2;
+
+  calcstaples_wilson(GC, geo, param, r, i, &stap1);
+  times_equal_real(&stap1, param->d_beta);
+
+  vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
+  times_equal_real(&stap2, param->d_higgs_beta*NCOLOR*NCOLOR); // one NCOLOR is conventional, the other is to compensate the
+                                                               // 1/N that is present in the gauge part
+
+  plus_equal(&stap1, &stap2);
+
+  single_heatbath(&(GC->lattice[r][i]), &stap1);
+  }
+
+
+// perform an update with overrelaxation in the higgs theory
+void overrelaxation_with_higgs(Gauge_Conf *GC,
+                               Geometry const * const geo,
+                               GParam const * const param,
+                               long r,
+                               int i)
+  {
+  #ifdef DEBUG
+  if(r >= param->d_volume)
+    {
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  if(i >= STDIM)
+    {
+    fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  GAUGE_GROUP stap1, stap2;
+
+  calcstaples_wilson(GC, geo, param, r, i, &stap1);
+  times_equal_real(&stap1, param->d_beta);
+
+  vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
+  times_equal_real(&stap2, param->d_higgs_beta*NCOLOR*NCOLOR); // one NCOLOR is conventional, the other is to compensate the
+                                                               // 1/N that is present in the gauge part
+
+  plus_equal(&stap1, &stap2);
+
+  single_overrelaxation(&(GC->lattice[r][i]), &stap1);
+  }
+
+
+// compute the staple for the higgs field
+void calcstaples_for_higgs(Gauge_Conf *GC,
+                           Geometry const * const geo,
+                           GParam const * const param,
+                           long r,
+                           GAUGE_VECS *staple)
+  {
+  #ifdef DEBUG
+  if(r >= param->d_volume)
+    {
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #else
+  (void) param; // just to avoid warnings
+  #endif
+
+  int i, j;
+  GAUGE_VECS aux;
+  GAUGE_GROUP matrix;
+
+  zero_vecs(staple);
+
+  // forward
+  for(i=0; i<STDIM; i++)
+     {
+     equal(&matrix, &(GC->lattice[r][i]) );
+     for(j=0; j<NHIGGS; j++)
+        {
+        matrix_times_vector_vecs(&aux, &matrix, &(GC->higgs[nnp(geo, r, i)]), j);
+        plus_equal_vecs(staple, &aux);
+        }
+     }
+
+  // backward
+  for(i=0; i<STDIM; i++)
+     {
+     equal_dag(&matrix, &(GC->lattice[nnm(geo, r, i)][i]) );
+     for(j=0; j<NHIGGS; j++)
+        {
+        matrix_times_vector_vecs(&aux, &matrix, &(GC->higgs[nnm(geo, r, i)]), j);
+        plus_equal_vecs(staple, &aux);
+        }
+     }
+  }
+
+
+// perform an update of the higgs field with overrelaxation
+void overrelaxation_for_higgs(Gauge_Conf *GC,
+                              Geometry const * const geo,
+                              GParam const * const param,
+                              long r)
+  {
+  #ifdef DEBUG
+  if(r >= param->d_volume)
+    {
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  GAUGE_VECS staple;
+
+  calcstaples_for_higgs(GC, geo, param, r, &staple);
+
+  single_overrelaxation_vecs(&(GC->higgs[r]), &staple);
+  }
+
+
+// perform an update of the higgs field with metropolis
+// return the number of accepted moves (from 0 to NHIGGS-1)
+int metropolis_for_higgs(Gauge_Conf *GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         long r)
+  {
+  #ifdef DEBUG
+  if(r >= param->d_volume)
+    {
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  int i, j, acc;
+  double old_energy, new_energy;
+  GAUGE_VECS staple, new_vector;
+  GAUGE_GROUP identity_matrix, matrix, rnd_matrix;
+
+  calcstaples_for_higgs(GC, geo, param, r, &staple);
+
+  one(&identity_matrix);
+
+  acc=0;
+  for(i=0; i<NHIGGS; i++)
+     {
+     old_energy=NCOLOR*NCOLOR*param->d_higgs_beta*re_scal_prod_vecs(&(GC->higgs[r]), &staple);
+
+     j=(int)(NHIGGS*casuale() - MIN_VALUE);
+
+     rand_matrix(&matrix);
+     times_equal_real(&matrix, param->d_epsilon_metro);
+     plus_equal(&matrix, &identity_matrix);
+     unitarize(&matrix);   // matrix = Proj_on_the_group[ 1 + epsilon_metro*random_matrix ]
+     if(casuale()<0.5)
+       {
+       equal(&rnd_matrix, &matrix);
+       }
+     else
+       {
+       equal_dag(&rnd_matrix, &matrix);
+       }
+
+     matrix_times_vector_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
+
+     new_energy=NCOLOR*NCOLOR*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
+
+     if(casuale()< exp(old_energy-new_energy))
+       {
+       equal_vecs(&(GC->higgs[r]), &new_vector);
+       acc+=1;
+       }
+     }
+
+  return acc;
+  }
+
+
+// perform a complete update with higgs field
+void update_with_higgs(Gauge_Conf * GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       double *acc)
+   {
+   #ifdef THETA_MODE
+    fprintf(stderr, "THETA_MODE not yet implemented in the higgs case, check everything (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+   #endif
+
+   int err, *a;
+   long r, asum;
+   int j, dir;
+
+   err=posix_memalign((void**)&a, (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(int));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating a vector! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   for(r=0; r<param->d_volume; r++)
+      {
+      a[r]=0;
+      }
+
+   // heatbath on links
+   for(dir=0; dir<STDIM; dir++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<(param->d_volume)/2; r++)
+         {
+         heatbath_with_higgs(GC, geo, param, r, dir);
+         }
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         {
+         heatbath_with_higgs(GC, geo, param, r, dir);
+         }
+      }
+
+   // overrelax links
+   for(dir=0; dir<STDIM; dir++)
+      {
+      for(j=0; j<param->d_overrelax; j++)
+         {
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #endif
+         for(r=0; r<(param->d_volume)/2; r++)
+            {
+            overrelaxation_with_higgs(GC, geo, param, r, dir);
+            }
+
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #endif
+         for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+            {
+            overrelaxation_with_higgs(GC, geo, param, r, dir);
+            }
+         }
+      }
+
+   // metropolis on higgs
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<(param->d_volume)/2; r++)
+      {
+      a[r]+=metropolis_for_higgs(GC, geo, param, r);
+      }
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+      {
+      a[r]+=metropolis_for_higgs(GC, geo, param, r);
+      }
+
+   // acceptance computation
+   asum=0;
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for reduction(+:asum) private(r)
+   #endif
+   for(r=0; r<param->d_volume; r++)
+      {
+      asum+=(long)a[r];
+      }
+
+   *acc=((double)asum)*param->d_inv_vol/(double)NHIGGS;
+
+   // overrelaxation on higgs
+   for(j=0; j<param->d_overrelax; j++)
+      {
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<(param->d_volume)/2; r++)
+         {
+         overrelaxation_for_higgs(GC, geo, param, r);
+         }
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         {
+         overrelaxation_for_higgs(GC, geo, param, r);
+         }
+      }
+
+   // final unitarization
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      for(dir=0; dir<STDIM; dir++)
+         {
+         unitarize(&(GC->lattice[r][dir]));
+         }
+      }
+
+   // final normalization for higgs
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      normalize_vecs(&(GC->higgs[r]));
+      }
+
+   free(a);
+
+   GC->update_index++;
+   }
+
+
+
+
 
 
 #endif

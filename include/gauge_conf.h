@@ -38,6 +38,9 @@ typedef struct Gauge_Conf {
   // for the connected correlator for string width
   TensProd **ml_polyplaqconn;   // [NLEVELS] [only slice 0] [space_vol]
   GAUGE_GROUP *loc_plaqconn;    // [only slice 0][space_vol] auxilliary vector to be used in the multilevel
+
+  // for higgs field & co
+  GAUGE_VECS *higgs;    // [volume]
   } Gauge_Conf;
 
 
@@ -47,7 +50,7 @@ void init_gauge_conf(Gauge_Conf *GC,
 void read_gauge_conf(Gauge_Conf *GC,
                      GParam const * const param);
 void free_gauge_conf(Gauge_Conf *GC,
-                    GParam const * const param);
+                     GParam const * const param);
 void write_conf_on_file_with_name(Gauge_Conf const * const GC,
                                   GParam const * const param,
                                   char const * const namefile);
@@ -136,6 +139,22 @@ void alloc_clover_array(Gauge_Conf *GC,
                         GParam const * const param);
 void end_clover_array(Gauge_Conf *GC,
                       GParam const * const param);
+
+void init_higgs_conf(Gauge_Conf *GC,
+                     GParam const * const param);
+void read_higgs_conf(Gauge_Conf *GC,
+                     GParam const * const param);
+void free_higgs_conf(Gauge_Conf *GC);
+void write_higgs_on_file_with_name(Gauge_Conf const * const GC,
+                                   GParam const * const param,
+                                   char const * const namefile);
+void write_higgs_on_file(Gauge_Conf const * const GC,
+                         GParam const * const param);
+void write_higgs_on_file_back(Gauge_Conf const * const GC,
+                              GParam const * const param);
+void compute_md5sum_higgs(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
+                          Gauge_Conf const * const GC,
+                          GParam const * const param);
 
 
 // in gauge_conf_meas.c
@@ -280,6 +299,12 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
 void perform_measures_tube_conn_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep);
+
+void perform_measures_higgs(Gauge_Conf const * const GC,
+                            Geometry const * const geo,
+                            GParam const * const param,
+                            FILE *datafilep);
+
 
 // in gauge_conf_multilevel.c
 void multihit(Gauge_Conf const * const GC,
@@ -458,5 +483,33 @@ void ape_smearing(Gauge_Conf *GC,
                   GParam const *const param,
                   double alpha,
                   int n);
+
+void heatbath_with_higgs(Gauge_Conf *GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         long r,
+                         int i);
+void overrelaxation_with_higgs(Gauge_Conf *GC,
+                               Geometry const * const geo,
+                               GParam const * const param,
+                               long r,
+                               int i);
+void calcstaples_for_higgs(Gauge_Conf *GC,
+                           Geometry const * const geo,
+                           GParam const * const param,
+                           long r,
+                           GAUGE_VECS *staple);
+void overrelaxation_for_higgs(Gauge_Conf *GC,
+                              Geometry const * const geo,
+                              GParam const * const param,
+                              long r);
+int metropolis_for_higgs(Gauge_Conf *GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         long r);
+void update_with_higgs(Gauge_Conf * GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       double *acc);
 
 #endif

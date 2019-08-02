@@ -156,6 +156,16 @@ void readinput(char *in_file, GParam *param)
                     }
                   param->d_adjbeta=temp_d;
                   }
+           else if(strncmp(str, "higgs_beta", 10)==0)
+                  {
+                  err=fscanf(input, "%lf", &temp_d);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_higgs_beta=temp_d;
+                  }
 
            else if(strncmp(str, "sample", 6)==0)
                   { 
@@ -367,6 +377,17 @@ void readinput(char *in_file, GParam *param)
                     }
                   strcpy(param->d_conf_file, temp_str);
                   }
+           else if(strncmp(str, "higgs_conf_file", 15)==0)
+                  {
+                  err=fscanf(input, "%s", temp_str);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  strcpy(param->d_higgs_conf_file, temp_str);
+                  }
+
            else if(strncmp(str, "data_file", 9)==0)
                   { 
                   err=fscanf(input, "%s", temp_str);
@@ -1287,6 +1308,69 @@ void print_parameters_tube_conn_long(GParam * param, time_t time_start, time_t t
     fclose(fp);
     }
 
+// print simulation parameters for the higgs case
+void print_parameters_higgs(GParam const * const param, time_t time_start, time_t time_end, double acc)
+    {
+    FILE *fp;
+    int i;
+    double diff_sec;
+
+    fp=fopen(param->d_log_file, "w");
+    fprintf(fp, "+-----------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_higgs |\n");
+    fprintf(fp, "+-----------------------------------------+\n\n");
+
+    #ifdef OPENMP_MODE
+     fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
+    #endif
+
+    fprintf(fp, "number of colors: %d\n", NCOLOR);
+    fprintf(fp, "number of higgs fields: %d\n", NHIGGS);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
+
+    fprintf(fp, "lattice: %d", param->d_size[0]);
+    for(i=1; i<STDIM; i++)
+       {
+       fprintf(fp, "x%d", param->d_size[i]);
+       }
+    fprintf(fp, "\n\n");
+
+    fprintf(fp, "beta:       %.10lf\n", param->d_beta);
+    fprintf(fp, "higgs_beta: %.10lf ", param->d_higgs_beta);
+    fprintf(fp, "\n\n");
+
+    fprintf(fp, "sample:    %d\n", param->d_sample);
+    fprintf(fp, "thermal:   %d\n", param->d_thermal);
+    fprintf(fp, "overrelax: %d\n", param->d_overrelax);
+    fprintf(fp, "measevery: %d\n", param->d_measevery);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "start:                   %d\n", param->d_start);
+    fprintf(fp, "saveconf_back_every:     %d\n", param->d_saveconf_back_every);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "epsilon_metro: %.10lf\n", param->d_epsilon_metro);
+    fprintf(fp, "metropolis acceptance: %.10lf\n", acc);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "randseed: %u\n", param->d_randseed);
+    fprintf(fp, "\n");
+
+    diff_sec = difftime(time_end, time_start);
+    fprintf(fp, "Simulation time: %.3lf seconds\n", diff_sec );
+    fprintf(fp, "\n");
+
+    if(endian()==0)
+      {
+      fprintf(fp, "Little endian machine\n\n");
+      }
+    else
+      {
+      fprintf(fp, "Big endian machine\n\n");
+      }
+
+    fclose(fp);
+    }
 
 
 #endif

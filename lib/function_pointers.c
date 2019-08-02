@@ -82,6 +82,7 @@ void (*zero_vecs)(GAUGE_VECS * restrict A)=&zero_U1Vecs;
 void (*equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&equal_U1Vecs;
 void (*conjugate_vecs)(GAUGE_VECS * restrict A)=&conjugate_U1Vecs;
 void (*minus_equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&minus_equal_U1Vecs;
+void (*plus_equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&plus_equal_U1Vecs;
 void (*times_equal_real_vecs)(GAUGE_VECS * restrict A, double r)=&times_equal_real_U1Vecs;
 
 double (*norm_vecs)(GAUGE_VECS const * const restrict A)=&norm_U1Vecs;
@@ -170,6 +171,7 @@ void (*zero_vecs)(GAUGE_VECS * restrict A)=&zero_Su2Vecs;
 void (*equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&equal_Su2Vecs;
 void (*conjugate_vecs)(GAUGE_VECS * restrict A)=&conjugate_Su2Vecs;
 void (*minus_equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&minus_equal_Su2Vecs;
+void (*plus_equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&plus_equal_Su2Vecs;
 void (*times_equal_real_vecs)(GAUGE_VECS * restrict A, double r)=&times_equal_real_Su2Vecs;
 
 double (*norm_vecs)(GAUGE_VECS const * const restrict A)=&norm_Su2Vecs;
@@ -258,6 +260,7 @@ void (*zero_vecs)(GAUGE_VECS * restrict A)=&zero_SuNVecs;
 void (*equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&equal_SuNVecs;
 void (*conjugate_vecs)(GAUGE_VECS * restrict A)=&conjugate_SuNVecs;
 void (*minus_equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&minus_equal_SuNVecs;
+void (*plus_equal_vecs)(GAUGE_VECS * restrict A, GAUGE_VECS const * const restrict B)=&plus_equal_SuNVecs;
 void (*times_equal_real_vecs)(GAUGE_VECS * restrict A, double r)=&times_equal_real_SuNVecs;
 
 double (*norm_vecs)(GAUGE_VECS const * const restrict A)=&norm_SuNVecs;

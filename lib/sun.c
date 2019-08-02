@@ -696,6 +696,10 @@ void conjugate_SuNVecs(SuNVecs * restrict A);
 void minus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B);
 
 
+// A+=B
+void plus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B);
+
+
 // *= with real number
 void times_equal_real_SuNVecs(SuNVecs * restrict A, double r);
 

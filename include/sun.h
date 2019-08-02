@@ -1257,6 +1257,23 @@ inline void minus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const rest
   }
 
 
+// A+=B
+inline void plus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]+=B->comp[i];
+     }
+  }
+
+
 // *= with real number
 inline void times_equal_real_SuNVecs(SuNVecs * restrict A, double r)
   {

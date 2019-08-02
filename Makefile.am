@@ -5,6 +5,7 @@ bin_PROGRAMS = conf_check \
                debug_sun \
                debug_u1 \
                debug_vecs \
+               yang_mills_higgs \
                yang_mills_local \
                yang_mills_local_fundadj \
                yang_mills_polycorr \
@@ -144,6 +145,21 @@ debug_vecs_SOURCES=./src/debug_vecs.c \
                    $(su2) \
                    $(sun) \
                    $(u1)
+
+yang_mills_higgs_SOURCES=./src/yang_mills_higgs.c \
+                          $(align) \
+                          $(dSFMT)  \
+                          $(endian) \
+                          $(funcpoint) \
+                          $(gauge_conf) \
+                          $(geometry) \
+                          $(gparam) \
+                          ./include/macro.h \
+                          $(random) \
+                          $(su2) \
+                          $(sun) \
+                          $(tens_prod) \
+                          $(u1) 
 
 yang_mills_local_SOURCES=./src/yang_mills_local.c \
                           $(align) \
@@ -357,4 +373,4 @@ yang_mills_tubeadj_disc_long_SOURCES=./src/yang_mills_tubeadj_disc_long.c \
    
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -Werror -pedantic -Wconversion @OPENMP_CFLAGS@
 
-CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in 
+CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in higgs_conf.dat* 

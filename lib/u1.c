@@ -395,6 +395,10 @@ void conjugate_U1Vecs(U1Vecs * restrict A);
 void minus_equal_U1Vecs(U1Vecs * restrict A, U1Vecs const * const restrict B);
 
 
+// A+=B
+void plus_equal_U1Vecs(U1Vecs * restrict A, U1Vecs const * const restrict B);
+
+
 // *= with real number
 void times_equal_real_U1Vecs(U1Vecs * restrict A, double r);
 

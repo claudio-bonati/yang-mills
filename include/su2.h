@@ -1056,6 +1056,23 @@ inline void minus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const rest
   }
 
 
+// A+=B
+inline void plus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<4*NHIGGS; i++)
+     {
+     A->comp[i]+=B->comp[i];
+     }
+  }
+
+
 // *= with real number
 inline void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r)
   {
