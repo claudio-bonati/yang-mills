@@ -300,6 +300,10 @@ void perform_measures_tube_conn_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep);
 
+void higgs_interaction(Gauge_Conf const * const GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       double *he);
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,

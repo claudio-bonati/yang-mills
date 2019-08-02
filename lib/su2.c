@@ -481,7 +481,12 @@ double re_scal_prod_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs const * c
 
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
-void matrix_times_vector_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2, int i);
+void matrix_times_vector_single_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2, int i);
+
+
+// all the components of v2 are multiplied by "matrix"
+// v1=matrix*v2
+void matrix_times_vector_all_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2);
 
 
 // tensor product of two vectors

@@ -49,7 +49,7 @@ int main(void)
   rand_vecs(&M);
   rand_matrix(&matrix);
   i=(int) (NHIGGS*casuale()-MIN_VALUE);
-  matrix_times_vector_vecs(&L, &matrix, &M, i);
+  matrix_times_vector_single_vecs(&L, &matrix, &M, i);
   equal_vecs(&N, &L);
   energy=re_scal_prod_vecs(&L,&N);
   if(fabs(energy-1) < MIN_VALUE)

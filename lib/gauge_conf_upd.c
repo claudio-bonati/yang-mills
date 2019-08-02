@@ -1604,7 +1604,7 @@ void calcstaples_for_higgs(Gauge_Conf *GC,
   (void) param; // just to avoid warnings
   #endif
 
-  int i, j;
+  int i;
   GAUGE_VECS aux;
   GAUGE_GROUP matrix;
 
@@ -1614,22 +1614,16 @@ void calcstaples_for_higgs(Gauge_Conf *GC,
   for(i=0; i<STDIM; i++)
      {
      equal(&matrix, &(GC->lattice[r][i]) );
-     for(j=0; j<NHIGGS; j++)
-        {
-        matrix_times_vector_vecs(&aux, &matrix, &(GC->higgs[nnp(geo, r, i)]), j);
-        plus_equal_vecs(staple, &aux);
-        }
+     matrix_times_vector_all_vecs(&aux, &matrix, &(GC->higgs[nnp(geo, r, i)]) );
+     plus_equal_vecs(staple, &aux);
      }
 
   // backward
   for(i=0; i<STDIM; i++)
      {
      equal_dag(&matrix, &(GC->lattice[nnm(geo, r, i)][i]) );
-     for(j=0; j<NHIGGS; j++)
-        {
-        matrix_times_vector_vecs(&aux, &matrix, &(GC->higgs[nnm(geo, r, i)]), j);
-        plus_equal_vecs(staple, &aux);
-        }
+     matrix_times_vector_all_vecs(&aux, &matrix, &(GC->higgs[nnm(geo, r, i)]) );
+     plus_equal_vecs(staple, &aux);
      }
   }
 
@@ -1700,7 +1694,7 @@ int metropolis_for_higgs(Gauge_Conf *GC,
        equal_dag(&rnd_matrix, &matrix);
        }
 
-     matrix_times_vector_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
+     matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
 
      new_energy=NCOLOR*NCOLOR*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
 

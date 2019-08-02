@@ -1971,17 +1971,52 @@ void perform_measures_tube_conn_long(Gauge_Conf *GC,
    }
 
 
+// compute the average value of \sum_{flavours} Re(H_x U_{x,mu} H_{x+mu})
+void higgs_interaction(Gauge_Conf const * const GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       double *he)
+  {
+  long r;
+  double ris=0.0;
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+  #endif
+  for(r=0; r<(param->d_volume); r++)
+     {
+     int i;
+     GAUGE_VECS v1;
+     GAUGE_GROUP matrix;
+
+     for(i=0; i<STDIM; i++)
+        {
+        equal(&matrix, &(GC->lattice[r][i]));
+
+        matrix_times_vector_all_vecs(&v1, &matrix, &(GC->higgs[nnp(geo, r, i)]));
+        ris+=re_scal_prod_vecs(&(GC->higgs[r]), &v1);
+        }
+     }
+
+  ris/=(double) STDIM;
+  ris*=param->d_inv_vol;
+
+  *he=ris;
+  }
+
+
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             FILE *datafilep)
    {
-   double plaqs, plaqt, polyre, polyim;
+   double plaqs, plaqt, polyre, polyim, he;
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
+   higgs_interaction(GC, geo, param, &he);
 
-   fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+   fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g", plaqs, plaqt, polyre, polyim, he);
    fprintf(datafilep, "\n");
    fflush(datafilep);
    }

@@ -1348,7 +1348,7 @@ inline double re_scal_prod_SuNVecs(SuNVecs const * const restrict v1, SuNVecs co
 
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
-inline void matrix_times_vector_SuNVecs(SuNVecs * restrict v1, SuN const * const restrict matrix, SuNVecs const * const restrict v2, int i)
+inline void matrix_times_vector_single_SuNVecs(SuNVecs * restrict v1, SuN const * const restrict matrix, SuNVecs const * const restrict v2, int i)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -1370,6 +1370,36 @@ inline void matrix_times_vector_SuNVecs(SuNVecs * restrict v1, SuN const * const
      for(k=0; k<NCOLOR; k++)
         {
         v1->comp[NCOLOR*i+j] += matrix->comp[m(j,k)] * v2->comp[NCOLOR*i+k];
+        }
+     }
+  }
+
+
+// all the components of v2 are multiplied by "matrix"
+// v1=matrix*v2
+inline void matrix_times_vector_all_SuNVecs(SuNVecs * restrict v1, SuN const * const restrict matrix, SuNVecs const * const restrict v2)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j, k;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        v1->comp[NCOLOR*i+j]=0;
+        }
+
+     for(j=0; j<NCOLOR; j++)
+        {
+        for(k=0; k<NCOLOR; k++)
+           {
+           v1->comp[NCOLOR*i+j] += matrix->comp[m(j,k)] * v2->comp[NCOLOR*i+k];
+           }
         }
      }
   }

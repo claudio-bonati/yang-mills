@@ -1156,7 +1156,7 @@ inline double re_scal_prod_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs co
 
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
-inline void matrix_times_vector_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2, int i)
+inline void matrix_times_vector_single_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2, int i)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -1179,6 +1179,36 @@ inline void matrix_times_vector_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const
   for(j=0; j<4; j++)
      {
      v1->comp[4*i+j]=aux1.comp[j];
+     }
+  }
+
+
+// all the components of v2 are multiplied by "matrix"
+// v1=matrix*v2
+inline void matrix_times_vector_all_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j;
+  Su2 aux1, aux2;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<4; j++)
+        {
+        aux2.comp[j]=v2->comp[4*i+j];
+        }
+
+     times_Su2(&aux1, matrix, &aux2);
+
+     for(j=0; j<4; j++)
+        {
+        v1->comp[4*i+j]=aux1.comp[j];
+        }
      }
   }
 
