@@ -180,6 +180,7 @@ int main (int argc, char **argv)
 
       printf("Compilation details:\n");
       printf("\tN_c (number of colors): %d\n", NCOLOR);
+      printf("\tN_higgs (number of higgs flavours): %d\n", NHIGGS);
       printf("\tST_dim (space-time dimensionality): %d\n", STDIM);
       printf("\tNum_levels (number of levels): %d\n", NLEVELS);
       printf("\n");
