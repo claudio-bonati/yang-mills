@@ -1539,8 +1539,15 @@ void heatbath_with_higgs(Gauge_Conf *GC,
 
   GAUGE_GROUP stap1, stap2;
 
-  calcstaples_wilson(GC, geo, param, r, i, &stap1);
-  times_equal_real(&stap1, param->d_beta);
+  if(fabs(param->d_beta)>MIN_VALUE)
+    {
+    calcstaples_wilson(GC, geo, param, r, i, &stap1);
+    times_equal_real(&stap1, param->d_beta);
+    }
+  else
+    {
+    zero(&stap1);
+    }
 
   vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
   times_equal_real(&stap2, param->d_higgs_beta*NCOLOR*NCOLOR); // one NCOLOR is conventional, the other is to compensate the
@@ -1574,8 +1581,15 @@ void overrelaxation_with_higgs(Gauge_Conf *GC,
 
   GAUGE_GROUP stap1, stap2;
 
-  calcstaples_wilson(GC, geo, param, r, i, &stap1);
-  times_equal_real(&stap1, param->d_beta);
+  if(fabs(param->d_beta)>MIN_VALUE)
+    {
+    calcstaples_wilson(GC, geo, param, r, i, &stap1);
+    times_equal_real(&stap1, param->d_beta);
+    }
+  else
+    {
+    zero(&stap1);
+    }
 
   vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
   times_equal_real(&stap2, param->d_higgs_beta*NCOLOR*NCOLOR); // one NCOLOR is conventional, the other is to compensate the
