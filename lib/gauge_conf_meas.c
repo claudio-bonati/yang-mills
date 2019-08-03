@@ -2006,11 +2006,16 @@ void higgs_interaction(Gauge_Conf const * const GC,
   }
 
 
-// compute the Phi field
-void compute_Phi_field(Gauge_Conf const * const GC,
-                       GParam const * const param)
+// compute flavour related observables
+void compute_flavour_observables(Gauge_Conf const * const GC,
+                                 GParam const * const param,
+                                 double *tildeG0,
+                                 double *tildeGminp)
   {
+  int coord[STDIM];
   long r;
+  const double p = 2.0*PI/(double)param->d_size[1];
+  FMatrix Q, Qp, Qmp, tmp1, tmp2;
 
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -2019,6 +2024,38 @@ void compute_Phi_field(Gauge_Conf const * const GC,
      {
      init_FMatrix_vecs(&(GC->Phi[r]), &(GC->higgs[r]));
      }
+
+  // Q =sum_x Q_x
+  // Qp=sum_x e^{ipx}Q_x
+  // Qmp=sum_x e^{-ipx}Q_x
+
+  zero_FMatrix(&Q);
+  zero_FMatrix(&Qp);
+  zero_FMatrix(&Qmp);
+  for(r=0; r<(param->d_volume); r++)
+     {
+     equal_FMatrix(&tmp1, &(GC->Phi[r]));
+     equal_FMatrix(&tmp2, &tmp1);
+
+     plus_equal_FMatrix(&Q, &tmp1);
+
+     si_to_cart(coord, r, param);
+
+     times_equal_complex_FMatrix(&tmp1, cexp(I*((double)coord[1])*p));
+     plus_equal_FMatrix(&Qp, &tmp1);
+
+     times_equal_complex_FMatrix(&tmp2, cexp(-I*((double)coord[1])*p));
+     plus_equal_FMatrix(&Qmp, &tmp2);
+     }
+
+  equal_FMatrix(&tmp1, &Q);
+  times_equal_FMatrix(&tmp1, &Q);
+
+  *tildeG0=retr_FMatrix(&tmp1)*param->d_inv_space_vol;
+
+  equal_FMatrix(&tmp1, &Qp);
+  times_equal_FMatrix(&tmp1, &Qmp);
+  *tildeGminp=retr_FMatrix(&tmp1)*param->d_inv_space_vol;
   }
 
 
@@ -2027,19 +2064,22 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
                             GParam const * const param,
                             FILE *datafilep)
    {
-   double plaqs, plaqt, polyre, polyim, he;
+   double plaqs, plaqt, polyre, polyim, he, tildeG0, tildeGminp;
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
    higgs_interaction(GC, geo, param, &he);
 
-   compute_Phi_field(GC, param);
+   compute_flavour_observables(GC, param, &tildeG0, &tildeGminp);
 
-   fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g", plaqs, plaqt, polyre, polyim, he);
+   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+   fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
+   fprintf(datafilep, "%.12g ", he);
+   fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
    fprintf(datafilep, "\n");
+
    fflush(datafilep);
    }
-
 
 
 #endif

@@ -306,8 +306,10 @@ void higgs_interaction(Gauge_Conf const * const GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        double *he);
-void compute_Phi_field(Gauge_Conf const * const GC,
-                       GParam const * const param);
+void compute_flavour_observables(Gauge_Conf const * const GC,
+                                 GParam const * const param,
+                                 double *chi,
+                                 double *chi_minp);
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
