@@ -42,6 +42,9 @@ dSFMT = ./include/dSFMT-common.h \
 endian = ./include/endianness.h  \
          ./lib/endianness.c 
 
+flavourmatrix = ./include/flavour_matrix.h \
+                ./lib/flavour_matrix.c
+
 funcpoint = ./include/function_pointers.h \
             ./lib/function_pointers.c
 
@@ -83,15 +86,32 @@ u1 = ./include/u1.h \
      ./lib/u1.c \
      ./lib/u1_upd.c
 
+everything =  $(align) \
+              $(dSFMT)  \
+              $(endian) \
+              $(flavourmatrix) \
+              $(funcpoint) \
+              $(gauge_conf) \
+              $(geometry) \
+              $(gparam) \
+              ./include/macro.h \
+              $(random) \
+              $(su2) \
+              $(sun) \
+              $(tens_prod) \
+              $(u1) 
+
 conf_check_SOURCES=./src/conf_check.c \
                    $(align) \
                    $(dSFMT) \
                    $(endian) \
+                   $(flavourmatrix) \
                    $(funcpoint) \
                    $(gparam) \
                    $(random) \
                    $(su2) \
                    $(sun) \
+                   $(tens_prod) \
                    $(u1) 
 
 debug_rng_SOURCES=./src/debug_rng.c \
@@ -103,27 +123,33 @@ debug_su2_SOURCES=./src/debug_su2.c \
                   $(align) \
                   $(dSFMT) \
                   $(endian) \
+                  $(flavourmatrix) \
                   $(gparam) \
                   ./include/macro.h \
                   $(random) \
-                  $(su2)
+                  $(su2) \
+                  $(tens_prod) 
 
 debug_su2_adj_SOURCES=./src/debug_su2_adj.c \
                       $(align) \
                       $(dSFMT) \
                       $(endian) \
+                      $(flavourmatrix) \
                       ./include/macro.h \
                       $(random) \
-                      $(su2) 
+                      $(su2) \
+                      $(tens_prod) 
 
 debug_sun_SOURCES=./src/debug_sun.c \
                   $(align) \
                   $(dSFMT) \
                   $(endian) \
+                  $(flavourmatrix) \
                   ./include/macro.h \
                   $(random) \
                   $(su2) \
-                  $(sun)
+                  $(sun) \
+                  $(tens_prod) 
 
 debug_u1_SOURCES=./src/debug_u1.c \
                   $(align) \
@@ -132,6 +158,7 @@ debug_u1_SOURCES=./src/debug_u1.c \
                   $(gparam) \
                   ./include/macro.h \
                   $(random) \
+                  $(tens_prod) \
                   $(u1)
 
 debug_vecs_SOURCES=./src/debug_vecs.c \
@@ -144,232 +171,53 @@ debug_vecs_SOURCES=./src/debug_vecs.c \
                    $(random) \
                    $(su2) \
                    $(sun) \
+                   $(tens_prod) \
                    $(u1)
 
 yang_mills_higgs_SOURCES=./src/yang_mills_higgs.c \
-                          $(align) \
-                          $(dSFMT)  \
-                          $(endian) \
-                          $(funcpoint) \
-                          $(gauge_conf) \
-                          $(geometry) \
-                          $(gparam) \
-                          ./include/macro.h \
-                          $(random) \
-                          $(su2) \
-                          $(sun) \
-                          $(tens_prod) \
-                          $(u1) 
+                          $(everything)
 
 yang_mills_local_SOURCES=./src/yang_mills_local.c \
-                          $(align) \
-                          $(dSFMT)  \
-                          $(endian) \
-                          $(funcpoint) \
-                          $(gauge_conf) \
-                          $(geometry) \
-                          $(gparam) \
-                          ./include/macro.h \
-                          $(random) \
-                          $(su2) \
-                          $(sun) \
-                          $(tens_prod) \
-                          $(u1) 
+                          $(everything)
 
 yang_mills_local_fundadj_SOURCES=./src/yang_mills_local_fundadj.c \
-                                 $(align) \
-                                 $(dSFMT)  \
-                                 $(endian) \
-                                 $(funcpoint) \
-                                 $(gauge_conf) \
-                                 $(geometry) \
-                                 $(gparam) \
-                                 ./include/macro.h \
-                                 $(random) \
-                                 $(su2) \
-                                 $(sun) \
-                                 $(tens_prod) \
-                                 $(u1) 
+                                 $(everything)
 
 yang_mills_polycorr_SOURCES=./src/yang_mills_polycorr.c \
-                             $(align) \
-                             $(dSFMT)  \
-                             $(endian) \
-                             $(funcpoint) \
-                             $(gauge_conf) \
-                             $(geometry) \
-                             $(gparam) \
-                             ./include/macro.h \
-                             $(random) \
-                             $(su2) \
-                             $(sun) \
-                             $(tens_prod) \
-                             $(u1) 
+                            $(everything)
 
 yang_mills_polycorr_long_SOURCES=./src/yang_mills_polycorr_long.c \
-                                  $(align) \
-                                  $(dSFMT)  \
-                                  $(endian) \
-                                  $(funcpoint) \
-                                  $(gauge_conf) \
-                                  $(geometry) \
-                                  $(gparam) \
-                                  ./include/macro.h \
-                                  $(random) \
-                                  $(su2) \
-                                  $(sun) \
-                                  $(tens_prod) \
-                                  $(u1) 
+                                 $(everything)
 
 yang_mills_polycorradj_SOURCES=./src/yang_mills_polycorradj.c \
-                                $(align) \
-                                $(dSFMT)  \
-                                $(endian) \
-                                $(funcpoint) \
-                                $(gauge_conf) \
-                                $(geometry) \
-                                $(gparam) \
-                                ./include/macro.h \
-                                $(random) \
-                                $(su2) \
-                                $(sun) \
-                                $(tens_prod) \
-                                $(u1) 
+                               $(everything)
 
 yang_mills_polycorradj_long_SOURCES=./src/yang_mills_polycorradj_long.c \
-                                  $(align) \
-                                  $(dSFMT)  \
-                                  $(endian) \
-                                  $(funcpoint) \
-                                  $(gauge_conf) \
-                                  $(geometry) \
-                                  $(gparam) \
-                                  ./include/macro.h \
-                                  $(random) \
-                                  $(su2) \
-                                  $(sun) \
-                                  $(tens_prod) \
-                                  $(u1)
+                                    $(everything)
 
 yang_mills_t0_SOURCES=./src/yang_mills_t0.c \
-                       $(align) \
-                       $(dSFMT)  \
-                       $(endian) \
-                       $(funcpoint) \
-                       $(gauge_conf) \
-                       $(geometry) \
-                       $(gparam) \
-                       ./include/macro.h \
-                       $(random) \
-                       $(su2) \
-                       $(sun) \
-                       $(tens_prod) \
-                       $(u1) 
+                      $(everything)
 
 yang_mills_tracedef_SOURCES=./src/yang_mills_tracedef.c \
-                            $(align) \
-                            $(dSFMT)  \
-                            $(endian) \
-                            $(funcpoint) \
-                            $(gauge_conf) \
-                            $(geometry) \
-                            $(gparam) \
-                            ./include/macro.h \
-                            $(random) \
-                            $(su2) \
-                            $(sun) \
-                            $(tens_prod) \
-                            $(u1) 
+                            $(everything)
 
 yang_mills_tube_conn_SOURCES=./src/yang_mills_tube_conn.c \
-                             $(align) \
-                             $(dSFMT)  \
-                             $(endian) \
-                             $(funcpoint) \
-                             $(gauge_conf) \
-                             $(geometry) \
-                             $(gparam) \
-                             ./include/macro.h \
-                             $(random) \
-                             $(su2) \
-                             $(sun) \
-                             $(tens_prod) \
-                             $(u1) 
+                             $(everything)
 
 yang_mills_tube_conn_long_SOURCES=./src/yang_mills_tube_conn_long.c \
-                                  $(align) \
-                                  $(dSFMT)  \
-                                  $(endian) \
-                                  $(funcpoint) \
-                                  $(gauge_conf) \
-                                  $(geometry) \
-                                  $(gparam) \
-                                  ./include/macro.h \
-                                  $(random) \
-                                  $(su2) \
-                                  $(sun) \
-                                  $(tens_prod) \
-                                  $(u1) 
+                                  $(everything)
 
 yang_mills_tube_disc_SOURCES=./src/yang_mills_tube_disc.c \
-                             $(align) \
-                             $(dSFMT)  \
-                             $(endian) \
-                             $(funcpoint) \
-                             $(gauge_conf) \
-                             $(geometry) \
-                             $(gparam) \
-                             ./include/macro.h \
-                             $(random) \
-                             $(su2) \
-                             $(sun) \
-                             $(tens_prod) \
-                             $(u1) 
+                             $(everything)
  
 yang_mills_tube_disc_long_SOURCES=./src/yang_mills_tube_disc_long.c \
-                                  $(align) \
-                                  $(dSFMT)  \
-                                  $(endian) \
-                                  $(funcpoint) \
-                                  $(gauge_conf) \
-                                  $(geometry) \
-                                  $(gparam) \
-                                  ./include/macro.h \
-                                  $(random) \
-                                  $(su2) \
-                                  $(sun) \
-                                  $(tens_prod) \
-                                  $(u1) 
+                                  $(everything)
 
 yang_mills_tubeadj_disc_SOURCES=./src/yang_mills_tubeadj_disc.c \
-                                $(align) \
-                                $(dSFMT)  \
-                                $(endian) \
-                                $(funcpoint) \
-                                $(gauge_conf) \
-                                $(geometry) \
-                                $(gparam) \
-                                ./include/macro.h \
-                                $(random) \
-                                $(su2) \
-                                $(sun) \
-                                $(tens_prod) \
-                                $(u1) 
+                                $(everything)
 
 yang_mills_tubeadj_disc_long_SOURCES=./src/yang_mills_tubeadj_disc_long.c \
-                                     $(align) \
-                                     $(dSFMT)  \
-                                     $(endian) \
-                                     $(funcpoint) \
-                                     $(gauge_conf) \
-                                     $(geometry) \
-                                     $(gparam) \
-                                     ./include/macro.h \
-                                     $(random) \
-                                     $(su2) \
-                                     $(sun) \
-                                     $(tens_prod) \
-                                     $(u1) 
+                                     $(everything)
    
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -Werror -pedantic -Wconversion @OPENMP_CFLAGS@
 

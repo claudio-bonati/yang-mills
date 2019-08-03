@@ -5,6 +5,7 @@
 #include<math.h>
 #include<stdio.h>
 
+#include"flavour_matrix.h"
 #include"macro.h"
 #include"tens_prod.h"
 #include"tens_prod_adj.h"
@@ -31,7 +32,9 @@ typedef struct SuNAdj {
 typedef struct SuNVecs {
    double complex comp[NCOLOR*NHIGGS] __attribute__((aligned(DOUBLE_ALIGN)));
 } SuNVecs;
-
+//
+// different flavours are associated to different [NCOLOR] blocks of SuNVecs
+//
 
 // ***************** for SuN
 
@@ -1428,6 +1431,38 @@ inline void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * 
            matrix->comp[m(j,k)]+=v2->comp[NCOLOR*i+j]*conj(v1->comp[NCOLOR*i+k]);
            }
         }
+     }
+  }
+
+
+// initialize the flavour matrix with a vector
+// FM[mf(i,j)]=\sum_{on_gauge}conj(v1[i])v1[j] - delta^{ij}/N
+// i, j are the flavour indices
+inline void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * const restrict v1)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(fmatrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j, k;
+
+  zero_FMatrix(fmatrix);
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NHIGGS; j++)
+        {
+        for(k=0; k<NCOLOR; k++)
+           {
+           fmatrix->comp[mf(i,j)]+= conj(v1->comp[NCOLOR*i+k])*v1->comp[NCOLOR*j+k];
+           }
+        }
+     }
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     fmatrix->comp[mf(i,i)]-=1.0/(double)NHIGGS;
      }
   }
 

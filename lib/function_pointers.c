@@ -95,6 +95,8 @@ void (*matrix_times_vector_single_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP co
 void (*matrix_times_vector_all_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2)=&matrix_times_vector_all_U1Vecs;
 void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix, GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&vector_tensor_vector_U1Vecs;
 
+void (*init_FMatrix_vecs)(FMatrix * restrict fmatrix, GAUGE_VECS const * const restrict v1)=&init_FMatrix_U1Vecs;
+
 int (*print_on_file_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_file_U1Vecs;
 int (*print_on_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_binary_file_bigen_U1Vecs;
 int (*read_from_file_vecs)(FILE *fp, GAUGE_VECS *A)=&read_from_file_U1Vecs;
@@ -185,6 +187,8 @@ void (*matrix_times_vector_single_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP co
 void (*matrix_times_vector_all_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2)=&matrix_times_vector_all_Su2Vecs;
 void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix, GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&vector_tensor_vector_Su2Vecs;
 
+void (*init_FMatrix_vecs)(FMatrix * restrict fmatrix, GAUGE_VECS const * const restrict v1)=&init_FMatrix_Su2Vecs;
+
 int (*print_on_file_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_file_Su2Vecs;
 int (*print_on_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_binary_file_bigen_Su2Vecs;
 int (*read_from_file_vecs)(FILE *fp, GAUGE_VECS *A)=&read_from_file_Su2Vecs;
@@ -274,6 +278,8 @@ double (*re_scal_prod_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS con
 void (*matrix_times_vector_single_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2, int i)=&matrix_times_vector_single_SuNVecs;
 void (*matrix_times_vector_all_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2)=&matrix_times_vector_all_SuNVecs;
 void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix, GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&vector_tensor_vector_SuNVecs;
+
+void (*init_FMatrix_vecs)(FMatrix * restrict fmatrix, GAUGE_VECS const * const restrict v1)=&init_FMatrix_SuNVecs;
 
 int (*print_on_file_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_file_SuNVecs;
 int (*print_on_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS const * const A)=&print_on_binary_file_bigen_SuNVecs;

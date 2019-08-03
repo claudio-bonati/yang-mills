@@ -5,6 +5,7 @@
 #include<math.h>
 #include<stdio.h>
 
+#include"flavour_matrix.h"
 #include"macro.h"
 #include"tens_prod.h"
 #include"tens_prod_adj.h"
@@ -29,6 +30,9 @@ typedef struct Su2Adj {
 // \tilde{U\Phi} = U \tilde{\Phi}
 // U\varphi=(\tilde{U\Phi}| U\Phi )
 // 2 Re (\Phi_A^{\dag} U \Phi_B) = Tr (\varphi_A^{\dag} U \varphi_B)
+//
+// the 2-dim complex form of the flavour "i" vector is
+// (v[4*i+2]+I v[4*i+1], v[4*i+0]-I v[4*i+3])
 
 typedef struct Su2Vecs {
      double comp[4*NHIGGS] __attribute__((aligned(DOUBLE_ALIGN)));
@@ -1243,6 +1247,45 @@ inline void vector_tensor_vector_Su2Vecs(Su2 * restrict matrix, Su2Vecs const * 
   times_equal_real_Su2(matrix, 0.5);   // 0.5 is due to the different normalization of matrices and vectors
                                        // see text above the definition of Su2Vecs
   }
+
+
+// initialize the flavour matrix with a vector
+// FM[mf(i,j)]=\sum_{on_gauge}conj(v1[i])v1[j] - delta^{ij}/N
+// i, j are the flavour indices
+inline void init_FMatrix_Su2Vecs(FMatrix * restrict fmatrix, Su2Vecs const * const restrict v1)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(fmatrix->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j;
+
+  zero_FMatrix(fmatrix);
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     for(j=0; j<NHIGGS; j++)
+        {
+        fmatrix->comp[mf(i,j)]+=(v1->comp[4*i+0])*(v1->comp[4*j+0]);
+        fmatrix->comp[mf(i,j)]+=(v1->comp[4*i+1])*(v1->comp[4*j+1]);
+        fmatrix->comp[mf(i,j)]+=(v1->comp[4*i+2])*(v1->comp[4*j+2]);
+        fmatrix->comp[mf(i,j)]+=(v1->comp[4*i+3])*(v1->comp[4*j+3]);
+
+        fmatrix->comp[mf(i,j)]+=(v1->comp[4*i+2])*(v1->comp[4*j+1])*I;
+        fmatrix->comp[mf(i,j)]-=(v1->comp[4*i+1])*(v1->comp[4*j+2])*I;
+
+        fmatrix->comp[mf(i,j)]+=(v1->comp[4*i+3])*(v1->comp[4*j+0])*I;
+        fmatrix->comp[mf(i,j)]-=(v1->comp[4*i+0])*(v1->comp[4*j+3])*I;
+        }
+     }
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     fmatrix->comp[mf(i,i)] -= 1.0/(double)NHIGGS;
+     }
+  }
+
 
 
 // print on file

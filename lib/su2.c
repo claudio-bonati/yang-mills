@@ -7,6 +7,7 @@
 
 #include"../include/aligncheck.h"
 #include"../include/endianness.h"
+#include"../include/flavour_matrix.h"
 #include"../include/macro.h"
 #include"../include/random.h"
 #include"../include/su2.h"
@@ -490,6 +491,12 @@ void matrix_times_vector_all_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const re
 // tensor product of two vectors
 // Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
 void vector_tensor_vector_Su2Vecs(Su2 * restrict matrix, Su2Vecs const * const restrict v1, Su2Vecs const * const restrict v2);
+
+
+// initialize the flavour matrix with a vector
+// FM[mf(i,j)]=\sum_{on_gauge}conj(v1[i])v1[j] - delta^{ij}/N
+// i, j are the flavour indices
+void init_FMatrix_Su2Vecs(FMatrix * restrict fmatrix, Su2Vecs const * const restrict v1);
 
 
 // print on file

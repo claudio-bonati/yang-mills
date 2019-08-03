@@ -73,3 +73,5 @@ src/yang_mills_tubeadj_disc_long.c
 src/yang_mills_local_fundadj.c
 src/debug_vecs.c
 src/yang_mills_higgs.c
+include/flavour_matrix.h
+lib/flavour_matrix.c

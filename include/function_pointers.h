@@ -4,6 +4,7 @@
 #include<complex.h>
 #include<stdio.h>
 
+#include"flavour_matrix.h"
 #include"macro.h"
 #include"su2.h"
 #include"su2_upd.h"
@@ -131,6 +132,9 @@ void (*matrix_times_vector_all_vecs)(GAUGE_VECS * restrict v1,
 void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix,
                                   GAUGE_VECS const * const restrict v1,
                                   GAUGE_VECS const * const restrict v2);
+
+void (*init_FMatrix_vecs)(FMatrix * restrict fmatrix,
+                          GAUGE_VECS const * const restrict v1);
 
 int (*print_on_file_vecs)(FILE *fp, GAUGE_VECS const * const A);
 int (*print_on_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS const * const A);

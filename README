@@ -38,7 +38,12 @@ In yang_mills_higgs the action is
 -beta*(1/N)\sum_{plaquettes} Re(Tr(paquette)) 
 -N*higgs_beta\sum_{r, mu}\sum_{i=1}^{N_higgs} ReTr([H_r^{(i)}]^{\dag} U_{r, mu} H_{r+mu}^{(i)} )
 
-where the sum on mu is just on positive orientations.
+where the sum on mu is just on positive orientations and Higgs fields are
+normalized according to
+
+\sum_{i=1}^{N_higgs} \|H_r^{(i)}\|^2 = 1 
+
+for every site r.
 
 
 ** OTHER CONFIGURE PARAMETERS
