@@ -7,6 +7,7 @@
 #include<openssl/md5.h>
 #include<stdio.h>
 
+#include"flavour_matrix.h"
 #include"gparam.h"
 #include"geometry.h"
 #include"su2.h"
@@ -41,6 +42,7 @@ typedef struct Gauge_Conf {
 
   // for higgs field & co
   GAUGE_VECS *higgs;    // [volume]
+  FMatrix *Phi;         // [volume]
   } Gauge_Conf;
 
 
@@ -304,6 +306,8 @@ void higgs_interaction(Gauge_Conf const * const GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        double *he);
+void compute_Phi_field(Gauge_Conf const * const GC,
+                       GParam const * const param);
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,

@@ -8,6 +8,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#include"../include/flavour_matrix.h"
 #include"../include/gparam.h"
 #include"../include/function_pointers.h"
 #include"../include/geometry.h"
@@ -2005,6 +2006,22 @@ void higgs_interaction(Gauge_Conf const * const GC,
   }
 
 
+// compute the Phi field
+void compute_Phi_field(Gauge_Conf const * const GC,
+                       GParam const * const param)
+  {
+  long r;
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(r)
+  #endif
+  for(r=0; r<(param->d_volume); r++)
+     {
+     init_FMatrix_vecs(&(GC->Phi[r]), &(GC->higgs[r]));
+     }
+  }
+
+
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
@@ -2015,6 +2032,8 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
    higgs_interaction(GC, geo, param, &he);
+
+   compute_Phi_field(GC, param);
 
    fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g", plaqs, plaqt, polyre, polyim, he);
    fprintf(datafilep, "\n");

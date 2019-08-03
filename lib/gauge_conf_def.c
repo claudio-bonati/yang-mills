@@ -8,6 +8,7 @@
 #include<stdlib.h>
 #include<string.h>
 
+#include"../include/flavour_matrix.h"
 #include"../include/function_pointers.h"
 #include"../include/gparam.h"
 #include"../include/geometry.h"
@@ -1727,6 +1728,15 @@ void init_higgs_conf(Gauge_Conf *GC, GParam const * const param)
     exit(EXIT_FAILURE);
     }
 
+  // allocate the Phi field
+  err=posix_memalign((void**) &(GC->Phi), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(FMatrix));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating the Phi field! (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+
+
   // initialize the higgs field
   if(param->d_start==0) // ordered start
     {
@@ -1858,6 +1868,7 @@ void read_higgs_conf(Gauge_Conf *GC, GParam const * const param)
 void free_higgs_conf(Gauge_Conf *GC)
   {
   free(GC->higgs);
+  free(GC->Phi);
   }
 
 
