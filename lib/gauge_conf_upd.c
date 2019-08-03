@@ -1770,10 +1770,10 @@ void update_with_higgs(Gauge_Conf * GC,
          }
       }
 
-   // overrelax links
-   for(dir=0; dir<STDIM; dir++)
+   // overrelax links and higgs
+   for(j=0; j<param->d_overrelax; j++)
       {
-      for(j=0; j<param->d_overrelax; j++)
+      for(dir=0; dir<STDIM; dir++)
          {
          #ifdef OPENMP_MODE
          #pragma omp parallel for num_threads(NTHREADS) private(r)
@@ -1790,6 +1790,22 @@ void update_with_higgs(Gauge_Conf * GC,
             {
             overrelaxation_with_higgs(GC, geo, param, r, dir);
             }
+         }
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<(param->d_volume)/2; r++)
+         {
+         overrelaxation_for_higgs(GC, geo, param, r);
+         }
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         {
+         overrelaxation_for_higgs(GC, geo, param, r);
          }
       }
 
@@ -1821,26 +1837,6 @@ void update_with_higgs(Gauge_Conf * GC,
       }
 
    *acc=((double)asum)*param->d_inv_vol/(double)NHIGGS;
-
-   // overrelaxation on higgs
-   for(j=0; j<param->d_overrelax; j++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<(param->d_volume)/2; r++)
-         {
-         overrelaxation_for_higgs(GC, geo, param, r);
-         }
-
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
-         {
-         overrelaxation_for_higgs(GC, geo, param, r);
-         }
-      }
 
    // final unitarization
    #ifdef OPENMP_MODE

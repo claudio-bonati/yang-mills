@@ -2051,11 +2051,11 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
   equal_FMatrix(&tmp1, &Q);
   times_equal_FMatrix(&tmp1, &Q);
 
-  *tildeG0=retr_FMatrix(&tmp1)*param->d_inv_space_vol;
+  *tildeG0=retr_FMatrix(&tmp1)*param->d_inv_vol;
 
   equal_FMatrix(&tmp1, &Qp);
   times_equal_FMatrix(&tmp1, &Qmp);
-  *tildeGminp=retr_FMatrix(&tmp1)*param->d_inv_space_vol;
+  *tildeGminp=retr_FMatrix(&tmp1)*param->d_inv_vol;
   }
 
 
