@@ -2,6 +2,7 @@ bin_PROGRAMS = conf_check \
                debug_rng \
                debug_su2 \
                debug_su2_adj \
+               debug_su2sun \
                debug_sun \
                debug_u1 \
                debug_vecs \
@@ -138,6 +139,17 @@ debug_su2_adj_SOURCES=./src/debug_su2_adj.c \
                       ./include/macro.h \
                       $(random) \
                       $(su2) \
+                      $(tens_prod) 
+
+debug_su2sun_SOURCES=./src/debug_su2sun.c \
+                      $(align) \
+                      $(dSFMT) \
+                      $(endian) \
+                      $(flavourmatrix) \
+                      ./include/macro.h \
+                      $(random) \
+                      $(su2) \
+                      $(sun) \
                       $(tens_prod) 
 
 debug_sun_SOURCES=./src/debug_sun.c \

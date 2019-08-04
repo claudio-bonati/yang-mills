@@ -77,11 +77,11 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = conf_check$(EXEEXT) debug_rng$(EXEEXT) \
-	debug_su2$(EXEEXT) debug_su2_adj$(EXEEXT) debug_sun$(EXEEXT) \
-	debug_u1$(EXEEXT) debug_vecs$(EXEEXT) \
-	yang_mills_higgs$(EXEEXT) yang_mills_local$(EXEEXT) \
-	yang_mills_local_fundadj$(EXEEXT) yang_mills_polycorr$(EXEEXT) \
-	yang_mills_polycorr_long$(EXEEXT) \
+	debug_su2$(EXEEXT) debug_su2_adj$(EXEEXT) \
+	debug_su2sun$(EXEEXT) debug_sun$(EXEEXT) debug_u1$(EXEEXT) \
+	debug_vecs$(EXEEXT) yang_mills_higgs$(EXEEXT) \
+	yang_mills_local$(EXEEXT) yang_mills_local_fundadj$(EXEEXT) \
+	yang_mills_polycorr$(EXEEXT) yang_mills_polycorr_long$(EXEEXT) \
 	yang_mills_polycorradj$(EXEEXT) \
 	yang_mills_polycorradj_long$(EXEEXT) yang_mills_t0$(EXEEXT) \
 	yang_mills_tracedef$(EXEEXT) yang_mills_tube_conn$(EXEEXT) \
@@ -145,6 +145,12 @@ am_debug_su2_adj_OBJECTS = ./src/debug_su2_adj.$(OBJEXT) \
 	$(am__objects_10)
 debug_su2_adj_OBJECTS = $(am_debug_su2_adj_OBJECTS)
 debug_su2_adj_LDADD = $(LDADD)
+am_debug_su2sun_OBJECTS = ./src/debug_su2sun.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
+	$(am__objects_4) $(am__objects_7) $(am__objects_8) \
+	$(am__objects_9) $(am__objects_10)
+debug_su2sun_OBJECTS = $(am_debug_su2sun_OBJECTS)
+debug_su2sun_LDADD = $(LDADD)
 am_debug_sun_OBJECTS = ./src/debug_sun.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
 	$(am__objects_7) $(am__objects_8) $(am__objects_9) \
@@ -269,7 +275,8 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
-	$(debug_sun_SOURCES) $(debug_u1_SOURCES) $(debug_vecs_SOURCES) \
+	$(debug_su2sun_SOURCES) $(debug_sun_SOURCES) \
+	$(debug_u1_SOURCES) $(debug_vecs_SOURCES) \
 	$(yang_mills_higgs_SOURCES) $(yang_mills_local_SOURCES) \
 	$(yang_mills_local_fundadj_SOURCES) \
 	$(yang_mills_polycorr_SOURCES) \
@@ -285,7 +292,8 @@ SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(yang_mills_tubeadj_disc_long_SOURCES)
 DIST_SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
-	$(debug_sun_SOURCES) $(debug_u1_SOURCES) $(debug_vecs_SOURCES) \
+	$(debug_su2sun_SOURCES) $(debug_sun_SOURCES) \
+	$(debug_u1_SOURCES) $(debug_vecs_SOURCES) \
 	$(yang_mills_higgs_SOURCES) $(yang_mills_local_SOURCES) \
 	$(yang_mills_local_fundadj_SOURCES) \
 	$(yang_mills_polycorr_SOURCES) \
@@ -555,6 +563,17 @@ debug_su2_adj_SOURCES = ./src/debug_su2_adj.c \
                       $(su2) \
                       $(tens_prod) 
 
+debug_su2sun_SOURCES = ./src/debug_su2sun.c \
+                      $(align) \
+                      $(dSFMT) \
+                      $(endian) \
+                      $(flavourmatrix) \
+                      ./include/macro.h \
+                      $(random) \
+                      $(su2) \
+                      $(sun) \
+                      $(tens_prod) 
+
 debug_sun_SOURCES = ./src/debug_sun.c \
                   $(align) \
                   $(dSFMT) \
@@ -797,6 +816,12 @@ debug_su2$(EXEEXT): $(debug_su2_OBJECTS) $(debug_su2_DEPENDENCIES) $(EXTRA_debug
 debug_su2_adj$(EXEEXT): $(debug_su2_adj_OBJECTS) $(debug_su2_adj_DEPENDENCIES) $(EXTRA_debug_su2_adj_DEPENDENCIES) 
 	@rm -f debug_su2_adj$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_su2_adj_OBJECTS) $(debug_su2_adj_LDADD) $(LIBS)
+./src/debug_su2sun.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+debug_su2sun$(EXEEXT): $(debug_su2sun_OBJECTS) $(debug_su2sun_DEPENDENCIES) $(EXTRA_debug_su2sun_DEPENDENCIES) 
+	@rm -f debug_su2sun$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(debug_su2sun_OBJECTS) $(debug_su2sun_LDADD) $(LIBS)
 ./src/debug_sun.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
@@ -949,6 +974,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_rng.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2_adj.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2sun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_sun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_u1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_vecs.Po@am__quote@

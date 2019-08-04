@@ -75,3 +75,4 @@ src/debug_vecs.c
 src/yang_mills_higgs.c
 include/flavour_matrix.h
 lib/flavour_matrix.c
+src/debug_su2sun.c
