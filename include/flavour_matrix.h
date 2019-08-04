@@ -81,6 +81,31 @@ inline void plus_equal_FMatrix(FMatrix * restrict A, FMatrix const * const restr
   }
 
 
+// A-=B
+inline void minus_equal_FMatrix(FMatrix * restrict A, FMatrix const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS*NHIGGS; i++)
+     {
+     A->comp[i]-=B->comp[i];
+     }
+  }
+
+
 // A*=r
 inline void times_equal_real_FMatrix(FMatrix * restrict A, double r)
   {
@@ -192,6 +217,26 @@ inline double imtr_FMatrix(FMatrix const * const restrict A)
      }
   ris=cimag(tr)/(double)NHIGGS;
   return ris;
+  }
+
+
+
+// l2 norm of the matrix
+inline double norm_FMatrix(FMatrix const * const restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double ris=0.0;
+
+  for(i=0; i<NHIGGS*NHIGGS; i++)
+     {
+     ris+=cabs(A->comp[i])*cabs(A->comp[i]);
+     }
+
+  return sqrt(ris);
   }
 
 

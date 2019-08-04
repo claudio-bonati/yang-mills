@@ -19,6 +19,10 @@ void equal_FMatrix(FMatrix * restrict A, FMatrix const * const restrict B);
 void plus_equal_FMatrix(FMatrix * restrict A, FMatrix const * const restrict B);
 
 
+// A-=B
+void minus_equal_FMatrix(FMatrix * restrict A, FMatrix const * const restrict B);
+
+
 // A*=r
 void times_equal_real_FMatrix(FMatrix * restrict A, double r);
 
@@ -37,6 +41,11 @@ double retr_FMatrix(FMatrix const * const restrict A);
 
 // imaginary part of the trace /NHIGGS
 double imtr_FMatrix(FMatrix const * const restrict A);
+
+
+// l2 norm of the matrix
+double norm_FMatrix(FMatrix const * const restrict A);
+
 
 
 #endif

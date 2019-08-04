@@ -228,13 +228,20 @@ void single_overrelaxation_SuNVecs(SuNVecs *restrict link, SuNVecs const * const
   double norm, scalprod;
 
   norm=norm_SuNVecs(staple);
-  scalprod=re_scal_prod_SuNVecs(link, staple);
+  if(norm>MIN_VALUE)
+    {
+    scalprod=re_scal_prod_SuNVecs(link, staple);
 
-  equal_SuNVecs(&newlink, staple);
-  times_equal_real_SuNVecs(&newlink, 2.0*scalprod/norm/norm);
-  minus_equal_SuNVecs(&newlink, link);
+    equal_SuNVecs(&newlink, staple);
+    times_equal_real_SuNVecs(&newlink, 2.0*scalprod/norm/norm);
+    minus_equal_SuNVecs(&newlink, link);
 
-  equal_SuNVecs(link, &newlink);
+    equal_SuNVecs(link, &newlink);
+    }
+  else
+    {
+    rand_vec_SuNVecs(link);
+    }
   }
 
 

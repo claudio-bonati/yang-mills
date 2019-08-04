@@ -94,13 +94,20 @@ void single_overrelaxation_U1Vecs(U1Vecs *restrict link, U1Vecs const * const st
   double norm, scalprod;
 
   norm=norm_U1Vecs(staple);
-  scalprod=re_scal_prod_U1Vecs(link, staple);
+  if(norm>MIN_VALUE)
+    {
+    scalprod=re_scal_prod_U1Vecs(link, staple);
 
-  equal_U1Vecs(&newlink, staple);
-  times_equal_real_U1Vecs(&newlink, 2.0*scalprod/norm/norm);
-  minus_equal_U1Vecs(&newlink, link);
+    equal_U1Vecs(&newlink, staple);
+    times_equal_real_U1Vecs(&newlink, 2.0*scalprod/norm/norm);
+    minus_equal_U1Vecs(&newlink, link);
 
-  equal_U1Vecs(link, &newlink);
+    equal_U1Vecs(link, &newlink);
+    }
+  else
+    {
+    rand_vec_U1Vecs(link);
+    }
   }
 
 

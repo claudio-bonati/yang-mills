@@ -140,13 +140,20 @@ void single_overrelaxation_Su2Vecs(Su2Vecs *restrict link, Su2Vecs const * const
   double norm, scalprod;
 
   norm=norm_Su2Vecs(staple);
-  scalprod=re_scal_prod_Su2Vecs(link, staple);
+  if(norm>MIN_VALUE)
+    {
+    scalprod=re_scal_prod_Su2Vecs(link, staple);
 
-  equal_Su2Vecs(&newlink, staple);
-  times_equal_real_Su2Vecs(&newlink, 2.0*scalprod/norm/norm);
-  minus_equal_Su2Vecs(&newlink, link);
+    equal_Su2Vecs(&newlink, staple);
+    times_equal_real_Su2Vecs(&newlink, 2.0*scalprod/norm/norm);
+    minus_equal_Su2Vecs(&newlink, link);
 
-  equal_Su2Vecs(link, &newlink);
+    equal_Su2Vecs(link, &newlink);
+    }
+  else
+    {
+    rand_vec_Su2Vecs(link);
+    }
   }
 
 
