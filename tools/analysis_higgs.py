@@ -57,23 +57,23 @@ if __name__=="__main__":
     return x
   def square(x):
     return x*x
+  def susc(x):
+    return L*L*L*(x[0]-x[1]*x[1])
   def U(x):
     return x[0]/x[1]/x[1]
   def xi2nd(x):
     return np.sqrt(x[0]/x[1]-1)/2.0/np.sin(np.pi/L)/L
 
-
-
   # data acquisition
   indata=np.loadtxt(infile, skiprows=therm, dtype=np.float)
   data=np.transpose(indata)     #column ordered
 
-  print(blocksize, end=' ')
+  #print(blocksize, end=' ')
 
-  ris, err = jack.jackknife_for_primary(id, (data[0]+2*data[1])/3.0, blocksize)
+  ris, err = jack.jackknife_for_secondary(susc, blocksize, [square, data[4]], [id, data[4]])
   print(ris, err, end=' ')
 
-  ris, err = jack.jackknife_for_primary(id, data[4], blocksize)
+  ris, err = jack.jackknife_for_primary(id, data[5], blocksize)
   print(ris, err, end=' ')
 
   ris, err = jack.jackknife_for_secondary(U, blocksize, [square, data[5]], [id, data[5]])
