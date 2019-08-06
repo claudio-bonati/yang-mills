@@ -44,7 +44,7 @@ int main(void)
   Su2Vecs v2, w2;
   SuNVecs vN, wN;
 
-  FMatrix fm2, fmN;
+  FMatrix fm2, fmN, fmaux;
 
   // initialize random seed
   initrand(seme);
@@ -128,6 +128,35 @@ int main(void)
   minus_equal_FMatrix(&fm2, &fmN);
   x=norm_FMatrix(&fm2);
   if(fabs(x)<MIN_VALUE)
+    {
+    printf("  OK\n");
+    }
+  else
+    {
+    printf("  ERROR!!!!!!!!!!!\n");
+    return EXIT_FAILURE;
+    }
+  printf("\n");
+
+
+  printf("VERIFY THAT FMatrix IS TRACELESS HERMITIAN ...");
+  rand_vec_Su2Vecs(&v2);
+  rand_vec_SuNVecs(&vN);
+
+  init_FMatrix_Su2Vecs(&fm2, &v2);
+  init_FMatrix_SuNVecs(&fmN, &vN);
+
+  x=fabs(retr_FMatrix(&fm2))+fabs(retr_FMatrix(&fmN));
+
+  equal_FMatrix(&fmaux, &fm2);
+  minus_equal_dag_FMatrix(&fmaux, &fm2);
+  x+=norm_FMatrix(&fmaux);
+
+  equal_FMatrix(&fmaux, &fmN);
+  minus_equal_dag_FMatrix(&fmaux, &fmN);
+  x+=norm_FMatrix(&fmaux);
+
+  if(fabs(x/4.0)<MIN_VALUE)
     {
     printf("  OK\n");
     }

@@ -23,6 +23,10 @@ void plus_equal_FMatrix(FMatrix * restrict A, FMatrix const * const restrict B);
 void minus_equal_FMatrix(FMatrix * restrict A, FMatrix const * const restrict B);
 
 
+// A-=B^{dag}
+void minus_equal_dag_FMatrix(FMatrix * restrict A, FMatrix const * const restrict B);
+
+
 // A*=r
 void times_equal_real_FMatrix(FMatrix * restrict A, double r);
 
