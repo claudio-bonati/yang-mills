@@ -478,6 +478,10 @@ void rand_vec_Su2Vecs(Su2Vecs * restrict A)
 double re_scal_prod_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs const * const restrict v2);
 
 
+// real part of the scalar product re(v_1[a]^{\dag}v_2[b]) with a, b flavour indices
+double re_scal_prod_single_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs const * const restrict v2, int a, int b);
+
+
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
 void matrix_times_vector_single_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2, int i);

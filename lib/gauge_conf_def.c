@@ -1728,11 +1728,11 @@ void init_higgs_conf(Gauge_Conf *GC, GParam const * const param)
     exit(EXIT_FAILURE);
     }
 
-  // allocate the Phi field
-  err=posix_memalign((void**) &(GC->Phi), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(FMatrix));
+  // allocate the Qh field
+  err=posix_memalign((void**) &(GC->Qh), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(FMatrix));
   if(err!=0)
     {
-    fprintf(stderr, "Problems in allocating the Phi field! (%s, %d)\n", __FILE__, __LINE__);
+    fprintf(stderr, "Problems in allocating the Qh field! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
 
@@ -1868,7 +1868,7 @@ void read_higgs_conf(Gauge_Conf *GC, GParam const * const param)
 void free_higgs_conf(Gauge_Conf *GC)
   {
   free(GC->higgs);
-  free(GC->Phi);
+  free(GC->Qh);
   }
 
 

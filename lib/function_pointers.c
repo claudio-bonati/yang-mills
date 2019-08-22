@@ -91,6 +91,7 @@ void (*normalize_vecs)(GAUGE_VECS * restrict A)=&normalize_U1Vecs;
 void (*rand_vecs)(GAUGE_VECS * restrict A)=&rand_vec_U1Vecs;
 
 double (*re_scal_prod_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&re_scal_prod_U1Vecs;
+double (*re_scal_prod_single_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2, int a, int b)=&re_scal_prod_single_U1Vecs;
 void (*matrix_times_vector_single_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2, int i)=&matrix_times_vector_single_U1Vecs;
 void (*matrix_times_vector_all_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2)=&matrix_times_vector_all_U1Vecs;
 void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix, GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&vector_tensor_vector_U1Vecs;
@@ -183,6 +184,7 @@ void (*normalize_vecs)(GAUGE_VECS * restrict A)=&normalize_Su2Vecs;
 void (*rand_vecs)(GAUGE_VECS * restrict A)=&rand_vec_Su2Vecs;
 
 double (*re_scal_prod_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&re_scal_prod_Su2Vecs;
+double (*re_scal_prod_single_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2, int a, int b)=&re_scal_prod_single_Su2Vecs;
 void (*matrix_times_vector_single_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2, int i)=&matrix_times_vector_single_Su2Vecs;
 void (*matrix_times_vector_all_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2)=&matrix_times_vector_all_Su2Vecs;
 void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix, GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&vector_tensor_vector_Su2Vecs;
@@ -275,6 +277,7 @@ void (*normalize_vecs)(GAUGE_VECS * restrict A)=&normalize_SuNVecs;
 void (*rand_vecs)(GAUGE_VECS * restrict A)=&rand_vec_SuNVecs;
 
 double (*re_scal_prod_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&re_scal_prod_SuNVecs;
+double (*re_scal_prod_single_vecs)(GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2, int a, int b)=&re_scal_prod_single_SuNVecs;
 void (*matrix_times_vector_single_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2, int i)=&matrix_times_vector_single_SuNVecs;
 void (*matrix_times_vector_all_vecs)(GAUGE_VECS * restrict v1, GAUGE_GROUP const * const restrict matrix, GAUGE_VECS const * const restrict v2)=&matrix_times_vector_all_SuNVecs;
 void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix, GAUGE_VECS const * const restrict v1, GAUGE_VECS const * const restrict v2)=&vector_tensor_vector_SuNVecs;

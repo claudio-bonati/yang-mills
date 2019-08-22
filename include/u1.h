@@ -835,6 +835,23 @@ inline double re_scal_prod_U1Vecs(U1Vecs const * const restrict v1, U1Vecs const
   }
 
 
+// real part of the scalar product re(v_1[a]^{\dag}v_2[b]) with a, b flavour indices
+inline double re_scal_prod_single_U1Vecs(U1Vecs const * const restrict v1, U1Vecs const * const restrict v2, int a, int b)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  double ris;
+
+  ris=creal( conj(v1->comp[a]) * v2->comp[b] );
+
+  return ris;
+  }
+
+
+
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
 inline void matrix_times_vector_single_U1Vecs(U1Vecs * restrict v1, U1 const * const restrict matrix, U1Vecs const * const restrict v2, int i)

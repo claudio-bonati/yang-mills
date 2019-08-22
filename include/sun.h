@@ -1349,6 +1349,25 @@ inline double re_scal_prod_SuNVecs(SuNVecs const * const restrict v1, SuNVecs co
   }
 
 
+// real part of the scalar product re(v_1[a]^{\dag}v_2[b]) with a, b flavour indices
+inline double re_scal_prod_single_SuNVecs(SuNVecs const * const restrict v1, SuNVecs const * const restrict v2, int a, int b)
+  {
+   #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double ris=0.0;
+
+  for(i=0; i<NCOLOR; i++)
+     {
+     ris+=creal( conj(v1->comp[a*NCOLOR+i]) * v2->comp[b*NCOLOR+i] );
+     }
+
+  return ris;
+  }
+
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
 inline void matrix_times_vector_single_SuNVecs(SuNVecs * restrict v1, SuN const * const restrict matrix, SuNVecs const * const restrict v2, int i)

@@ -2022,7 +2022,7 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
   #endif
   for(r=0; r<(param->d_volume); r++)
      {
-     init_FMatrix_vecs(&(GC->Phi[r]), &(GC->higgs[r]));
+     init_FMatrix_vecs(&(GC->Qh[r]), &(GC->higgs[r]));
      }
 
   // Q =sum_x Q_x
@@ -2034,7 +2034,7 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
   zero_FMatrix(&Qmp);
   for(r=0; r<(param->d_volume); r++)
      {
-     equal_FMatrix(&tmp1, &(GC->Phi[r]));
+     equal_FMatrix(&tmp1, &(GC->Qh[r]));
      equal_FMatrix(&tmp2, &tmp1);
 
      plus_equal_FMatrix(&Q, &tmp1);
@@ -2059,24 +2059,140 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
   }
 
 
+// compute correlators of flavour observables and
+// flavour matrices HAS TO BE INITIALIZED before calling this function
+// using init_FMatrix_vecs
+void compute_flavour_observables_corr(Gauge_Conf const * const GC,
+                                      Geometry const * const geo,
+                                      GParam const * const param,
+                                      double *corrQQ,
+                                      double *corr0string0,
+                                      double *corr0string1)
+  {
+  int dist;
+  long r;
+  double accumulator1, accumulator2;
+
+  for(dist=0; dist<param->d_size[1]; dist++)
+     {
+     accumulator1=0.0;
+
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : accumulator1)
+     #endif
+     for(r=0; r<(param->d_volume); r++)
+        {
+        int i;
+        long r1;
+        FMatrix tmp1;
+
+        equal_FMatrix(&tmp1, &(GC->Qh[r]));
+        r1=r;
+        for(i=0; i<dist; i++)
+           {
+           r1=nnp(geo, r1, 1);
+           }
+        times_equal_FMatrix(&tmp1, &(GC->Qh[r1]));
+        accumulator1+=retr_FMatrix(&tmp1);
+        }
+     accumulator1*=param->d_inv_vol;
+     corrQQ[dist]=accumulator1;
+
+     accumulator1=0.0;
+     accumulator2=0.0;
+
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : accumulator1) reduction(+ : accumulator2)
+     #endif
+     for(r=0; r<(param->d_volume); r++)
+        {
+        int i;
+        long r1;
+        GAUGE_VECS phi1, phi2;
+        GAUGE_GROUP U;
+
+        equal_vecs(&phi1, &(GC->higgs[r]));
+        r1=r;
+        one(&U);
+        for(i=0; i<dist; i++)
+           {
+           times_equal(&U, &(GC->lattice[r][1]));
+           r1=nnp(geo, r1, 1);
+           }
+        matrix_times_vector_all_vecs(&phi2, &U, &(GC->higgs[r1]));
+        accumulator1+=re_scal_prod_single_vecs(&phi1, &phi2, 0, 0);
+        #if NHIGGS >1
+         accumulator2+=re_scal_prod_single_vecs(&phi1, &phi2, 0, 1);
+        #else
+         accumulator2+=0.0;
+        #endif
+        }
+     accumulator1*=param->d_inv_vol;
+     accumulator2*=param->d_inv_vol;
+
+     corr0string0[dist]=accumulator1;
+     corr0string1[dist]=accumulator2;
+     }
+  }
+
+
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             FILE *datafilep)
    {
+   int err, i;
    double plaqs, plaqt, polyre, polyim, he, tildeG0, tildeGminp;
+
+   double *corrQQ, *corr0string0, *corr0string1;
+   err=posix_memalign((void**) &(corrQQ), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
+   err+=posix_memalign((void**) &(corr0string0), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
+   err+=posix_memalign((void**) &(corr0string1), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating the correlators! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
    higgs_interaction(GC, geo, param, &he);
 
-   compute_flavour_observables(GC, param, &tildeG0, &tildeGminp);
+   compute_flavour_observables(GC,
+                               param,
+                               &tildeG0,
+                               &tildeGminp);
 
    fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
    fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
    fprintf(datafilep, "%.12g ", he);
    fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
+
+
+   compute_flavour_observables_corr(GC,
+                                    geo,
+                                    param,
+                                    corrQQ,
+                                    corr0string0,
+                                    corr0string1);
+   for(i=0; i<param->d_size[1]; i++)
+      {
+      fprintf(datafilep, "%.12g ", corrQQ[i]);
+      }
+   for(i=0; i<param->d_size[1]; i++)
+      {
+      fprintf(datafilep, "%.12g ", corr0string0[i]);
+      }
+    for(i=0; i<param->d_size[1]; i++)
+      {
+      fprintf(datafilep, "%.12g ", corr0string1[i]);
+      }
+
    fprintf(datafilep, "\n");
+
+   free(corrQQ);
+   free(corr0string0);
+   free(corr0string1);
 
    fflush(datafilep);
    }

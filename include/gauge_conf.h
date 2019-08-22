@@ -42,7 +42,7 @@ typedef struct Gauge_Conf {
 
   // for higgs field & co
   GAUGE_VECS *higgs;    // [volume]
-  FMatrix *Phi;         // [volume]
+  FMatrix *Qh;          // [volume]
   } Gauge_Conf;
 
 
@@ -308,8 +308,14 @@ void higgs_interaction(Gauge_Conf const * const GC,
                        double *he);
 void compute_flavour_observables(Gauge_Conf const * const GC,
                                  GParam const * const param,
-                                 double *chi,
-                                 double *chi_minp);
+                                 double *tildeG0,
+                                 double *tildeGminp);
+void compute_flavour_observables_corr(Gauge_Conf const * const GC,
+                                      Geometry const * const geo,
+                                      GParam const * const param,
+                                      double *corrQQ,
+                                      double *corr0string0,
+                                      double *corr0string1);
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,

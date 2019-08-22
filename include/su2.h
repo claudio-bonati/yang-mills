@@ -1158,6 +1158,32 @@ inline double re_scal_prod_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs co
   }
 
 
+// real part of the scalar product re(v_1[a]^{\dag}v_2[b]) with a, b flavour indices
+inline double re_scal_prod_single_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs const * const restrict v2, int a, int b)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int j;
+  Su2 aux1, aux2;
+  double ris;
+
+  for(j=0; j<4; j++)
+     {
+     aux1.comp[j]=v1->comp[4*a+j];
+     aux2.comp[j]=v2->comp[4*b+j];
+     }
+
+  times_equal_dag_Su2(&aux2, &aux1);
+  ris=retr_Su2(&aux2);  // the 0.5 that is due to the different normalization of matrices and vectors
+                        // (see text above the definition of Su2Vecs) is not needed sing retr = trace/2
+
+  return ris;
+  }
+
+
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
 inline void matrix_times_vector_single_Su2Vecs(Su2Vecs * restrict v1, Su2 const * const restrict matrix, Su2Vecs const * const restrict v2, int i)

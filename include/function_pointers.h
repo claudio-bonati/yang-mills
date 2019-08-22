@@ -122,6 +122,10 @@ void (*rand_vecs)(GAUGE_VECS * restrict A);
 
 double (*re_scal_prod_vecs)(GAUGE_VECS const * const restrict v1,
                             GAUGE_VECS const * const restrict v2);
+double (*re_scal_prod_single_vecs)(GAUGE_VECS const * const restrict v1,
+                                   GAUGE_VECS const * const restrict v2,
+                                   int a,
+                                   int b);
 void (*matrix_times_vector_single_vecs)(GAUGE_VECS * restrict v1,
                                         GAUGE_GROUP const * const restrict matrix,
                                         GAUGE_VECS const * const restrict v2,
