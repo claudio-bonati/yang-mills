@@ -2007,6 +2007,9 @@ void higgs_interaction(Gauge_Conf const * const GC,
 
 
 // compute flavour related observables
+// tildeG0=ReTr[(\sum_x Q_x)(\sum_y Q_y)]/volume
+// tildeGminp=ReTr[(\sum_x Q_xe^{ipx})(\sum_y Q_ye^{-ipy)]/volume
+// tildeG0 is the susceptibility, tildeGminp is used to compute the 2nd momentum correlation function
 void compute_flavour_observables(Gauge_Conf const * const GC,
                                  GParam const * const param,
                                  double *tildeG0,
@@ -2062,6 +2065,9 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
 // compute correlators of flavour observables and
 // flavour matrices HAS TO BE INITIALIZED before calling this function
 // using init_FMatrix_vecs
+// corrQQ is the correlato ReTr[Q_x Q_{x+d}]
+// corr0string0 is the correlator Re[h0^{dag} U_{x,1}U_{x+1,1}....Q_{x+d} h0], where h0 is the first flavour
+// corr0string1 is the correlator Re[h0^{dag} U_{x,1}U_{x+1,1}....Q_{x+d} h1], where h1 is the second flavour
 void compute_flavour_observables_corr(Gauge_Conf const * const GC,
                                       Geometry const * const geo,
                                       GParam const * const param,
