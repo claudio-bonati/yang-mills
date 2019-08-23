@@ -2147,10 +2147,10 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
                             GParam const * const param,
                             FILE *datafilep)
    {
-   int err, i;
    double plaqs, plaqt, polyre, polyim, he, tildeG0, tildeGminp;
 
-
+   /*
+   int err, i;
    double *corrQQ, *corr0string0, *corr0string1;
    err=posix_memalign((void**) &(corrQQ), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
    err+=posix_memalign((void**) &(corr0string0), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
@@ -2160,7 +2160,7 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
      fprintf(stderr, "Problems in allocating the correlators! (%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
-
+   */
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
@@ -2176,7 +2176,7 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
    fprintf(datafilep, "%.12g ", he);
    fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
 
-
+   /*
    compute_flavour_observables_corr(GC,
                                     geo,
                                     param,
@@ -2195,15 +2195,15 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
       {
       fprintf(datafilep, "%.12g ", corr0string1[i]);
       }
-
+   */
 
    fprintf(datafilep, "\n");
 
-
+   /*
    free(corrQQ);
    free(corr0string0);
    free(corr0string1);
-
+   */
 
    fflush(datafilep);
    }
