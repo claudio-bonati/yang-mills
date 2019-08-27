@@ -2006,6 +2006,71 @@ void higgs_interaction(Gauge_Conf const * const GC,
   }
 
 
+// compute \sum_x(tr(Q_x^2)/volume) and
+// tildeG0=ReTr[(\sum_x Q_x)(\sum_y Q_y)]/volume
+void compute_flavour_test(Gauge_Conf const * const GC,
+                          GParam const * const param,
+                          double *Q2,
+                          double *tildeG0,
+                          double *tildeGminp)
+  {
+  int coord[STDIM];
+  long r;
+  const double p = 2.0*PI/(double)param->d_size[1];
+  FMatrix Q, Qp, Qmp, tmp1, tmp2;
+  double ris;
+
+  #ifdef OPENMP_MODE
+  #pragma omp parallel for num_threads(NTHREADS) private(r)
+  #endif
+  for(r=0; r<(param->d_volume); r++)
+     {
+     init_FMatrix_vecs(&(GC->Qh[r]), &(GC->higgs[r]));
+     }
+
+  ris=0.0;
+  for(r=0; r<(param->d_volume); r++)
+     {
+     equal_FMatrix(&tmp1, &(GC->Qh[r]));
+     equal_FMatrix(&tmp2, &tmp1);
+
+     times_equal_FMatrix(&tmp2, &tmp1);
+
+     ris+=retr_FMatrix(&tmp2);
+     }
+  ris*=param->d_inv_vol;
+  *Q2=ris;
+
+  zero_FMatrix(&Q);
+  zero_FMatrix(&Qp);
+  zero_FMatrix(&Qmp);
+  for(r=0; r<(param->d_volume); r++)
+     {
+     equal_FMatrix(&tmp1, &(GC->Qh[r]));
+     equal_FMatrix(&tmp2, &tmp1);
+
+     plus_equal_FMatrix(&Q, &tmp1);
+
+     si_to_cart(coord, r, param);
+
+     times_equal_complex_FMatrix(&tmp1, cexp(I*((double)coord[1])*p));
+     plus_equal_FMatrix(&Qp, &tmp1);
+
+     times_equal_complex_FMatrix(&tmp2, cexp(-I*((double)coord[1])*p));
+     plus_equal_FMatrix(&Qmp, &tmp2);
+     }
+
+  equal_FMatrix(&tmp1, &Q);
+  times_equal_FMatrix(&tmp1, &Q);
+
+  *tildeG0=retr_FMatrix(&tmp1)*param->d_inv_vol;
+
+  equal_FMatrix(&tmp1, &Qp);
+  times_equal_FMatrix(&tmp1, &Qmp);
+  *tildeGminp=retr_FMatrix(&tmp1)*param->d_inv_vol;
+  }
+
+
 // compute flavour related observables
 // tildeG0=ReTr[(\sum_x Q_x)(\sum_y Q_y)]/volume
 // tildeGminp=ReTr[(\sum_x Q_xe^{ipx})(\sum_y Q_ye^{-ipy)]/volume
@@ -2207,6 +2272,31 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
 
    fflush(datafilep);
    }
+
+
+void perform_measures_higgs_test(Gauge_Conf const * const GC,
+                                 Geometry const * const geo,
+                                 GParam const * const param,
+                                 FILE *datafilep)
+   {
+   double plaqs, plaqt, polyre, polyim, he, Q2, tildeG0, tildeGpmin;
+
+   plaquette(GC, geo, param, &plaqs, &plaqt);
+   polyakov(GC, geo, param, &polyre, &polyim);
+   higgs_interaction(GC, geo, param, &he);
+
+   compute_flavour_test(GC, param, &Q2, &tildeG0, &tildeGpmin);
+
+   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+   fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
+   fprintf(datafilep, "%.12g ", he);
+   fprintf(datafilep, "%.12g %.12g %.12g", tildeG0, tildeGpmin, Q2);
+
+   fprintf(datafilep, "\n");
+
+   fflush(datafilep);
+   }
+
 
 
 #endif
