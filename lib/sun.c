@@ -763,6 +763,33 @@ void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * const r
 void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * const restrict v1);
 
 
+//
+// THE FOLLOWING FUNCTIONS ARE FOR THE MONOPOLES MEASURES
+//
+
+
+// Computation of the Lambda Matrix
+void compute_lambda_matrix_SuN(double *lambda)
+   {
+    int i;
+   
+    // costruisco la matrice L= diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
+    for(i=0; i<=NCOLOR; i++)
+       {
+       lambda[i] = (NCOLOR - 1)/2 - i 
+       }
+   }
+
+
+
+
+
+
+
+
+
+
+
 // print on file
 int print_on_file_SuNVecs(FILE *fp, SuNVecs const * const A)
   {

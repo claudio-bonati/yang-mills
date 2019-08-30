@@ -15,8 +15,8 @@
 
 
 void max_abelian_gauge(Gauge_Conf *GC,
-              Geometry const * const geo,
-              GParam const * const param)
+                       Geometry const * const geo,
+                       GParam const * const param)
   {
   // Indici
   long r;
@@ -44,7 +44,7 @@ void max_abelian_gauge(Gauge_Conf *GC,
     }
  
   // Inizializzo la matrice lambda 
-  compute_lambda_matrix(&lambda);
+  compute_lambda_matrix(lambda);
 
   // Adesso nel codice fortran vengo unitarizzati tutti i link del reticolo, qui lo sono già
 
@@ -83,5 +83,10 @@ void max_abelian_gauge(Gauge_Conf *GC,
             }
          }
   }
+
+
+
+
+
 
 
