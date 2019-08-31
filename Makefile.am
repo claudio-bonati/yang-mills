@@ -53,7 +53,8 @@ gauge_conf = ./include/gauge_conf.h \
              ./lib/gauge_conf_def.c \
              ./lib/gauge_conf_meas.c \
              ./lib/gauge_conf_multilevel.c \
-             ./lib/gauge_conf_upd.c 
+             ./lib/gauge_conf_upd.c \
+	     ./lib/gauge_conf_monopoles.c
 
 geometry = ./include/geometry.h \
            ./lib/geometry.c

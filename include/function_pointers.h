@@ -87,6 +87,16 @@ int  (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A);
 int  (*read_from_file)(FILE *fp, GAUGE_GROUP *A);
 int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A);
 
+//
+//   MONOPOLES STUFF
+//
+
+void (*compute_lambda_matrix)(double *lambda);
+
+
+
+
+
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B);
 
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2);

@@ -1314,6 +1314,13 @@ inline void init_FMatrix_Su2Vecs(FMatrix * restrict fmatrix, Su2Vecs const * con
 
 
 
+//
+// MONOPOLES STUFF
+//
+
+//compute lambda matrix
+void compute_lambda_matrix_Su2(double *lambda);
+
 // print on file
 int print_on_file_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A);
 

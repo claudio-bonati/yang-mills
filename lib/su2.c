@@ -190,6 +190,23 @@ void ta_Su2(Su2 *A);
 void taexp_Su2(Su2 *A);
 
 
+//
+// MONOPOLES STUFF
+//
+
+
+// Computation of the Lambda Matrix
+void compute_lambda_matrix_Su2(double *lambda)
+   {
+   // Per SU(2) la matrice lambda è sigma_3
+   lambda[0] = 1;
+   lambda[1] = -1;
+   }
+
+
+
+
+
 // print on screen
 void print_on_screen_Su2(Su2 const * const restrict A)
   {

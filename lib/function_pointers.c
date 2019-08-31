@@ -59,6 +59,13 @@ int  (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &pri
 int  (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_U1;
 int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_U1;
 
+//
+//  MONOPOLES STUFF
+//
+
+
+
+
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_U1;
 
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_U1;
@@ -152,6 +159,14 @@ int  (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &pri
 int  (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_Su2;
 int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_Su2;
 
+//
+// MONOPOLES STUFF
+//
+
+void (*compute_lambda_matrix)(double *lambda) = &compute_lambda_matrix_Su2;
+
+
+
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_Su2;
 
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_Su2;
@@ -244,6 +259,14 @@ int  (*print_on_file)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_file_Su
 int  (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_binary_file_bigen_SuN;
 int  (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_SuN;
 int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_SuN;
+
+
+//
+// MONOPOLES STUFF
+//
+
+void (*compute_lambda_matrix)(double *lambda) = &compute_lambda_matrix_SuN;
+
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_SuN;
 

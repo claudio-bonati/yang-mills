@@ -228,11 +228,15 @@ double topcharge(Gauge_Conf const * const GC,
 void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
-                               FILE *datafilep);
+                               FILE *datafilep,
+			       FILE *monofilep);
+
 void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              Geometry const * const geo,
                                              GParam const * const param,
-                                             FILE *datafilep);
+                                             FILE *datafilep,
+			                     FILE *monofilep);
+
 void perform_measures_localobs_fundadj(Gauge_Conf const * const GC,
                                        Geometry const * const geo,
                                        GParam const * const param,
@@ -335,7 +339,8 @@ void perform_measures_higgs_test(Gauge_Conf const * const GC,
 // in gauge_conf_monopoles.c
 void max_abelian_gauge(Gauge_Conf *GC,
                        Geometry const * const geo,
-                       GParam const * const param);
+                       GParam const * const param,
+		       FILE *monofilep);
 
 
 

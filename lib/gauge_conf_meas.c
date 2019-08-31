@@ -785,7 +785,8 @@ void topcharge_cooling(Gauge_Conf const * const GC,
 void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
-                               FILE *datafilep)
+                               FILE *datafilep,
+			       FILE *monofilep)
    {
    #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
      int i, err;
@@ -822,6 +823,14 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
      free(charge);
      free(meanplaq);
 
+     if(param->d_mon_meas == 1)
+       {
+       Gauge_Conf helperconf;
+       init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+       max_abelian_gauge(&helperconf, geo, param, monofilep);
+       free_gauge_conf(&helperconf, param);
+       }
+
    #else
 
      double plaqs, plaqt, polyre, polyim;
@@ -840,7 +849,8 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
 void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              Geometry const * const geo,
                                              GParam const * const param,
-                                             FILE *datafilep)
+                                             FILE *datafilep,
+                                             FILE *monofilep)
    {
    #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
 
@@ -881,6 +891,15 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
      fprintf(datafilep, "\n");
 
      fflush(datafilep);
+
+// MONOPOLES STUFF
+     if(param->d_mon_meas == 1)
+       {
+       Gauge_Conf helperconf;
+       init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+       max_abelian_gauge(&helperconf, geo, param, monofilep);
+       free_gauge_conf(&helperconf, param);
+       }
 
      free(charge);
      free(meanplaq);
@@ -1701,31 +1720,6 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
    fprintf(datafilep, "\n");
    fflush(datafilep);
    }
-
-////////////////////////////////////////////
-////////////////////////////////////////////
-////////////////////////////////////////////
-/*   WORK IN PROGRESS MONOPOLES MEASURES */
-////////////////////////////////////////////
-////////////////////////////////////////////
-////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // perform the computation of the string width with the
 // disconnected correlator that has been computed by multilevel (long version)

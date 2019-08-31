@@ -16,11 +16,12 @@
 
 void max_abelian_gauge(Gauge_Conf *GC,
                        Geometry const * const geo,
-                       GParam const * const param)
+                       GParam const * const param,
+                       FILE *monofilep)
   {
   // Indici
   long r;
-  int dir;
+  int dir, err;
   
 
   //params
@@ -45,14 +46,16 @@ void max_abelian_gauge(Gauge_Conf *GC,
  
   // Inizializzo la matrice lambda 
   compute_lambda_matrix(lambda);
+  fprintf(monofilep, "%.12g %.12g %.12g %.12g \n", lambda[0], lambda[1], lambda[2], lambda[3]);
 
+  free(lambda);
   // Adesso nel codice fortran vengo unitarizzati tutti i link del reticolo, qui lo sono già
 
 
   //
   //      ORA COMINCIA IL GAUGE FIXING VERO E PROPRIO
   //
-
+/*
   while(non_diag_contr > precision)
        {
        for(r=0; r<(param->d_volume); r++) // Ciclo su tutti i siti del reticolo
@@ -81,11 +84,11 @@ void max_abelian_gauge(Gauge_Conf *GC,
             {
             unitarize(&(GC->lattice[r][dir]))
             }
-         }
+         }*/
   }
 
 
-
+#endif
 
 
 

@@ -774,9 +774,9 @@ void compute_lambda_matrix_SuN(double *lambda)
     int i;
    
     // costruisco la matrice L= diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
-    for(i=0; i<=NCOLOR; i++)
+    for(i=0; i<NCOLOR; i++)
        {
-       lambda[i] = (NCOLOR - 1)/2 - i 
+       lambda[i] = (double) (NCOLOR -1)/2 - i;
        }
    }
 
