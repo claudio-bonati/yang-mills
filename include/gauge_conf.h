@@ -331,6 +331,21 @@ void perform_measures_higgs_test(Gauge_Conf const * const GC,
                                  FILE *datafilep);
 
 
+
+// in gauge_conf_monopoles.c
+void max_abelian_gauge(Gauge_Conf *GC,
+                       Geometry const * const geo,
+                       GParam const * const param);
+
+
+
+
+
+
+
+
+
+
 // in gauge_conf_multilevel.c
 void multihit(Gauge_Conf const * const GC,
               Geometry const * const geo,

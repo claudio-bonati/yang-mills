@@ -922,6 +922,17 @@ inline void exp_of_ta_SuN(SuN * restrict A)
   }
 
 
+//  MONOPOLES STUFF
+
+//computation of the lambda matrix
+void compute_lambda_matrix_SuN(double *lambda)
+
+
+
+
+
+
+
 // print on screen
 void print_on_screen_SuN(SuN const * const A);
 
