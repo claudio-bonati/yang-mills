@@ -2191,7 +2191,7 @@ void compute_flavour_observables_corr(Gauge_Conf const * const GC,
            r1=nnp(geo, r1, 1);
            }
         matrix_times_vector_all_vecs(&phi2, &U, &(GC->higgs[r1]));
-        accumulator1+=re_scal_prod_single_vecs(&phi1, &phi2, 0, 0);
+        accumulator1+=re_scal_prod_vecs(&phi1, &phi2);
         #if NHIGGS >1
          accumulator2+=re_scal_prod_single_vecs(&phi1, &phi2, 0, 1);
         #else
