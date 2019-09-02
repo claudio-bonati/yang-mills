@@ -190,23 +190,6 @@ void ta_Su2(Su2 *A);
 void taexp_Su2(Su2 *A);
 
 
-//
-// MONOPOLES STUFF
-//
-
-
-// Computation of the Lambda Matrix
-void compute_lambda_matrix_Su2(double *lambda)
-   {
-   // Per SU(2) la matrice lambda è sigma_3
-   lambda[0] = 1;
-   lambda[1] = -1;
-   }
-
-
-
-
-
 // print on screen
 void print_on_screen_Su2(Su2 const * const restrict A)
   {
@@ -461,6 +444,15 @@ void plus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B);
 
 // *= with real number
 void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r);
+
+
+
+// MONOPOLES 
+// A = lambda*B with lambda diagonal marix
+void diag_matrix_times_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+void diag_matrix_times_dag_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
 
 
 // norm

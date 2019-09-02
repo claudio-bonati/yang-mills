@@ -342,7 +342,13 @@ void max_abelian_gauge(Gauge_Conf *GC,
                        GParam const * const param,
 		       FILE *monofilep);
 
-
+void comp_operator_X (Gauge_Conf const * const GC,
+		      Geometry const * const geo,
+                      GParam const * const param,
+                      long r,
+                      double *lambda,
+                      GAUGE_GROUP *X);
+ 
 
 
 

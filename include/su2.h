@@ -470,6 +470,70 @@ inline void times_Su2(Su2 * restrict A,
   }
 
 
+// MONOPOLES A=lambda*B with lambda diagonal matrix
+inline void diag_matrix_times_Su2(Su2 * restrict A, 
+                                  double *lambda, 
+                                  Su2 const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+  
+  // riscrivo la matrice lambda come a*1 +ib*sigma con ((a=lambda[1]+lambda[2])/2) e ((b=lambda[1]-lambda[2])/2) 
+  double a,b;
+  
+  a = (double) (lambda[1] + lambda[2])/2;
+  b = (double) (lambda[1] - lambda[2])/2;
+
+  A->comp[0]= B->comp[0]*a - B->comp[3]*b;
+  A->comp[1]= a*B->comp[1] + b*B->comp[2];
+  A->comp[2]= B->comp[2]*a - b*B->comp[1];
+  A->comp[3]= a*B->comp[3] + B->comp[0]*b;
+  }
+
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+inline void diag_matrix_times_dag_Su2(Su2 * restrict A,
+                                      double *lambda,
+                                      Su2 const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+ 
+  // riscrivo la matrice lambda come a*1 +ib*sigma con ((a=lambda[1]+lambda[2])/2) e ((b=lambda[1]-lambda[2])/2) 
+  double a,b;
+  
+  a = (double) (lambda[1] + lambda[2])/2;
+  b = (double) (lambda[1] - lambda[2])/2;
+
+
+  A->comp[0]=  B->comp[0]*a + B->comp[3]*b;
+  A->comp[1]=  B->comp[1]*a + B->comp[2]*b;
+  A->comp[2]=  B->comp[2]*a - B->comp[1]*b;
+  A->comp[3]= -B->comp[0]*b + B->comp[3]*a;
+  }
+
+
+
 // A=B^{dag}*C
 inline void times_dag1_Su2(Su2 * restrict A,
                     Su2 const * const restrict B,
@@ -1312,14 +1376,6 @@ inline void init_FMatrix_Su2Vecs(FMatrix * restrict fmatrix, Su2Vecs const * con
      }
   }
 
-
-
-//
-// MONOPOLES STUFF
-//
-
-//compute lambda matrix
-void compute_lambda_matrix_Su2(double *lambda);
 
 // print on file
 int print_on_file_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A);

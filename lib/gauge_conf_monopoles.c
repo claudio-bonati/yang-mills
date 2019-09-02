@@ -21,7 +21,7 @@ void max_abelian_gauge(Gauge_Conf *GC,
   {
   // Indici
   long r;
-  int dir, err;
+  int i, dir, err;
   
 
   //params
@@ -44,24 +44,29 @@ void max_abelian_gauge(Gauge_Conf *GC,
     exit(EXIT_FAILURE);
     }
  
-  // Inizializzo la matrice lambda 
-  compute_lambda_matrix(lambda);
-  fprintf(monofilep, "%.12g %.12g %.12g %.12g \n", lambda[0], lambda[1], lambda[2], lambda[3]);
+  // Inizializzo la matrice lambda L= diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
+    for(i=0; i<NCOLOR; i++)
+       {
+       lambda[i] = (double) (NCOLOR -1)/2 - i;
+       }
 
-  free(lambda);
   // Adesso nel codice fortran vengo unitarizzati tutti i link del reticolo, qui lo sono già
 
+  // metto a uno la matrice dell'operatore X(n) e G_mag
+  zero(&X);
+  one(&G_mag);
 
   //
   //      ORA COMINCIA IL GAUGE FIXING VERO E PROPRIO
   //
+  comp_operator_X(GC, geo, param, r=0, lambda, &X);
 /*
   while(non_diag_contr > precision)
        {
        for(r=0; r<(param->d_volume); r++) // Ciclo su tutti i siti del reticolo
           {
           // Prima viene calcolato l'operatore X(n) nel sito r
-          comp_operator_X(Gc, geo, param, r, lambda, &X);
+          comp_operator_X(GC, geo, param, r, lambda, &X);
      
           // Viene ora calcolata la matrice di gauge G_mag massimizzando X
           maximize_operator_X(GC, geo, param, r, &X, &G_mag);
@@ -85,7 +90,38 @@ void max_abelian_gauge(Gauge_Conf *GC,
             unitarize(&(GC->lattice[r][dir]))
             }
          }*/
+  free(lambda);
   }
+
+
+
+// questa funzione calcola l'operatore X(n) che deve essere massimizzato
+//  X(n) = sum_alldir { U_{\mu}(n)*lambda*Udag_mu(n) + Udag_{\mu}(n - \mu)*lambda*U_mu(n - \mu)}
+void comp_operator_X (Gauge_Conf const * const GC,
+		      Geometry const * const geo,
+                      GParam const * const param,
+                      long r,
+                      double *lambda,
+                      GAUGE_GROUP *X)
+  {
+  int dir, i;
+  GAUGE_GROUP aux1, aux2, aux3;
+
+  for(dir=0; dir<NCOLOR; dir++) 
+     {
+     //calcolo lambda*Udag_mu(n) e lambda*U_mu(n- mu)
+     diag_matrix_times_dag(&aux1, lambda, &(GC->lattice[r][dir]));
+     diag_matrix_times(&aux2, lambda, &(GC->lattice[nnm(geo, r, dir)][dir]));
+     
+     //Calcolo la matrice X(n)
+     times(&aux3, &(GC->lattice[r][dir]), &aux1);
+     plus_equal(X, &aux3);
+     times_dag1(&aux3, &(GC->lattice[nnm(geo, r, dir)][dir]), &aux2);
+     plus_equal(X, &aux3);
+     }   
+  }
+
+
 
 
 #endif

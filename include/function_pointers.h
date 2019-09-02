@@ -91,9 +91,8 @@ int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A);
 //   MONOPOLES STUFF
 //
 
-void (*compute_lambda_matrix)(double *lambda);
-
-
+void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B);
+void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B); 
 
 
 

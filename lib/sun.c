@@ -767,22 +767,13 @@ void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * const rest
 // THE FOLLOWING FUNCTIONS ARE FOR THE MONOPOLES MEASURES
 //
 
-
-// Computation of the Lambda Matrix
-void compute_lambda_matrix_SuN(double *lambda)
-   {
-    int i;
-   
-    // costruisco la matrice L= diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
-    for(i=0; i<NCOLOR; i++)
-       {
-       lambda[i] = (double) (NCOLOR -1)/2 - i;
-       }
-   }
+// A = lambda*B with lambda diagonal marix
+void diag_matrix_times_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
 
 
-
-
+// A=lambda*B^{dag} with lambda diagonal matrix
+void diag_matrix_times_dag_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
+  
 
 
 
