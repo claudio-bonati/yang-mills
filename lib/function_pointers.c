@@ -63,6 +63,10 @@ int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binar
 //  MONOPOLES STUFF
 //
 
+void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_U1;
+void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_dag_U1; 
+void (*max_X_comp_G)(double OverRelaxParam, GAUGE_GROUP *X, GAUGE_GROUP *G) = &max_X_comp_G_U1;
+
 
 
 
@@ -165,6 +169,8 @@ int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binar
 
 void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_Su2;
 void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_dag_Su2; 
+void (*max_X_comp_G)(double OverRelaxParam, GAUGE_GROUP *X, GAUGE_GROUP *G) = &max_X_comp_G_Su2;
+
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_Su2;
 
@@ -266,6 +272,8 @@ int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binar
 
 void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_SuN;
 void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_dag_SuN; 
+void (*max_X_comp_G)(double OverRelaxParam, GAUGE_GROUP *X, GAUGE_GROUP *G) = &max_X_comp_G_SuN;
+
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_SuN;
 

@@ -533,6 +533,19 @@ inline void diag_matrix_times_dag_Su2(Su2 * restrict A,
   }
 
 
+void max_X_comp_G_Su2_aux (double OverRelaxParam,
+		           Su2 *X,
+                           Su2 *G);
+
+void max_X_comp_G_Su2 (double OverRelaxParam,
+		       Su2 *X,
+                       Su2 *G);
+
+
+
+
+
+
 
 // A=B^{dag}*C
 inline void times_dag1_Su2(Su2 * restrict A,

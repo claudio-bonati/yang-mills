@@ -510,6 +510,19 @@ inline void taexp_U1(U1 * restrict A)
   }
 
 
+//
+// MONOPOLES STUFF
+//
+
+
+// all this functions are useless
+void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
+
+void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
+
+void max_X_comp_G_U1(double OverRelaxParam, U1 *X, U1 *G);
+
+
 // print on screen
 void print_on_screen_U1(U1 const * const A);
 

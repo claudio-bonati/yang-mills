@@ -349,7 +349,7 @@ inline void diag_matrix_times_dag_SuN(SuN * restrict A,
      }
   }
 
-
+void max_X_comp_G_SuN (double OverRelaxParam, SuN *X, SuN *G);
 
 
 

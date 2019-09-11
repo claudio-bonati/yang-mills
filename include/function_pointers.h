@@ -93,7 +93,7 @@ int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A);
 
 void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B);
 void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B); 
-
+void (*max_X_comp_G)(double OverRelaxParam, GAUGE_GROUP *X, GAUGE_GROUP *G); 
 
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B);

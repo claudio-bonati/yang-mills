@@ -25,8 +25,8 @@ void max_abelian_gauge(Gauge_Conf *GC,
   
 
   //params
-  double OverrelaxParameter = 1.85;     // The parameter for the Overrelaxation is the una used in the SU(2) case
-  double precision = 0.0000000001;      // This is used to check that the diagonal elements of X(n) are near zero
+  double OverRelaxParam = 1.85;     // The parameter for the Overrelaxation is the una used in the SU(2) case
+  //double precision = 0.0000000001;      // This is used to check that the diagonal elements of X(n) are near zero
   
   // variabili dell'algoritmo
   double funzionale_old;                // unico dubbio, mai veramente usato
@@ -52,34 +52,32 @@ void max_abelian_gauge(Gauge_Conf *GC,
 
   // Adesso nel codice fortran vengo unitarizzati tutti i link del reticolo, qui lo sono già
 
-  // metto a uno la matrice dell'operatore X(n) e G_mag
-  zero(&X);
-  one(&G_mag);
-
   //
   //      ORA COMINCIA IL GAUGE FIXING VERO E PROPRIO
   //
-  comp_operator_X(GC, geo, param, r=0, lambda, &X);
-/*
-  while(non_diag_contr > precision)
+
+  while(non_diag_contr > MIN_VALUE)
        {
        for(r=0; r<(param->d_volume); r++) // Ciclo su tutti i siti del reticolo
           {
+          zero(&X);
+          one(&G_mag);
           // Prima viene calcolato l'operatore X(n) nel sito r
           comp_operator_X(GC, geo, param, r, lambda, &X);
      
           // Viene ora calcolata la matrice di gauge G_mag massimizzando X
-          maximize_operator_X(GC, geo, param, r, &X, &G_mag);
+          max_X_comp_G(OverRelaxParam, &X, &G_mag);
      
           // Ora si applica la trasformazione di gauge G_mag nel punto r
           for(dir=0; dir<STDIM; dir++)
              {
-             apply_mag_single_site(GC, geo, param, &G_mag);
+             times_equal(&(GC->lattice[r][dir]), &G_mag);
+             times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag); 
              }
           }
      
        // Viene calcolata la media del contributo degli elementi non diagonali di X(n)
-       comp_non_diagonal_contribution(GC, &non_diag_contr)
+       comp_non_diagonal_contribution(GC, geo, param, lambda, &non_diag_contr);
       }
       
       // Faccio una unitarizzazione della conf una volta applicata la gauge
@@ -87,9 +85,9 @@ void max_abelian_gauge(Gauge_Conf *GC,
          {
          for(dir=0; dir<STDIM; dir++)
             {
-            unitarize(&(GC->lattice[r][dir]))
+            unitarize(&(GC->lattice[r][dir]));
             }
-         }*/
+         }
   free(lambda);
   }
 
@@ -106,6 +104,7 @@ void comp_operator_X (Gauge_Conf const * const GC,
   {
   int dir, i;
   GAUGE_GROUP aux1, aux2, aux3;
+  zero(X);
 
   for(dir=0; dir<NCOLOR; dir++) 
      {
@@ -121,8 +120,32 @@ void comp_operator_X (Gauge_Conf const * const GC,
      }   
   }
 
-
-
+//questa funzione calcola la media del modulo quadro dei contributi fuori diagonale dell'operatre X(n)
+void comp_non_diagonal_contribution(Gauge_Conf const * const GC, 
+                                    Geometry const * const geo,
+                                    GParam const * const param,
+                                    double *lambda,
+                                    double *non_diag_contr)
+   {
+   int i,j;
+   long r;
+   GAUGE_GROUP X;
+   double aux=0;
+   
+   
+   for(r=0; r<param->d_volume; r++)
+      {
+      comp_operator_X(GC, geo, param, r, lambda, &X);
+      for(i=0; i<NCOLOR-1; i++)
+         {
+        for(j=0; j<NCOLOR; j++)
+           {
+           aux += creal(X.comp[m(i,j)])*creal((X.comp[m(i,j)])) + cimag(X.comp[m(i,j)])*cimag(X.comp[m(i,j)]);
+           }
+         }
+      }
+   *non_diag_contr = (double) aux/(param->d_volume);    
+   }
 
 #endif
 

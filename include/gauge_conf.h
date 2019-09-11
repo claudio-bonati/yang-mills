@@ -350,10 +350,12 @@ void comp_operator_X (Gauge_Conf const * const GC,
                       GAUGE_GROUP *X);
  
 
-
-
-
-
+void comp_non_diagonal_contribution(Gauge_Conf const * const GC, 
+                                    Geometry const * const geo,
+                                    GParam const * const param,
+                                    double *lambda,
+                                    double *non_diag_contr);
+  
 
 
 
