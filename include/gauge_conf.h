@@ -336,28 +336,6 @@ void perform_measures_higgs_test(Gauge_Conf const * const GC,
 
 
 
-// in gauge_conf_monopoles.c
-void max_abelian_gauge(Gauge_Conf *GC,
-                       Geometry const * const geo,
-                       GParam const * const param,
-		       FILE *monofilep);
-
-void comp_operator_X (Gauge_Conf const * const GC,
-		      Geometry const * const geo,
-                      GParam const * const param,
-                      long r,
-                      double *lambda,
-                      GAUGE_GROUP *X);
- 
-
-void comp_non_diagonal_contribution(Gauge_Conf const * const GC, 
-                                    Geometry const * const geo,
-                                    GParam const * const param,
-                                    double *lambda,
-                                    double *non_diag_contr);
-  
-
-
 
 // in gauge_conf_multilevel.c
 void multihit(Gauge_Conf const * const GC,
@@ -564,5 +542,14 @@ void update_with_higgs(Gauge_Conf * GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        double *acc);
+
+
+void max_abelian_gauge(Gauge_Conf *GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       FILE *monofilep);
+ 
+ 
+
 
 #endif

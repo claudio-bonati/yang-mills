@@ -15,7 +15,8 @@
 #include"../include/gauge_conf.h"
 #include"../include/tens_prod.h"
 #include"../include/tens_prod_adj.h"
-
+#include"../include/su2_monopoles.h"
+#include"../include/sun_monopoles.h"
 
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
 double plaquettep(Gauge_Conf const * const GC,
@@ -895,11 +896,20 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
 // MONOPOLES STUFF
      if(param->d_mon_meas == 1)
        {
+     
        Gauge_Conf helperconf;
        init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
        max_abelian_gauge(&helperconf, geo, param, monofilep);
+
+// TEST DELLA PLAQUETTA
+       plaquette(&helperconf, geo, param, &plaqs, &plaqt);
+       
+       fprintf(monofilep, "%.12g %.12g\n", plaqs, plaqt);
+
+
        free_gauge_conf(&helperconf, param);
-       }
+      // fflush(monofilep);
+}
 
      free(charge);
      free(meanplaq);
@@ -2314,6 +2324,91 @@ void perform_measures_higgs_test(Gauge_Conf const * const GC,
 
    fflush(datafilep);
    }
+
+void max_abelian_gauge(Gauge_Conf *GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       FILE *monofilep)
+   {
+   int i, dir;
+   long r;
+   double lambda[NCOLOR];
+   double OverRelaxParam=1.85, non_diag_contribution=1, non_diag_contr_aux, counter, fmag, fmag_aux;
+   GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // x_links contains the 2*STDIM links used in the computation of X(n)
+
+   // Inizialize the matrix lambda L= diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
+   for(i=0; i<NCOLOR; i++)
+     {
+     lambda[i] = ( (double) NCOLOR -1.)/2. - i;
+     }
+ 
+   /////////////////////////////////////////////////////
+   //                                                 //
+   //      NOW THE GAUGE FIXING PROCEDURE BEGINS      //
+   //                                                 //
+   /////////////////////////////////////////////////////
+   
+
+   while(non_diag_contribution > MIN_VALUE)
+       {
+   
+       for(r=0;r<param->d_volume;r++)
+         {
+         
+         //Initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r. Links 0-(STDIM-1) are forward, while links STDIM-(2*STDIM-1) are backwards.
+         for(dir=0;dir<STDIM;dir++)
+           {
+           equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+           equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+           }
+          
+           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+ 
+         // Apply the gauge transformation to the whole lattice
+         for(dir=0; dir<STDIM; dir++)
+           {
+           times(&help, &G_mag, &(GC->lattice[r][dir]));
+           equal(&(GC->lattice[r][dir]), &help);
+           times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);  
+           }
+         }
+         
+         //Control if the diagonal elements of X(n) computed on the new conf are zero and compute the functional
+
+         non_diag_contr_aux=0;
+         fmag_aux=0;
+         for(r=0;r<param->d_volume;r++)
+           {
+           for(dir=0;dir<STDIM;dir++)
+             {
+             equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+             equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+             }
+           
+           //comp_functional_fmag(X_links, lambda, &fmag);
+           //fmag_aux += fmag;
+           
+           comp_non_diagonal_contribution(X_links, lambda, &counter);           
+           non_diag_contr_aux += counter;
+           }      
+     
+         non_diag_contribution =  non_diag_contr_aux*param->d_inv_vol;
+         //printf("%.12g\n", fmag_aux);
+         //fprintf(monofilep, "%.12g\n", non_diag_contribution);
+         //fflush(monofilep);
+       }
+
+    // Unitarize all the links of the conf after the gauge fixing
+   for(r=0; r<(param->d_volume); r++)
+      {
+      for(dir=0; dir<STDIM; dir++)
+         {
+         unitarize(&(GC->lattice[r][dir]));
+         }
+      }
+   } 
+
+
 
 
 

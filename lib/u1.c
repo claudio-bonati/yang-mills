@@ -170,11 +170,19 @@ void print_on_screen_U1(U1 const * const A)
 //
 
 // all this functions are useless
-void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B) {(void)A;};
+void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B) 
+{
+(void)A;
+(void)lambda[0];
+(void)B;
+}
 
-void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B) {(void)B;};
-
-void max_X_comp_G_U1(double OverRelaxParam, U1 *X, U1 *G) {(void)X;};
+void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B)
+{
+(void)A;
+(void)lambda[0];
+(void)B;
+}
 
 // print on file
 int print_on_file_U1(FILE *fp, U1 const * const A)

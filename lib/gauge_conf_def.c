@@ -59,6 +59,14 @@ void init_gauge_conf(Gauge_Conf *GC, GParam const * const param)
           plus_equal(&aux2, &aux1);
           unitarize(&aux2);
           equal_dag(&(GC->lattice[r][j]), &aux2);
+        
+
+
+
+
+// !!!!!!
+         //equal_dag(&(GC->lattice[r][j]), &aux1);
+          
           }
        }
     }

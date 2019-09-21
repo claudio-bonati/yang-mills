@@ -14,7 +14,9 @@
 #include"tens_prod_adj.h"
 #include"u1.h"
 #include"u1_upd.h"
-
+#include"geometry.h"
+#include"gparam.h"
+#include"gauge_conf.h"
 
 void (*one)(GAUGE_GROUP *A);         // A=1
 void (*zero)(GAUGE_GROUP *A);        // A=0
@@ -93,7 +95,10 @@ int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A);
 
 void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B);
 void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B); 
-void (*max_X_comp_G)(double OverRelaxParam, GAUGE_GROUP *X, GAUGE_GROUP *G); 
+void (*comp_MAG_gauge_transformation) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double OverRelaxParam, GAUGE_GROUP *G_mag);
+void (*comp_non_diagonal_contribution) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *non_diag_contr);
+void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *fmag);
+
 
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B);

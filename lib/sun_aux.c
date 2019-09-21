@@ -67,10 +67,10 @@ void ennetodue(SuN const * const in, int i, int j, double *xi, Su2 *u)
 // X = (x_ii, x_ij, x_ji, x_jj) = (x_ii + x_jj)/2*Id + i*\vec{x}*sigma con vec{x} = (Re(x_ij), Im(x_ji), 0.5*(x_ii - x_jj))
 void ennetodue_bis(SuN const * const in, int i, int j, Su2 *u)
    {
-   u->comp[0] = 0.5*(creal(in->comp[m(i,i)]) + creal(in->comp[m(j,j)]));
+   u->comp[0] = 0.5*(creal(in->comp[m(i,i)]) +  cimag(in->comp[m(i,i)]) + creal(in->comp[m(j,j)]) + cimag(in->comp[m(j,j)]));
    u->comp[1] = creal(in->comp[m(i,j)]);
    u->comp[2] = cimag(in->comp[m(j,i)]);
-   u->comp[3] = 0.5*(creal(in->comp[m(i,i)]) - creal(in->comp[m(j,j)]));
+   u->comp[3] = 0.5*(creal(in->comp[m(i,i)]) + cimag(in->comp[m(i,i)]) - creal(in->comp[m(j,j)]) - cimag(in->comp[m(j,j)]));
    }
 
 

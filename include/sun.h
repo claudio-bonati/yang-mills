@@ -337,8 +337,7 @@ inline void diag_matrix_times_dag_SuN(SuN * restrict A,
   __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
-  int i, j, k;
-  double complex sum;
+  int i, j;
 
   for(i=0; i<NCOLOR; i++)
      {
@@ -348,9 +347,6 @@ inline void diag_matrix_times_dag_SuN(SuN * restrict A,
         }
      }
   }
-
-void max_X_comp_G_SuN (double OverRelaxParam, SuN *X, SuN *G);
-
 
 
 // A=b*B^{dag}+c*C

@@ -445,75 +445,11 @@ void plus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B);
 // *= with real number
 void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r);
 
-
-
-// MONOPOLES 
 // A = lambda*B with lambda diagonal marix
 void diag_matrix_times_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
 
 // A=lambda*B^{dag} with lambda diagonal matrix
 void diag_matrix_times_dag_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
-
-
-// questa funzione massimizza l'operatore X(n) e calcola la matrice trasformazione di gauge G(n) -- CASO SU(2)
-// ref C. Bonati, M. D'Elia Nuc. Phys. B 877 (2013) 233-259 
-void max_X_comp_G_Su2_aux (double OverRelaxParam,
-		           Su2 *X,
-                           Su2 *G)
-   {
-    //la matrice X, essendo traceless, può essere scritta come X = \vec*{x}*\sigma con \vec{x} = (x1,x2,x3)
-   double X_mod, X1, X2, X3;
-   double alpha_max, theta;
-   
-   X_mod = sqrt((X->comp[1])*(X->comp[1]) + (X->comp[2])*(X->comp[2]) + (X->comp[3])*(X->comp[3]));
-   
-   if (X_mod < MIN_VALUE)
-      return;
-   else
-   
-    
-   X1 = (double) (X->comp[1])/X_mod;
-   X2 = (double) (X->comp[2])/X_mod;
-   X3 = (double) (X->comp[3])/X_mod;
-   
-   X_mod = sqrt(X1*X1 + X2*X2);
-   
-   if (X_mod < MIN_VALUE)
-      return;
-   else 
-   
-   X1 = (double) X1/X_mod;
-   X2 = (double) X2/X_mod;
-   
-   theta = acos(X3);
-   
-   alpha_max = (double) OverRelaxParam*(theta/2);
-   
-   
-   G->comp[0]  =  cos(alpha_max);
-   G->comp[1]  = -sin(alpha_max)*X2;
-   G->comp[0]  =  sin(alpha_max)*X1;
-   
-   return;
-   }
-
-// questa funzione massimizza il funzionale X e gli applica la matrice di gauge G
-void max_X_comp_G_Su2 (double OverRelaxParam,
-                       Su2 *X,
-                       Su2 *G)
-   {
-   Su2 aux;
-
-   max_X_comp_G_Su2_aux(OverRelaxParam, X, G);
-
-   // X -> G*X*G^{dag}
-   times_equal_dag_Su2(X, G);
-   times_Su2(&aux, G, X);
-   equal_Su2(X, &aux);
-   }
- 
-
-
 
 // norm
 double norm_Su2Vecs(Su2Vecs const * const restrict A);
