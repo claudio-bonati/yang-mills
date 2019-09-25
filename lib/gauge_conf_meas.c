@@ -17,6 +17,8 @@
 #include"../include/tens_prod_adj.h"
 #include"../include/su2_monopoles.h"
 #include"../include/sun_monopoles.h"
+#include"../include/u1_monopoles.h"
+
 
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
 double plaquettep(Gauge_Conf const * const GC,
@@ -823,17 +825,26 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
 
      free(charge);
      free(meanplaq);
+#else
 
+// MONOPOLES STUFF
      if(param->d_mon_meas == 1)
        {
+     
        Gauge_Conf helperconf;
        init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+       
+       //gauge fixing
        max_abelian_gauge(&helperconf, geo, param, monofilep);
-       free_gauge_conf(&helperconf, param);
-       }
+   
+   //    write_conf_on_file(&helperconf, param);
+printf("ho salvato la conf\n");
+       //diagonal projection
+       diag_projection(&helperconf, geo, param);
 
-   #else
-
+      free_gauge_conf(&helperconf, param);
+      }
+   
      double plaqs, plaqt, polyre, polyim;
 
      plaquette(GC, geo, param, &plaqs, &plaqt);
@@ -899,7 +910,16 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
      
        Gauge_Conf helperconf;
        init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+       
+       //gauge fixing
        max_abelian_gauge(&helperconf, geo, param, monofilep);
+   
+   //    write_conf_on_file(&helperconf, param);
+printf("ho salvato la conf\n");
+       //diagonal projection
+       diag_projection(&helperconf, geo, param);
+
+
 
 // TEST DELLA PLAQUETTA
        plaquette(&helperconf, geo, param, &plaqs, &plaqt);
@@ -2348,13 +2368,15 @@ void max_abelian_gauge(Gauge_Conf *GC,
    //                                                 //
    /////////////////////////////////////////////////////
    
-
+//long r1;
    while(non_diag_contribution > MIN_VALUE)
        {
    
        for(r=0;r<param->d_volume;r++)
          {
-         
+   //      r=lex_to_si(r1, param);
+   //      printf("sito %ld\n", r);
+
          //Initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r. Links 0-(STDIM-1) are forward, while links STDIM-(2*STDIM-1) are backwards.
          for(dir=0;dir<STDIM;dir++)
            {
@@ -2376,7 +2398,7 @@ void max_abelian_gauge(Gauge_Conf *GC,
          //Control if the diagonal elements of X(n) computed on the new conf are zero and compute the functional
 
          non_diag_contr_aux=0;
-         fmag_aux=0;
+         //fmag_aux=0;
          for(r=0;r<param->d_volume;r++)
            {
            for(dir=0;dir<STDIM;dir++)
@@ -2408,7 +2430,27 @@ void max_abelian_gauge(Gauge_Conf *GC,
       }
    } 
 
+//Extract the diagonal part of each gauge link. 
+void diag_projection(Gauge_Conf *GC, 
+                     Geometry const * const geo, 
+                     GParam const * const param)
+   {
+   //initialize the lattice conf for the abelian phases
+   
+   int subg, dir; 
+   long r;
+   alloc_diag_proj(GC, param);
 
+   // Now I take the argument of the diagonal elements
+   for(r=0;r<param->d_volume;r++)
+     {
+     for(dir=0;dir<STDIM;dir++)
+       {
+       diag_projection_single_site(GC, &(GC->lattice[r][dir]), r, dir);
+       }
+     }
+   free_diag_proj(GC, param);
+   }
 
 
 

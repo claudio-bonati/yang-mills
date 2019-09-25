@@ -50,7 +50,21 @@ void comp_functional_fmag_U1 (U1 X_links[2*STDIM],
    }
 
 
+// In the U(1) we just need the argument of the complex number
+void diag_projection_single_site_U1(Gauge_Conf *GC,
+                                     U1 *link, 
+                                     long r,
+                                     int dir)
 
+   {
+   double phi;
+   
+   phi = atan2(cimag(link->comp), creal(link->comp));
+
+   //printf("sito %ld dir %d angoli %.12lg\n", r, dir, phi);
+
+   (GC->diag_proj[r][dir][0]) = phi;
+   }
  #endif
 
 

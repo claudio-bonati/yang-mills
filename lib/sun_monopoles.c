@@ -216,6 +216,74 @@ void comp_functional_fmag_SuN(SuN X_links[2*STDIM],
    }
 
 
+void diag_projection_single_site_SuN(Gauge_Conf *GC,
+                                     SuN *link, 
+                                     long r,
+                                     int dir)
+   {
+   int subg;
+   double phi[NCOLOR], inv_rho[NCOLOR], dphi, inv_rho_sum, phi_aux;
+   complex double u_ii; 
+
+
+   dphi=0;
+   inv_rho_sum=0;
+   for(subg=0;subg<NCOLOR;subg++)
+     {
+     u_ii = link->comp[m(subg,subg)];
+     phi[subg] = atan2(cimag(u_ii), creal(u_ii));
+
+   //printf("INIZIO site %ld dir %d sub %d : %.12lf\n", r, dir, subg, phi[subg]);
+     
+
+     //D = diag(exp(i phi1),exp(i phi2),exp(i phi3), ... . exp(i phiN))
+     //condition for maximum Re(Tr(U*D^dag)) is
+     //|U_11| sin(phi1 - theta1) = |U_22| sin(phi2 - theta2) = |U_22| sin(phi3 - theta3) = ...
+     //assuming phases are already almost factorized, we linearize "sin", then
+     //(phii - thetai) \propto 1/|U_ii| 
+     // the general formula is phidiag_i = phi_i - dphi *(|U_ii|^{-1}/sum_j|U_jj|^{-1})       
+
+
+     inv_rho[subg] = 1.0/(sqrt(creal(u_ii)*creal(u_ii) + cimag(u_ii)*cimag(u_ii)));
+     inv_rho_sum += inv_rho[subg];
+     
+     dphi += phi[subg]; 
+     }
+     if(dphi > PI)
+      {
+      dphi = dphi - PI2;
+      }
+     else if(dphi < -PI)
+      {
+      dphi = dphi + PI2;
+      }
+     
+
+     for(subg=0;subg<NCOLOR;subg++)
+       {      
+       phi_aux =  phi[subg] - dphi*inv_rho[subg]/inv_rho_sum;
+       if(phi_aux > PI)
+        {
+        phi_aux = phi_aux - PI2;
+        }
+       else if (phi_aux < -PI)
+        {
+        phi_aux = phi_aux + PI2;
+        } 
+       
+       (GC->diag_proj[r][dir][subg]) = phi_aux;
+       //printf("final angles site %ld dir %d sub %d : %.12lf\n", r, dir, subg, GC->diag_proj[r][dir][subg]);
+       }
+   }
+
+
+
+
+
+
+
+
+
 #endif
 
 

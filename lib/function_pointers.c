@@ -70,7 +70,9 @@ void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP 
 void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_dag_U1; 
 void (*comp_non_diagonal_contribution) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *non_diag_contr) = &comp_non_diagonal_contribution_U1; 
 void (*comp_MAG_gauge_transformation) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double OverRelaxParam, GAUGE_GROUP *G_mag) = &comp_MAG_gauge_transformation_U1;
-void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *fmag) = &comp_functional_fmag_U1;
+void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *fmag) = &comp_functional_fmag_U1; 
+void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir) = &diag_projection_single_site_U1;
+
 
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_U1;
@@ -175,7 +177,7 @@ void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GR
 void (*comp_MAG_gauge_transformation) (GAUGE_GROUP helper_X[2*STDIM], double lambda[NCOLOR], double OverRelaxParam, GAUGE_GROUP *G_mag) = &comp_MAG_gauge_transformation_Su2;
 void (*comp_non_diagonal_contribution) (GAUGE_GROUP helper_X[2*STDIM], double lambda[NCOLOR], double *non_diag_contr) = &comp_non_diagonal_contribution_Su2;
 void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *fmag) = &comp_functional_fmag_Su2;
-
+void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir) = &diag_projection_single_site_Su2;
 
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_Su2;
@@ -281,7 +283,7 @@ void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GR
 void (*comp_non_diagonal_contribution) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *non_diag_contr) = &comp_non_diagonal_contribution_SuN;
 void (*comp_MAG_gauge_transformation) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double OverRelaxParam, GAUGE_GROUP *G_mag) = &comp_MAG_gauge_transformation_SuN;
 void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *fmag) = &comp_functional_fmag_SuN;
-
+void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir) = &diag_projection_single_site_SuN;
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_SuN;
 

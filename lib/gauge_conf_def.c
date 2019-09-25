@@ -2001,6 +2001,57 @@ void compute_md5sum_higgs(char *res, Gauge_Conf const * const GC, GParam const *
      }
   }
 
+void alloc_diag_proj(Gauge_Conf *GC,
+                     GParam const * const param)
+   {
+   int err, dir;
+   long r;
 
+   err=posix_memalign((void**) &(GC->diag_proj), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating the diagonal projection on the lattice (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   
+   for(r=0;r<param->d_volume;r++)
+     {
+     err=posix_memalign((void**) &(GC->diag_proj[r]), (size_t)DOUBLE_ALIGN, (size_t) STDIM * sizeof(double));
+     if(err!=0)
+      {
+      fprintf(stderr, "Problems in allocating the diagonal projection on the lattice (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+     for(dir=0; dir<STDIM; dir++)
+       {   
+       err=posix_memalign((void**) &(GC->diag_proj[r][dir]), (size_t)DOUBLE_ALIGN, (size_t) NCOLOR * sizeof(double));
+       if(err!=0)
+        {
+        fprintf(stderr, "Problems in allocating the diagonal projection on the lattice (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
+       } 
+     }
+   }
+
+void free_diag_proj(Gauge_Conf *GC,
+                    GParam const * const param)
+   {
+   int err, dir;
+   long r;
+   
+
+   for(r=0;r<param->d_volume;r++)
+     {
+     for(dir=0;dir<STDIM;dir++)
+       {
+       free((GC->diag_proj[r][dir]));
+       }
+     free((GC->diag_proj[r]));
+    } free(GC->diag_proj);
+
+
+
+   }
 
 #endif

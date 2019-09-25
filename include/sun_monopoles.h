@@ -26,4 +26,10 @@ void comp_functional_fmag_SuN(SuN X_links[2*STDIM],
                               double lambda[NCOLOR],
                               double *fmag);
 
+
+void diag_projection_single_site_SuN(Gauge_Conf *GC,
+                                     SuN *link,
+                                     long r,
+                                     int dir);
+  
 #endif

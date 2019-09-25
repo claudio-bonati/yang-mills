@@ -14,7 +14,7 @@
 #include"../include/gparam.h"
 #include"../include/su2_monopoles.h"
 #include"../include/sun_monopoles.h"
-
+#include"../include/u1_monopoles.h"
 
 // This function compute the MAG gauge transformation
 void comp_MAG_gauge_transformation_Su2 (Su2 X_links[2*STDIM],
@@ -301,6 +301,37 @@ void comp_functional_fmag_Su2(Su2 X_links[2*STDIM],
    
    *fmag = creal(X[0]) + cimag(X[0]) + creal(X[3]) + cimag(X[3]);
    }
+
+// In the SU(2) we just need the phase of the diagonal elements of each link
+void diag_projection_single_site_Su2(Gauge_Conf *GC,
+                                     Su2 *link, 
+                                     long r,
+                                     int dir)
+   {
+   int subg;
+   double phi[NCOLOR], inv_rho[NCOLOR], dphi, inv_rho_sum, phi_aux;
+   complex double U_matrix[4]; 
+   
+
+   dphi=0;
+   inv_rho_sum=0;
+
+ 
+   U_matrix[0]  =  link->comp[0] + link->comp[3]*I;     
+   U_matrix[1]  =  link->comp[2] + link->comp[1]*I;     
+   U_matrix[2]  = -link->comp[2] + link->comp[1]*I;     
+   U_matrix[3]  =  link->comp[0] - link->comp[3]*I;     
+  
+ 
+   phi[0] = atan2(cimag(U_matrix[0]), creal(U_matrix[0]));
+   phi[1] = atan2(cimag(U_matrix[3]), creal(U_matrix[3]));
+
+   //printf("sito %ld dir %d angoli %.12lg %.12lg\n", r, dir, phi[0], phi[1]);
+
+   (GC->diag_proj[r][dir][0]) = phi[0];
+   (GC->diag_proj[r][dir][1]) = phi[1];
+   }
+
 
 
 

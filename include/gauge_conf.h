@@ -43,6 +43,9 @@ typedef struct Gauge_Conf {
   // for higgs field & co
   GAUGE_VECS *higgs;    // [volume]
   FMatrix *Qh;          // [volume]
+ 
+  // for Abelian projection
+  double ***diag_proj; // [volume] [STDIM] [ABELIAN SUBGROUP TYPE]
   } Gauge_Conf;
 
 
@@ -157,6 +160,12 @@ void write_higgs_on_file_back(Gauge_Conf const * const GC,
 void compute_md5sum_higgs(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                           Gauge_Conf const * const GC,
                           GParam const * const param);
+
+void alloc_diag_proj(Gauge_Conf *GC,
+                    GParam const * const param);
+
+void free_diag_proj(Gauge_Conf *GC,
+                    GParam const * const param);
 
 
 // in gauge_conf_meas.c
@@ -543,6 +552,11 @@ void update_with_higgs(Gauge_Conf * GC,
                        GParam const * const param,
                        double *acc);
 
+
+void diag_projection(Gauge_Conf *GC, 
+                     Geometry const * const geo, 
+                     GParam const * const param);
+ 
 
 void max_abelian_gauge(Gauge_Conf *GC,
                        Geometry const * const geo,

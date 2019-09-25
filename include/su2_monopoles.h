@@ -32,5 +32,11 @@ void comp_functional_fmag_Su2(Su2 X_links[2*STDIM],
                               double lambda[2],
                               double *fmag);
 
+
+
+void diag_projection_single_site_Su2(Gauge_Conf *GC,
+                                     Su2 *link, 
+                                     long r,
+                                     int dir);
 #endif
 

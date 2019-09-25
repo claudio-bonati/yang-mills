@@ -26,6 +26,13 @@ void comp_functional_fmag_U1 (U1 X_links[2*STDIM],
                               double *lambda,
                               double *fmag);
  
+void diag_projection_single_site_U1(Gauge_Conf *GC,
+                                     U1 *link, 
+                                     long r,
+                                     int dir);
+
+
+
 
 #endif
 
