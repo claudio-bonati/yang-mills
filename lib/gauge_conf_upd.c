@@ -1665,7 +1665,7 @@ void overrelaxation_for_higgs(Gauge_Conf *GC,
 
 
 // perform an update of the higgs field with metropolis
-// return the number of accepted moves (from 0 to NHIGGS-1)
+// return the number of accepted moves (from 0 to NHIGGS)
 int metropolis_for_higgs(Gauge_Conf *GC,
                          Geometry const * const geo,
                          GParam const * const param,
@@ -1852,7 +1852,7 @@ void update_with_higgs(Gauge_Conf * GC,
 
    // final normalization for higgs
    #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
    #endif
    for(r=0; r<(param->d_volume); r++)
       {

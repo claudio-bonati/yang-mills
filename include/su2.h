@@ -1138,7 +1138,7 @@ inline double re_scal_prod_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs co
   #endif
 
   int i, j;
-  Su2 aux1, aux2;
+  Su2 aux1, aux2 __attribute__((aligned(DOUBLE_ALIGN)));
   double ris=0.0;
 
   for(i=0; i<NHIGGS; i++)
@@ -1151,7 +1151,7 @@ inline double re_scal_prod_Su2Vecs(Su2Vecs const * const restrict v1, Su2Vecs co
 
      times_equal_dag_Su2(&aux2, &aux1);
      ris+=retr_Su2(&aux2);  // the 0.5 that is due to the different normalization of matrices and vectors
-                            // (see text above the definition of Su2Vecs) is not needed sing retr = trace/2
+                            // (see text above the definition of Su2Vecs) is not needed since retr = trace/2
      }
 
   return ris;
@@ -1167,7 +1167,7 @@ inline double re_scal_prod_single_Su2Vecs(Su2Vecs const * const restrict v1, Su2
   #endif
 
   int j;
-  Su2 aux1, aux2;
+  Su2 aux1, aux2 __attribute__((aligned(DOUBLE_ALIGN)));
   double ris;
 
   for(j=0; j<4; j++)
@@ -1178,7 +1178,7 @@ inline double re_scal_prod_single_Su2Vecs(Su2Vecs const * const restrict v1, Su2
 
   times_equal_dag_Su2(&aux2, &aux1);
   ris=retr_Su2(&aux2);  // the 0.5 that is due to the different normalization of matrices and vectors
-                        // (see text above the definition of Su2Vecs) is not needed sing retr = trace/2
+                        // (see text above the definition of Su2Vecs) is not needed since retr = trace/2
 
   return ris;
   }
@@ -1195,7 +1195,7 @@ inline void matrix_times_vector_single_Su2Vecs(Su2Vecs * restrict v1, Su2 const 
   #endif
 
   int j;
-  Su2 aux1, aux2;
+  Su2 aux1, aux2 __attribute__((aligned(DOUBLE_ALIGN)));
 
   equal_Su2Vecs(v1, v2);
 
@@ -1224,7 +1224,7 @@ inline void matrix_times_vector_all_Su2Vecs(Su2Vecs * restrict v1, Su2 const * c
   #endif
 
   int i, j;
-  Su2 aux1, aux2;
+  Su2 aux1, aux2 __attribute__((aligned(DOUBLE_ALIGN)));
 
   for(i=0; i<NHIGGS; i++)
      {
@@ -1254,7 +1254,7 @@ inline void vector_tensor_vector_Su2Vecs(Su2 * restrict matrix, Su2Vecs const * 
   #endif
 
   int i, j;
-  Su2 aux1, aux2, aux3;
+  Su2 aux1, aux2, aux3 __attribute__((aligned(DOUBLE_ALIGN)));
 
   zero_Su2(matrix);
 
