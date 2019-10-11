@@ -2049,9 +2049,85 @@ void free_diag_proj(Gauge_Conf *GC,
        }
      free((GC->diag_proj[r]));
     } free(GC->diag_proj);
-
-
-
    }
+
+
+
+void alloc_u1_subg(Gauge_Conf *GC,
+                   GParam const * const param)
+   {
+   int err, dir;
+   long r;
+
+   err=posix_memalign((void**) &(GC->u1_subg), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating the u1 extraction on the lattice (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   
+   for(r=0;r<param->d_volume;r++)
+     {
+     err=posix_memalign((void**) &(GC->u1_subg[r]), (size_t)DOUBLE_ALIGN, (size_t) STDIM * sizeof(double));
+     if(err!=0)
+      {
+      fprintf(stderr, "Problems in allocating the u1 extraction on the lattice (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+     }
+   }
+
+
+void free_u1_subg(Gauge_Conf *GC,
+                  GParam const * const param)
+   {
+   long r;
+   
+   for(r=0;r<param->d_volume;r++)
+     {
+     free((GC->u1_subg[r]));
+     } free(GC->u1_subg);
+   }
+
+void alloc_uflag(Gauge_Conf *GC,
+                 GParam const * const param)
+   {
+   int err, dir;
+   long r;
+
+   err=posix_memalign((void**) &(GC->uflag), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating the uflag on the lattice (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   
+   for(r=0;r<param->d_volume;r++)
+     {
+     err=posix_memalign((void**) &(GC->uflag[r]), (size_t)DOUBLE_ALIGN, (size_t) STDIM * sizeof(double));
+     if(err!=0)
+      {
+      fprintf(stderr, "Problems in allocating the uflag on the lattice (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+     }
+   }
+
+
+void free_uflag(Gauge_Conf *GC,
+                GParam const * const param)
+   {
+   int err, dir;
+   long r;
+   
+
+   for(r=0;r<param->d_volume;r++)
+     {
+     free((GC->uflag[r]));
+     } free(GC->uflag);
+   }
+
+
+
 
 #endif
