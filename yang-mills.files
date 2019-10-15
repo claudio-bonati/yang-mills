@@ -83,3 +83,4 @@ include/flavour_matrix.h
 lib/flavour_matrix.c
 src/debug_su2sun.c
 lib/gauge_conf_monopoles.c
+lib/gauge_conf_meas_multilevel.c
