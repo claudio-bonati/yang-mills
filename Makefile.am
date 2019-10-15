@@ -67,15 +67,19 @@ random = ./include/myrngparam.h \
 
 su2 = ./include/su2.h \
       ./include/su2_upd.h \
+      ./include/su2_monopoles.h \
       ./lib/su2.c \
-      ./lib/su2_upd.c 
+      ./lib/su2_upd.c \
+      ./lib/su2_monopoles.c 
 
 sun = ./include/sun_aux.h \
       ./include/sun.h \
       ./include/sun_upd.h \
+      ./include/sun_monopoles.h \
       ./lib/sun_aux.c \
       ./lib/sun.c \
-      ./lib/sun_upd.c 
+      ./lib/sun_upd.c \
+      ./lib/sun_monopoles.c
 
 tens_prod = ./include/tens_prod.h \
             ./include/tens_prod_adj.h \
@@ -84,8 +88,10 @@ tens_prod = ./include/tens_prod.h \
 
 u1 = ./include/u1.h \
      ./include/u1_upd.h \
+     ./include/u1_monopoles.h \
      ./lib/u1.c \
-     ./lib/u1_upd.c
+     ./lib/u1_upd.c \
+     ./lib/u1_monopoles.c
 
 everything =  $(align) \
               $(dSFMT)  \

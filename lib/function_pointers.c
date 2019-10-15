@@ -11,6 +11,9 @@
 #include"../include/tens_prod_adj.h"
 #include"../include/u1.h"
 #include"../include/u1_upd.h"
+#include"../include/sun_monopoles.h"
+#include"../include/su2_monopoles.h"
+#include"../include/u1_monopoles.h"
 
 #if NCOLOR == 1
 
@@ -58,6 +61,19 @@ int  (*print_on_file)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_file_U1
 int  (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_binary_file_bigen_U1;
 int  (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_U1;
 int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_U1;
+
+//
+//  MONOPOLES STUFF
+//
+
+void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_U1;
+void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_dag_U1; 
+void (*comp_non_diagonal_contribution) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *non_diag_contr) = &comp_non_diagonal_contribution_U1; 
+void (*comp_MAG_gauge_transformation) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double OverRelaxParam, GAUGE_GROUP *G_mag) = &comp_MAG_gauge_transformation_U1;
+void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *fmag) = &comp_functional_fmag_U1; 
+void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir) = &diag_projection_single_site_U1;
+
+
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_U1;
 
@@ -152,6 +168,18 @@ int  (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &pri
 int  (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_Su2;
 int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_Su2;
 
+//
+// MONOPOLES STUFF
+//
+
+void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_Su2;
+void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_dag_Su2; 
+void (*comp_MAG_gauge_transformation) (GAUGE_GROUP helper_X[2*STDIM], double lambda[NCOLOR], double OverRelaxParam, GAUGE_GROUP *G_mag) = &comp_MAG_gauge_transformation_Su2;
+void (*comp_non_diagonal_contribution) (GAUGE_GROUP helper_X[2*STDIM], double lambda[NCOLOR], double *non_diag_contr) = &comp_non_diagonal_contribution_Su2;
+void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *fmag) = &comp_functional_fmag_Su2;
+void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir) = &diag_projection_single_site_Su2;
+
+
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_Su2;
 
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_Su2;
@@ -244,6 +272,18 @@ int  (*print_on_file)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_file_Su
 int  (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A) = &print_on_binary_file_bigen_SuN;
 int  (*read_from_file)(FILE *fp, GAUGE_GROUP *A) = &read_from_file_SuN;
 int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A) = &read_from_binary_file_bigen_SuN;
+
+
+//
+// MONOPOLES STUFF
+//
+
+void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_SuN;
+void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B) = &diag_matrix_times_dag_SuN;
+void (*comp_non_diagonal_contribution) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *non_diag_contr) = &comp_non_diagonal_contribution_SuN;
+void (*comp_MAG_gauge_transformation) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double OverRelaxParam, GAUGE_GROUP *G_mag) = &comp_MAG_gauge_transformation_SuN;
+void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *fmag) = &comp_functional_fmag_SuN;
+void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir) = &diag_projection_single_site_SuN;
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_SuN;
 

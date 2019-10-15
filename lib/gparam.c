@@ -207,6 +207,19 @@ void readinput(char *in_file, GParam *param)
                     }
                   param->d_measevery=temp_i;
                   }
+          
+	   //MONOPOLES  measures
+           else if(strncmp(str, "monopoles", 9)==0)
+                  { 
+                  err=fscanf(input, "%d", &temp_i);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  param->d_mon_meas=temp_i;
+                  }
+
 
            else if(strncmp(str, "start", 5)==0)
                   { 
@@ -398,6 +411,17 @@ void readinput(char *in_file, GParam *param)
                     }
                   strcpy(param->d_data_file, temp_str);
                   }
+	   // MONOPOLES file
+	   else if(strncmp(str, "mon_file", 8)==0)
+                  { 
+                  err=fscanf(input, "%s", temp_str);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  strcpy(param->d_mon_file, temp_str);
+                  }
            else if(strncmp(str, "log_file", 8)==0)
                   { 
                   err=fscanf(input, "%s", temp_str);
@@ -566,6 +590,44 @@ void init_data_file(FILE **dataf, GParam const * const param)
   fflush(*dataf);
   }
 
+// initialize MONOPOLES file
+void init_mon_file(FILE **monof, GParam const * const param)
+  {
+  int i;
+
+  if(param->d_start==2)
+    {
+    *monof=fopen(param->d_mon_file, "r");
+    if(*monof!=NULL) // file exists
+      {
+      fclose(*monof);
+      *monof=fopen(param->d_mon_file, "a");
+      }
+    else
+      {
+      *monof=fopen(param->d_mon_file, "w");
+      fprintf(*monof, "%d ", STDIM);
+      for(i=0; i<STDIM; i++)
+         {
+         fprintf(*monof, "%d ", param->d_size[i]);
+         }
+      fprintf(*monof, "\n");
+      }
+    }
+  else
+    {
+    *monof=fopen(param->d_mon_file, "w");
+    fprintf(*monof, "%d ", STDIM);
+    for(i=0; i<STDIM; i++)
+       {
+       fprintf(*monof, "%d ", param->d_size[i]);
+       }
+    fprintf(*monof, "\n");
+    }
+  fflush(*monof);
+  }
+
+
 
 // print simulation parameters
 void print_parameters_local(GParam const * const param, time_t time_start, time_t time_end)
@@ -603,6 +665,7 @@ void print_parameters_local(GParam const * const param, time_t time_start, time_
     fprintf(fp, "thermal:   %d\n", param->d_thermal);
     fprintf(fp, "overrelax: %d\n", param->d_overrelax);
     fprintf(fp, "measevery: %d\n", param->d_measevery);
+    fprintf(fp, "monopoles: %d\n", param->d_mon_meas);
     fprintf(fp, "\n");
 
     fprintf(fp, "start:                   %d\n", param->d_start);
@@ -952,6 +1015,7 @@ void print_parameters_tracedef(GParam const * const param, time_t time_start, ti
     fprintf(fp, "thermal:   %d\n", param->d_thermal);
     fprintf(fp, "overrelax: %d\n", param->d_overrelax);
     fprintf(fp, "measevery: %d\n", param->d_measevery);
+    fprintf(fp, "monopoles: %d\n", param->d_mon_meas);
     fprintf(fp, "\n");
 
     fprintf(fp, "start:                   %d\n", param->d_start);

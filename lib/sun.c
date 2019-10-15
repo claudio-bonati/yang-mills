@@ -13,6 +13,7 @@
 #include"../include/macro.h"
 #include"../include/random.h"
 #include"../include/sun.h"
+#include"../include/sun_aux.h"
 #include"../include/sun_upd.h"
 #include"../include/tens_prod.h"
 #include"../include/tens_prod_adj.h"
@@ -761,6 +762,18 @@ void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * const r
 // FM[mf(i,j)]=\sum_{on_gauge}conj(v1[i])v1[j] - delta^{ij}/N
 // i, j are the flavour indices
 void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * const restrict v1);
+
+
+//
+// THE FOLLOWING FUNCTIONS ARE FOR THE MONOPOLES MEASURES
+//
+
+// A = lambda*B with lambda diagonal marix
+void diag_matrix_times_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
+
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+void diag_matrix_times_dag_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
 
 
 // print on file

@@ -43,6 +43,12 @@ typedef struct Gauge_Conf {
   // for higgs field & co
   GAUGE_VECS *higgs;    // [volume]
   FMatrix *Qh;          // [volume]
+ 
+  // for Abelian projection & co
+  double ***diag_proj; // [volume] [STDIM] [ABELIAN SUBGROUP TYPE]
+  double **u1_subg;    // [volume] [STDIM]
+  double **uflag;      // [volume] [STDIM] this is used to check if the link has already been considered in the searching of the Wraps
+ 
   } Gauge_Conf;
 
 
@@ -158,6 +164,28 @@ void compute_md5sum_higgs(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                           Gauge_Conf const * const GC,
                           GParam const * const param);
 
+void alloc_diag_proj(Gauge_Conf *GC,
+                    GParam const * const param);
+
+void free_diag_proj(Gauge_Conf *GC,
+                    GParam const * const param);
+
+
+void alloc_u1_subg(Gauge_Conf *GC,
+                   GParam const * const param);
+
+void free_u1_subg(Gauge_Conf *GC,
+                  GParam const * const param);
+
+
+void alloc_uflag(Gauge_Conf *GC,
+                 GParam const * const param);
+
+void free_uflag(Gauge_Conf *GC,
+                GParam const * const param);
+
+
+
 
 // in gauge_conf_meas.c
 double plaquettep(Gauge_Conf const * const GC,
@@ -228,11 +256,15 @@ double topcharge(Gauge_Conf const * const GC,
 void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
-                               FILE *datafilep);
+                               FILE *datafilep,
+			       FILE *monofilep);
+
 void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              Geometry const * const geo,
                                              GParam const * const param,
-                                             FILE *datafilep);
+                                             FILE *datafilep,
+			                     FILE *monofilep);
+
 void perform_measures_localobs_fundadj(Gauge_Conf const * const GC,
                                        Geometry const * const geo,
                                        GParam const * const param,
@@ -320,6 +352,8 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             FILE *datafilep);
+
+
 
 // in gauge_conf_multilevel.c
 void multihit(Gauge_Conf const * const GC,
@@ -526,5 +560,90 @@ void update_with_higgs(Gauge_Conf * GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        double *acc);
+
+
+void diag_projection(Gauge_Conf *GC, 
+                     GParam const * const param);
+ 
+
+void max_abelian_gauge(Gauge_Conf *GC,
+                       Geometry const * const geo,
+                       GParam const * const param);
+ 
+void U1_extract(Gauge_Conf *GC, 
+                GParam const * const param,
+                int subg);
+
+void Di_Fjk(Gauge_Conf *GC,
+            Geometry const * const geo,
+            long r,
+            int idir,
+            int jdir,
+            int kdir,
+            double *DiFjk);
+
+
+void DeGrand_current(Gauge_Conf *GC,
+                     Geometry const * const geo,
+                     long r,
+                     int dir,
+                     int *n_mu);
+ 
+
+void Plaqs_on_DeGrand_Cube(Gauge_Conf *GC,
+                           Geometry const * const geo,
+                           GParam const * const param,
+                           long r,
+                           int dir,
+                           double *plaq_cube);
+
+void SUMi_Pjk(Gauge_Conf *GC,
+              Geometry const * const geo,
+              GParam const * const param,
+              long r,
+              int idir,
+              int jdir,
+              int kdir,
+              double *plaq_cube);
+ 
+void DUALSUMi_Pjk(Gauge_Conf *GC,
+                  Geometry const * const geo,
+                  GParam const * const param,
+                  long r,
+                  int mu,
+                  int idir,
+                  int jdir,
+                  int kdir,
+                  double *plaq_cube);
+
+void Plaqs_dual_on_DeGrand_Cube(Gauge_Conf *GC,
+                                Geometry const * const geo,
+                                GParam const * const param,
+                                long r,
+                                int dir,
+                                double *plaq_dual_cube);
+ 
+ 
+
+void wrap_search(Gauge_Conf *GC,
+                 Geometry const * const geo, 
+                 GParam const * const param, 
+                 long r, 
+                 long r_tback, 
+                 int *num_wrap, 
+                 int *nls, 
+                 int *nlt, 
+                 double *distsum, 
+                 double *distmax, 
+                 int *nlloc, 
+                 double *distsumloc);
+
+
+void monopoles_obs(Gauge_Conf *GC, 
+                   Geometry const * const geo,
+                   GParam const * const param, 
+                   int subg, 
+                   FILE* monofilep);
+ 
 
 #endif

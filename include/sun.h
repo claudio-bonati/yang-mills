@@ -288,6 +288,67 @@ inline void lin_comb_SuN(SuN * restrict A,
   }
 
 
+// MONOPOLES A=lambda*B with lambda diagonal matrix
+inline void diag_matrix_times_SuN(SuN * restrict A,
+                                  double *lambda,
+                                  SuN const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i,j;
+
+  for(i=0; i<NCOLOR; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        A->comp[m(i,j)] = lambda[i]*(B->comp[m(i,j)]);
+        }
+     }
+  }
+
+
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+inline void diag_matrix_times_dag_SuN(SuN * restrict A,
+                                      double *lambda,
+                                      SuN const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i, j;
+
+  for(i=0; i<NCOLOR; i++)
+     {
+     for(j=0; j<NCOLOR; j++)
+        {
+        A->comp[m(i,j)] = lambda[i]*conj(B->comp[m(j,i)]);
+        }
+     }
+  }
+
+
 // A=b*B^{dag}+c*C
 inline void lin_comb_dag1_SuN(SuN * restrict A,
                        double b, SuN const * const restrict B,
@@ -920,6 +981,10 @@ inline void exp_of_ta_SuN(SuN * restrict A)
 
   unitarize_SuN(A);
   }
+
+
+
+
 
 
 // print on screen
