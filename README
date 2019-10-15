@@ -21,7 +21,7 @@ charge is used (see later "A note on the topological charge" for more details).
 In yang_mills_tracedef a trace deformation is also added to the action, of the
 form
 
-\sum_{sites} \sum_{i=0}^{N/2} h_i|Tr(polyakov^{i+1})/N|^2
+\sum_{sites on a spatial slice} \sum_{i=0}^{N/2} h_i|Tr(polyakov^{i+1})|^2
 
 The update is performed by means of heatbath and overrelaxation updates (and in
 some case also Metropolis updates) implemented a la Cabibbo-Marinari.

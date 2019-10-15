@@ -338,11 +338,6 @@ void higgs_interaction(Gauge_Conf const * const GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        double *he);
-void compute_flavour_test(Gauge_Conf const * const GC,
-                          GParam const * const param,
-                          double *Q2,
-                          double *tildeG0,
-                          double *tildeGminp);
 void compute_flavour_observables(Gauge_Conf const * const GC,
                                  GParam const * const param,
                                  double *tildeG0,
@@ -357,11 +352,6 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             FILE *datafilep);
-void perform_measures_higgs_test(Gauge_Conf const * const GC,
-                                 Geometry const * const geo,
-                                 GParam const * const param,
-                                 FILE *datafilep);
-
 
 
 
