@@ -30,6 +30,12 @@ lib/function_pointers.c
 lib/gauge_conf_def.c
 lib/gauge_conf_meas.c
 lib/gauge_conf_upd.c
+lib/su2_monopoles.c
+include/su2_monopoles.h
+lib/sun_monopoles.c
+include/sun_monopoles.h
+lib/u1_monopoles.c
+include/u1_monopoles.h
 lib/geometry.c
 lib/gparam.c
 lib/random.c
