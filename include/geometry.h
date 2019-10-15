@@ -21,7 +21,7 @@ long (*sisp_and_t_to_si_compute)(long sisp, int t, GParam const * const param); 
 void (*si_to_sisp_and_t_compute)(long *sisp, int *t, long si, GParam const * const param); // single index tot -> single index spatial and time
 
 
-double comp_distance_periodic(Geometry const * const geo, GParam const * const param, long r1, long r2);
+double comp_distance_periodic(GParam const * const param, long r1, long r2);
  
 
 // general functions

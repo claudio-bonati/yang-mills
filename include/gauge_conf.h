@@ -573,14 +573,12 @@ void update_with_higgs(Gauge_Conf * GC,
 
 
 void diag_projection(Gauge_Conf *GC, 
-                     Geometry const * const geo, 
                      GParam const * const param);
  
 
 void max_abelian_gauge(Gauge_Conf *GC,
                        Geometry const * const geo,
-                       GParam const * const param,
-                       FILE *monofilep);
+                       GParam const * const param);
  
 void U1_extract(Gauge_Conf *GC, 
                 GParam const * const param,

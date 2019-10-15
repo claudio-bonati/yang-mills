@@ -825,14 +825,11 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
 
      free(charge);
      free(meanplaq);
-#else
 
 // MONOPOLES STUFF
      if(param->d_mon_meas == 1)
        {
-       int n_mu, dir, subg;
-       double plaq_cube, dual_plaq_cube;
-       long r, rsp;
+       int subg;
        Gauge_Conf helperconf;
        init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
        alloc_diag_proj(&helperconf, param); // the diagonal component of the gauge links
@@ -841,12 +838,12 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
        
 
        //gauge fixing
-       max_abelian_gauge(&helperconf, geo, param, monofilep);
+       max_abelian_gauge(&helperconf, geo, param);
       // write_conf_on_file(&helperconf, param);  
        printf("MAG done\n");
  
        //diagonal projection
-       diag_projection(&helperconf, geo, param);
+       diag_projection(&helperconf, param);
        printf("diag_proj_done\n");    
    
        //loop on all the U(1) subgroups 
@@ -879,7 +876,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
 
       // fflush(monofilep);
   }
-
+#else
   
      double plaqs, plaqt, polyre, polyim;
 
@@ -943,9 +940,7 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
 // MONOPOLES STUFF
      if(param->d_mon_meas == 1)
        {
-       int n_mu, dir, subg;
-       double plaq_cube, dual_plaq_cube;
-       long r, rsp;
+       int subg;
        Gauge_Conf helperconf;
        init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
        alloc_diag_proj(&helperconf, param); // the diagonal component of the gauge links
@@ -954,12 +949,12 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
        
 
        //gauge fixing
-       max_abelian_gauge(&helperconf, geo, param, monofilep);
+       max_abelian_gauge(&helperconf, geo, param);
       // write_conf_on_file(&helperconf, param);  
        printf("MAG done\n");
  
        //diagonal projection
-       diag_projection(&helperconf, geo, param);
+       diag_projection(&helperconf, param);
        printf("diag_proj_done\n");    
    
        //loop on all the U(1) subgroups 
@@ -2409,13 +2404,12 @@ void perform_measures_higgs_test(Gauge_Conf const * const GC,
 
 void max_abelian_gauge(Gauge_Conf *GC,
                        Geometry const * const geo,
-                       GParam const * const param,
-                       FILE *monofilep)
+                       GParam const * const param)
    {
    int i, dir;
    long r;
    double lambda[NCOLOR];
-   double OverRelaxParam=1.85, non_diag_contribution=1, non_diag_contr_aux, counter, fmag, fmag_aux;
+   double OverRelaxParam=1.85, non_diag_contribution=1, non_diag_contr_aux, counter;
    GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // x_links contains the 2*STDIM links used in the computation of X(n)
 
    // Inizialize the matrix lambda L= diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
@@ -2494,11 +2488,10 @@ void max_abelian_gauge(Gauge_Conf *GC,
 
 //Extract the diagonal part of each gauge link.
 //It saves the phases in GC->diag_proj 
-void diag_projection(Gauge_Conf *GC, 
-                     Geometry const * const geo, 
+void diag_projection(Gauge_Conf *GC,
                      GParam const * const param)
    {
-   int subg, dir; 
+   int dir; 
    long r;
 
    // Now I take the argument of the diagonal elements
@@ -2760,7 +2753,7 @@ void monopoles_obs(Gauge_Conf *GC,
                    int subg, 
                    FILE* monofilep)
    {
-   double mean_wrap, mean_dist_max, num_dist_max, plaq, dual_plaq, pl_sum, dual_pl_sum;
+   double mean_wrap, mean_dist_max, num_dist_max;
    long r, rsp, r_tback, r_tbackback;
    int n_mu, num_wrap, nlt, nls, nlloc;       
    double distsum, distsumloc, distmax;
@@ -2924,10 +2917,9 @@ void wrap_search(Gauge_Conf *GC,
 
 
    {
-   int dir, n_mu, sdir;
+   int dir, n_mu;
    double dist;
    int cart_coord_rn[4], cart_coord_r[4];
-   int cart_aux[4];
 
    if(r == r_tback)
     {
@@ -2959,7 +2951,7 @@ void wrap_search(Gauge_Conf *GC,
 //       printf("\n");
 
        GC->uflag[r][dir] += 1;
-       dist = comp_distance_periodic(geo, param, r_tback, nnp(geo, r, dir));
+       dist = comp_distance_periodic(param, r_tback, nnp(geo, r, dir));
        
   //     printf("dist %.12g\n", dist);       
 
@@ -3049,7 +3041,7 @@ void wrap_search(Gauge_Conf *GC,
 
 
        GC->uflag[nnm(geo, r, dir)][dir] -= 1;
-       dist = comp_distance_periodic(geo, param, r_tback, nnm(geo, r, dir));
+       dist = comp_distance_periodic(param, r_tback, nnm(geo, r, dir));
        
     //   printf("dist back %.12g\n", dist);
 

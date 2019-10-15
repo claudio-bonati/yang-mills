@@ -2037,7 +2037,7 @@ void alloc_diag_proj(Gauge_Conf *GC,
 void free_diag_proj(Gauge_Conf *GC,
                     GParam const * const param)
    {
-   int err, dir;
+   int dir;
    long r;
    
 
@@ -2056,7 +2056,7 @@ void free_diag_proj(Gauge_Conf *GC,
 void alloc_u1_subg(Gauge_Conf *GC,
                    GParam const * const param)
    {
-   int err, dir;
+   int err;
    long r;
 
    err=posix_memalign((void**) &(GC->u1_subg), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
@@ -2092,7 +2092,7 @@ void free_u1_subg(Gauge_Conf *GC,
 void alloc_uflag(Gauge_Conf *GC,
                  GParam const * const param)
    {
-   int err, dir;
+   int err;
    long r;
 
    err=posix_memalign((void**) &(GC->uflag), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
@@ -2117,7 +2117,6 @@ void alloc_uflag(Gauge_Conf *GC,
 void free_uflag(Gauge_Conf *GC,
                 GParam const * const param)
    {
-   int err, dir;
    long r;
    
 

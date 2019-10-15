@@ -308,14 +308,8 @@ void diag_projection_single_site_Su2(Gauge_Conf *GC,
                                      long r,
                                      int dir)
    {
-   int subg;
-   double phi[NCOLOR], inv_rho[NCOLOR], dphi, inv_rho_sum, phi_aux;
+   double phi[NCOLOR];
    complex double U_matrix[4]; 
-   
-
-   dphi=0;
-   inv_rho_sum=0;
-
  
    U_matrix[0]  =  link->comp[0] + link->comp[3]*I;     
    U_matrix[1]  =  link->comp[2] + link->comp[1]*I;     

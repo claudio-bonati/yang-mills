@@ -166,7 +166,7 @@ long sisp_and_t_to_si(Geometry const * const geo, long sisp, int t);
 void si_to_sisp_and_t(long *sisp, int *t, Geometry const * const geo, long si);
 
 // This function compute the square distance between the sites r1 and r2 taking into account periodic boundary conditions
-double comp_distance_periodic(Geometry const * const geo, GParam const * const param, long r1, long r2)
+double comp_distance_periodic(GParam const * const param, long r1, long r2)
    {
    int cartcoord_r1[STDIM], cartcoord_r2[STDIM];
 
