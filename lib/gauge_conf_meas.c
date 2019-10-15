@@ -1659,7 +1659,7 @@ void monopoles_obs(Gauge_Conf *GC,
    double mean_wrap, mean_dist_max, num_dist_max;
    long r, rsp, r_tback, r_tbackback;
    int n_mu, num_wrap, nlt, nls, nlloc;       
-   double distsum, distsumloc, distmax;
+   double distsum, distsumt, distmaxperp;
    int cartcoord[4];
 
    mean_wrap = 0.0;     // mean value of monopole wraps for unit volume
@@ -1691,21 +1691,21 @@ void monopoles_obs(Gauge_Conf *GC,
       nlloc = 0;
  
       distsum = 0;
-      distsumloc = 0;
-      distmax = 0;
+      distsumt = 0;
+      distmaxperp = 0;
       
       GC->uflag[r_tback][0] += 1;
       
-      wrap_search(GC, geo, param, r, r_tback, &num_wrap, &nls, &nlt, &distsum, &distmax, &nlloc, &distsumloc); 
+      wrap_search(GC, geo, param, r, r_tback, &num_wrap, &nls, &nlt, &distsum, &distmaxperp, &nlloc, &distsumt);
       
       mean_wrap += abs(num_wrap);
       num_dist_max += 1;
-      mean_dist_max += distmax;
+      mean_dist_max += distmaxperp;
       distsum = distsum/(nls + nlt);
      
       if(nlloc > 0)
        {
-       distsumloc = distsumloc / nlloc;
+       distsumt = distsumt / nlloc;
        }
      
       lexeo_to_cart(cartcoord, r_tback, param); 
@@ -1715,7 +1715,7 @@ void monopoles_obs(Gauge_Conf *GC,
          {
          fprintf(monofilep, "%d ", cartcoord[k]);
          }
-       fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumloc, distmax, nls, nlt, nlloc);    
+       fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
        }
 
       else if (GC->uflag[r][0] == 1)
@@ -1724,7 +1724,7 @@ void monopoles_obs(Gauge_Conf *GC,
          {
          fprintf(monofilep, "%d ", cartcoord[k]);
          }
-       fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumloc, distmax, nls, nlt, nlloc);   
+       fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
         }
       else if (GC->uflag[r][0] == 2)
        {
@@ -1732,7 +1732,7 @@ void monopoles_obs(Gauge_Conf *GC,
          {
          fprintf(monofilep, "%d ", cartcoord[k]);
          }
-       fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumloc, distmax, nls, nlt, nlloc);   
+       fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
        }
       }
     } //close the for for the charge=2 
@@ -1753,21 +1753,21 @@ void monopoles_obs(Gauge_Conf *GC,
           nlloc = 0;
      
           distsum = 0;
-          distsumloc = 0;
-          distmax = 0;
+          distsumt = 0;
+          distmaxperp = 0;
    
           GC->uflag[r_tbackback][0] -= 1;
           
-          wrap_search(GC, geo, param, r_tbackback, r_tback, &num_wrap, &nls, &nlt, &distsum, &distmax, &nlloc, &distsumloc); 
+          wrap_search(GC, geo, param, r_tbackback, r_tback, &num_wrap, &nls, &nlt, &distsum, &distmaxperp, &nlloc, &distsumt);
           
           mean_wrap += abs(num_wrap);
           num_dist_max += 1;
-          mean_dist_max += distmax;
+          mean_dist_max += distmaxperp;
           distsum = distsum/(nls + nlt);
          
           if(nlloc > 0)
            {
-           distsumloc = distsumloc / nlloc;
+           distsumt = distsumt / nlloc;
            }
          
           lexeo_to_cart(cartcoord, r_tback, param); 
@@ -1777,7 +1777,7 @@ void monopoles_obs(Gauge_Conf *GC,
              {
              fprintf(monofilep, "%d ", cartcoord[k]);
              }
-           fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumloc, distmax, nls, nlt, nlloc);    
+           fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
            }
     
           else if (GC->uflag[r][0] == -1)
@@ -1786,7 +1786,7 @@ void monopoles_obs(Gauge_Conf *GC,
              {
              fprintf(monofilep, "%d ", cartcoord[k]);
              }
-           fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumloc, distmax, nls, nlt, nlloc);   
+           fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
             }
           else if (GC->uflag[r][0] == -2)
            {
@@ -1794,7 +1794,7 @@ void monopoles_obs(Gauge_Conf *GC,
              {
              fprintf(monofilep, "%d ", cartcoord[k]);
              }
-           fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumloc, distmax, nls, nlt, nlloc);   
+           fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
            }
           }
         }

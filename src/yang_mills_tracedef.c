@@ -44,13 +44,11 @@ void real_main(char *in_file)
     // open data_file
     init_data_file(&datafilep, &param);
 
-    // MONOPOLES STUFF
     // open mon_file
-    if (param.d_mon_meas == 1)
-       {
-       init_mon_file(&monofilep, &param);    
-       }
-
+    if(param.d_mon_meas == 1)
+      {
+      init_mon_file(&monofilep, &param);
+      }
 
     // initialize geometry
     init_indexing_lexeo();
@@ -151,7 +149,7 @@ void print_template_input(void)
     fprintf(fp, "thermal   0\n");
     fprintf(fp, "overrelax 5\n");
     fprintf(fp, "measevery 1\n");
-    fprintf(fp, "monopoles 0   # 1=monopoles measures are performed\n");
+    fprintf(fp, "monomeas 0   # 1=monopoles measures are performed\n");
     fprintf(fp,"\n");
     fprintf(fp, "start                   0  # 0=ordered  1=random  2=from saved configuration\n");
     fprintf(fp, "saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates\n");

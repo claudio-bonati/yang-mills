@@ -208,8 +208,7 @@ void readinput(char *in_file, GParam *param)
                   param->d_measevery=temp_i;
                   }
           
-	   //MONOPOLES  measures
-           else if(strncmp(str, "monopoles", 9)==0)
+           else if(strncmp(str, "monomeas", 8)==0)
                   { 
                   err=fscanf(input, "%d", &temp_i);
                   if(err!=1)
@@ -590,7 +589,8 @@ void init_data_file(FILE **dataf, GParam const * const param)
   fflush(*dataf);
   }
 
-// initialize MONOPOLES file
+
+// initialize monopoles file
 void init_mon_file(FILE **monof, GParam const * const param)
   {
   int i;
