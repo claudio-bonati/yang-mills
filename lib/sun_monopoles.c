@@ -88,7 +88,7 @@ void comp_MAG_gauge_transformation_SuN (SuN X_links[2*STDIM],
            }
           else
            { 
-           max_X_comp_G_Su2_aux(OverRelaxParam, vec_x, &G_mag_su2);
+           diagonalize_X_Su2_aux(OverRelaxParam, vec_x, &G_mag_su2);
            duetoenne(&G_mag_su2, i, j, &aux_g);
          
            //print_on_screen(&X);
@@ -131,7 +131,7 @@ void comp_MAG_gauge_transformation_SuN (SuN X_links[2*STDIM],
 }
 
 //questa funzione calcola la media del modulo quadro dei contributi fuori diagonale dell'operatre X(n)
-void comp_non_diagonal_contribution_SuN (SuN X_links[2*STDIM], 
+void comp_outdiagnorm_of_X_SuN (SuN X_links[2*STDIM],
                                          double *lambda,
                                          double *counter)
    {

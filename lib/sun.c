@@ -103,6 +103,14 @@ void times_equal_dag_SuN(SuN *A, SuN const * const B);
 void times_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
 
+// A = lambda*B with lambda diagonal marix
+void diag_matrix_times_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
+
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+void diag_matrix_times_dag_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
+
+
 // A=B^{dag}*C
 void times_dag1_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
@@ -763,17 +771,6 @@ void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * const r
 // i, j are the flavour indices
 void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * const restrict v1);
 
-
-//
-// THE FOLLOWING FUNCTIONS ARE FOR THE MONOPOLES MEASURES
-//
-
-// A = lambda*B with lambda diagonal marix
-void diag_matrix_times_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
-
-
-// A=lambda*B^{dag} with lambda diagonal matrix
-void diag_matrix_times_dag_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
 
 
 // print on file

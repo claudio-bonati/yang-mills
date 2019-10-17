@@ -446,8 +446,8 @@ inline void times_equal_dag_Su2(Su2 * restrict A, Su2 const * const restrict B)
 
 // A=B*C
 inline void times_Su2(Su2 * restrict A,
-               Su2 const * const restrict B,
-               Su2 const * const restrict C)
+                      Su2 const * const restrict B,
+                      Su2 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -470,7 +470,7 @@ inline void times_Su2(Su2 * restrict A,
   }
 
 
-// MONOPOLES A=lambda*B with lambda diagonal matrix
+// A=lambda*B with lambda diagonal matrix
 inline void diag_matrix_times_Su2(Su2 * restrict A, 
                                   double *lambda, 
                                   Su2 const * const restrict B)
@@ -488,7 +488,7 @@ inline void diag_matrix_times_Su2(Su2 * restrict A,
   __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
   
-  // riscrivo la matrice lambda come a*1 +ib*sigma con ((a=lambda[1]+lambda[2])/2) e ((b=lambda[1]-lambda[2])/2) 
+  // lambda is written in the form lambda = a*1 +ib*sigma with a=(lambda[1]+lambda[2])/2 e b=(lambda[1]-lambda[2])/2
   double a,b;
   
   a = (double) (lambda[1] + lambda[2])/2;
@@ -519,18 +519,18 @@ inline void diag_matrix_times_dag_Su2(Su2 * restrict A,
     __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
  
-  // riscrivo la matrice lambda come a*1 +ib*sigma con ((a=lambda[1]+lambda[2])/2) e ((b=lambda[1]-lambda[2])/2) 
+  // lambda is written in the form lambda = a*1 +ib*sigma with a=(lambda[1]+lambda[2])/2 e b=(lambda[1]-lambda[2])/2
   double a,b;
   
   a = (double) (lambda[1] + lambda[2])/2;
   b = (double) (lambda[1] - lambda[2])/2;
-
 
   A->comp[0]=  B->comp[0]*a + B->comp[3]*b;
   A->comp[1]=  B->comp[1]*a + B->comp[2]*b;
   A->comp[2]=  B->comp[2]*a - B->comp[1]*b;
   A->comp[3]= -B->comp[0]*b + B->comp[3]*a;
   }
+
 
 // A=B^{dag}*C
 inline void times_dag1_Su2(Su2 * restrict A,

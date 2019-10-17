@@ -357,8 +357,8 @@ inline void times_equal_dag_U1(U1 * restrict A, U1 const * const restrict B)
 
 // A=B*C
 inline void times_U1(U1 * restrict A,
-              U1 const * const restrict B,
-              U1 const * const restrict C)
+                     U1 const * const restrict B,
+                     U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -375,6 +375,46 @@ inline void times_U1(U1 * restrict A,
   #endif
 
   A->comp= B->comp * C->comp;
+  }
+
+
+// A=lambda*B with lambda diagonal matrix
+inline void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  A->comp= B->comp * (*lambda);
+  }
+
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+inline void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+
+  A->comp= conj(B->comp) * (*lambda);
   }
 
 
@@ -508,18 +548,6 @@ inline void taexp_U1(U1 * restrict A)
 
   A->comp=c+I*s;
   }
-
-
-//
-// MONOPOLES STUFF
-//
-
-
-// all this functions are useless
-void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
-
-void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
-
 
 
 // print on screen

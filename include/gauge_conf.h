@@ -45,9 +45,9 @@ typedef struct Gauge_Conf {
   FMatrix *Qh;          // [volume]
  
   // for Abelian projection & co
-  double ***diag_proj; // [volume] [STDIM] [ABELIAN SUBGROUP TYPE]
+  double ***diag_proj; // [volume] [STDIM] [NCOLOR]
   double **u1_subg;    // [volume] [STDIM]
-  double **uflag;      // [volume] [STDIM] this is used to check if the link has already been considered in the searching of the Wraps
+  double **uflag;      // [volume] [STDIM] this is used to check if the link has already been considered in the searching of the wraps
  
   } Gauge_Conf;
 
@@ -164,25 +164,10 @@ void compute_md5sum_higgs(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                           Gauge_Conf const * const GC,
                           GParam const * const param);
 
-void alloc_diag_proj(Gauge_Conf *GC,
-                    GParam const * const param);
-
-void free_diag_proj(Gauge_Conf *GC,
-                    GParam const * const param);
-
-
-void alloc_u1_subg(Gauge_Conf *GC,
-                   GParam const * const param);
-
-void free_u1_subg(Gauge_Conf *GC,
-                  GParam const * const param);
-
-
-void alloc_uflag(Gauge_Conf *GC,
-                 GParam const * const param);
-
-void free_uflag(Gauge_Conf *GC,
-                GParam const * const param);
+void alloc_diag_proj_stuff(Gauge_Conf *GC,
+                           GParam const * const param);
+void free_diag_proj_stuff(Gauge_Conf *GC,
+                          GParam const * const param);
 
 
 // in gauge_conf_meas.c
@@ -287,11 +272,11 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
                             GParam const * const param,
                             FILE *datafilep);
 
+void max_abelian_gauge_fix(Gauge_Conf *GC,
+                           Geometry const * const geo,
+                           GParam const * const param);
 void diag_projection(Gauge_Conf *GC,
                      GParam const * const param);
-void max_abelian_gauge(Gauge_Conf *GC,
-                       Geometry const * const geo,
-                       GParam const * const param);
 void U1_extract(Gauge_Conf *GC,
                 GParam const * const param,
                 int subg);

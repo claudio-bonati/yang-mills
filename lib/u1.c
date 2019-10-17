@@ -102,6 +102,14 @@ void times_equal_dag_U1(U1 *A, U1 const * const B);
 void times_U1(U1 *A, U1 const * const B, U1 const * const C);
 
 
+// A=lambda*B with lambda diagonal matrix
+void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
+
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
+
+
 // A=B^{dag}*C
 void times_dag1_U1(U1 *A, U1 const * const B, U1 const * const C);
 
@@ -165,24 +173,6 @@ void print_on_screen_U1(U1 const * const A)
   printf("%.16lf %.16lf\n", creal(A->comp), cimag(A->comp));
   }
 
-//
-// MONOPOLES STUFF
-//
-
-// all this functions are useless
-void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B) 
-{
-(void)A;
-(void)lambda[0];
-(void)B;
-}
-
-void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B)
-{
-(void)A;
-(void)lambda[0];
-(void)B;
-}
 
 // print on file
 int print_on_file_U1(FILE *fp, U1 const * const A)

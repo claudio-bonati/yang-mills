@@ -832,13 +832,10 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
        int subg;
        Gauge_Conf helperconf;
        init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
-       alloc_diag_proj(&helperconf, param); // the diagonal component of the gauge links
-       alloc_u1_subg(&helperconf, param); // the abelian phases
-       alloc_uflag(&helperconf,param);  // if the link has been considered in the wrapping serch procedure.
-       
+       alloc_diag_proj_stuff(&helperconf, param);
 
        //gauge fixing
-       max_abelian_gauge(&helperconf, geo, param);
+       max_abelian_gauge_fix(&helperconf, geo, param);
       // write_conf_on_file(&helperconf, param);  
        printf("MAG done\n");
  
@@ -869,9 +866,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
          }
 
 
-       free_u1_subg(&helperconf, param);
-       free_uflag(&helperconf, param);
-       free_diag_proj(&helperconf, param); 
+       free_diag_proj_stuff(&helperconf, param);
        free_gauge_conf(&helperconf, param);
 
       // fflush(monofilep);
@@ -940,16 +935,15 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
 // MONOPOLES STUFF
      if(param->d_mon_meas == 1)
        {
-       int subg;
        Gauge_Conf helperconf;
+       int subg;
+
        init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
-       alloc_diag_proj(&helperconf, param); // the diagonal component of the gauge links
-       alloc_u1_subg(&helperconf, param); // the abelian phases
-       alloc_uflag(&helperconf,param);  // if the link has been considered in the wrapping serch procedure.
+       alloc_diag_proj_stuff(&helperconf, param);
        
 
        //gauge fixing
-       max_abelian_gauge(&helperconf, geo, param);
+       max_abelian_gauge_fix(&helperconf, geo, param);
       // write_conf_on_file(&helperconf, param);  
        printf("MAG done\n");
  
@@ -980,9 +974,7 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
          }
 
 
-       free_u1_subg(&helperconf, param);
-       free_uflag(&helperconf, param);
-       free_diag_proj(&helperconf, param); 
+       free_diag_proj_stuff(&helperconf, param);
        free_gauge_conf(&helperconf, param);
 
       // fflush(monofilep);
@@ -1305,81 +1297,68 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
    }
 
 
-void max_abelian_gauge(Gauge_Conf *GC,
-                       Geometry const * const geo,
-                       GParam const * const param)
+// fix maximal abelian gauge
+// following the procedure described in
+// C. Bonati, M. D'Elia Nuc. Phys. B 877 (2013) 233-259 [ 1308.0302 ]
+void max_abelian_gauge_fix(Gauge_Conf *GC,
+                           Geometry const * const geo,
+                           GParam const * const param)
    {
    int i, dir;
    long r;
    double lambda[NCOLOR];
-   double OverRelaxParam=1.85, non_diag_contribution=1, non_diag_contr_aux, counter;
-   GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // x_links contains the 2*STDIM links used in the computation of X(n)
+   const double OverRelaxParam=1.85;
+   double non_diag_contribution, non_diag_contr_aux, counter;
+   GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
 
-   // Inizialize the matrix lambda L= diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
+   // inizialize the matrix lambda = diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
    for(i=0; i<NCOLOR; i++)
-     {
-     lambda[i] = ( (double) NCOLOR -1.)/2. - i;
-     }
+      {
+      lambda[i] = ( (double) NCOLOR -1.)/2. - i;
+      }
  
-   /////////////////////////////////////////////////////
-   //                                                 //
-   //      NOW THE GAUGE FIXING PROCEDURE BEGINS      //
-   //                                                 //
-   /////////////////////////////////////////////////////
-   
-//long r1;
+   non_diag_contribution=1.0;
    while(non_diag_contribution > MIN_VALUE)
        {
-   
        for(r=0;r<param->d_volume;r++)
          {
-   //      r=lex_to_si(r1, param);
-   //      printf("sito %ld\n", r);
-
-         //Initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r. Links 0-(STDIM-1) are forward, while links STDIM-(2*STDIM-1) are backwards.
+         // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
+         // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
          for(dir=0;dir<STDIM;dir++)
-           {
-           equal(&(X_links[dir]), &(GC->lattice[r][dir]));
-           equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
-           }
+            {
+            equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+            equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+            }
           
-           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+         comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
  
-         // Apply the gauge transformation to the whole lattice
+         // apply the gauge transformation
          for(dir=0; dir<STDIM; dir++)
-           {
-           times(&help, &G_mag, &(GC->lattice[r][dir]));
-           equal(&(GC->lattice[r][dir]), &help);
-           times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);  
-           }
+            {
+            times(&help, &G_mag, &(GC->lattice[r][dir]));
+            equal(&(GC->lattice[r][dir]), &help);
+
+            times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
+            }
          }
          
-         //Control if the diagonal elements of X(n) computed on the new conf are zero and compute the functional
-
-         non_diag_contr_aux=0;
-         //fmag_aux=0;
-         for(r=0;r<param->d_volume;r++)
-           {
-           for(dir=0;dir<STDIM;dir++)
-             {
-             equal(&(X_links[dir]), &(GC->lattice[r][dir]));
-             equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
-             }
-           
-           //comp_functional_fmag(X_links, lambda, &fmag);
-           //fmag_aux += fmag;
-           
-           comp_non_diagonal_contribution(X_links, lambda, &counter);           
-           non_diag_contr_aux += counter;
-           }      
+       // check if the diagonal elements of X(n) are zero
+       non_diag_contr_aux=0;
+       for(r=0;r<param->d_volume;r++)
+         {
+         for(dir=0;dir<STDIM;dir++)
+            {
+            equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+            equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+            }
+         comp_outdiagnorm_of_X(X_links, lambda, &counter);
+         non_diag_contr_aux += counter;
+         }
      
-         non_diag_contribution =  non_diag_contr_aux*param->d_inv_vol;
-         //printf("%.12g\n", fmag_aux);
-         //fprintf(monofilep, "%.12g\n", non_diag_contribution);
-         //fflush(monofilep);
+       non_diag_contribution*=param->d_inv_vol;
        }
 
-    // Unitarize all the links of the conf after the gauge fixing
+   // unitarize all the links
    for(r=0; r<(param->d_volume); r++)
       {
       for(dir=0; dir<STDIM; dir++)
@@ -1389,27 +1368,32 @@ void max_abelian_gauge(Gauge_Conf *GC,
       }
    } 
 
-//Extract the diagonal part of each gauge link.
-//It saves the phases in GC->diag_proj 
+
+// extract the diagonal part of the links after gauge fixing.
+// the phases are saved in GC->diag_proj but these are NOT the monopole phases (see U1_extract)
 void diag_projection(Gauge_Conf *GC,
                      GParam const * const param)
    {
    int dir; 
    long r;
 
-   // Now I take the argument of the diagonal elements
    for(r=0;r<param->d_volume;r++)
-     {
-     for(dir=0;dir<STDIM;dir++)
-       {
-       diag_projection_single_site(GC, &(GC->lattice[r][dir]), r, dir);
-       }
-     }
+      {
+      for(dir=0;dir<STDIM;dir++)
+         {
+         diag_projection_single_site(GC, &(GC->lattice[r][dir]), r, dir);
+         }
+      }
    }
 
-//Extract the abelian component of the link
-// thetak_{\mu}(n) = sum_{j=1}^k phij_{\mu}(n)
-// where phi are the phases obtained using the diagonal projection
+
+
+// extract the abelian components of the link
+// following the procedure described in
+// Bonati, D'Elia https://arxiv.org/abs/1308.0302
+// and save them in GC->u1_subg
+//
+// also intialize GC->uflag to zero
 void U1_extract(Gauge_Conf *GC, 
                 GParam const * const param,
                 int subg)
@@ -1418,8 +1402,8 @@ void U1_extract(Gauge_Conf *GC,
    long r;    
 
    for(r=0;r<param->d_volume;r++)
-     {
-     for(dir=0;dir<STDIM;dir++)
+      {
+      for(dir=0;dir<STDIM;dir++)
        {
        GC->u1_subg[r][dir] = 0.0;
        for(i=0;i<=subg;i++)
@@ -1427,11 +1411,11 @@ void U1_extract(Gauge_Conf *GC,
          GC->u1_subg[r][dir] += GC->diag_proj[r][dir][i];
          }
        
-         GC->uflag[r][dir] = 0;
-//       printf("sito %ld direzione %d subg %d componente abeliana %.12lg\n", r, dir, i, GC->u1_subg[r][dir]);
+       GC->uflag[r][dir] = 0;
        }
      }
    }
+
 
 // It computes the discrete derivative of the plaquette Fjk in direction i. The angle is
 // then chosen between -pi and pi.

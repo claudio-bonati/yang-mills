@@ -26,14 +26,18 @@ void init_Su2(Su2 *A, double vec[4]);
 // A=1
 void one_Su2(Su2 *A);
 
+
 // A=0
 void zero_Su2(Su2 *A);
+
 
 // A=B
 void equal_Su2(Su2 *A, Su2 const * const B);
 
+
 // A=B^{dag}
 void equal_dag_Su2(Su2 *A, Su2 const * const B);
+
 
 // A+=B
 void plus_equal_Su2(Su2 *A, Su2 const * const B);
@@ -54,10 +58,12 @@ void minus_equal_times_real_Su2(Su2 *A, Su2 const * const B, double r);
 // A-=B^{dag}
 void minus_equal_dag_Su2(Su2 *A, Su2 const * const B);
 
+
 // A=b*B+c*C
 void lin_comb_Su2(Su2 *A,
                   double b, Su2 const * const B,
                   double c, Su2 const * const C);
+
 
 // A=b*B^{dag}+c*C
 void lin_comb_dag1_Su2(Su2 *A,
@@ -79,6 +85,7 @@ void lin_comb_dag12_Su2(Su2 *A,
 // A*=r
 void times_equal_real_Su2(Su2 *A, double r);
 
+
 // A*=r
 void times_equal_complex_Su2(Su2 *A, double complex r);
 
@@ -93,6 +100,13 @@ void times_equal_dag_Su2(Su2 *A, Su2 const * const B);
 
 // A=B*C
 void times_Su2(Su2 *A, Su2 const * const B, Su2 const * const C);
+
+
+// A = lambda*B with lambda diagonal marix
+void diag_matrix_times_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+void diag_matrix_times_dag_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
 
 
 // A=B^{dag}*C
@@ -445,11 +459,6 @@ void plus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B);
 // *= with real number
 void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r);
 
-// A = lambda*B with lambda diagonal marix
-void diag_matrix_times_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
-
-// A=lambda*B^{dag} with lambda diagonal matrix
-void diag_matrix_times_dag_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
 
 // norm
 double norm_Su2Vecs(Su2Vecs const * const restrict A);

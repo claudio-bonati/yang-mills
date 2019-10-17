@@ -17,7 +17,7 @@ void comp_MAG_gauge_transformation_SuN (SuN X_links[2*STDIM],
                                         double OverRelaxParam,
                                         SuN *G_mag);
 
-void comp_non_diagonal_contribution_SuN (SuN X_links[2*STDIM], 
+void comp_outdiagnorm_of_X_SuN (SuN X_links[2*STDIM],
                                          double *lambda,
                                          double *non_diag_contr);
   

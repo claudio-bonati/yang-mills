@@ -288,7 +288,7 @@ inline void lin_comb_SuN(SuN * restrict A,
   }
 
 
-// MONOPOLES A=lambda*B with lambda diagonal matrix
+// A=lambda*B with lambda diagonal matrix
 inline void diag_matrix_times_SuN(SuN * restrict A,
                                   double *lambda,
                                   SuN const * const restrict B)
@@ -316,7 +316,6 @@ inline void diag_matrix_times_SuN(SuN * restrict A,
         }
      }
   }
-
 
 
 // A=lambda*B^{dag} with lambda diagonal matrix

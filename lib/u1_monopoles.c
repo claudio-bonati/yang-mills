@@ -29,7 +29,7 @@ void comp_MAG_gauge_transformation_U1  (U1 X_links[2*STDIM],
    }
 
 
-void comp_non_diagonal_contribution_U1  (U1 X_links[2*STDIM], 
+void comp_outdiagnorm_of_X_U1  (U1 X_links[2*STDIM], 
                                          double *lambda,
                                          double *non_diag_contr)
 
