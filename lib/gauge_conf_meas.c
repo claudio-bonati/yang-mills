@@ -789,17 +789,22 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
                                FILE *datafilep,
-			       FILE *monofilep)
+                               FILE *monofilep)
    {
+   double plaqs, plaqt, polyre, polyim;
+
+   plaquette(GC, geo, param, &plaqs, &plaqt);
+   polyakov(GC, geo, param, &polyre, &polyim);
+
+   fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+
+   // topological observables
    #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
      int i, err;
-     double plaqs, plaqt, polyre, polyim, *charge, *meanplaq, charge_nocooling;
+     double*charge, *meanplaq, charge_nocooling;
 
-     plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov(GC, geo, param, &polyre, &polyim);
      charge_nocooling=topcharge(GC, geo, param);
-
-     fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim, charge_nocooling);
+     fprintf(datafilep, " %.12g ", charge_nocooling);
 
      err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
      if(err!=0)
@@ -821,66 +826,52 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
         }
      fprintf(datafilep, "\n");
 
-     fflush(datafilep);
-
      free(charge);
      free(meanplaq);
-
-// MONOPOLES STUFF
-     if(param->d_mon_meas == 1)
-       {
-       int subg;
-       Gauge_Conf helperconf;
-       init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
-       alloc_diag_proj_stuff(&helperconf, param);
-
-       //gauge fixing
-       max_abelian_gauge_fix(&helperconf, geo, param);
-      // write_conf_on_file(&helperconf, param);  
-       printf("MAG done\n");
- 
-       //diagonal projection
-       diag_projection(&helperconf, param);
-       printf("diag_proj_done\n");    
-   
-       //loop on all the U(1) subgroups 
-       for(subg=0; subg<NCOLOR-1; subg++)
-         {
-         //extraction of the abelian component subg
-         U1_extract(&helperconf, param, subg);
-         
-         monopoles_obs(&helperconf, geo, param, subg, monofilep);
-         
-/*
-         for(rsp=0; rsp<param->d_space_vol;rsp++)
-           {
-           r = sisp_and_t_to_si(geo, rsp, 1);
-           DeGrand_current(&helperconf, geo, r, 0, &n_mu);
-           for(dir=0;dir<STDIM;dir++)
-             {
-             printf("r = %ld ", r);   
-             Plaqs_dual_on_DeGrand_Cube(&helperconf,geo, param, r, dir, &dual_plaq_cube);
-             printf("site %ld dir %d subg %d plaq_cube %.12g\n", r, dir, i, dual_plaq_cube);
-             }
-           }*/
-         }
-
-
-       free_diag_proj_stuff(&helperconf, param);
-       free_gauge_conf(&helperconf, param);
-
-      // fflush(monofilep);
-  }
-#else
-  
-     double plaqs, plaqt, polyre, polyim;
-
-     plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov(GC, geo, param, &polyre, &polyim);
-
-     fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+   #else
      fprintf(datafilep, "\n");
-     fflush(datafilep);
+   #endif
+   fflush(datafilep);
+
+   // monopole observables
+   #if(STDIM==4)
+   if(param->d_mon_meas == 1)
+     {
+     int subg, subgnum;
+     Gauge_Conf helperconf;
+
+     init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+     alloc_diag_proj_stuff(&helperconf, param);
+
+     // MAG gauge fixing
+     max_abelian_gauge_fix(&helperconf, geo, param);
+ 
+     //diagonal projection
+     diag_projection(&helperconf, param);
+   
+     //loop on all the U(1) subgroups
+     if(NCOLOR>1)
+       {
+       subgnum=NCOLOR-1;
+       }
+     else
+       {
+       subgnum=1;
+       }
+     for(subg=0; subg<subgnum; subg++)
+        {
+        // extract the abelian component subg and save it to GC->u1_subg
+        U1_extract(&helperconf, param, subg);
+
+        // compute monopole observables
+        monopoles_obs(&helperconf, geo, param, subg, monofilep);
+        }
+
+     free_diag_proj_stuff(&helperconf, param);
+     free_gauge_conf(&helperconf, param);
+
+     fflush(monofilep);
+     }
    #endif
    }
 
@@ -892,22 +883,26 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              FILE *datafilep,
                                              FILE *monofilep)
    {
-   #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
+   int i;
+   double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1]; // +1 just to avoid warning if NCOLOR=1
 
-     int i, err;
-     double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1]; // +1 just to avoid warning if NCOLOR=1
+   plaquette(GC, geo, param, &plaqs, &plaqt);
+   polyakov_for_tracedef(GC, geo, param, polyre, polyim);
+
+   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+
+   for(i=0; i<(int)floor(NCOLOR/2); i++)
+      {
+      fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
+      }
+
+   // topological observables
+   #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
+     int err;
      double *charge, *meanplaq, charge_nocooling;
 
-     plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov_for_tracedef(GC, geo, param, polyre, polyim);
      charge_nocooling=topcharge(GC, geo, param);
 
-     fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
-
-     for(i=0; i<(int)floor(NCOLOR/2); i++)
-        {
-        fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
-        }
      fprintf(datafilep, "%.12g ", charge_nocooling);
 
      err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
@@ -930,76 +925,53 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
         }
      fprintf(datafilep, "\n");
 
-     fflush(datafilep);
-
-// MONOPOLES STUFF
-     if(param->d_mon_meas == 1)
-       {
-       Gauge_Conf helperconf;
-       int subg;
-
-       init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
-       alloc_diag_proj_stuff(&helperconf, param);
-       
-
-       //gauge fixing
-       max_abelian_gauge_fix(&helperconf, geo, param);
-      // write_conf_on_file(&helperconf, param);  
-       printf("MAG done\n");
- 
-       //diagonal projection
-       diag_projection(&helperconf, param);
-       printf("diag_proj_done\n");    
-   
-       //loop on all the U(1) subgroups 
-       for(subg=0; subg<NCOLOR-1; subg++)
-         {
-         //extraction of the abelian component subg
-         U1_extract(&helperconf, param, subg);
-         
-         monopoles_obs(&helperconf, geo, param, subg, monofilep);
-         
-/*
-         for(rsp=0; rsp<param->d_space_vol;rsp++)
-           {
-           r = sisp_and_t_to_si(geo, rsp, 1);
-           DeGrand_current(&helperconf, geo, r, 0, &n_mu);
-           for(dir=0;dir<STDIM;dir++)
-             {
-             printf("r = %ld ", r);   
-             Plaqs_dual_on_DeGrand_Cube(&helperconf,geo, param, r, dir, &dual_plaq_cube);
-             printf("site %ld dir %d subg %d plaq_cube %.12g\n", r, dir, i, dual_plaq_cube);
-             }
-           }*/
-         }
-
-
-       free_diag_proj_stuff(&helperconf, param);
-       free_gauge_conf(&helperconf, param);
-
-      // fflush(monofilep);
-  }
-
      free(charge);
      free(meanplaq);
-
    #else
-
-     int i;
-     double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1];   // +1 just to avoid warning if NCOLOR=1
-
-     plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov_for_tracedef(GC, geo, param, polyre, polyim);
-
-     fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
-     for(i=0; i<(int)floor(NCOLOR/2); i++)
-        {
-        fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
-        }
      fprintf(datafilep, "\n");
+   #endif
 
-     fflush(datafilep);
+   fflush(datafilep);
 
+   // monopole observables
+   #if(STDIM==4)
+   if(param->d_mon_meas == 1)
+     {
+     Gauge_Conf helperconf;
+     int subg, subgnum;
+
+     init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+     alloc_diag_proj_stuff(&helperconf, param);
+
+     // MAG gauge fixing
+     max_abelian_gauge_fix(&helperconf, geo, param);
+
+     //diagonal projection
+     diag_projection(&helperconf, param);
+
+     //loop on all the U(1) subgroups
+     if(NCOLOR>1)
+       {
+       subgnum=NCOLOR-1;
+       }
+     else
+       {
+       subgnum=1;
+       }
+     for(subg=0; subg<subgnum; subg++)
+        {
+        // extract the abelian component subg and save it to GC->u1_subg
+        U1_extract(&helperconf, param, subg);
+
+        // compute monopole observables
+        monopoles_obs(&helperconf, geo, param, subg, monofilep);
+        }
+
+     free_diag_proj_stuff(&helperconf, param);
+     free_gauge_conf(&helperconf, param);
+
+     fflush(monofilep);
+     }
    #endif
    }
 
@@ -1660,7 +1632,11 @@ void monopoles_obs(Gauge_Conf *GC,
      //control the T=1 temporal slice to find monopoles currents
      DeGrand_current(GC, geo, r, 0, &n_mu);
 
-      
+
+////// REMEMBER TO ADD THE CONFIGURATION NUMBER
+
+
+
      // In the case of monopole current it starts following it
      for(int a = 0; a<2; a++){
      if(n_mu > GC->uflag[r_tback][0])

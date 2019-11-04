@@ -19,8 +19,6 @@ void comp_outdiagnorm_of_X_Su2(Su2 X_links[2*STDIM],
                                double lambda[2],
                                double *non_diag_contr);
 
-
-
 void comp_functional_fmag_Su2(Su2 X_links[2*STDIM], 
                               double lambda[2],
                               double *fmag);

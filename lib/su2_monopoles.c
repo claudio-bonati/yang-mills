@@ -70,7 +70,7 @@ void comp_MAG_gauge_transformation_Su2(Su2 X_links[2*STDIM],
       aux2[2] = lambda[1]*Urm_matrix[2];
       aux2[3] = lambda[1]*Urm_matrix[3];
      
-      // X = U_{dir}(n)*lambda*U^{dag}_{dir}(n) and U^{dag}_{dir}(n-dir)*lambda*U_{dir}(n-dir)
+      // X = U_{dir}(n)*lambda*U^{dag}_{dir}(n) + U^{dag}_{dir}(n-dir)*lambda*U_{dir}(n-dir)
       // as in C. Bonati, M. D'Elia Nuc. Phys. B 877 (2013) 233-259 [ 1308.0302 ]
 
       X[0] += Ur_matrix[0]*aux1[0] + Ur_matrix[1]*aux1[2];
@@ -93,10 +93,11 @@ void comp_MAG_gauge_transformation_Su2(Su2 X_links[2*STDIM],
    herm_real_check = creal(X[1]) - creal(X[2]);
    herm_imag_check = cimag(X[1]) + cimag(X[2]);
 
-   if(herm_real_check > MIN_VALUE*10 || herm_imag_check > MIN_VALUE*10 || creal(trace_check) > MIN_VALUE*10 || cimag(trace_check) > MIN_VALUE*10)
+   if(fabs(herm_real_check) > MIN_VALUE*10 || fabs(herm_imag_check) > MIN_VALUE*10 || cabs(trace_check) > MIN_VALUE*10 )
      {
      fprintf(stderr, "herm_real_check = %.12g herm_imag_check = %.12g ", herm_real_check, herm_imag_check);
-     fprintf(stderr, "trace_check_real = %.12g trace_check_imag = %.12g\n", creal(trace_check), cimag(trace_check));
+     fprintf(stderr, "trace_check_real = %.12g trace_check_imag = %.12g ", creal(trace_check), cimag(trace_check));
+     fprintf(stderr, "(%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
    #endif
@@ -192,7 +193,7 @@ void comp_outdiagnorm_of_X_Su2(Su2 X_links[2*STDIM],
       aux2[2] = lambda[1]*Urm_matrix[2];
       aux2[3] = lambda[1]*Urm_matrix[3];
 
-      // X = U_{dir}(n)*lambda*U^{dag}_{dir}(n) and U^{dag}_{dir}(n-dir)*lambda*U_{dir}(n-dir)
+      // X = U_{dir}(n)*lambda*U^{dag}_{dir}(n) + U^{dag}_{dir}(n-dir)*lambda*U_{dir}(n-dir)
       // as in C. Bonati, M. D'Elia Nuc. Phys. B 877 (2013) 233-259 [ 1308.0302 ]
 
       X[0] += Ur_matrix[0]*aux1[0] + Ur_matrix[1]*aux1[2];
@@ -219,7 +220,8 @@ void comp_outdiagnorm_of_X_Su2(Su2 X_links[2*STDIM],
    if(herm_real_check > MIN_VALUE*10 || herm_imag_check > MIN_VALUE*10 || creal(trace_check) > MIN_VALUE*10 || cimag(trace_check) > MIN_VALUE*10)
      {
      fprintf(stderr, "herm_real_check = %.12g herm_imag_check = %.12g ", herm_real_check, herm_imag_check);
-     fprintf(stderr, "trace_check_real = %.12g trace_check_imag = %.12g\n", creal(trace_check), cimag(trace_check));
+     fprintf(stderr, "trace_check_real = %.12g trace_check_imag = %.12g", creal(trace_check), cimag(trace_check));
+     fprintf(stderr, "(%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
    #endif
@@ -308,20 +310,6 @@ void diag_projection_single_site_Su2(Gauge_Conf *GC,
    GC->diag_proj[r][dir][0] = phi[0];
    GC->diag_proj[r][dir][1] = phi[1];
    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

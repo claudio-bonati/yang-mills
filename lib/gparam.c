@@ -125,7 +125,17 @@ void readinput(char *in_file, GParam *param)
                   }
            else if(strncmp(str, "htracedef", 9)==0)
                   {
-                  for(i=0; i<(int)floor(NCOLOR/2.0); i++)
+                  int halfncolor;
+                  if(NCOLOR==1)
+                    {
+                    halfncolor=1;
+                    }
+                  else
+                    {
+                    halfncolor=(int)floor(NCOLOR/2.0);
+                    }
+
+                  for(i=0; i<halfncolor; i++)
                      {
                      err=fscanf(input, "%lf", &temp_d);
                      if(err!=1)
