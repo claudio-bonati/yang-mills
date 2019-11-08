@@ -107,7 +107,10 @@ void real_main(char *in_file)
     fclose(datafilep);
 
     // close mon file
-    fclose(monofilep);
+    if(param.d_mon_meas == 1)
+      {
+      fclose(monofilep);
+      }
 
     // save configuration
     if(param.d_saveconf_back_every!=0)

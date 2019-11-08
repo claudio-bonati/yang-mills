@@ -1125,7 +1125,7 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
 // compute correlators of flavour observables and
 // flavour matrices HAS TO BE INITIALIZED before calling this function
 // using init_FMatrix_vecs
-// corrQQ is the correlato ReTr[Q_x Q_{x+d}]
+// corrQQ is the correlator ReTr[Q_x Q_{x+d}]/N_higgs
 // corr0string0 is the correlator Re[h0^{dag} U_{x,1}U_{x+1,1}....Q_{x+d} h0], where h0 is the first flavour
 // corr0string1 is the correlator Re[h0^{dag} U_{x,1}U_{x+1,1}....Q_{x+d} h1], where h1 is the second flavour
 void compute_flavour_observables_corr(Gauge_Conf const * const GC,
@@ -1314,7 +1314,7 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
             }
          }
          
-       // check if the diagonal elements of X(n) are zero
+       // check if the out-of-diagonal-diagonal elements of X(n) are zero
        non_diag_contr_aux=0;
        for(r=0;r<param->d_volume;r++)
          {
@@ -1327,7 +1327,7 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
          non_diag_contr_aux += counter;
          }
      
-       non_diag_contribution*=param->d_inv_vol;
+       non_diag_contribution = non_diag_contr_aux * param->d_inv_vol;
        }
 
    // unitarize all the links
