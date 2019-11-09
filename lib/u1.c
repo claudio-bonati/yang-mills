@@ -516,13 +516,13 @@ int print_on_binary_file_swap_U1Vecs(FILE *fp, U1Vecs const * const A)
   {
   int i;
   double tmp;
-  size_t err=0;
+  size_t err;
 
   for(i=0;i<NHIGGS; i++)
      {
      tmp=creal(A->comp[i]);
      SwapBytesDouble(&tmp);
-     err+=fwrite(&(tmp), sizeof(double), 1, fp);
+     err=fwrite(&(tmp), sizeof(double), 1, fp);
 
      tmp=cimag(A->comp[i]);
      SwapBytesDouble(&tmp);
