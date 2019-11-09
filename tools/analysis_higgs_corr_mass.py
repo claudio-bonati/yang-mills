@@ -63,8 +63,8 @@ if __name__=="__main__":
     return x[0]/x[1]/x[1]
   def xi2nd(x):
     return np.sqrt(x[0]/x[1]-1)/2.0/np.sin(np.pi/L)/L
-  def xigauge(x):
-    return np.sqrt(x[1]/x[0])/L
+  def logratio(x):
+    return 1./np.log(x[1]/x[0])
 
   # data acquisition
   indata=np.loadtxt(infile, skiprows=therm, dtype=np.float)
@@ -72,21 +72,11 @@ if __name__=="__main__":
 
   #print(blocksize, end=' ')
 
-  ris, err = jack.jackknife_for_secondary(susc, blocksize, [square, data[4]], [id, data[4]])
-  print(ris, err, end=' ')
+  for i in range(L):
+    print(i, end=' ')
 
-  ris, err = jack.jackknife_for_primary(id, data[5], blocksize)
-  print(ris, err, end=' ')
-
-  ris, err = jack.jackknife_for_secondary(U, blocksize, [square, data[5]], [id, data[5]])
-  print(ris, err, end=' ')
-
-  ris, err = jack.jackknife_for_secondary(xi2nd, blocksize, [id, data[5]], [id, data[6]])
-  print(ris, err, end=' ')
-
-  if(len(indata[0])==9):
-    ris, err = jack.jackknife_for_secondary(xigauge, blocksize, [id, data[7]], [id, data[8]])
+    ris, err = jack.jackknife_for_secondary(logratio, blocksize, [id, data[7+i+1+L]], [id, data[7+i+L]])
     print(ris, err, end=' ')
 
-  print('')
+    print('')
 

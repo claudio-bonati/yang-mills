@@ -316,6 +316,11 @@ void compute_flavour_observables_corr(Gauge_Conf const * const GC,
                                       double *corrQQ,
                                       double *corr0string0,
                                       double *corr0string1);
+void compute_flavour_gauge_corr_length(Gauge_Conf const * const GC,
+                                       Geometry const * const geo,
+                                       GParam const * const param,
+                                       double *intG,
+                                       double *r2G);
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,

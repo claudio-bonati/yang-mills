@@ -2065,12 +2065,12 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
   }
 
 
-// compute correlators of flavour observables and
+// compute correlators of flavour observables
 // flavour matrices HAS TO BE INITIALIZED before calling this function
 // using init_FMatrix_vecs
-// corrQQ is the correlato ReTr[Q_x Q_{x+d}]
-// corr0string0 is the correlator Re[h0^{dag} U_{x,1}U_{x+1,1}....Q_{x+d} h0], where h0 is the first flavour
-// corr0string1 is the correlator Re[h0^{dag} U_{x,1}U_{x+1,1}....Q_{x+d} h1], where h1 is the second flavour
+// corrQQ is the correlato ReTr[Q_x Q_{x+d}]/N_higgs
+// corr0string0 is the correlator \sum_f Re[hf^{dag} U_{x,1}U_{x+1,1}....Q_{x+d-1,1} hf], where hf is the f-th flavour
+// corr0string1 is the correlator Re[h0^{dag} U_{x,1}U_{x+1,1}....U_{x+d-1,1} h1], where h1 is the second flavour
 void compute_flavour_observables_corr(Gauge_Conf const * const GC,
                                       Geometry const * const geo,
                                       GParam const * const param,
@@ -2145,25 +2145,67 @@ void compute_flavour_observables_corr(Gauge_Conf const * const GC,
   }
 
 
+
+// compute second moment correlation lenght of the correlator with a string of gauge field
+//
+// intG is \sum_0^{L/2} G(x) where G(x) is the correlator \sum_{f} Re[hf^{dag} U_{0,1}U_{1,1}....U_{d-1,1} hf], where hf is the f-th flavour
+// r2G in \sum_0^{L/2} x^2 G(x)
+void compute_flavour_gauge_corr_length(Gauge_Conf const * const GC,
+                                       Geometry const * const geo,
+                                       GParam const * const param,
+                                       double *intG,
+                                       double *r2G)
+  {
+  int dist;
+  long r;
+  double sum1, sum2;
+
+  *intG=0.0;
+  *r2G=0.0;
+
+  for(dist=0; dist<param->d_size[1]/2; dist++)
+     {
+     sum1=0.0;
+     sum2=0.0;
+
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : sum1) reduction(+ : sum2)
+     #endif
+     for(r=0; r<(param->d_volume); r++)
+        {
+        int i;
+        long r1;
+        GAUGE_VECS phi1, phi2;
+        GAUGE_GROUP U;
+
+        equal_vecs(&phi1, &(GC->higgs[r]));
+        r1=r;
+        one(&U);
+        for(i=0; i<dist; i++)
+           {
+           times_equal(&U, &(GC->lattice[r1][1]));
+           r1=nnp(geo, r1, 1);
+           }
+        matrix_times_vector_all_vecs(&phi2, &U, &(GC->higgs[r1]));
+
+        sum1+=re_scal_prod_vecs(&phi1, &phi2);
+        sum2+= ( dist*dist*re_scal_prod_vecs(&phi1, &phi2) );
+        }
+     sum1*=param->d_inv_vol;
+     sum2*=param->d_inv_vol;
+
+     *intG+=sum1;
+     *r2G+=sum2;
+     }
+  }
+
+
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             FILE *datafilep)
    {
    double plaqs, plaqt, polyre, polyim, he, tildeG0, tildeGminp;
-
-   /*
-   int err, i;
-   double *corrQQ, *corr0string0, *corr0string1;
-   err=posix_memalign((void**) &(corrQQ), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
-   err+=posix_memalign((void**) &(corr0string0), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
-   err+=posix_memalign((void**) &(corr0string1), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating the correlators! (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   */
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
@@ -2180,6 +2222,30 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
    fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
 
    /*
+   // for second moment correlation length of the flavour observable with a string of gauge fields
+   double intG, r2G;
+   compute_flavour_gauge_corr_length(GC,
+                                     geo,
+                                     param,
+                                     &intG,
+                                     &r2G);
+   fprintf(datafilep, "%.12g %.12g ", intG, r2G);
+   */
+
+   /*
+   // for correlators
+
+   int err, i;
+   double *corrQQ, *corr0string0, *corr0string1;
+   err=posix_memalign((void**) &(corrQQ), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
+   err+=posix_memalign((void**) &(corr0string0), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
+   err+=posix_memalign((void**) &(corr0string1), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating the correlators! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
    compute_flavour_observables_corr(GC,
                                     geo,
                                     param,
@@ -2198,15 +2264,13 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
       {
       fprintf(datafilep, "%.12g ", corr0string1[i]);
       }
-   */
 
-   fprintf(datafilep, "\n");
-
-   /*
    free(corrQQ);
    free(corr0string0);
    free(corr0string1);
    */
+
+   fprintf(datafilep, "\n");
 
    fflush(datafilep);
    }
