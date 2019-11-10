@@ -606,11 +606,11 @@ int read_from_binary_file_swap_U1Vecs(FILE *fp, U1Vecs *A)
   {
   int i;
   double re, im;
-  size_t err=0;
+  size_t err;
 
   for(i=0; i<NHIGGS; i++)
      {
-     err+=fread(&re, sizeof(double), 1, fp);
+     err=fread(&re, sizeof(double), 1, fp);
      err+=fread(&im, sizeof(double), 1, fp);
 
      if(err!=2)
