@@ -1291,44 +1291,44 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
  
    non_diag_contribution=1.0;
    while(non_diag_contribution > MIN_VALUE)
-       {
-       for(r=0;r<param->d_volume;r++)
-         {
-         // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
-         // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
-         for(dir=0;dir<STDIM;dir++)
-            {
-            equal(&(X_links[dir]), &(GC->lattice[r][dir]));
-            equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
-            }
-          
-         comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
- 
-         // apply the gauge transformation
-         for(dir=0; dir<STDIM; dir++)
-            {
-            times(&help, &G_mag, &(GC->lattice[r][dir]));
-            equal(&(GC->lattice[r][dir]), &help);
+        {
+        for(r=0;r<param->d_volume;r++)
+          {
+          // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
+          // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
+          for(dir=0;dir<STDIM;dir++)
+             {
+             equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+             equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+             }
 
-            times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
-            }
-         }
-         
-       // check if the out-of-diagonal-diagonal elements of X(n) are zero
-       non_diag_contr_aux=0;
-       for(r=0;r<param->d_volume;r++)
-         {
-         for(dir=0;dir<STDIM;dir++)
-            {
-            equal(&(X_links[dir]), &(GC->lattice[r][dir]));
-            equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
-            }
-         comp_outdiagnorm_of_X(X_links, lambda, &counter);
-         non_diag_contr_aux += counter;
-         }
+          comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+ 
+          // apply the gauge transformation
+          for(dir=0; dir<STDIM; dir++)
+             {
+             times(&help, &G_mag, &(GC->lattice[r][dir]));
+             equal(&(GC->lattice[r][dir]), &help);
+
+             times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
+             }
+          }
+
+        // check if the out-of-diagonal-diagonal elements of X(n) are zero
+        non_diag_contr_aux=0;
+        for(r=0;r<param->d_volume;r++)
+          {
+          for(dir=0;dir<STDIM;dir++)
+             {
+             equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+             equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+             }
+          comp_outdiagnorm_of_X(X_links, lambda, &counter);
+          non_diag_contr_aux += counter;
+          }
      
-       non_diag_contribution = non_diag_contr_aux * param->d_inv_vol;
-       }
+        non_diag_contribution = non_diag_contr_aux * param->d_inv_vol;
+        }
 
    // unitarize all the links
    for(r=0; r<(param->d_volume); r++)
@@ -1359,7 +1359,6 @@ void diag_projection(Gauge_Conf *GC,
    }
 
 
-
 // extract the abelian components of the link
 // following the procedure described in
 // Bonati, D'Elia https://arxiv.org/abs/1308.0302
@@ -1376,21 +1375,21 @@ void U1_extract(Gauge_Conf *GC,
    for(r=0;r<param->d_volume;r++)
       {
       for(dir=0;dir<STDIM;dir++)
-       {
-       GC->u1_subg[r][dir] = 0.0;
-       for(i=0;i<=subg;i++)
          {
-         GC->u1_subg[r][dir] += GC->diag_proj[r][dir][i];
+         GC->u1_subg[r][dir] = 0.0;
+         for(i=0;i<=subg;i++)
+            {
+            GC->u1_subg[r][dir] += GC->diag_proj[r][dir][i];
+            }
+
+         GC->uflag[r][dir] = 0;
          }
-       
-       GC->uflag[r][dir] = 0;
-       }
-     }
+      }
    }
 
 
-// It computes the discrete derivative of the plaquette Fjk in direction i. The angle is
-// then chosen between -pi and pi.
+// Compute the forward derivative of the abelian part of the plaquette Fjk in direction i.
+// the angle is chosen in between -pi and pi.
 void Di_Fjk(Gauge_Conf *GC,
             Geometry const * const geo,
             long r,
@@ -1400,211 +1399,182 @@ void Di_Fjk(Gauge_Conf *GC,
             double *DiFjk)
 
    {
-   double p1, p2; // p1 -> plaquette at site n and p2 plaquette at site n+idir
-   long site1, ssite1, site2, ssite2;
+   double prpi, pr; // pr -> plaquette at site r, prpi plaquette at site r+idir
 
-   p1 = 0.0;
-   p2 = 0.0;
+//
+//       ^ k
+//       |
+//       +---<---+
+//       |       |
+//       V       ^         pr
+//       |       |
+//       +--->---+---> j
+//       r
+//
 
-   site2 = r;
-   ssite2 = r;
+   pr  = GC->u1_subg[r][jdir] - GC->u1_subg[r][kdir];
+   pr += GC->u1_subg[nnp(geo, r, jdir)][kdir] - GC->u1_subg[nnp(geo, r, kdir)][jdir];
 
-   site1 = nnp(geo, r, idir);
-   ssite1 = nnp(geo, r, idir);
 
-   p1 += GC->u1_subg[ssite1][jdir] - GC->u1_subg[site1][kdir];
-   p2 += GC->u1_subg[ssite2][jdir] - GC->u1_subg[site2][kdir];
+//
+//       ^ k
+//       |   (2)
+//       +---<---+
+//       |       |
+//   (3) V       ^ (1)        prpi
+//       |       |
+//       +--->---+---> j
+//      r+i    (4)
+//
+
+   r=nnp(geo, r, idir);
+
+   prpi  = GC->u1_subg[r][jdir] - GC->u1_subg[r][kdir];
+   prpi += GC->u1_subg[nnp(geo, r, jdir)][kdir] - GC->u1_subg[nnp(geo, r, kdir)][jdir];
  
-
-   site1 = nnp(geo, site1, kdir);
-   site2 = nnp(geo, site2, kdir);
-   ssite1 = nnp(geo, ssite1, jdir);
-   ssite2 = nnp(geo, ssite2, jdir);
-
-   p1 += GC->u1_subg[ssite1][kdir] - GC->u1_subg[site1][jdir];
-   p2 += GC->u1_subg[ssite2][kdir] - GC->u1_subg[site2][jdir];
- 
-   *DiFjk = 2*(atan(tan(p1/2.0)) - atan(tan(p2/2.0)));
+   *DiFjk = 2.0*(atan(tan(prpi/2.0)) - atan(tan(pr/2.0)));
    }
 
-void DeGrand_current(Gauge_Conf *GC,
-                     Geometry const * const geo,
-                     long r,
-                     int dir,
-                     int *n_mu)
+
+// compute the DeGrand-DeTar currents
+int DeGrand_current(Gauge_Conf *GC,
+                    Geometry const * const geo,
+                    long r,
+                    int dir)
    {
-   
+   if(STDIM!=4)
+     {
+     fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
    double der1, der2, der3;
+   int ris;
 
-   if (dir == 0)
-    {
-    Di_Fjk(GC, geo, r, 1,2,3, &der1);
-    Di_Fjk(GC, geo, r, 3,1,2, &der2);
-    Di_Fjk(GC, geo, r, 2,1,3, &der3);
+   if(dir == 0)
+     {
+     Di_Fjk(GC, geo, r, 1, 2, 3, &der1);
+     Di_Fjk(GC, geo, r, 3, 1, 2, &der2);
+     Di_Fjk(GC, geo, r, 2, 1, 3, &der3);
    
-    *n_mu = (int) round(((der1 + der2 - der3)/PI2));
-    }
-   else if (dir ==1)
-    {
-    Di_Fjk(GC, geo, r, 3,2,0, &der1);
-    Di_Fjk(GC, geo, r, 0,3,2, &der2);
-    Di_Fjk(GC, geo, r, 2,3,0, &der3);
+     ris = (int) round( ((der1 + der2 - der3)/PI2) );
+     }
+   else if(dir ==1)
+          {
+          Di_Fjk(GC, geo, r, 3, 2, 0, &der1);
+          Di_Fjk(GC, geo, r, 0, 3, 2, &der2);
+          Di_Fjk(GC, geo, r, 2, 3, 0, &der3);
 
-    *n_mu = (int) round(((der1 + der2 - der3)/PI2));
-    }
-   else if (dir == 2)
-    {
-    Di_Fjk(GC, geo, r, 3,0,1, &der1);
-    Di_Fjk(GC, geo, r, 0,1,3, &der2);
-    Di_Fjk(GC, geo, r, 1,0,3, &der3);
+          ris = (int) round( ((der1 + der2 - der3)/PI2) );
+          }
+   else if(dir == 2)
+          {
+          Di_Fjk(GC, geo, r, 3, 0, 1, &der1);
+          Di_Fjk(GC, geo, r, 0, 1, 3, &der2);
+          Di_Fjk(GC, geo, r, 1, 0, 3, &der3);
 
-    *n_mu = (int) round(((der1 + der2 - der3)/PI2));
-    }
-   else if (dir == 3)
-    {
-    Di_Fjk(GC, geo, r, 0,2,1, &der1);
-    Di_Fjk(GC, geo, r, 2,1,0, &der2);
-    Di_Fjk(GC, geo, r, 1,2,0, &der3);
+          ris = (int) round( ((der1 + der2 - der3)/PI2) );
+          }
+   else
+     {
+     Di_Fjk(GC, geo, r, 0,2,1, &der1);
+     Di_Fjk(GC, geo, r, 2,1,0, &der2);
+     Di_Fjk(GC, geo, r, 1,2,0, &der3);
 
-    *n_mu = (int) round(((der1 + der2 - der3)/PI2));
-    }
-   } 
+     ris = (int) round( ((der1 + der2 - der3)/PI2) );
+     }
 
-// compute 1/6 (1 -1/2 SUMP)
-// where SUMP is the trace of the sum of (NON ABELIAN) plaquettes
-// lying on the DeGrand cube (site,mu)  
-void Plaqs_on_DeGrand_Cube(Gauge_Conf *GC,
-                           Geometry const * const geo,
-                           GParam const * const param,
-                           long r,
-                           int dir,
-                           double *plaq_cube)
-   {
-   
-   double plaq_aux1, plaq_aux2, plaq_aux3;
-
-   if (dir == 0)
-    {
-    SUMi_Pjk(GC, geo, param, r, 1,2,3, &plaq_aux1);
-    SUMi_Pjk(GC, geo, param, r, 3,1,2, &plaq_aux2);
-    SUMi_Pjk(GC, geo, param, r, 2,1,3, &plaq_aux3);
-    }
-   else if (dir ==1)
-    {
-    SUMi_Pjk(GC, geo, param, r, 3,2,0, &plaq_aux1);
-    SUMi_Pjk(GC, geo, param, r, 0,3,2, &plaq_aux2);
-    SUMi_Pjk(GC, geo, param, r, 2,3,0, &plaq_aux3);
-    }
-   else if (dir == 2) 
-    {
-    SUMi_Pjk(GC, geo, param, r, 3,0,1, &plaq_aux1);
-    SUMi_Pjk(GC, geo, param, r, 0,1,3, &plaq_aux2);
-    SUMi_Pjk(GC, geo, param, r, 1,0,3, &plaq_aux3);
-    }
-   else if (dir == 3) 
-    {
-    SUMi_Pjk(GC, geo, param, r, 0,2,1, &plaq_aux1);
-    SUMi_Pjk(GC, geo, param, r, 2,1,0, &plaq_aux2);
-    SUMi_Pjk(GC, geo, param, r, 1,2,0, &plaq_aux3);
-    }
-  
- 
-   *plaq_cube = (1./6.)*(6. - (plaq_aux1 + plaq_aux2 + plaq_aux3));
-    
+   return ris;
    } 
 
 
-//compute the sum of the non abelian plaquette (site, jdir, kdir) with the
-//one in the direction forward idir
-void SUMi_Pjk(Gauge_Conf *GC,
-              Geometry const * const geo,
-              GParam const * const param,
-              long r,
-              int idir,
-              int jdir,
-              int kdir,
-              double *plaq_cube)
+///// DA SEPARARE AVANTI E INDIETRO
+
+// search for monopole wrappings passing from r_tback
+// this function can be invoked in two different ways
+//
+// or r=nnp(geo, r_tback, 0) and DeGrand_current(GC, geo, r_tback, 0)!=0 (forward case)
+// or r=nnm(geo, r_tback, 0) and DeGrand_current(GC, geo, r, 0)!=0  (backward case)
+//
+// GC->uflag[][] is initialized in monopole_obs
+//
+// nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
+//
+// num_wrap = number of wrappings
+void wrap_search(Gauge_Conf *GC,
+                 Geometry const * const geo,
+                 GParam const * const param,
+                 long r,
+                 long r_tback,
+                 int *num_wrap)
    {
-   
-   double plaq1, plaq2;
+   if(STDIM!=4)
+     {
+     fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #ifdef DEBUG
+   if(DeGrand_current(GC, geo, r_tback, 0)==0)
+     {
+     fprintf(stderr, "Problems in DeGrand_current! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
 
-   plaq1 = plaquettep(GC, geo, param, r, jdir, kdir); 
-   plaq2 = plaquettep(GC, geo, param, nnp(geo, r, idir), jdir, kdir); 
+   int dir, n_mu;
 
-   *plaq_cube = plaq1 + plaq2;
+   if(r == r_tback)
+     {
+     return;
+     }
+   else
+     {
+     // forward case
+     for(dir=0; dir<STDIM; dir++)
+        {
+        n_mu=DeGrand_current(GC, geo, nnp(geo, r, dir), dir);
 
-   }
-// compute 1/24 (1 -1/2 SUMP)
-// where SUMP is the trace of the sum of (NON ABELIAN) plaquettes
-// lying on the plane (mu,nu) for each link nu of the DeGrand cube (site,mu)
-void Plaqs_dual_on_DeGrand_Cube(Gauge_Conf *GC,
-                                Geometry const * const geo,
-                                GParam const * const param,
-                                long r,
-                                int dir,
-                                double *plaq_dual_cube)
-   {
-   
-   double plaq_aux1, plaq_aux2, plaq_aux3;
+        // if not all the monopole currents have been followed
+        if(n_mu > GC->uflag[r][dir])
+          {
+          GC->uflag[r][dir] += 1;
 
-   if (dir == 0)
-    {
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  1,2,3, &plaq_aux1);
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  3,1,2, &plaq_aux2);
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  2,1,3, &plaq_aux3);
-    }
-   else if (dir ==1)
-    {
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  3,2,0, &plaq_aux1);
-    DUALSUMi_Pjk(GC, geo, param, r,  dir, 0,3,2, &plaq_aux2);
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  2,3,0, &plaq_aux3);
-    }
-   else if (dir == 2) 
-    {
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  3,0,1, &plaq_aux1);
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  0,1,3, &plaq_aux2);
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  1,0,3, &plaq_aux3);
-    }
-   else if (dir == 3) 
-    {
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  0,2,1, &plaq_aux1);
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  2,1,0, &plaq_aux2);
-    DUALSUMi_Pjk(GC, geo, param, r, dir,  1,2,0, &plaq_aux3);
-    }
-  
- 
-   *plaq_dual_cube = (1./24.)*(24. - (plaq_aux1 + plaq_aux2 + plaq_aux3));
-    
-   } 
-// for each link orthogonal to the plaquette (jdir,kdir) compute the sum
-// of the plaquette lying in the (idir, mu)plane
-void DUALSUMi_Pjk(Gauge_Conf *GC,
-                  Geometry const * const geo,
-                  GParam const * const param,
-                  long r,
-                  int mu,
-                  int idir,
-                  int jdir,
-                  int kdir,
-                  double *plaq_cube)
- 
-   {
-   double pl_aux;
-   *plaq_cube = 0;
+          if( (geo->d_timeslice[r] == param->d_size[0]-1) && (dir == 0) )
+            {
+            *num_wrap += 1;
+            }
 
-   SUMi_Pjk(GC, geo, param, nnm(geo, r, mu), mu, idir, mu, &pl_aux);
-   *plaq_cube += pl_aux;
+          wrap_search(GC, geo, param, nnp(geo, r, dir), r_tback, num_wrap);
 
-   SUMi_Pjk(GC, geo, param, nnp(geo, nnm(geo, r, mu), jdir), mu, idir, mu, &pl_aux);
-   *plaq_cube += pl_aux;
+          return;
+          }
+        }
 
-   SUMi_Pjk(GC, geo, param, nnp(geo, nnm(geo, r, mu), kdir), mu, idir, mu, &pl_aux);
-   *plaq_cube += pl_aux;
+     //backward case
+     for(dir=0;dir<STDIM;dir++)
+        {
+        n_mu=DeGrand_current(GC, geo, r, dir);
 
-   SUMi_Pjk(GC, geo, param, nnp(geo, nnp(geo, nnm(geo, r, mu), jdir), kdir), mu, idir, mu, &pl_aux);
-   *plaq_cube += pl_aux;
+        if(n_mu < GC->uflag[nnm(geo, r, dir)][dir])
+          {
+          GC->uflag[nnm(geo, r, dir)][dir] -= 1;
+
+          if( (geo->d_timeslice[r] == 0) && (dir == 0) )
+            {
+            *num_wrap -= 1;
+            }
+
+          wrap_search(GC, geo, param, nnm(geo, r, dir), r_tback, num_wrap);
+
+          return;
+          }
+        }
+     }
    }
 
+
+// GC->uflag[][] has to be initialized to zero before calling this function
+// (when GC->uflag is allocated it is also initialized to zero)
 
 void monopoles_obs(Gauge_Conf *GC, 
                    Geometry const * const geo,
@@ -1612,351 +1582,109 @@ void monopoles_obs(Gauge_Conf *GC,
                    int subg, 
                    FILE* monofilep)
    {
-   double mean_wrap, mean_dist_max, num_dist_max;
+   double mean_wrap;
    long r, rsp, r_tback, r_tbackback;
-   int n_mu, num_wrap, nlt, nls, nlloc;       
-   double distsum, distsumt, distmaxperp;
+   int n_mu, num_wrap, mono_charge;
    int cartcoord[4];
 
    mean_wrap = 0.0;     // mean value of monopole wraps for unit volume
-   mean_dist_max = 0.0; // mean maximum distance of each current
-   num_dist_max = 0.0;  // number of currents
 
    for(rsp=0; rsp<param->d_space_vol; rsp++)
-     {
-     //rsp=10;
-     r = sisp_and_t_to_si(geo, rsp, 1); 
-     r_tback = sisp_and_t_to_si(geo, rsp, 0); 
-     r_tbackback = sisp_and_t_to_si(geo, rsp, param->d_size[0]-1);
-
-     //control the T=1 temporal slice to find monopoles currents
-     DeGrand_current(GC, geo, r, 0, &n_mu);
-
-
-////// REMEMBER TO ADD THE CONFIGURATION NUMBER
-
-
-
-     // In the case of monopole current it starts following it
-     for(int a = 0; a<2; a++){
-     if(n_mu > GC->uflag[r_tback][0])
       {
-      lexeo_to_cart(cartcoord, r_tback, param);
-     // printf("RINVENUTA CORRENTE MONOPOLICA: %ld %d %d %d %d\n", rsp, cartcoord[0], cartcoord[1]+1,cartcoord[2]+1,cartcoord[3]+1);
+      r = sisp_and_t_to_si(geo, rsp, 1);                             // t=1 slice
+      r_tback = sisp_and_t_to_si(geo, rsp, 0);                       // t=0 slice
+      r_tbackback = sisp_and_t_to_si(geo, rsp, param->d_size[0]-1);  // t=T-1 slice
 
-      num_wrap = 0; 
-      nlt = 1;  // starts from 1 because we have already done a step forward in the temporal direction
-     
-      nls = 0;
-      nlloc = 0;
- 
-      distsum = 0;
-      distsumt = 0;
-      distmaxperp = 0;
-      
-      GC->uflag[r_tback][0] += 1;
-      
-      wrap_search(GC, geo, param, r, r_tback, &num_wrap, &nls, &nlt, &distsum, &distmaxperp, &nlloc, &distsumt);
-      
-      mean_wrap += abs(num_wrap);
-      num_dist_max += 1;
-      mean_dist_max += distmaxperp;
-      distsum = distsum/(nls + nlt);
-     
-      if(nlloc > 0)
-       {
-       distsumt = distsumt / nlloc;
-       }
-     
-      lexeo_to_cart(cartcoord, r_tback, param); 
-      if(n_mu == 1)
-       {
-       for(int k = 0; k< 4; k++)
-         {
-         fprintf(monofilep, "%d ", cartcoord[k]);
-         }
-       fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
-       }
+      // check the t=1 temporal slice to find monopoles currents
+      n_mu=DeGrand_current(GC, geo, r, 0);
 
-      else if (GC->uflag[r][0] == 1)
-       {
-        for(int k = 0; k< 4; k++)
+      // start following monopole charge in forward direction. Maximum lattice charge is +2 so we try twice
+      for(mono_charge = 0; mono_charge<2; mono_charge++)
          {
-         fprintf(monofilep, "%d ", cartcoord[k]);
-         }
-       fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
-        }
-      else if (GC->uflag[r][0] == 2)
-       {
-        for(int k = 0; k< 4; k++)
-         {
-         fprintf(monofilep, "%d ", cartcoord[k]);
-         }
-       fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
-       }
-      }
-    } //close the for for the charge=2 
-
-//NOW THE BACKWARD DIRECTION
-  
-    
-    DeGrand_current(GC, geo, r_tback, 0, &n_mu);
-   
-    for(int b = 0; b<2; b++){
-         if(n_mu < GC->uflag[r_tbackback][0])
-          {
-   //       printf("ENTEREND IN THE BACK CYCLE");
-          num_wrap = -1; 
-          nlt = 1;  // starts from 1 because we have already done a step forward in the temporal direction
-         
-          nls = 0;
-          nlloc = 0;
-     
-          distsum = 0;
-          distsumt = 0;
-          distmaxperp = 0;
-   
-          GC->uflag[r_tbackback][0] -= 1;
-          
-          wrap_search(GC, geo, param, r_tbackback, r_tback, &num_wrap, &nls, &nlt, &distsum, &distmaxperp, &nlloc, &distsumt);
-          
-          mean_wrap += abs(num_wrap);
-          num_dist_max += 1;
-          mean_dist_max += distmaxperp;
-          distsum = distsum/(nls + nlt);
-         
-          if(nlloc > 0)
+         // nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
+         if(n_mu > GC->uflag[r_tback][0])
            {
-           distsumt = distsumt / nlloc;
-           }
-         
-          lexeo_to_cart(cartcoord, r_tback, param); 
-          if(n_mu == -1)
-           {
-           for(int k = 0; k< 4; k++)
+           GC->uflag[r_tback][0] += 1;
+
+           num_wrap = 0;
+           wrap_search(GC, geo, param, r, r_tback, &num_wrap);
+
+           mean_wrap += abs(num_wrap);
+
+           lexeo_to_cart(cartcoord, r_tback, param);
+           if(n_mu == 1)
              {
-             fprintf(monofilep, "%d ", cartcoord[k]);
+             for(int k = 0; k< 4; k++)
+                {
+                fprintf(monofilep, "%d ", cartcoord[k]);
+                }
+             fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
              }
-           fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
-           }
-    
-          else if (GC->uflag[r][0] == -1)
-           {
-            for(int k = 0; k< 4; k++)
+           else if (GC->uflag[r_tback][0] == 1) // this is to print only once monopole of charge +2
              {
-             fprintf(monofilep, "%d ", cartcoord[k]);
+             for(int k = 0; k<4; k++)
+                {
+                fprintf(monofilep, "%d ", cartcoord[k]);
+                }
+             fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
              }
-           fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
+           /*   MOLTO PROBABILMENTE DA LEVARE
+           else if (GC->uflag[r_tback][0] == 2)
+            {
+             for(int k = 0; k< 4; k++)
+              {
+              fprintf(monofilep, "%d ", cartcoord[k]);
+              }
+            fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
             }
-          else if (GC->uflag[r][0] == -2)
-           {
-            for(int k = 0; k< 4; k++)
-             {
-             fprintf(monofilep, "%d ", cartcoord[k]);
-             }
-           fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
+           */
            }
-          }
-        }
+         }
 
-     }
+      n_mu=DeGrand_current(GC, geo, r_tback, 0);
 
+      // start following monopole charge in backward direction. Maximum lattice charge is +2 so we try twice
+      for(mono_charge = 0; mono_charge<2; mono_charge++)
+         {
+         // nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
+         if(n_mu < GC->uflag[r_tbackback][0])
+           {
+           GC->uflag[r_tbackback][0] -= 1;
+
+           num_wrap = -1;
+           wrap_search(GC, geo, param, r_tbackback, r_tback, &num_wrap);
+
+           lexeo_to_cart(cartcoord, r_tback, param);
+           if(n_mu == -1)
+             {
+             for(int k = 0; k<4; k++)
+                {
+                fprintf(monofilep, "%d ", cartcoord[k]);
+                }
+             fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+             }
+           else if(GC->uflag[r][0] == -1)
+                  {
+                  for(int k=0; k<4; k++)
+                     {
+                     fprintf(monofilep, "%d ", cartcoord[k]);
+                     }
+                  fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+                  }
+           /*
+           else if (GC->uflag[r][0] == -2)
+              {
+              for(int k = 0; k< 4; k++)
+               {
+               fprintf(monofilep, "%d ", cartcoord[k]);
+               }
+             fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
+             }
+            */
+           }
+         }
+      }
    }
-
-
-
-void wrap_search(Gauge_Conf *GC,
-                 Geometry const * const geo, 
-                 GParam const * const param, 
-                 long r, 
-                 long r_tback, 
-                 int *num_wrap, 
-                 int *nls, 
-                 int *nlt, 
-                 double *distsum, 
-                 double *distmax, 
-                 int *nlloc, 
-                 double *distsumloc)
-
-
-   {
-   int dir, n_mu;
-   double dist;
-   int cart_coord_rn[4], cart_coord_r[4];
-
-   if(r == r_tback)
-    {
-  //  printf("OH USCIAMO");
-    return;
-    }
-  
-   else
-    {
-    for(dir=0;dir<STDIM;dir++)
-      {
-      //if(sdir == 0) dir = 3;
-      //if(sdir == 1) dir = 2;
-      //if(sdir == 2) dir = 1;
-      //if(sdir == 3) dir = 0;
-      
-      DeGrand_current(GC, geo, nnp(geo, r, dir), dir, &n_mu);
-      if(n_mu > GC->uflag[r][dir])
-       {
-
-//       lexeo_to_cart(cart_aux, nnp(geo, r, dir), param);
-//
-//       printf("seguo ");
-//       for(int a =0; a<STDIM; a++)
-//         {
-//         printf("%d ", cart_aux[a]+1);
-//         }
-//
-//       printf("\n");
-
-       GC->uflag[r][dir] += 1;
-       dist = comp_distance_periodic(param, r_tback, nnp(geo, r, dir));
-       
-  //     printf("dist %.12g\n", dist);       
-
-       *distsum += dist; 
-
-       if(dir == 0)
-        {
-        *nlt = *nlt + 1;
-        }
-       if(dir != 0)
-        {
-        *nls = *nls +1;
-        }
-    
-     lexeo_to_cart(cart_coord_rn, nnp(geo, r, dir), param);
-     lexeo_to_cart(cart_coord_r, r, param);
-    
-     if(cart_coord_rn[0] == 0)
-      {
-      *distsumloc += dist;
-      *nlloc = *nlloc + 1;
-      } 
-     if(dist > *distmax)
-      {
-      *distmax = dist;
-      }
-    
-     if((cart_coord_r[0] == param->d_size[0]-1) && (dir == 0))
-      {
-      *num_wrap += 1;
-      }
-    
-//      printf("num_wrap %d\n", *num_wrap);
-      wrap_search(GC, geo, param, nnp(geo, r, dir), r_tback, num_wrap, nls, nlt, distsum, distmax, nlloc, distsumloc); 
-
-// 
-//       printf("prima del return ");
-//       for(int a =0; a<STDIM; a++)
-//         {
-//         printf("%d ", cart_coord_rn[a]+1);
-//         }
-//
-//       printf("\n");
-//    
-     return; 
-     }
-    }
-   
-//Now the cycle in backward direction 
-    for(dir=0;dir<STDIM;dir++)
-      {
-     // if(sdir == 0) dir = 3;
-     // if(sdir == 1) dir = 2;
-     // if(sdir == 2) dir = 1;
-     // if(sdir == 3) dir = 0;
-      
-      DeGrand_current(GC, geo, r, dir, &n_mu);
-//      printf("perchè non entri? nmu GC %d %lg\n", n_mu, GC->uflag[nnm(geo,r,dir)][dir]);
-
- 
-     lexeo_to_cart(cart_coord_rn, nnm(geo, r, dir), param);
-//       printf("prima del disastro ");
-//       for(int a =0; a<STDIM; a++)
-//         {
-//         printf("%d ", cart_coord_rn[a]+1);
-//         }
-//
-//       printf("\n");
-
-
-      if(n_mu < GC->uflag[nnm(geo, r, dir)][dir])
-       {
-
-
-//       lexeo_to_cart(cart_aux, nnm(geo, r, dir), param);
-//
-//       printf("seguo back ");
-//       for(int a =0; a<STDIM; a++)
-//         {
-//         printf("%d ", cart_aux[a]+1);
-//         }
-//
-//       printf("\n");
-
-
-
-
-
-       GC->uflag[nnm(geo, r, dir)][dir] -= 1;
-       dist = comp_distance_periodic(param, r_tback, nnm(geo, r, dir));
-       
-    //   printf("dist back %.12g\n", dist);
-
-       *distsum += dist; 
-
-       if(dir == 0)
-        {
-        *nlt = *nlt + 1;
-        }
-       if(dir != 0)
-        {
-        *nls = *nls +1;
-        }
-    
-     lexeo_to_cart(cart_coord_rn, nnm(geo, r, dir), param);
-     lexeo_to_cart(cart_coord_r, r, param);
-    
-     if(cart_coord_rn[0] == 0)
-      {
-      *distsumloc += dist;
-      *nlloc = *nlloc + 1;
-      } 
-     if(dist > *distmax)
-      {
-      *distmax = dist;
-      }
- 
-
- //      printf("per quale minchia di motivo entri nel ciclo ");
- //      for(int a =0; a<STDIM; a++)
-  //       {
-   //      printf("%d ", cart_coord_rn[a]+1);
- //        }
-
-   //    printf("\n");
-
-//     printf("DIR %d\n", dir); 
-     if((cart_coord_r[0] == 0) && (dir == 0))
-      {
-
-      *num_wrap -= 1;
-
-      }
-    
-  //    printf("num_wrap back %d\n", *num_wrap);
-     wrap_search(GC, geo, param, nnm(geo, r, dir), r_tback, num_wrap, nls, nlt, distsum, distmax, nlloc, distsumloc); 
-     
-     return; 
-     }
-    }
-   }
-  } 
 
 
 #endif

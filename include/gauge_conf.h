@@ -240,7 +240,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
                                FILE *datafilep,
-			       FILE *monofilep);
+                               FILE *monofilep);
 
 void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              Geometry const * const geo,
@@ -287,53 +287,16 @@ void Di_Fjk(Gauge_Conf *GC,
             int jdir,
             int kdir,
             double *DiFjk);
-void DeGrand_current(Gauge_Conf *GC,
-                     Geometry const * const geo,
-                     long r,
-                     int dir,
-                     int *n_mu);
-void Plaqs_on_DeGrand_Cube(Gauge_Conf *GC,
-                           Geometry const * const geo,
-                           GParam const * const param,
-                           long r,
-                           int dir,
-                           double *plaq_cube);
-void SUMi_Pjk(Gauge_Conf *GC,
-              Geometry const * const geo,
-              GParam const * const param,
-              long r,
-              int idir,
-              int jdir,
-              int kdir,
-              double *plaq_cube);
-
-void DUALSUMi_Pjk(Gauge_Conf *GC,
-                  Geometry const * const geo,
-                  GParam const * const param,
-                  long r,
-                  int mu,
-                  int idir,
-                  int jdir,
-                  int kdir,
-                  double *plaq_cube);
-void Plaqs_dual_on_DeGrand_Cube(Gauge_Conf *GC,
-                                Geometry const * const geo,
-                                GParam const * const param,
-                                long r,
-                                int dir,
-                                double *plaq_dual_cube);
+int DeGrand_current(Gauge_Conf *GC,
+                    Geometry const * const geo,
+                    long r,
+                    int dir);
 void wrap_search(Gauge_Conf *GC,
                  Geometry const * const geo,
                  GParam const * const param,
                  long r,
                  long r_tback,
-                 int *num_wrap,
-                 int *nls,
-                 int *nlt,
-                 double *distsum,
-                 double *distmax,
-                 int *nlloc,
-                 double *distsumloc);
+                 int *num_wrap);
 void monopoles_obs(Gauge_Conf *GC,
                    Geometry const * const geo,
                    GParam const * const param,
