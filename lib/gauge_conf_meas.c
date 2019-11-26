@@ -1280,8 +1280,7 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
    long r;
    double lambda[NCOLOR];
    const double OverRelaxParam=1.85;
-   double non_diag_contribution, non_diag_contr_aux, counter;
-   GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
+   double non_diag_contribution, non_diag_contr_aux;
 
    // inizialize the matrix lambda = diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
    for(i=0; i<NCOLOR; i++)
@@ -1292,45 +1291,87 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
    non_diag_contribution=1.0;
    while(non_diag_contribution > MIN_VALUE)
         {
-        for(r=0;r<param->d_volume;r++)
-          {
-          // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
-          // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
-          for(dir=0;dir<STDIM;dir++)
-             {
-             equal(&(X_links[dir]), &(GC->lattice[r][dir]));
-             equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
-             }
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+        #endif
+        for(r=0; r<param->d_volume/2; r++)
+           {
+           GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
 
-          comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+           // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
+           // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
+           for(dir=0;dir<STDIM;dir++)
+              {
+              equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+              equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+              }
+
+           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
  
-          // apply the gauge transformation
-          for(dir=0; dir<STDIM; dir++)
-             {
-             times(&help, &G_mag, &(GC->lattice[r][dir]));
-             equal(&(GC->lattice[r][dir]), &help);
+           // apply the gauge transformation
+           for(dir=0; dir<STDIM; dir++)
+              {
+              times(&help, &G_mag, &(GC->lattice[r][dir]));
+              equal(&(GC->lattice[r][dir]), &help);
 
-             times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
-             }
-          }
+              times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
+              }
+           }
+
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+        #endif
+        for(r=param->d_volume/2; r<param->d_volume; r++)
+           {
+           GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
+
+           // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
+           // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
+           for(dir=0;dir<STDIM;dir++)
+              {
+              equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+              equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+              }
+
+           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+
+           // apply the gauge transformation
+           for(dir=0; dir<STDIM; dir++)
+              {
+              times(&help, &G_mag, &(GC->lattice[r][dir]));
+              equal(&(GC->lattice[r][dir]), &help);
+
+              times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
+              }
+           }
 
         // check if the out-of-diagonal-diagonal elements of X(n) are zero
         non_diag_contr_aux=0;
+
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)  reduction(+ : non_diag_contr_aux)
+        #endif
         for(r=0;r<param->d_volume;r++)
-          {
-          for(dir=0;dir<STDIM;dir++)
-             {
-             equal(&(X_links[dir]), &(GC->lattice[r][dir]));
-             equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
-             }
-          comp_outdiagnorm_of_X(X_links, lambda, &counter);
-          non_diag_contr_aux += counter;
-          }
+           {
+           GAUGE_GROUP X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
+           double counter;
+
+           for(dir=0;dir<STDIM;dir++)
+              {
+              equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+              equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+              }
+           comp_outdiagnorm_of_X(X_links, lambda, &counter);
+           non_diag_contr_aux += counter;
+           }
      
         non_diag_contribution = non_diag_contr_aux * param->d_inv_vol;
         }
 
    // unitarize all the links
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #endif
    for(r=0; r<(param->d_volume); r++)
       {
       for(dir=0; dir<STDIM; dir++)
