@@ -1529,8 +1529,6 @@ int DeGrand_current(Gauge_Conf *GC,
    } 
 
 
-///// DA SEPARARE AVANTI E INDIETRO
-
 // search for monopole wrappings passing from r_tback
 // this function can be invoked in two different ways
 //
@@ -1616,7 +1614,6 @@ void wrap_search(Gauge_Conf *GC,
 
 // GC->uflag[][] has to be initialized to zero before calling this function
 // (when GC->uflag is allocated it is also initialized to zero)
-
 void monopoles_obs(Gauge_Conf *GC, 
                    Geometry const * const geo,
                    GParam const * const param, 
@@ -1655,30 +1652,24 @@ void monopoles_obs(Gauge_Conf *GC,
            lexeo_to_cart(cartcoord, r_tback, param);
            if(n_mu == 1)
              {
+             fprintf(monofilep, "%ld ", GC->update_index);
+
              for(int k = 0; k< 4; k++)
                 {
                 fprintf(monofilep, "%d ", cartcoord[k]);
                 }
              fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
              }
-           else if (GC->uflag[r_tback][0] == 1) // this is to print only once monopole of charge +2
-             {
-             for(int k = 0; k<4; k++)
-                {
-                fprintf(monofilep, "%d ", cartcoord[k]);
-                }
-             fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
-             }
-           /*   MOLTO PROBABILMENTE DA LEVARE
-           else if (GC->uflag[r_tback][0] == 2)
-            {
-             for(int k = 0; k< 4; k++)
-              {
-              fprintf(monofilep, "%d ", cartcoord[k]);
-              }
-            fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
-            }
-           */
+           else if(GC->uflag[r_tback][0] == 1) // this is to print only once monopole of charge +2
+                  {
+                  fprintf(monofilep, "%ld ", GC->update_index);
+
+                  for(int k = 0; k<4; k++)
+                     {
+                     fprintf(monofilep, "%d ", cartcoord[k]);
+                     }
+                  fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+                  }
            }
          }
 
@@ -1698,30 +1689,24 @@ void monopoles_obs(Gauge_Conf *GC,
            lexeo_to_cart(cartcoord, r_tback, param);
            if(n_mu == -1)
              {
+             fprintf(monofilep, "%ld ", GC->update_index);
+
              for(int k = 0; k<4; k++)
                 {
                 fprintf(monofilep, "%d ", cartcoord[k]);
                 }
              fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
              }
-           else if(GC->uflag[r][0] == -1)
+           else if(GC->uflag[r][0] == -1)  // this is to print only once monopole of charge +2
                   {
+                  fprintf(monofilep, "%ld ", GC->update_index);
+
                   for(int k=0; k<4; k++)
                      {
                      fprintf(monofilep, "%d ", cartcoord[k]);
                      }
                   fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
                   }
-           /*
-           else if (GC->uflag[r][0] == -2)
-              {
-              for(int k = 0; k< 4; k++)
-               {
-               fprintf(monofilep, "%d ", cartcoord[k]);
-               }
-             fprintf(monofilep, "%d %d %d %.12g %.12g %.12g %d %d %d\n", subg, n_mu, num_wrap, distsum, distsumt, distmaxperp, nls, nlt, nlloc);
-             }
-            */
            }
          }
       }
