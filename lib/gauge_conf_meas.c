@@ -1075,8 +1075,8 @@ void higgs_interaction(Gauge_Conf const * const GC,
 //
 // tildeG0 is NHIGGS*susceptibility, tildeGminp is used to compute the 2nd momentum correlation function
 //
-// tildeD0=Re[(\sum_x D_x)(\sum_y D_y)]/volume
-// tildeDminp=Re[(\sum_x Q_xe^{ipx})(\sum_y Q_ye^{-ipy)]/volume
+// tildeD0=conj(\sum_x D_x) (\sum_y D_y) / volume
+// tildeDminp=(\sum_x D_x e^{ipx}) conj(\sum_y D_y e^{ipy}) /volume
 //
 // tildeD0 is a U1 susceptibility, tildeDminp is used to compute the 2nd momentum correlation function
 void compute_flavour_observables(Gauge_Conf const * const GC,
@@ -1089,18 +1089,17 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
   int coord[STDIM];
   long r;
   const double p = 2.0*PI/(double)param->d_size[1];
-  double complex D, Dp, Dmp;
+  double complex D, Dp;
   FMatrix Q, Qp, Qmp, tmp1, tmp2;
 
   // Q =sum_x Q_x
   // Qp=sum_x e^{ipx}Q_x
   // Qmp=sum_x e^{-ipx}Q_x
   //
-  // D, Dp and Dmp are the analogous for D
+  // D, Dp and are the analogous of Q and Qp for D
 
   D=0.0+0.0*I;
   Dp=0.0+0.0*I;
-  Dmp=0.0+0.0*I;
 
   zero_FMatrix(&Q);
   zero_FMatrix(&Qp);
@@ -1121,19 +1120,18 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
 
      times_equal_complex_FMatrix(&tmp2, cexp(-I*((double)coord[1])*p));
      plus_equal_FMatrix(&Qmp, &tmp2);
-     Dmp+=((GC->Dh[r]) * cexp(-I*((double)coord[1])*p) );
      }
 
   equal_FMatrix(&tmp1, &Q);
   times_equal_FMatrix(&tmp1, &Q);
 
   *tildeG0=retr_FMatrix(&tmp1)*param->d_inv_vol;
-  *tildeD0=creal(D*D)*param->d_inv_vol;
+  *tildeD0=creal(conj(D)*D)*param->d_inv_vol;
 
   equal_FMatrix(&tmp1, &Qp);
   times_equal_FMatrix(&tmp1, &Qmp);
   *tildeGminp=retr_FMatrix(&tmp1)*param->d_inv_vol;
-  *tildeDminp=creal(Dmp*Dp)*param->d_inv_vol;
+  *tildeDminp=creal(Dp*conj(Dp))*param->d_inv_vol;
   }
 
 

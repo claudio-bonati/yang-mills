@@ -626,8 +626,6 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-CRYPTO_COMPILATION_FALSE
-CRYPTO_COMPILATION_TRUE
 N_higgs
 ST_dim
 Num_threads
@@ -4822,16 +4820,9 @@ _ACEOF
 fi
 
 
-
 ### CONDITIONALS
 
- if test x${has_crypto}x${has_md5} = xyesxyes; then
-  CRYPTO_COMPILATION_TRUE=
-  CRYPTO_COMPILATION_FALSE='#'
-else
-  CRYPTO_COMPILATION_TRUE='#'
-  CRYPTO_COMPILATION_FALSE=
-fi
+
 
 
 ac_config_files="$ac_config_files Makefile"
@@ -4967,10 +4958,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${CRYPTO_COMPILATION_TRUE}" && test -z "${CRYPTO_COMPILATION_FALSE}"; then
-  as_fn_error $? "conditional \"CRYPTO_COMPILATION\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
