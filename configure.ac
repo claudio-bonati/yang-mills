@@ -158,10 +158,10 @@ else
 fi
 
 
-
 ### CONDITIONALS
 
-AM_CONDITIONAL([CRYPTO_COMPILATION], [test x${has_crypto}x${has_md5} = xyesxyes])
+
+
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
