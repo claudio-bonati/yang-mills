@@ -24,11 +24,19 @@ void convert_Su2Vecs_to_SuNVecs(SuNVecs * restrict vN, Su2Vecs const * const res
 
 void convert_Su2_to_SuN(SuN * restrict MN, Su2 const * const restrict M2)
   {
-  MN->comp[m(0,0)]=M2->comp[0]+I*M2->comp[3];
-  MN->comp[m(1,1)]=M2->comp[0]-I*M2->comp[3];
+  #if NCOLOR!=2
+    (void) MN;
+    (void) M2;
 
-  MN->comp[m(0,1)]=+M2->comp[2]+I*M2->comp[1];
-  MN->comp[m(1,0)]=-M2->comp[2]+I*M2->comp[1];
+    printf("This code require N_c=2\n\n");
+    exit(EXIT_FAILURE);
+  #else
+    MN->comp[m(0,0)]=M2->comp[0]+I*M2->comp[3];
+    MN->comp[m(1,1)]=M2->comp[0]-I*M2->comp[3];
+  
+    MN->comp[m(0,1)]=+M2->comp[2]+I*M2->comp[1];
+    MN->comp[m(1,0)]=-M2->comp[2]+I*M2->comp[1];
+  #endif
   }
 
 
