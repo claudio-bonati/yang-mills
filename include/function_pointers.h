@@ -148,6 +148,7 @@ void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix,
 
 void (*init_FMatrix_vecs)(FMatrix * restrict fmatrix,
                           GAUGE_VECS const * const restrict v1);
+double complex (*HiggsU1Obs_vecs)(GAUGE_VECS const * const restrict v1);
 
 int (*print_on_file_vecs)(FILE *fp, GAUGE_VECS const * const A);
 int (*print_on_binary_file_bigen_vecs)(FILE *fp, GAUGE_VECS const * const A);

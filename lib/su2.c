@@ -517,6 +517,10 @@ void vector_tensor_vector_Su2Vecs(Su2 * restrict matrix, Su2Vecs const * const r
 void init_FMatrix_Su2Vecs(FMatrix * restrict fmatrix, Su2Vecs const * const restrict v1);
 
 
+// return a double coumplex number to check the fate of U(1) flavour symmetry
+double complex HiggsU1Obs_Su2Vecs(Su2Vecs const * const restrict v1);
+
+
 // print on file
 int print_on_file_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A)
   {

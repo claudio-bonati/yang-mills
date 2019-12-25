@@ -55,14 +55,6 @@ if __name__=="__main__":
   # functions to be evaluated
   def id(x):
     return x
-  def square(x):
-    return x*x
-  def susc(x):
-    return L*L*L*(x[0]-x[1]*x[1])
-  def U(x):
-    return x[0]/x[1]/x[1]
-  def xi2nd(x):
-    return np.sqrt(x[0]/x[1]-1)/2.0/np.sin(np.pi/L)/L
 
   # data acquisition
   indata=np.loadtxt(infile, skiprows=therm, dtype=np.float)
@@ -76,13 +68,13 @@ if __name__=="__main__":
   for i in range(L):
     print(i, end=' ')
 
-    ris, err = jack.jackknife_for_primary(id, 2*data[7+i], blocksize)
+    ris, err = jack.jackknife_for_primary(id, data[9+i], blocksize)
     print(ris, err, end=' ')
 
-    ris, err = jack.jackknife_for_primary(id, data[7+i+L], blocksize)
+    ris, err = jack.jackknife_for_primary(id, data[9+i+L], blocksize)
     print(ris, err, end=' ')
 
-    ris, err = jack.jackknife_for_primary(id, data[7+i+2*L], blocksize)
+    ris, err = jack.jackknife_for_primary(id, data[9+i+2*L], blocksize)
     print(ris, err, end=' ')
 
     print('')

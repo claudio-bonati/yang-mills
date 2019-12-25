@@ -1067,30 +1067,40 @@ void higgs_interaction(Gauge_Conf const * const GC,
 
 
 // compute flavour related observables
+//
+// flavour matrices Qh and Dh HAVE TO BE INITIALIZED before calling this function
+//
 // tildeG0=ReTr[(\sum_x Q_x)(\sum_y Q_y)]/volume/NHIGGS
 // tildeGminp=ReTr[(\sum_x Q_xe^{ipx})(\sum_y Q_ye^{-ipy)]/volume/NHIGGS
+//
 // tildeG0 is NHIGGS*susceptibility, tildeGminp is used to compute the 2nd momentum correlation function
+//
+// tildeD0=Re[(\sum_x D_x)(\sum_y D_y)]/volume
+// tildeDminp=Re[(\sum_x Q_xe^{ipx})(\sum_y Q_ye^{-ipy)]/volume
+//
+// tildeD0 is a U1 susceptibility, tildeDminp is used to compute the 2nd momentum correlation function
 void compute_flavour_observables(Gauge_Conf const * const GC,
                                  GParam const * const param,
                                  double *tildeG0,
-                                 double *tildeGminp)
+                                 double *tildeGminp,
+                                 double *tildeD0,
+                                 double *tildeDminp)
   {
   int coord[STDIM];
   long r;
   const double p = 2.0*PI/(double)param->d_size[1];
+  double complex D, Dp, Dmp;
   FMatrix Q, Qp, Qmp, tmp1, tmp2;
-
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r)
-  #endif
-  for(r=0; r<(param->d_volume); r++)
-     {
-     init_FMatrix_vecs(&(GC->Qh[r]), &(GC->higgs[r]));
-     }
 
   // Q =sum_x Q_x
   // Qp=sum_x e^{ipx}Q_x
   // Qmp=sum_x e^{-ipx}Q_x
+  //
+  // D, Dp and Dmp are the analogous for D
+
+  D=0.0+0.0*I;
+  Dp=0.0+0.0*I;
+  Dmp=0.0+0.0*I;
 
   zero_FMatrix(&Q);
   zero_FMatrix(&Qp);
@@ -1101,30 +1111,36 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
      equal_FMatrix(&tmp2, &tmp1);
 
      plus_equal_FMatrix(&Q, &tmp1);
+     D+=(GC->Dh[r]);
 
      si_to_cart(coord, r, param);
 
      times_equal_complex_FMatrix(&tmp1, cexp(I*((double)coord[1])*p));
      plus_equal_FMatrix(&Qp, &tmp1);
+     Dp+=((GC->Dh[r]) * cexp(I*((double)coord[1])*p) );
 
      times_equal_complex_FMatrix(&tmp2, cexp(-I*((double)coord[1])*p));
      plus_equal_FMatrix(&Qmp, &tmp2);
+     Dmp+=((GC->Dh[r]) * cexp(-I*((double)coord[1])*p) );
      }
 
   equal_FMatrix(&tmp1, &Q);
   times_equal_FMatrix(&tmp1, &Q);
 
   *tildeG0=retr_FMatrix(&tmp1)*param->d_inv_vol;
+  *tildeD0=creal(D*D)*param->d_inv_vol;
 
   equal_FMatrix(&tmp1, &Qp);
   times_equal_FMatrix(&tmp1, &Qmp);
   *tildeGminp=retr_FMatrix(&tmp1)*param->d_inv_vol;
+  *tildeDminp=creal(Dmp*Dp)*param->d_inv_vol;
   }
 
 
 // compute correlators of flavour observables
-// flavour matrices HAS TO BE INITIALIZED before calling this function
-// using init_FMatrix_vecs
+//
+// flavour matrices Qh and Dh HAVE TO BE INITIALIZED before calling this function
+//
 // corrQQ is the correlato ReTr[Q_x Q_{x+d}]/N_higgs
 // corr0string0 is the correlator \sum_f Re[hf^{dag} U_{x,1}U_{x+1,1}....Q_{x+d-1,1} hf], where hf is the f-th flavour
 // corr0string1 is the correlator Re[h0^{dag} U_{x,1}U_{x+1,1}....U_{x+d-1,1} h1], where h1 is the second flavour
@@ -1202,26 +1218,39 @@ void compute_flavour_observables_corr(Gauge_Conf const * const GC,
   }
 
 
-void perform_measures_higgs(Gauge_Conf const * const GC,
+void perform_measures_higgs(Gauge_Conf *GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             FILE *datafilep)
    {
-   double plaqs, plaqt, polyre, polyim, he, tildeG0, tildeGminp;
+   double plaqs, plaqt, polyre, polyim, he, tildeG0, tildeGminp, tildeD0, tildeDminp;
+   long r;
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
    higgs_interaction(GC, geo, param, &he);
 
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      init_FMatrix_vecs(&(GC->Qh[r]), &(GC->higgs[r]));
+      GC->Dh[r] = HiggsU1Obs_vecs(&(GC->higgs[r]));
+      }
+
    compute_flavour_observables(GC,
                                param,
                                &tildeG0,
-                               &tildeGminp);
+                               &tildeGminp,
+                               &tildeD0,
+                               &tildeDminp);
 
    fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
    fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
    fprintf(datafilep, "%.12g ", he);
    fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
+   fprintf(datafilep, "%.12g %.12g ", tildeD0, tildeDminp);
 
    /*
    // for correlators

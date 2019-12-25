@@ -1736,6 +1736,13 @@ void init_higgs_conf(Gauge_Conf *GC, GParam const * const param)
     exit(EXIT_FAILURE);
     }
 
+  // allocate the Dh field
+  err=posix_memalign((void**) &(GC->Dh), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double complex));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating the Dh field! (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
 
   // initialize the higgs field
   if(param->d_start==0) // ordered start
@@ -1750,6 +1757,7 @@ void init_higgs_conf(Gauge_Conf *GC, GParam const * const param)
        equal_vecs(&(GC->higgs[r]), &aux1);
        }
     }
+
   if(param->d_start==1)  // random start
     {
     GAUGE_VECS aux1;
@@ -1869,6 +1877,7 @@ void free_higgs_conf(Gauge_Conf *GC)
   {
   free(GC->higgs);
   free(GC->Qh);
+  free(GC->Dh);
   }
 
 

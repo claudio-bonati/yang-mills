@@ -55,14 +55,6 @@ if __name__=="__main__":
   # functions to be evaluated
   def id(x):
     return x
-  def square(x):
-    return x*x
-  def susc(x):
-    return L*L*L*(x[0]-x[1]*x[1])
-  def U(x):
-    return x[0]/x[1]/x[1]
-  def xi2nd(x):
-    return np.sqrt(x[0]/x[1]-1)/2.0/np.sin(np.pi/L)/L
   def logratio(x):
     return 1./np.log(x[1]/x[0])
 
@@ -75,7 +67,7 @@ if __name__=="__main__":
   for i in range(L):
     print(i, end=' ')
 
-    ris, err = jack.jackknife_for_secondary(logratio, blocksize, [id, data[7+i+1+L]], [id, data[7+i+L]])
+    ris, err = jack.jackknife_for_secondary(logratio, blocksize, [id, data[9+i+1+L]], [id, data[9+i+L]])
     print(ris, err, end=' ')
 
     print('')

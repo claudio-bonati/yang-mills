@@ -316,7 +316,7 @@ void LU_SuN(SuN const * const restrict A, SuN * restrict ris, int * restrict sig
 
 
 // determinant
-complex double det_SuN(SuN const * const A);
+double complex det_SuN(SuN const * const A);
 
 
 // gives 0 if the matrix is in SU(N) and 1 otherwise
@@ -771,6 +771,9 @@ void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * const r
 // i, j are the flavour indices
 void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * const restrict v1);
 
+
+// return a double coumplex number to check the fate of U(1) flavour symmetry
+double complex HiggsU1Obs_SuNVecs(SuNVecs const * const restrict v1);
 
 
 // print on file

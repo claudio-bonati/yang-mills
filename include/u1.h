@@ -973,6 +973,23 @@ inline void init_FMatrix_U1Vecs(FMatrix * restrict fmatrix, U1Vecs const * const
      }
   }
 
+
+// return a double coumplex number to check the fate of U(1) flavour symmetry
+inline double complex HiggsU1Obs_U1Vecs(U1Vecs const * const restrict v1)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  #endif
+
+  #if NHIGGS >= 1
+    return v1->comp[0];
+  #else
+    (void) v1;
+    return 0.0 + 0.0*I;
+  #endif
+  }
+
+
 // print on file
 int print_on_file_U1Vecs(FILE *fp, U1Vecs const * const A);
 

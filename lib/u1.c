@@ -470,6 +470,10 @@ void vector_tensor_vector_U1Vecs(U1 * restrict matrix, U1Vecs const * const rest
 void init_FMatrix_U1Vecs(FMatrix * restrict fmatrix, U1Vecs const * const restrict v1);
 
 
+// return a double coumplex number to check the fate of U(1) flavour symmetry
+double complex HiggsU1Obs_U1Vecs(U1Vecs const * const restrict v1);
+
+
 // print on file
 int print_on_file_U1Vecs(FILE *fp, U1Vecs const * const A)
   {

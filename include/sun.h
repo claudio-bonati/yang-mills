@@ -1550,6 +1550,33 @@ inline void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * con
   }
 
 
+// return a double coumplex number to check the fate of U(1) flavour symmetry
+inline double complex HiggsU1Obs_SuNVecs(SuNVecs const * const restrict v1)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  #endif
+
+  #if NHIGGS >=NCOLOR
+    SuN aux;
+    int i, j;
+
+    for(i=0; i<NCOLOR; i++)
+       {
+       for(j=0; j<NCOLOR; j++)
+          {
+          aux.comp[m(i,j)]=(v1->comp[NCOLOR*i+j]);
+          }
+       }
+
+    return det_SuN(&aux);
+  #else
+    (void) v1;
+    return 0.0 + 0.0*I;
+  #endif
+  }
+
+
 // print on file
 int print_on_file_SuNVecs(FILE *fp, SuNVecs const * const A);
 

@@ -43,6 +43,7 @@ typedef struct Gauge_Conf {
   // for higgs field & co
   GAUGE_VECS *higgs;    // [volume]
   FMatrix *Qh;          // [volume]
+  double complex *Dh;   // [volume]
  
   // for Abelian projection & co
   double ***diag_proj; // [volume] [STDIM] [NCOLOR]
@@ -260,14 +261,16 @@ void higgs_interaction(Gauge_Conf const * const GC,
 void compute_flavour_observables(Gauge_Conf const * const GC,
                                  GParam const * const param,
                                  double *tildeG0,
-                                 double *tildeGminp);
+                                 double *tildeGminp,
+                                 double *tildeD0,
+                                 double *tildeDminp);
 void compute_flavour_observables_corr(Gauge_Conf const * const GC,
                                       Geometry const * const geo,
                                       GParam const * const param,
                                       double *corrQQ,
                                       double *corr0string0,
                                       double *corr0string1);
-void perform_measures_higgs(Gauge_Conf const * const GC,
+void perform_measures_higgs(Gauge_Conf * GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             FILE *datafilep);

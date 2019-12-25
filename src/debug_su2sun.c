@@ -46,6 +46,7 @@ int main(void)
 
   int i;
   double x;
+  double complex y;
   Su2 M2, U2;
   SuN MN, UN;
 
@@ -126,7 +127,7 @@ int main(void)
   printf("\n");
 
 
-  printf("VERIFY CONSISTENCY BETWEEN Su2Vecs->FMatrix and SuNVecs->FMatrix ...");
+  printf("VERIFY CONSISTENCY BETWEEN Su2Vecs -> FMatrix and SuNVecs -> FMatrix ...");
   rand_vec_Su2Vecs(&v2);
   convert_Su2Vecs_to_SuNVecs(&vN, &v2);
 
@@ -220,6 +221,33 @@ int main(void)
   if(fabs(x)<MIN_VALUE)
     {
     printf("  OK\n");
+    }
+  else
+    {
+    printf("  ERROR!!!!!!!!!!!\n");
+    return EXIT_FAILURE;
+    }
+  printf("\n");
+
+
+  printf("VERIFY CONSISTENCY BETWEEN Su2Vecs -> HiggsU1Obs and SuNVecs -> HiggsU1Obs ...");
+  rand_vec_Su2Vecs(&v2);
+  convert_Su2Vecs_to_SuNVecs(&vN, &v2);
+
+  y=HiggsU1Obs_Su2Vecs(&v2);
+  y-=HiggsU1Obs_SuNVecs(&vN);
+
+  x=cabs(y);
+  if(fabs(x)<MIN_VALUE)
+    {
+    if(NHIGGS<NCOLOR)
+      {
+      printf("  OK but trivial since NHIGGS<NCOLOR\n");
+      }
+    else
+      {
+      printf("  OK\n");
+      }
     }
   else
     {

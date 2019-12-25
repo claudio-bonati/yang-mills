@@ -84,9 +84,14 @@ if __name__=="__main__":
   ris, err = jack.jackknife_for_secondary(xi2nd, blocksize, [id, data[5]], [id, data[6]])
   print(ris, err, end=' ')
 
-  if(len(indata[0])==9):
-    ris, err = jack.jackknife_for_secondary(xigauge, blocksize, [id, data[7]], [id, data[8]])
-    print(ris, err, end=' ')
+  ris, err = jack.jackknife_for_primary(id, data[7], blocksize)
+  print(ris, err, end=' ')
+
+  ris, err = jack.jackknife_for_secondary(U, blocksize, [square, data[7]], [id, data[7]])
+  print(ris, err, end=' ')
+
+  ris, err = jack.jackknife_for_secondary(xi2nd, blocksize, [id, data[7]], [id, data[8]])
+  print(ris, err, end=' ')
 
   print('')
 

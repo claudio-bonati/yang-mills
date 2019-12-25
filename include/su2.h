@@ -1376,6 +1376,29 @@ inline void init_FMatrix_Su2Vecs(FMatrix * restrict fmatrix, Su2Vecs const * con
   }
 
 
+// return a double coumplex number to check the fate of U(1) flavour symmetry
+inline double complex HiggsU1Obs_Su2Vecs(Su2Vecs const * const restrict v1)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  #endif
+
+  #if NHIGGS >=2
+    double complex a, b, c, d;
+
+    a = v1->comp[2] + (v1->comp[1])*I;
+    b = v1->comp[0] - (v1->comp[3])*I;  // first flavour = (a,b)
+
+    c = v1->comp[4+2] + (v1->comp[4+1])*I;
+    d = v1->comp[4+0] - (v1->comp[4+3])*I;  // second flavour = (c, d)
+
+    return a*d-b*c;   // = det[ (a,b), (c,d) ]
+  #else
+    (void) v1;
+    return 0.0 + 0.0*I;
+  #endif
+  }
+
 // print on file
 int print_on_file_Su2Vecs(FILE *fp, Su2Vecs const * const restrict A);
 
