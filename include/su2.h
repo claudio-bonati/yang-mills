@@ -23,6 +23,7 @@ typedef struct Su2Adj {
      double comp[9] __attribute__((aligned(DOUBLE_ALIGN)));
 } Su2Adj;
 
+//
 // a complex 2-vector \Phi = (\phi_1+i\phi_2, \phi_3+i\phi_4) can be conveniently rewritten as a 2x2 matrix \varphi
 // by using the auxilliary vector \tilde{\Phi}=i\sigma_2\Phi and
 // \varphi=( \tilde{\Phi} | \Phi ) = \phi_3 Id + i\sigma_1\phi_2 +i\sigma_2\phi_1-i\sigma_3\phi_4
@@ -33,7 +34,7 @@ typedef struct Su2Adj {
 //
 // the 2-dim complex form of the flavour "i" vector is
 // (v[4*i+2]+I v[4*i+1], v[4*i+0]-I v[4*i+3])
-
+//
 typedef struct Su2Vecs {
      double comp[4*NHIGGS] __attribute__((aligned(DOUBLE_ALIGN)));
 } Su2Vecs;
@@ -446,8 +447,8 @@ inline void times_equal_dag_Su2(Su2 * restrict A, Su2 const * const restrict B)
 
 // A=B*C
 inline void times_Su2(Su2 * restrict A,
-               Su2 const * const restrict B,
-               Su2 const * const restrict C)
+                      Su2 const * const restrict B,
+                      Su2 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -467,6 +468,68 @@ inline void times_Su2(Su2 * restrict A,
   A->comp[1]= B->comp[0]*C->comp[1] + B->comp[1]*C->comp[0] - B->comp[2]*C->comp[3] + B->comp[3]*C->comp[2];
   A->comp[2]= B->comp[0]*C->comp[2] + B->comp[2]*C->comp[0] + B->comp[1]*C->comp[3] - B->comp[3]*C->comp[1];
   A->comp[3]= B->comp[0]*C->comp[3] + B->comp[3]*C->comp[0] - B->comp[1]*C->comp[2] + B->comp[2]*C->comp[1];
+  }
+
+
+// A=lambda*B with lambda diagonal matrix
+inline void diag_matrix_times_Su2(Su2 * restrict A, 
+                                  double *lambda, 
+                                  Su2 const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+  
+  // lambda is written in the form lambda = a*1 +ib*sigma with a=(lambda[1]+lambda[2])/2 e b=(lambda[1]-lambda[2])/2
+  double a,b;
+  
+  a = (double) (lambda[1] + lambda[2])/2;
+  b = (double) (lambda[1] - lambda[2])/2;
+
+  A->comp[0]= B->comp[0]*a - B->comp[3]*b;
+  A->comp[1]= a*B->comp[1] + b*B->comp[2];
+  A->comp[2]= B->comp[2]*a - b*B->comp[1];
+  A->comp[3]= a*B->comp[3] + B->comp[0]*b;
+  }
+
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+inline void diag_matrix_times_dag_Su2(Su2 * restrict A,
+                                      double *lambda,
+                                      Su2 const * const restrict B)
+  {
+  #ifdef DEBUG
+  if(A==B)
+    {
+    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  #endif
+
+  #ifdef __INTEL_COMPILER
+    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
+  #endif
+ 
+  // lambda is written in the form lambda = a*1 +ib*sigma with a=(lambda[1]+lambda[2])/2 e b=(lambda[1]-lambda[2])/2
+  double a,b;
+  
+  a = (double) (lambda[1] + lambda[2])/2;
+  b = (double) (lambda[1] - lambda[2])/2;
+
+  A->comp[0]=  B->comp[0]*a + B->comp[3]*b;
+  A->comp[1]=  B->comp[1]*a + B->comp[2]*b;
+  A->comp[2]=  B->comp[2]*a - B->comp[1]*b;
+  A->comp[3]= -B->comp[0]*b + B->comp[3]*a;
   }
 
 
@@ -1311,7 +1374,6 @@ inline void init_FMatrix_Su2Vecs(FMatrix * restrict fmatrix, Su2Vecs const * con
      fmatrix->comp[mf(i,i)] -= 1.0/(double)NHIGGS;
      }
   }
-
 
 
 // print on file

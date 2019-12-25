@@ -29,12 +29,12 @@ typedef struct Gauge_Conf {
 
   // for computing the polyakov loop correlator in the adjoint rep. with multilevel
   TensProdAdj ***ml_polycorradj;   // [NLEVELS] [d_size[0]/d_ml_step[i]] [space_vol]
-  GAUGE_GROUP_ADJ **loc_polyadj;    // [d_size[0]/d_ml_step[NLEVELS-1]] [space_vol] auxilliary vector to be used in the multilevel
+  GAUGE_GROUP_ADJ **loc_polyadj;   // [d_size[0]/d_ml_step[NLEVELS-1]] [space_vol] auxilliary vector to be used in the multilevel
 
   // for the disconnected correlator for string width
-  TensProd **ml_polyplaq;   // [NLEVELS] [only slice 0] [space_vol]
-  TensProdAdj **ml_polyplaqadj;   // [NLEVELS] [only slice 0] [space_vol]  for the adjoint case
-  double complex *loc_plaq;  // [only slice 0] [space_vol] auxilliary vector to be used in the multilevel
+  TensProd **ml_polyplaq;        // [NLEVELS] [only slice 0] [space_vol]
+  TensProdAdj **ml_polyplaqadj;  // [NLEVELS] [only slice 0] [space_vol]  for the adjoint case
+  double complex *loc_plaq;      // [only slice 0] [space_vol] auxilliary vector to be used in the multilevel
 
   // for the connected correlator for string width
   TensProd **ml_polyplaqconn;   // [NLEVELS] [only slice 0] [space_vol]
@@ -43,6 +43,12 @@ typedef struct Gauge_Conf {
   // for higgs field & co
   GAUGE_VECS *higgs;    // [volume]
   FMatrix *Qh;          // [volume]
+ 
+  // for Abelian projection & co
+  double ***diag_proj; // [volume] [STDIM] [NCOLOR]
+  double **u1_subg;    // [volume] [STDIM]
+  double **uflag;      // [volume] [STDIM] this is used to check if the link has already been considered in the searching of the wraps
+ 
   } Gauge_Conf;
 
 
@@ -158,6 +164,11 @@ void compute_md5sum_higgs(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                           Gauge_Conf const * const GC,
                           GParam const * const param);
 
+void alloc_diag_proj_stuff(Gauge_Conf *GC,
+                           GParam const * const param);
+void free_diag_proj_stuff(Gauge_Conf *GC,
+                          GParam const * const param);
+
 
 // in gauge_conf_meas.c
 double plaquettep(Gauge_Conf const * const GC,
@@ -228,16 +239,72 @@ double topcharge(Gauge_Conf const * const GC,
 void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
-                               FILE *datafilep);
+                               FILE *datafilep,
+                               FILE *monofilep);
+
 void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              Geometry const * const geo,
                                              GParam const * const param,
-                                             FILE *datafilep);
+                                             FILE *datafilep,
+                                             FILE *monofilep);
+
 void perform_measures_localobs_fundadj(Gauge_Conf const * const GC,
                                        Geometry const * const geo,
                                        GParam const * const param,
                                        FILE *datafilep);
 
+void higgs_interaction(Gauge_Conf const * const GC,
+                       Geometry const * const geo,
+                       GParam const * const param,
+                       double *he);
+void compute_flavour_observables(Gauge_Conf const * const GC,
+                                 GParam const * const param,
+                                 double *tildeG0,
+                                 double *tildeGminp);
+void compute_flavour_observables_corr(Gauge_Conf const * const GC,
+                                      Geometry const * const geo,
+                                      GParam const * const param,
+                                      double *corrQQ,
+                                      double *corr0string0,
+                                      double *corr0string1);
+void perform_measures_higgs(Gauge_Conf const * const GC,
+                            Geometry const * const geo,
+                            GParam const * const param,
+                            FILE *datafilep);
+
+void max_abelian_gauge_fix(Gauge_Conf *GC,
+                           Geometry const * const geo,
+                           GParam const * const param);
+void diag_projection(Gauge_Conf *GC,
+                     GParam const * const param);
+void U1_extract(Gauge_Conf *GC,
+                GParam const * const param,
+                int subg);
+void Di_Fjk(Gauge_Conf *GC,
+            Geometry const * const geo,
+            long r,
+            int idir,
+            int jdir,
+            int kdir,
+            double *DiFjk);
+int DeGrand_current(Gauge_Conf *GC,
+                    Geometry const * const geo,
+                    long r,
+                    int dir);
+void wrap_search(Gauge_Conf *GC,
+                 Geometry const * const geo,
+                 GParam const * const param,
+                 long r,
+                 long r_tback,
+                 int *num_wrap);
+void monopoles_obs(Gauge_Conf *GC,
+                   Geometry const * const geo,
+                   GParam const * const param,
+                   int subg,
+                   FILE* monofilep);
+
+
+// in gauge_conf_meas_multilevel.c
 void optimize_multihit_polycorr(Gauge_Conf *GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
@@ -302,29 +369,6 @@ void perform_measures_tube_conn_long(Gauge_Conf *GC,
                                      GParam const * const param,
                                      FILE *datafilep);
 
-void higgs_interaction(Gauge_Conf const * const GC,
-                       Geometry const * const geo,
-                       GParam const * const param,
-                       double *he);
-void compute_flavour_observables(Gauge_Conf const * const GC,
-                                 GParam const * const param,
-                                 double *tildeG0,
-                                 double *tildeGminp);
-void compute_flavour_observables_corr(Gauge_Conf const * const GC,
-                                      Geometry const * const geo,
-                                      GParam const * const param,
-                                      double *corrQQ,
-                                      double *corr0string0,
-                                      double *corr0string1);
-void compute_flavour_gauge_corr_length(Gauge_Conf const * const GC,
-                                       Geometry const * const geo,
-                                       GParam const * const param,
-                                       double *intG,
-                                       double *r2G);
-void perform_measures_higgs(Gauge_Conf const * const GC,
-                            Geometry const * const geo,
-                            GParam const * const param,
-                            FILE *datafilep);
 
 // in gauge_conf_multilevel.c
 void multihit(Gauge_Conf const * const GC,
@@ -531,5 +575,6 @@ void update_with_higgs(Gauge_Conf * GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        double *acc);
+
 
 #endif

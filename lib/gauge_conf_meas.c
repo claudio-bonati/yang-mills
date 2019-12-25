@@ -15,6 +15,9 @@
 #include"../include/gauge_conf.h"
 #include"../include/tens_prod.h"
 #include"../include/tens_prod_adj.h"
+#include"../include/su2_monopoles.h"
+#include"../include/sun_monopoles.h"
+#include"../include/u1_monopoles.h"
 
 
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
@@ -785,17 +788,23 @@ void topcharge_cooling(Gauge_Conf const * const GC,
 void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
-                               FILE *datafilep)
+                               FILE *datafilep,
+                               FILE *monofilep)
    {
+   double plaqs, plaqt, polyre, polyim;
+
+   plaquette(GC, geo, param, &plaqs, &plaqt);
+   polyakov(GC, geo, param, &polyre, &polyim);
+
+   fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+
+   // topological observables
    #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
      int i, err;
-     double plaqs, plaqt, polyre, polyim, *charge, *meanplaq, charge_nocooling;
+     double*charge, *meanplaq, charge_nocooling;
 
-     plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov(GC, geo, param, &polyre, &polyim);
      charge_nocooling=topcharge(GC, geo, param);
-
-     fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim, charge_nocooling);
+     fprintf(datafilep, " %.12g ", charge_nocooling);
 
      err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
      if(err!=0)
@@ -817,21 +826,52 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
         }
      fprintf(datafilep, "\n");
 
-     fflush(datafilep);
-
      free(charge);
      free(meanplaq);
-
    #else
-
-     double plaqs, plaqt, polyre, polyim;
-
-     plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov(GC, geo, param, &polyre, &polyim);
-
-     fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
      fprintf(datafilep, "\n");
-     fflush(datafilep);
+   #endif
+   fflush(datafilep);
+
+   // monopole observables
+   #if(STDIM==4)
+   if(param->d_mon_meas == 1)
+     {
+     int subg, subgnum;
+     Gauge_Conf helperconf;
+
+     init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+     alloc_diag_proj_stuff(&helperconf, param);
+
+     // MAG gauge fixing
+     max_abelian_gauge_fix(&helperconf, geo, param);
+ 
+     //diagonal projection
+     diag_projection(&helperconf, param);
+   
+     //loop on all the U(1) subgroups
+     if(NCOLOR>1)
+       {
+       subgnum=NCOLOR-1;
+       }
+     else
+       {
+       subgnum=1;
+       }
+     for(subg=0; subg<subgnum; subg++)
+        {
+        // extract the abelian component subg and save it to GC->u1_subg
+        U1_extract(&helperconf, param, subg);
+
+        // compute monopole observables
+        monopoles_obs(&helperconf, geo, param, subg, monofilep);
+        }
+
+     free_diag_proj_stuff(&helperconf, param);
+     free_gauge_conf(&helperconf, param);
+
+     fflush(monofilep);
+     }
    #endif
    }
 
@@ -840,24 +880,29 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
 void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              Geometry const * const geo,
                                              GParam const * const param,
-                                             FILE *datafilep)
+                                             FILE *datafilep,
+                                             FILE *monofilep)
    {
-   #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
+   int i;
+   double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1]; // +1 just to avoid warning if NCOLOR=1
 
-     int i, err;
-     double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1]; // +1 just to avoid warning if NCOLOR=1
+   plaquette(GC, geo, param, &plaqs, &plaqt);
+   polyakov_for_tracedef(GC, geo, param, polyre, polyim);
+
+   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+
+   for(i=0; i<(int)floor(NCOLOR/2); i++)
+      {
+      fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
+      }
+
+   // topological observables
+   #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
+     int err;
      double *charge, *meanplaq, charge_nocooling;
 
-     plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov_for_tracedef(GC, geo, param, polyre, polyim);
      charge_nocooling=topcharge(GC, geo, param);
 
-     fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
-
-     for(i=0; i<(int)floor(NCOLOR/2); i++)
-        {
-        fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
-        }
      fprintf(datafilep, "%.12g ", charge_nocooling);
 
      err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
@@ -880,28 +925,53 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
         }
      fprintf(datafilep, "\n");
 
-     fflush(datafilep);
-
      free(charge);
      free(meanplaq);
-
    #else
-
-     int i;
-     double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1];   // +1 just to avoid warning if NCOLOR=1
-
-     plaquette(GC, geo, param, &plaqs, &plaqt);
-     polyakov_for_tracedef(GC, geo, param, polyre, polyim);
-
-     fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
-     for(i=0; i<(int)floor(NCOLOR/2); i++)
-        {
-        fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
-        }
      fprintf(datafilep, "\n");
+   #endif
 
-     fflush(datafilep);
+   fflush(datafilep);
 
+   // monopole observables
+   #if(STDIM==4)
+   if(param->d_mon_meas == 1)
+     {
+     Gauge_Conf helperconf;
+     int subg, subgnum;
+
+     init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+     alloc_diag_proj_stuff(&helperconf, param);
+
+     // MAG gauge fixing
+     max_abelian_gauge_fix(&helperconf, geo, param);
+
+     //diagonal projection
+     diag_projection(&helperconf, param);
+
+     //loop on all the U(1) subgroups
+     if(NCOLOR>1)
+       {
+       subgnum=NCOLOR-1;
+       }
+     else
+       {
+       subgnum=1;
+       }
+     for(subg=0; subg<subgnum; subg++)
+        {
+        // extract the abelian component subg and save it to GC->u1_subg
+        U1_extract(&helperconf, param, subg);
+
+        // compute monopole observables
+        monopoles_obs(&helperconf, geo, param, subg, monofilep);
+        }
+
+     free_diag_proj_stuff(&helperconf, param);
+     free_gauge_conf(&helperconf, param);
+
+     fflush(monofilep);
+     }
    #endif
    }
 
@@ -956,1019 +1026,6 @@ void perform_measures_localobs_fundadj(Gauge_Conf const * const GC,
      fprintf(datafilep, "\n");
      fflush(datafilep);
    #endif
-   }
-
-
-// to optimize the number of hits to be used in multilevel
-void optimize_multihit_polycorr(Gauge_Conf *GC,
-                                Geometry const * const geo,
-                                GParam const * const param,
-                                FILE *datafilep)
-  {
-  const int max_hit=50;
-  const int dir=1;
-
-  int i, mh, t_tmp, err;
-  long r, r1, r2;
-  double complex poly_corr;
-  double poly_corr_abs, poly_corr_fluct, diff_sec;
-  double complex *poly_array;
-  time_t time1, time2;
-  GAUGE_GROUP matrix, tmp;
-
-  err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
-  if(err!=0)
-    {
-    fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-
-  #ifdef THETA_MODE
-   compute_clovers(GC, geo, param, 0);
-  #endif
-
-  fprintf(datafilep, "Multihit optimization: \n");
-  fprintf(datafilep, "the smaller the value the better the multihit\n");
-
-  for(mh=1; mh<max_hit; mh++)
-     {
-     time(&time1);
-
-     // polyakov loop computation
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        one(&matrix);
-        for(i=0; i<param->d_size[0]; i++)
-           {
-           multihit(GC,
-                    geo,
-                    param,
-                    sisp_and_t_to_si(geo, r, i),
-                    0,
-                    mh,
-                    &tmp);
-           times_equal(&matrix, &tmp);
-           }
-        poly_array[r]=retr(&matrix)+I*imtr(&matrix);
-        }
-
-     // average correlator computation
-     poly_corr=0.0+I*0.0;
-     poly_corr_abs=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        r1=sisp_and_t_to_si(geo, r, 0);
-        for(i=0; i<param->d_dist_poly; i++)
-           {
-           r1=nnp(geo, r1, dir);
-           }
-        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
-
-        poly_corr += poly_array[r]*conj(poly_array[r2]);
-        poly_corr_abs += cabs(poly_array[r]*conj(poly_array[r2]));
-        }
-     poly_corr*=param->d_inv_space_vol;
-     poly_corr_abs*=param->d_inv_space_vol;
-
-     // fluctuation of the average correlator computation
-     poly_corr_fluct=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        r1=sisp_and_t_to_si(geo, r, 0);
-        for(i=0; i<param->d_dist_poly; i++)
-           {
-           r1=nnp(geo, r1, dir);
-           }
-        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
-        poly_corr_fluct+=cabs( poly_array[r]*conj(poly_array[r2]) - poly_corr );
-        }
-     poly_corr_fluct*=param->d_inv_space_vol;
-
-
-     time(&time2);
-     diff_sec = difftime(time2, time1);
-
-     fprintf(datafilep, "%d  %.12g  %.12g (time:%g)\n", mh, poly_corr_abs*sqrt(mh), poly_corr_fluct*sqrt(mh), diff_sec);
-
-     fflush(datafilep);
-     }
-
-  free(poly_array);
-  }
-
-
-// to optimize the multilevel
-void optimize_multilevel_polycorr(Gauge_Conf *GC,
-                                  Geometry const * const geo,
-                                  GParam const * const param,
-                                  FILE *datafilep)
-   {
-   int i, err;
-   long r;
-   double complex poly_corr;
-   double poly_corr_abs, poly_corr_fluct;
-   double complex *poly_array;
-
-   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-
-   fprintf(datafilep, "Multilevel optimization: ");
-   fprintf(datafilep, "the smaller the value the better the update\n");
-
-   multilevel_polycorr(GC,
-                       geo,
-                       param,
-                       param->d_size[0]);
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
-         }
-      }
-
-   // averages
-   poly_corr=0.0+I*0.0;
-   poly_corr_abs=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
-
-      poly_corr+=poly_array[r];
-      poly_corr_abs+=cabs(poly_array[r]);
-      }
-   poly_corr*=param->d_inv_space_vol;
-   poly_corr_abs*=param->d_inv_space_vol;
-
-   // fluctuations
-   poly_corr_fluct=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_corr_fluct += cabs(poly_array[r]-poly_corr);
-      }
-   poly_corr_fluct*=param->d_inv_space_vol;
-
-   // normalizations
-   for(i=0; i<NLEVELS; i++)
-      {
-      poly_corr_abs*= sqrt(param->d_ml_upd[i]);
-      poly_corr_fluct*= sqrt(param->d_ml_upd[i]);
-      }
-   poly_corr_abs*=sqrt(param->d_multihit);
-   poly_corr_fluct*=sqrt(param->d_multihit);
-
-   fprintf(datafilep, "%.12g ", poly_corr_abs);
-   for(i=0; i<NLEVELS; i++)
-      {
-      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
-      }
-   fprintf(datafilep, "(1, %d) ", param->d_multihit);
-   fprintf(datafilep, "\n");
-   fflush(datafilep);
-
-   free(poly_array);
-   }
-
-
-// perform the computation of the polyakov loop correlator with the multilevel algorithm
-void perform_measures_polycorr(Gauge_Conf *GC,
-                               Geometry const * const geo,
-                               GParam const * const param,
-                               FILE *datafilep)
-   {
-   #ifndef OPT_MULTIHIT
-   #ifndef OPT_MULTILEVEL
-     double ris;
-     long r;
-     int i;
-
-     multilevel_polycorr(GC,
-                geo,
-                param,
-                param->d_size[0]);
-
-     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-        {
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r)
-        #endif
-        for(r=0; r<param->d_space_vol; r++)
-           {
-           times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
-           }
-        }
-
-     ris=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        ris+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
-        }
-     ris*=param->d_inv_space_vol;
-
-     fprintf(datafilep, "%.12g\n", ris);
-     fflush(datafilep);
-   #endif
-   #endif
-
-   #ifdef OPT_MULTIHIT
-     optimize_multihit_polycorr(GC, geo, param, datafilep);
-   #endif
-
-   #ifdef OPT_MULTILEVEL
-     optimize_multilevel_polycorr(GC, geo, param, datafilep);
-   #endif
-   }
-
-
-// to optimize the number of hits to be used in multilevel for the adjoint representation
-void optimize_multihit_polycorradj(Gauge_Conf *GC,
-                                   Geometry const * const geo,
-                                   GParam const * const param,
-                                   FILE *datafilep)
-  {
-  const int max_hit=50;
-  const int dir=1;
-
-  int i, mh, t_tmp, err;
-  long r, r1, r2;
-  double poly_corr, poly_corr_abs, poly_corr_fluct, diff_sec;
-  double *poly_array;
-  time_t time1, time2;
-  GAUGE_GROUP_ADJ matrix, tmp;
-
-  err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
-  if(err!=0)
-    {
-    fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-
-  #ifdef THETA_MODE
-   compute_clovers(GC, geo, param, 0);
-  #endif
-
-  fprintf(datafilep, "Multihit optimization: \n");
-  fprintf(datafilep, "the smaller the value the better the multihit\n");
-
-  for(mh=1; mh<max_hit; mh++)
-     {
-     time(&time1);
-
-     // polyakov loop in the adjoint representation computation
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        one_adj(&matrix);
-        for(i=0; i<param->d_size[0]; i++)
-           {
-           multihitadj(GC,
-                       geo,
-                       param,
-                       sisp_and_t_to_si(geo, r, i),
-                       0,
-                       mh,
-                       &tmp);
-           times_equal_adj(&matrix, &tmp);
-           }
-
-        //trace of the matix in the fundamental representation
-        poly_array[r]=retr_adj(&matrix);
-        }
-
-     // average correlator computation
-     poly_corr=0.0;
-     poly_corr_abs=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        r1=sisp_and_t_to_si(geo, r, 0);
-        for(i=0; i<param->d_dist_poly; i++)
-           {
-           r1=nnp(geo, r1, dir);
-           }
-        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
-
-        poly_corr+= poly_array[r]*poly_array[r2];
-        poly_corr_abs+=fabs(poly_array[r]*poly_array[r2]);
-        }
-     poly_corr*=param->d_inv_space_vol;
-     poly_corr_abs*=param->d_inv_space_vol;
-
-     // fluctuation of the average correlator computation
-     poly_corr_fluct=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        r1=sisp_and_t_to_si(geo, r, 0);
-        for(i=0; i<param->d_dist_poly; i++)
-           {
-           r1=nnp(geo, r1, dir);
-           }
-        si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
-
-        poly_corr_fluct+=fabs(poly_array[r]*poly_array[r2]-poly_corr);
-        }
-     poly_corr_fluct*=param->d_inv_space_vol;
-
-     time(&time2);
-     diff_sec = difftime(time2, time1);
-
-     fprintf(datafilep, "%d  %.12g  %.12g (time:%g)\n", mh, poly_corr_abs*sqrt(mh), poly_corr_fluct*sqrt(mh), diff_sec);
-
-     fflush(datafilep);
-     }
-
-  free(poly_array);
-  }
-
-
-// to optimize the multilevel (adjoint representation)
-void optimize_multilevel_polycorradj(Gauge_Conf *GC,
-                                     Geometry const * const geo,
-                                     GParam const * const param,
-                                     FILE *datafilep)
-   {
-   int i, err;
-   long r;
-   double poly_corr, poly_corr_abs, poly_corr_fluct;
-   double *poly_array;
-
-   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-
-   fprintf(datafilep, "Multilevel optimization: ");
-   fprintf(datafilep, "the smaller the value the better the update\n");
-
-   multilevel_polycorradj(GC,
-                          geo,
-                          param,
-                          param->d_size[0]);
-
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
-         }
-      }
-
-   // averages
-   poly_corr=0.0;
-   poly_corr_abs=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_array[r]=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
-
-      poly_corr+=poly_array[r];
-      poly_corr_abs+=fabs(poly_array[r]);
-      }
-   poly_corr*=param->d_inv_space_vol;
-   poly_corr_abs*=param->d_inv_space_vol;
-
-   // fluctuations
-   poly_corr_fluct=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_corr_fluct+=fabs(poly_array[r]-poly_corr);
-      }
-   poly_corr_fluct*=param->d_inv_space_vol;
-
-   // normalizations
-   for(i=0; i<NLEVELS; i++)
-      {
-      poly_corr_abs*=sqrt(param->d_ml_upd[i]);
-      poly_corr_fluct*=sqrt(param->d_ml_upd[i]);
-      }
-   poly_corr_abs*=sqrt(param->d_multihit);
-   poly_corr_fluct*=sqrt(param->d_multihit);
-
-   fprintf(datafilep, "%.12g %.12g ", poly_corr_abs, poly_corr_fluct);
-   for(i=0; i<NLEVELS; i++)
-      {
-      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
-      }
-   fprintf(datafilep, "(1, %d) ", param->d_multihit);
-   fprintf(datafilep, "\n");
-   fflush(datafilep);
-
-   free(poly_array);
-   }
-
-
-// perform the computation of the polyakov loop correlator in the adjoint representation with the multilevel algorithm
-void perform_measures_polycorradj(Gauge_Conf *GC,
-                                  Geometry const * const geo,
-                                  GParam const * const param,
-                                  FILE *datafilep)
-   {
-   #ifndef OPT_MULTIHIT
-   #ifndef OPT_MULTILEVEL
-     double ris;
-     long r;
-     int i;
-
-     multilevel_polycorradj(GC,
-                            geo,
-                            param,
-                            param->d_size[0]);
-
-     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-        {
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r)
-        #endif
-        for(r=0; r<param->d_space_vol; r++)
-           {
-           times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
-           }
-        }
-
-     ris=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        ris+=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
-        }
-     ris*=param->d_inv_space_vol;
-
-     fprintf(datafilep, "%.12g\n", ris);
-     fflush(datafilep);
-   #endif
-   #endif
-
-   #ifdef OPT_MULTIHIT
-     optimize_multihit_polycorradj(GC, geo, param, datafilep);
-   #endif
-
-   #ifdef OPT_MULTILEVEL
-     optimize_multilevel_polycorradj(GC, geo, param, datafilep);
-   #endif
-   }
-
-
-// to optimize the multilevel
-void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
-                                       GParam const * const param,
-                                       FILE *datafilep)
-   {
-   int i, err;
-   long r;
-   double poly_corr_abs, poly_corr_fluct;
-   double complex poly_corr;
-   double complex *poly_array;
-
-   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-
-   fprintf(datafilep, "Multilevel optimization: ");
-   fprintf(datafilep, "the smaller the value the better the update\n");
-
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
-         }
-      }
-
-   // average
-   poly_corr=0.0+I*0.0;
-   poly_corr_abs=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
-
-      poly_corr+=poly_array[r];
-      poly_corr_abs+=cabs(poly_array[r]);
-      }
-   poly_corr*=param->d_inv_space_vol;
-   poly_corr_abs*=param->d_inv_space_vol;
-
-   // fluctuation
-   poly_corr_fluct=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_corr_fluct+=cabs(poly_array[r]-poly_corr);
-      }
-   poly_corr_fluct*=param->d_inv_space_vol;
-
-   // normalization
-   for(i=0; i<NLEVELS; i++)
-      {
-      poly_corr_abs*=sqrt(param->d_ml_upd[i]);
-      poly_corr_fluct*=sqrt(param->d_ml_upd[i]);
-      }
-   poly_corr_abs*=sqrt(param->d_ml_level0_repeat);
-   poly_corr_fluct*=sqrt(param->d_ml_level0_repeat);
-
-   poly_corr_abs*=sqrt(param->d_multihit);
-   poly_corr_fluct*=sqrt(param->d_multihit);
-
-   fprintf(datafilep, "%.12g %.12g ", poly_corr_abs, poly_corr_fluct);
-   for(i=0; i<NLEVELS; i++)
-      {
-      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
-      }
-   fprintf(datafilep, "(1, %d) ", param->d_multihit);
-   fprintf(datafilep, "(%d) ", param->d_ml_level0_repeat);
-   fprintf(datafilep, "\n");
-
-   fflush(datafilep);
-
-   free(poly_array);
-   }
-
-
-// print the value of the polyakov loop correlator that has been computed by multilevel
-void perform_measures_polycorr_long(Gauge_Conf *GC,
-                                    GParam const * const param,
-                                    FILE *datafilep)
-   {
-   #ifdef OPT_MULTILEVEL
-      optimize_multilevel_polycorr_long(GC, param, datafilep);
-   #else
-     double ris;
-     long r;
-     int i;
-
-     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-        {
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r)
-        #endif
-        for(r=0; r<param->d_space_vol; r++)
-           {
-           times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
-           }
-        }
-
-     ris=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        ris+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
-        }
-     ris*=param->d_inv_space_vol;
-
-     fprintf(datafilep, "%.12g\n", ris);
-     fflush(datafilep);
-   #endif
-   }
-
-
-
-// to optimize the multilevel
-void optimize_multilevel_polycorradj_long(Gauge_Conf *GC,
-                                          GParam const * const param,
-                                          FILE *datafilep)
-   {
-   int i, err;
-   long r;
-   double poly_corr, poly_corr_abs, poly_corr_fluct;
-   double *poly_array;
-
-   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-
-   fprintf(datafilep, "Multilevel optimization: ");
-   fprintf(datafilep, "the smaller the value the better the update\n");
-
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
-         }
-      }
-
-   // average
-   poly_corr=0.0;
-   poly_corr_abs=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_array[r]=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
-
-      poly_corr+=poly_array[r];
-      poly_corr_abs+=fabs(poly_array[r]);
-      }
-   poly_corr*=param->d_inv_space_vol;
-   poly_corr_abs*=param->d_inv_space_vol;
-
-   // fluctuation
-   poly_corr_fluct=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      poly_corr_fluct+=fabs(poly_array[r]-poly_corr);
-      }
-   poly_corr_fluct*=param->d_inv_space_vol;
-
-   // normalization
-   for(i=0; i<NLEVELS; i++)
-      {
-      poly_corr_abs*=sqrt(param->d_ml_upd[i]);
-      poly_corr_fluct*=sqrt(param->d_ml_upd[i]);
-      }
-   poly_corr_abs*=sqrt(param->d_ml_level0_repeat);
-   poly_corr_fluct*=sqrt(param->d_ml_level0_repeat);
-
-   poly_corr_abs*=sqrt(param->d_multihit);
-   poly_corr_fluct*=sqrt(param->d_multihit);
-
-   fprintf(datafilep, "%.12g %.12g ", poly_corr_abs, poly_corr_fluct);
-   for(i=0; i<NLEVELS; i++)
-      {
-      fprintf(datafilep, "(%d, %d) ", param->d_ml_step[i], param->d_ml_upd[i]);
-      }
-   fprintf(datafilep, "(1, %d) ", param->d_multihit);
-   fprintf(datafilep, "(%d) ", param->d_ml_level0_repeat);
-   fprintf(datafilep, "\n");
-
-   fflush(datafilep);
-
-   free(poly_array);
-   }
-
-
-// print the value of the polyakov loop correlator that has been computed by multilevel
-void perform_measures_polycorradj_long(Gauge_Conf *GC,
-                                       GParam const * const param,
-                                       FILE *datafilep)
-   {
-   #ifdef OPT_MULTILEVEL
-      optimize_multilevel_polycorradj_long(GC, param, datafilep);
-   #else
-     double ris;
-     long r;
-     int i;
-
-     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-        {
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r)
-        #endif
-        for(r=0; r<param->d_space_vol; r++)
-           {
-           times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
-           }
-        }
-
-     ris=0.0;
-     for(r=0; r<param->d_space_vol; r++)
-        {
-        ris+=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
-        }
-     ris*=param->d_inv_space_vol;
-
-     fprintf(datafilep, "%.12g\n", ris);
-     fflush(datafilep);
-   #endif
-   }
-
-
-// perform the computation of the string width with the
-// disconnected correlator using the multilevel algorithm
-void perform_measures_tube_disc(Gauge_Conf *GC,
-                                Geometry const * const geo,
-                                GParam const * const param,
-                                FILE *datafilep)
-   {
-   double risr, risi;
-   long r;
-   int i;
-
-   multilevel_tube_disc(GC,
-                        geo,
-                        param,
-                        param->d_size[0]);
-
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
-         times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
-         }
-      }
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   fprintf(datafilep, "\n");
-   fflush(datafilep);
-   }
-
-
-// perform the computation of the string width with the
-// disconnected correlator that has been computed by multilevel (long version)
-void perform_measures_tube_disc_long(Gauge_Conf *GC,
-                                     GParam const * const param,
-                                     FILE *datafilep)
-   {
-   double risr, risi;
-   long r;
-   int i;
-
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
-         times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
-         }
-      }
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   fprintf(datafilep, "\n");
-   fflush(datafilep);
-   }
-
-
-// perform the computation of the string width in the adjoint representation with the
-// disconnected correlator using the multilevel algorithm
-void perform_measures_tubeadj_disc(Gauge_Conf *GC,
-                                   Geometry const * const geo,
-                                   GParam const * const param,
-                                   FILE *datafilep)
-   {
-   double ris;
-   long r;
-   int i;
-
-   multilevel_tubeadj_disc(GC,
-                           geo,
-                           param,
-                           param->d_size[0]);
-
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
-         times_equal_TensProdAdj(&(GC->ml_polyplaqadj[0][r]), &(GC->ml_polycorradj[0][i][r]) );
-         }
-      }
-
-   ris=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      ris+=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
-      }
-   ris*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", ris, 0.0);
-
-   ris=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      ris+=retr_TensProdAdj(&(GC->ml_polyplaqadj[0][r]));
-      }
-   ris*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", ris, 0.0);
-
-   fprintf(datafilep, "\n");
-   fflush(datafilep);
-   }
-
-
-// perform the computation of the string width in the adjoint representation with the
-// disconnected correlator using the multilevel algorithm
-void perform_measures_tubeadj_disc_long(Gauge_Conf *GC,
-                                        GParam const * const param,
-                                        FILE *datafilep)
-   {
-   double ris;
-   long r;
-   int i;
-
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProdAdj(&(GC->ml_polycorradj[0][0][r]), &(GC->ml_polycorradj[0][i][r]) );
-         times_equal_TensProdAdj(&(GC->ml_polyplaqadj[0][r]), &(GC->ml_polycorradj[0][i][r]) );
-         }
-      }
-
-   ris=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      ris+=retr_TensProdAdj(&(GC->ml_polycorradj[0][0][r]));
-      }
-   ris*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", ris, 0.0);
-
-   ris=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      ris+=retr_TensProdAdj(&(GC->ml_polyplaqadj[0][r]));
-      }
-   ris*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", ris, 0.0);
-
-   fprintf(datafilep, "\n");
-   fflush(datafilep);
-   }
-
-
-// perform the computation of the string width with the
-// connected correlator using the multilevel algorithm
-void perform_measures_tube_conn(Gauge_Conf *GC,
-                                Geometry const * const geo,
-                                GParam const * const param,
-                                FILE *datafilep)
-   {
-   double risr, risi;
-   long r;
-   int i;
-
-   multilevel_tube_conn(GC,
-                        geo,
-                        param,
-                        param->d_size[0]);
-
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
-         times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
-         times_equal_TensProd(&(GC->ml_polyplaqconn[0][r]), &(GC->ml_polycorr[0][i][r]) );
-         }
-      }
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polyplaqconn[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaqconn[0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   fprintf(datafilep, "\n");
-   fflush(datafilep);
-   }
-
-
-// print the value of the the string width with the
-// connected correlator that has been computed by multilevel
-void perform_measures_tube_conn_long(Gauge_Conf *GC,
-                                     GParam const * const param,
-                                     FILE *datafilep)
-   {
-   double risr, risi;
-   long r;
-   int i;
-
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
-      {
-      #ifdef OPENMP_MODE
-      #pragma omp parallel for num_threads(NTHREADS) private(r)
-      #endif
-      for(r=0; r<param->d_space_vol; r++)
-         {
-         times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
-         times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
-         times_equal_TensProd(&(GC->ml_polyplaqconn[0][r]), &(GC->ml_polycorr[0][i][r]) );
-         }
-      }
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   risr=0.0;
-   risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
-      {
-      risr+=retr_TensProd(&(GC->ml_polyplaqconn[0][r]));
-      risi+=imtr_TensProd(&(GC->ml_polyplaqconn[0][r]));
-      }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
-   fprintf(datafilep, "%.12g %.12g ", risr, risi);
-
-   fprintf(datafilep, "\n");
-   fflush(datafilep);
    }
 
 
@@ -2145,61 +1202,6 @@ void compute_flavour_observables_corr(Gauge_Conf const * const GC,
   }
 
 
-
-// compute second moment correlation lenght of the correlator with a string of gauge field
-//
-// intG is \sum_0^{L/2} G(x) where G(x) is the correlator \sum_{f} Re[hf^{dag} U_{0,1}U_{1,1}....U_{d-1,1} hf], where hf is the f-th flavour
-// r2G in \sum_0^{L/2} x^2 G(x)
-void compute_flavour_gauge_corr_length(Gauge_Conf const * const GC,
-                                       Geometry const * const geo,
-                                       GParam const * const param,
-                                       double *intG,
-                                       double *r2G)
-  {
-  int dist;
-  long r;
-  double sum1, sum2;
-
-  *intG=0.0;
-  *r2G=0.0;
-
-  for(dist=0; dist<param->d_size[1]/2; dist++)
-     {
-     sum1=0.0;
-     sum2=0.0;
-
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : sum1) reduction(+ : sum2)
-     #endif
-     for(r=0; r<(param->d_volume); r++)
-        {
-        int i;
-        long r1;
-        GAUGE_VECS phi1, phi2;
-        GAUGE_GROUP U;
-
-        equal_vecs(&phi1, &(GC->higgs[r]));
-        r1=r;
-        one(&U);
-        for(i=0; i<dist; i++)
-           {
-           times_equal(&U, &(GC->lattice[r1][1]));
-           r1=nnp(geo, r1, 1);
-           }
-        matrix_times_vector_all_vecs(&phi2, &U, &(GC->higgs[r1]));
-
-        sum1+=re_scal_prod_vecs(&phi1, &phi2);
-        sum2+= ( dist*dist*re_scal_prod_vecs(&phi1, &phi2) );
-        }
-     sum1*=param->d_inv_vol;
-     sum2*=param->d_inv_vol;
-
-     *intG+=sum1;
-     *r2G+=sum2;
-     }
-  }
-
-
 void perform_measures_higgs(Gauge_Conf const * const GC,
                             Geometry const * const geo,
                             GParam const * const param,
@@ -2220,17 +1222,6 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
    fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
    fprintf(datafilep, "%.12g ", he);
    fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
-
-   /*
-   // for second moment correlation length of the flavour observable with a string of gauge fields
-   double intG, r2G;
-   compute_flavour_gauge_corr_length(GC,
-                                     geo,
-                                     param,
-                                     &intG,
-                                     &r2G);
-   fprintf(datafilep, "%.12g %.12g ", intG, r2G);
-   */
 
    /*
    // for correlators
@@ -2276,5 +1267,460 @@ void perform_measures_higgs(Gauge_Conf const * const GC,
    }
 
 
+// fix maximal abelian gauge
+// following the procedure described in
+// C. Bonati, M. D'Elia Nuc. Phys. B 877 (2013) 233-259 [ 1308.0302 ]
+void max_abelian_gauge_fix(Gauge_Conf *GC,
+                           Geometry const * const geo,
+                           GParam const * const param)
+   {
+   int i, dir;
+   long r;
+   double lambda[NCOLOR];
+   const double OverRelaxParam=1.85;
+   double non_diag_contribution, non_diag_contr_aux;
+
+   // inizialize the matrix lambda = diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
+   for(i=0; i<NCOLOR; i++)
+      {
+      lambda[i] = ( (double) NCOLOR -1.)/2. - i;
+      }
+ 
+   non_diag_contribution=1.0;
+   while(non_diag_contribution > MIN_VALUE)
+        {
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+        #endif
+        for(r=0; r<param->d_volume/2; r++)
+           {
+           GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
+
+           // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
+           // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
+           for(dir=0;dir<STDIM;dir++)
+              {
+              equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+              equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+              }
+
+           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+ 
+           // apply the gauge transformation
+           for(dir=0; dir<STDIM; dir++)
+              {
+              times(&help, &G_mag, &(GC->lattice[r][dir]));
+              equal(&(GC->lattice[r][dir]), &help);
+
+              times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
+              }
+           }
+
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+        #endif
+        for(r=param->d_volume/2; r<param->d_volume; r++)
+           {
+           GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
+
+           // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
+           // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
+           for(dir=0;dir<STDIM;dir++)
+              {
+              equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+              equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+              }
+
+           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+
+           // apply the gauge transformation
+           for(dir=0; dir<STDIM; dir++)
+              {
+              times(&help, &G_mag, &(GC->lattice[r][dir]));
+              equal(&(GC->lattice[r][dir]), &help);
+
+              times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
+              }
+           }
+
+        // check if the out-of-diagonal-diagonal elements of X(n) are zero
+        non_diag_contr_aux=0;
+
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)  reduction(+ : non_diag_contr_aux)
+        #endif
+        for(r=0;r<param->d_volume;r++)
+           {
+           GAUGE_GROUP X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
+           double counter;
+
+           for(dir=0;dir<STDIM;dir++)
+              {
+              equal(&(X_links[dir]), &(GC->lattice[r][dir]));
+              equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
+              }
+           comp_outdiagnorm_of_X(X_links, lambda, &counter);
+           non_diag_contr_aux += counter;
+           }
+     
+        non_diag_contribution = non_diag_contr_aux * param->d_inv_vol;
+        }
+
+   // unitarize all the links
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      for(dir=0; dir<STDIM; dir++)
+         {
+         unitarize(&(GC->lattice[r][dir]));
+         }
+      }
+   } 
+
+
+// extract the diagonal part of the links after gauge fixing.
+// the phases are saved in GC->diag_proj but these are NOT the monopole phases (see U1_extract)
+void diag_projection(Gauge_Conf *GC,
+                     GParam const * const param)
+   {
+   int dir; 
+   long r;
+
+   for(r=0;r<param->d_volume;r++)
+      {
+      for(dir=0;dir<STDIM;dir++)
+         {
+         diag_projection_single_site(GC, &(GC->lattice[r][dir]), r, dir);
+         }
+      }
+   }
+
+
+// extract the abelian components of the link
+// following the procedure described in
+// Bonati, D'Elia https://arxiv.org/abs/1308.0302
+// and save them in GC->u1_subg
+//
+// also intialize GC->uflag to zero
+void U1_extract(Gauge_Conf *GC, 
+                GParam const * const param,
+                int subg)
+   { 
+   int dir, i;
+   long r;    
+
+   for(r=0;r<param->d_volume;r++)
+      {
+      for(dir=0;dir<STDIM;dir++)
+         {
+         GC->u1_subg[r][dir] = 0.0;
+         for(i=0;i<=subg;i++)
+            {
+            GC->u1_subg[r][dir] += GC->diag_proj[r][dir][i];
+            }
+
+         GC->uflag[r][dir] = 0;
+         }
+      }
+   }
+
+
+// Compute the forward derivative of the abelian part of the plaquette Fjk in direction i.
+// the angle is chosen in between -pi and pi.
+void Di_Fjk(Gauge_Conf *GC,
+            Geometry const * const geo,
+            long r,
+            int idir,
+            int jdir,
+            int kdir,
+            double *DiFjk)
+
+   {
+   double prpi, pr; // pr -> plaquette at site r, prpi plaquette at site r+idir
+
+//
+//       ^ k
+//       |
+//       +---<---+
+//       |       |
+//       V       ^         pr
+//       |       |
+//       +--->---+---> j
+//       r
+//
+
+   pr  = GC->u1_subg[r][jdir] - GC->u1_subg[r][kdir];
+   pr += GC->u1_subg[nnp(geo, r, jdir)][kdir] - GC->u1_subg[nnp(geo, r, kdir)][jdir];
+
+
+//
+//       ^ k
+//       |   (2)
+//       +---<---+
+//       |       |
+//   (3) V       ^ (1)        prpi
+//       |       |
+//       +--->---+---> j
+//      r+i    (4)
+//
+
+   r=nnp(geo, r, idir);
+
+   prpi  = GC->u1_subg[r][jdir] - GC->u1_subg[r][kdir];
+   prpi += GC->u1_subg[nnp(geo, r, jdir)][kdir] - GC->u1_subg[nnp(geo, r, kdir)][jdir];
+ 
+   *DiFjk = 2.0*(atan(tan(prpi/2.0)) - atan(tan(pr/2.0)));
+   }
+
+
+// compute the DeGrand-DeTar currents
+int DeGrand_current(Gauge_Conf *GC,
+                    Geometry const * const geo,
+                    long r,
+                    int dir)
+   {
+   if(STDIM!=4)
+     {
+     fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+
+   double der1, der2, der3;
+   int ris;
+
+   if(dir == 0)
+     {
+     Di_Fjk(GC, geo, r, 1, 2, 3, &der1);
+     Di_Fjk(GC, geo, r, 3, 1, 2, &der2);
+     Di_Fjk(GC, geo, r, 2, 1, 3, &der3);
+   
+     ris = (int) round( ((der1 + der2 - der3)/PI2) );
+     }
+   else if(dir ==1)
+          {
+          Di_Fjk(GC, geo, r, 3, 2, 0, &der1);
+          Di_Fjk(GC, geo, r, 0, 3, 2, &der2);
+          Di_Fjk(GC, geo, r, 2, 3, 0, &der3);
+
+          ris = (int) round( ((der1 + der2 - der3)/PI2) );
+          }
+   else if(dir == 2)
+          {
+          Di_Fjk(GC, geo, r, 3, 0, 1, &der1);
+          Di_Fjk(GC, geo, r, 0, 1, 3, &der2);
+          Di_Fjk(GC, geo, r, 1, 0, 3, &der3);
+
+          ris = (int) round( ((der1 + der2 - der3)/PI2) );
+          }
+   else
+     {
+     Di_Fjk(GC, geo, r, 0,2,1, &der1);
+     Di_Fjk(GC, geo, r, 2,1,0, &der2);
+     Di_Fjk(GC, geo, r, 1,2,0, &der3);
+
+     ris = (int) round( ((der1 + der2 - der3)/PI2) );
+     }
+
+   return ris;
+   } 
+
+
+// search for monopole wrappings passing from r_tback
+// this function can be invoked in two different ways
+//
+// or r=nnp(geo, r_tback, 0) and DeGrand_current(GC, geo, r_tback, 0)!=0 (forward case)
+// or r=nnm(geo, r_tback, 0) and DeGrand_current(GC, geo, r, 0)!=0  (backward case)
+//
+// GC->uflag[][] is initialized in monopole_obs
+//
+// nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
+//
+// num_wrap = number of wrappings
+void wrap_search(Gauge_Conf *GC,
+                 Geometry const * const geo,
+                 GParam const * const param,
+                 long r,
+                 long r_tback,
+                 int *num_wrap)
+   {
+   if(STDIM!=4)
+     {
+     fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #ifdef DEBUG
+   if(DeGrand_current(GC, geo, r_tback, 0)==0)
+     {
+     fprintf(stderr, "Problems in DeGrand_current! (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   #endif
+
+   int dir, n_mu;
+
+   if(r == r_tback)
+     {
+     return;
+     }
+   else
+     {
+     // forward case
+     for(dir=0; dir<STDIM; dir++)
+        {
+        n_mu=DeGrand_current(GC, geo, nnp(geo, r, dir), dir);
+
+        // if not all the monopole currents have been followed
+        if(n_mu > GC->uflag[r][dir])
+          {
+          GC->uflag[r][dir] += 1;
+
+          if( (geo->d_timeslice[r] == param->d_size[0]-1) && (dir == 0) )
+            {
+            *num_wrap += 1;
+            }
+
+          wrap_search(GC, geo, param, nnp(geo, r, dir), r_tback, num_wrap);
+
+          return;
+          }
+        }
+
+     //backward case
+     for(dir=0;dir<STDIM;dir++)
+        {
+        n_mu=DeGrand_current(GC, geo, r, dir);
+
+        if(n_mu < GC->uflag[nnm(geo, r, dir)][dir])
+          {
+          GC->uflag[nnm(geo, r, dir)][dir] -= 1;
+
+          if( (geo->d_timeslice[r] == 0) && (dir == 0) )
+            {
+            *num_wrap -= 1;
+            }
+
+          wrap_search(GC, geo, param, nnm(geo, r, dir), r_tback, num_wrap);
+
+          return;
+          }
+        }
+     }
+   }
+
+
+// GC->uflag[][] has to be initialized to zero before calling this function
+// (when GC->uflag is allocated it is also initialized to zero)
+void monopoles_obs(Gauge_Conf *GC, 
+                   Geometry const * const geo,
+                   GParam const * const param, 
+                   int subg, 
+                   FILE* monofilep)
+   {
+   double mean_wrap;
+   long r, rsp, r_tback, r_tbackback;
+   int n_mu, num_wrap, mono_charge;
+   int cartcoord[4];
+
+   mean_wrap = 0.0;     // mean value of monopole wraps for unit volume
+
+   for(rsp=0; rsp<param->d_space_vol; rsp++)
+      {
+      r = sisp_and_t_to_si(geo, rsp, 1);                             // t=1 slice
+      r_tback = sisp_and_t_to_si(geo, rsp, 0);                       // t=0 slice
+      r_tbackback = sisp_and_t_to_si(geo, rsp, param->d_size[0]-1);  // t=T-1 slice
+
+      // check the t=1 temporal slice to find monopoles currents
+      n_mu=DeGrand_current(GC, geo, r, 0);
+
+      // start following monopole charge in forward direction. Maximum lattice charge is +2 so we try twice
+      for(mono_charge = 0; mono_charge<2; mono_charge++)
+         {
+         // nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
+         if(n_mu > GC->uflag[r_tback][0])
+           {
+           GC->uflag[r_tback][0] += 1;
+
+           num_wrap = 0;
+           wrap_search(GC, geo, param, r, r_tback, &num_wrap);
+
+           mean_wrap += abs(num_wrap);
+
+           lexeo_to_cart(cartcoord, r_tback, param);
+           if(n_mu == 1)
+             {
+             fprintf(monofilep, "%ld ", GC->update_index);
+
+             for(int k = 0; k< 4; k++)
+                {
+                fprintf(monofilep, "%d ", cartcoord[k]);
+                }
+             fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+             }
+           else if(GC->uflag[r_tback][0] == 1) // this is to print only once monopole of charge +2
+                  {
+                  fprintf(monofilep, "%ld ", GC->update_index);
+
+                  for(int k = 0; k<4; k++)
+                     {
+                     fprintf(monofilep, "%d ", cartcoord[k]);
+                     }
+                  fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+                  }
+           }
+         }
+
+      n_mu=DeGrand_current(GC, geo, r_tback, 0);
+
+      // start following monopole charge in backward direction. Maximum lattice charge is +2 so we try twice
+      for(mono_charge = 0; mono_charge<2; mono_charge++)
+         {
+         // nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
+         if(n_mu < GC->uflag[r_tbackback][0])
+           {
+           GC->uflag[r_tbackback][0] -= 1;
+
+           num_wrap = -1;
+           wrap_search(GC, geo, param, r_tbackback, r_tback, &num_wrap);
+
+           lexeo_to_cart(cartcoord, r_tback, param);
+           if(n_mu == -1)
+             {
+             fprintf(monofilep, "%ld ", GC->update_index);
+
+             for(int k = 0; k<4; k++)
+                {
+                fprintf(monofilep, "%d ", cartcoord[k]);
+                }
+             fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+             }
+           else if(GC->uflag[r][0] == -1)  // this is to print only once monopole of charge +2
+                  {
+                  fprintf(monofilep, "%ld ", GC->update_index);
+
+                  for(int k=0; k<4; k++)
+                     {
+                     fprintf(monofilep, "%d ", cartcoord[k]);
+                     }
+                  fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+                  }
+           }
+         }
+      }
+   }
+
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+

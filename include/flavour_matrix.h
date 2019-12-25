@@ -2,6 +2,8 @@
 #define FLAVOUR_MATRIX_H
 
 #include<complex.h>
+#include<stdio.h>
+#include<stdlib.h>
 #include<math.h>
 
 #include"macro.h"

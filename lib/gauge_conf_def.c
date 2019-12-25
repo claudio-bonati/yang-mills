@@ -1994,5 +1994,105 @@ void compute_md5sum_higgs(char *res, Gauge_Conf const * const GC, GParam const *
   }
 
 
+// alloc diagonal projection related stuff
+void alloc_diag_proj_stuff(Gauge_Conf *GC,
+                           GParam const * const param)
+   {
+   int err, dir;
+   long r;
+
+   // allocate diag_proj
+   err=posix_memalign((void**) &(GC->diag_proj), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating diag_proj (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   for(r=0;r<param->d_volume;r++)
+     {
+     err=posix_memalign((void**) &(GC->diag_proj[r]), (size_t)DOUBLE_ALIGN, (size_t) STDIM * sizeof(double));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating diag_proj (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     for(dir=0; dir<STDIM; dir++)
+        {
+        err=posix_memalign((void**) &(GC->diag_proj[r][dir]), (size_t)DOUBLE_ALIGN, (size_t) NCOLOR * sizeof(double));
+        if(err!=0)
+          {
+          fprintf(stderr, "Problems in allocating diag_proj (%s, %d)\n", __FILE__, __LINE__);
+          exit(EXIT_FAILURE);
+          }
+        }
+     }
+
+   // alloc u1_subg
+   err=posix_memalign((void**) &(GC->u1_subg), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating u1_subg (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   for(r=0;r<param->d_volume;r++)
+     {
+     err=posix_memalign((void**) &(GC->u1_subg[r]), (size_t)DOUBLE_ALIGN, (size_t) STDIM * sizeof(double));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating u1_subg (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     }
+
+   // alloc uflag
+   err=posix_memalign((void**) &(GC->uflag), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating uflag (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   for(r=0;r<param->d_volume;r++)
+     {
+     err=posix_memalign((void**) &(GC->uflag[r]), (size_t)DOUBLE_ALIGN, (size_t) STDIM * sizeof(double));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating uflag (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     }
+   }
+
+
+// free diagonal projection related stuff
+void free_diag_proj_stuff(Gauge_Conf *GC,
+                          GParam const * const param)
+   {
+   int dir;
+   long r;
+   
+   for(r=0;r<param->d_volume;r++)
+      {
+      for(dir=0;dir<STDIM;dir++)
+         {
+         free((GC->diag_proj[r][dir]));
+         }
+      free((GC->diag_proj[r]));
+      }
+   free(GC->diag_proj);
+
+   for(r=0;r<param->d_volume;r++)
+      {
+      free((GC->u1_subg[r]));
+      }
+   free(GC->u1_subg);
+
+   for(r=0;r<param->d_volume;r++)
+      {
+      free((GC->uflag[r]));
+      }
+   free(GC->uflag);
+   }
+
+
 
 #endif

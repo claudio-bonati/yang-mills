@@ -76,7 +76,7 @@ if __name__=="__main__":
   for i in range(L):
     print(i, end=' ')
 
-    ris, err = jack.jackknife_for_primary(id, data[7+i], blocksize)
+    ris, err = jack.jackknife_for_primary(id, 2*data[7+i], blocksize)
     print(ris, err, end=' ')
 
     ris, err = jack.jackknife_for_primary(id, data[7+i+L], blocksize)

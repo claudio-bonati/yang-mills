@@ -27,7 +27,7 @@ void real_main(char *in_file)
     char name[STD_STRING_LENGTH], aux[STD_STRING_LENGTH];
     int count;
     double acc, acc_local;
-    FILE *datafilep;
+    FILE *datafilep, *monofilep;
     time_t time1, time2;
 
     // to disable nested parallelism
@@ -43,6 +43,12 @@ void real_main(char *in_file)
 
     // open data_file
     init_data_file(&datafilep, &param);
+
+    // open mon_file
+    if(param.d_mon_meas == 1)
+      {
+      init_mon_file(&monofilep, &param);
+      }
 
     // initialize geometry
     init_indexing_lexeo();
@@ -64,7 +70,7 @@ void real_main(char *in_file)
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {
-         perform_measures_localobs_with_tracedef(&GC, &geo, &param, datafilep);
+         perform_measures_localobs_with_tracedef(&GC, &geo, &param, datafilep, monofilep);
          }
 
        // save configuration for backup
@@ -99,6 +105,12 @@ void real_main(char *in_file)
 
     // close data file
     fclose(datafilep);
+
+    // close mon file
+    if(param.d_mon_meas == 1)
+      {
+      fclose(monofilep);
+      }
 
     // save configuration
     if(param.d_saveconf_back_every!=0)
@@ -140,6 +152,7 @@ void print_template_input(void)
     fprintf(fp, "thermal   0\n");
     fprintf(fp, "overrelax 5\n");
     fprintf(fp, "measevery 1\n");
+    fprintf(fp, "monomeas 0   # 1=monopoles measures are performed\n");
     fprintf(fp,"\n");
     fprintf(fp, "start                   0  # 0=ordered  1=random  2=from saved configuration\n");
     fprintf(fp, "saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates\n");
@@ -153,6 +166,7 @@ void print_template_input(void)
     fprintf(fp, "#output files\n");
     fprintf(fp, "conf_file  conf.dat\n");
     fprintf(fp, "data_file  dati.dat\n");
+    fprintf(fp, "mon_file   mon.dat\n");
     fprintf(fp, "log_file   log.dat\n");
     fprintf(fp, "\n");
     fprintf(fp, "randseed 0    #(0=time)\n");
