@@ -1702,14 +1702,15 @@ int metropolis_for_higgs(Gauge_Conf *GC,
      if(casuale()<0.5)
        {
        equal(&rnd_matrix, &matrix);
+       matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
+       times_equal_complex_single_vecs(&new_vector, cexp(I*param->d_epsilon_metro*PI*casuale()),j);
        }
      else
        {
        equal_dag(&rnd_matrix, &matrix);
+       matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
+       times_equal_complex_single_vecs(&new_vector, cexp(-I*param->d_epsilon_metro*PI*casuale()),j);
        }
-
-     matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
-     times_equal_complex_single_vecs(&new_vector, cexp(I*param->d_epsilon_metro*PI),j);
 
      new_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
 
