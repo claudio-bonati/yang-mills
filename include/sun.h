@@ -1357,6 +1357,23 @@ inline void times_equal_real_SuNVecs(SuNVecs * restrict A, double r)
   }
 
 
+// *= with complex number for a single component
+inline void times_equal_complex_single_SuNVecs(SuNVecs * restrict A, double complex r, int j)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=NCOLOR*j; i<NCOLOR*(j+1); i++)
+     {
+     A->comp[i]*=r;
+     }
+  }
+
+
+
 // norm
 inline double norm_SuNVecs(SuNVecs const * const restrict A)
   {

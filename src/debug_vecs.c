@@ -1,6 +1,7 @@
 #ifndef DEBUG_VECS_C
 #define DEBUG_VECS_C
 
+#include<complex.h>
 #include<math.h>
 #include<stdlib.h>
 
@@ -52,6 +53,23 @@ int main(void)
   matrix_times_vector_single_vecs(&L, &matrix, &M, i);
   equal_vecs(&N, &L);
   energy=re_scal_prod_vecs(&L,&N);
+  if(fabs(energy-1) < MIN_VALUE)
+    {
+    printf("  OK\n");
+    }
+  else
+    {
+    printf("  ERROR!!!!!!!!!!!\n");
+    return EXIT_FAILURE;
+    }
+  printf("\n");
+
+  printf("VERIFY THAT THE RANDOM PHASE MULTIPLICATION DOES NOT CHANGE THE NORMALIZATION ...");
+  rand_vecs(&L);
+  i=(int) (NHIGGS*casuale()-MIN_VALUE);
+  times_equal_complex_single_vecs(&L, cexp(PI2*casuale()*I), i);
+  equal_vecs(&N, &L);
+  energy=re_scal_prod_vecs(&L, &N);
   if(fabs(energy-1) < MIN_VALUE)
     {
     printf("  OK\n");

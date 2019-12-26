@@ -1156,6 +1156,28 @@ inline void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r)
   }
 
 
+// *= with complex number for a single component
+inline void times_equal_complex_single_Su2Vecs(Su2Vecs * restrict A, double complex r, int j)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  double complex a, b;
+
+  a=A->comp[4*j+2]+I*A->comp[4*j+1];
+  b=A->comp[4*j+0]-I*A->comp[4*j+3];
+
+  a*=r;
+  b*=r;
+
+  A->comp[4*j+2]=creal(a);
+  A->comp[4*j+1]=cimag(a);
+  A->comp[4*j+0]=creal(b);
+  A->comp[4*j+3]=-cimag(b);
+  }
+
+
 // norm
 inline double norm_Su2Vecs(Su2Vecs const * const restrict A)
   {

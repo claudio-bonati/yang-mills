@@ -714,6 +714,10 @@ void plus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B);
 void times_equal_real_SuNVecs(SuNVecs * restrict A, double r);
 
 
+// *= with complex number for a single component
+void times_equal_complex_single_SuNVecs(SuNVecs * restrict A, double complex r, int j);
+
+
 // norm
 double norm_SuNVecs(SuNVecs const * const restrict A);
 
