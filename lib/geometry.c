@@ -165,40 +165,6 @@ long sisp_and_t_to_si(Geometry const * const geo, long sisp, int t);
 
 void si_to_sisp_and_t(long *sisp, int *t, Geometry const * const geo, long si);
 
-// This function compute the square distance between the sites r1 and r2 taking into account periodic boundary conditions
-double comp_distance_periodic(GParam const * const param, long r1, long r2)
-   {
-   int cartcoord_r1[STDIM], cartcoord_r2[STDIM];
-
-   lexeo_to_cart(cartcoord_r1, r1, param);
-   lexeo_to_cart(cartcoord_r2, r2, param);
-
-   double distx, disty, distz;
-
-   distx = abs(cartcoord_r1[1] - cartcoord_r2[1]);
-   if(distx > param->d_size[1]/2)
-    {
-    distx = param->d_size[1] - distx;
-    } 
-
-   disty = abs(cartcoord_r1[2] - cartcoord_r2[2]);
-   if(disty > param->d_size[2]/2)
-    {
-    disty = param->d_size[2] - disty;
-    }
-
-   distz = abs(cartcoord_r1[3] - cartcoord_r2[3]);
-   if(distz > param->d_size[3]/2)
-    {
-    distz = param->d_size[1] - distz;
-    }
-
-    return distx*distx + disty*disty + distz*distz;
-   }
-
-
-
-
 
 void test_geometry(Geometry const * const geo, GParam const * const param)
   {

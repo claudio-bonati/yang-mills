@@ -834,9 +834,9 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
    fflush(datafilep);
 
    // monopole observables
-   #if(STDIM==4)
    if(param->d_mon_meas == 1)
      {
+     #if STDIM==4
      int subg, subgnum;
      Gauge_Conf helperconf;
 
@@ -871,8 +871,10 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
      free_gauge_conf(&helperconf, param);
 
      fflush(monofilep);
+     #else
+     (void) monofilep;
+     #endif
      }
-   #endif
    }
 
 
@@ -934,9 +936,9 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
    fflush(datafilep);
 
    // monopole observables
-   #if(STDIM==4)
    if(param->d_mon_meas == 1)
      {
+     #if(STDIM==4)
      Gauge_Conf helperconf;
      int subg, subgnum;
 
@@ -971,8 +973,10 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
      free_gauge_conf(&helperconf, param);
 
      fflush(monofilep);
+     #else
+     (void) monofilep;
+     #endif
      }
-   #endif
    }
 
 
