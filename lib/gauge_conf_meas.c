@@ -1298,6 +1298,55 @@ void perform_measures_higgs(Gauge_Conf *GC,
    }
 
 
+// this is a function to be used just to test some fine points
+// most notably TrP^2=TrQ^2+1/NHIGGS
+void perform_measures_higgs_for_testing(Gauge_Conf *GC,
+                                        Geometry const * const geo,
+                                        GParam const * const param,
+                                        FILE *datafilep)
+   {
+   double plaqs, plaqt, polyre, polyim, he, p2;
+   long r;
+
+   plaquette(GC, geo, param, &plaqs, &plaqt);
+   polyakov(GC, geo, param, &polyre, &polyim);
+   higgs_interaction(GC, geo, param, &he);
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      init_FMatrix_vecs(&(GC->Qh[r]), &(GC->higgs[r]));
+      GC->Dh[r] = HiggsU1Obs_vecs(&(GC->higgs[r]));
+      }
+
+   p2=0.0;
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+: p2)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      FMatrix tmp1, tmp2;
+      equal_FMatrix(&tmp1, &(GC->Qh[r]));
+      equal_FMatrix(&tmp2, &tmp1);
+      times_equal_FMatrix(&tmp1, &tmp2);
+      p2+=retr_FMatrix(&tmp1)*NHIGGS+1./NHIGGS;
+      }
+   p2*=param->d_inv_vol;
+
+   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+   fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
+   fprintf(datafilep, "%.12g ", he);
+   fprintf(datafilep, "%.12g ", p2);
+
+   fprintf(datafilep, "\n");
+
+   fflush(datafilep);
+   }
+
+
+
 // fix maximal abelian gauge
 // following the procedure described in
 // C. Bonati, M. D'Elia Nuc. Phys. B 877 (2013) 233-259 [ 1308.0302 ]

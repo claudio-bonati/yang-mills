@@ -274,6 +274,10 @@ void perform_measures_higgs(Gauge_Conf * GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             FILE *datafilep);
+void perform_measures_higgs_for_testing(Gauge_Conf *GC,
+                                        Geometry const * const geo,
+                                        GParam const * const param,
+                                        FILE *datafilep);
 
 void max_abelian_gauge_fix(Gauge_Conf *GC,
                            Geometry const * const geo,
