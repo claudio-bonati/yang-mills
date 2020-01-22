@@ -10,11 +10,51 @@
 #include"../include/u1.h"
 #include"../include/u1_upd.h"
 
-
-// heatbath (see Moriarty Phys. Rev. D 25, p2185 (1982) )
+// heatbath ( in fact it is not exactly an heatbath, but an approximate heatbath
+//            corrected by a Metropolis step )
 //
-// generate link according to the distibution \exp[-(1/N_c)ReTr(link*staple)]
+// generate link according to the distibution \exp[ReTr(link*staple)]
 // the coupling is inside the staple
+//
+// based on Giovanni Iannelli master thesis (october 2018)
+//
+void single_heatbath_U1(U1 * restrict link, U1 const * const restrict staple)
+  {
+  double k, xold, y1, y2, xnew, prob;
+  U1 aux;
+
+  k=norm_U1(staple);
+
+  if(k>MIN_VALUE)
+    {
+    times_U1(&aux, link, staple);
+    xold=atan2(cimag(aux.comp), creal(aux.comp));
+
+    y1=casuale();
+    y2=casuale();
+
+    xnew=sqrt( -2./k*log(1 - y1*(1-exp(-k*PI*PI/2.0)) ) )*cos(PI2*(y2-0.5));
+
+    prob=exp( k * (cos(xnew) -xold*xold/2.0 -cos(xold) +xnew*xnew/2.0 ));
+
+    if(casuale()<prob)
+      {
+      link->comp = cos(xnew)+sin(xnew)*I;
+      times_equal_dag_U1(link, staple);
+      times_equal_real_U1(link, 1./k);
+      }
+    }
+  else
+    {
+    rand_matrix_U1(link);
+    }
+  }
+
+
+/*
+// heatbath by Moriarty Phys. Rev. D 25, p2185 (1982)
+//
+// very inefficient for large values of the lattice coupling
 //
 void single_heatbath_U1(U1 * restrict link, U1 const * const restrict staple)
   {
@@ -51,7 +91,15 @@ void single_heatbath_U1(U1 * restrict link, U1 const * const restrict staple)
     {
     rand_matrix_U1(link);
     }
+
+  //  WorkingPrecision->1000;
+  //  Q[x_]:=Exp[Cos[Pi/2*(1-x)]-x]
+  //  FindRoot[D[Q[x],x]==0, {x,1}, WorkingPrecision->100]
+  //  Out[52]= {x -> 0.5606641805798867176366776048997096707812104519411362714885751166519976969907076829844764496162691569}
+  //  N[Log[Q[x]/.%41], 100]
+  //  Out[53]= 0.210513662353018684327769435155832317434879346989632455087165428289411464536813734686515674410131331
   }
+*/
 
 
 void single_overrelaxation_U1(U1 * restrict link, U1 const * const restrict staple)
@@ -111,21 +159,6 @@ void single_overrelaxation_U1Vecs(U1Vecs *restrict link, U1Vecs const * const st
   }
 
 
-
-/*
-WorkingPrecision->1000;
-
-Q[x_]:=Exp[Cos[Pi/2*(1-x)]-x]
-
-FindRoot[D[Q[x],x]==0, {x,1}, WorkingPrecision->100]
-
-Out[52]= {x -> 0.5606641805798867176366776048997096707812104519411362714885751166519976969907076829844764496162691569}
-
-
-N[Log[Q[x]/.%41], 100]
-
-Out[53]= 0.210513662353018684327769435155832317434879346989632455087165428289411464536813734686515674410131331
-*/
 
 
 
