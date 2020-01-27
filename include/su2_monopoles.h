@@ -8,12 +8,12 @@
 
 void comp_MAG_gauge_transformation_Su2(Su2 X_links[2*STDIM],
                                        double lambda[NCOLOR],
-                                       double OverRelaxParam,
+                                       double overrelaxparam,
                                        Su2 *G_mag);
 
 void diagonalize_X_Su2_aux(double OverRelaxParam,
-                          double X[3],
-                          Su2 *G);
+                           double X[3],
+                           Su2 *G);
 
 void comp_outdiagnorm_of_X_Su2(Su2 X_links[2*STDIM],
                                double lambda[2],

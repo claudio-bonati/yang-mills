@@ -1368,17 +1368,17 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
    int i, dir;
    long r;
    double lambda[NCOLOR];
-   const double OverRelaxParam=1.85;
-   double non_diag_contribution, non_diag_contr_aux;
+   const double overrelaxparam=1.85;
+   double nondiag, nondiagaux;
 
    // inizialize the matrix lambda = diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
    for(i=0; i<NCOLOR; i++)
       {
-      lambda[i] = ( (double) NCOLOR -1.)/2. - i;
+      lambda[i] = ( (double) NCOLOR -1.)/2. - (double) i;
       }
  
-   non_diag_contribution=1.0;
-   while(non_diag_contribution > MIN_VALUE)
+   nondiag=1.0;
+   while(nondiag > MIN_VALUE)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
@@ -1395,7 +1395,7 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
               }
 
-           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+           comp_MAG_gauge_transformation(X_links, lambda, overrelaxparam, &G_mag);
  
            // apply the gauge transformation
            for(dir=0; dir<STDIM; dir++)
@@ -1422,7 +1422,7 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
               }
 
-           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+           comp_MAG_gauge_transformation(X_links, lambda, overrelaxparam, &G_mag);
 
            // apply the gauge transformation
            for(dir=0; dir<STDIM; dir++)
@@ -1434,11 +1434,11 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
               }
            }
 
-        // check if the out-of-diagonal-diagonal elements of X(n) are zero
-        non_diag_contr_aux=0;
+        // nondiagaux is the sum of the squares of the out-diagonal terms
+        nondiagaux=0;
 
         #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)  reduction(+ : non_diag_contr_aux)
+        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)  reduction(+ : nondiagaux)
         #endif
         for(r=0;r<param->d_volume;r++)
            {
@@ -1451,10 +1451,13 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
               }
            comp_outdiagnorm_of_X(X_links, lambda, &counter);
-           non_diag_contr_aux += counter;
+           nondiagaux += counter;
            }
      
-        non_diag_contribution = non_diag_contr_aux * param->d_inv_vol;
+        nondiag = nondiagaux * param->d_inv_vol / (double)NCOLOR / (double) NCOLOR;
+
+        printf("%g  %g\n", nondiag, nondiag/MIN_VALUE);
+        fflush(stdout);
         }
 
    // unitarize all the links

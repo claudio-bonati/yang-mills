@@ -615,11 +615,11 @@ inline void TensProd_init_U1(TensProd * restrict TP, U1 const * const restrict A
 // convert the fundamental representation matrix B to the adjoint representation matrix A
 inline void fund_to_adj_U1(U1Adj * restrict A, U1 const * const restrict B)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) A;
   (void) B;
-
-  fprintf(stderr, "The function fund_to_adj_U1 still has to be written (%s, %d)\n", __FILE__, __LINE__);
-  exit(EXIT_FAILURE);
   }
 
 
@@ -627,12 +627,12 @@ inline void fund_to_adj_U1(U1Adj * restrict A, U1 const * const restrict B)
 // using two matrices in the fundamental representation
 inline void TensProdAdj_init_U1(TensProdAdj * restrict TP, U1 const * const restrict A1, U1 const * const restrict A2)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) TP;
   (void) A1;
   (void) A2;
-
-  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
-  exit(EXIT_FAILURE);
   }
 
 
@@ -640,54 +640,63 @@ inline void TensProdAdj_init_U1(TensProdAdj * restrict TP, U1 const * const rest
 // using two matrices in the adjoint representation
 inline void TensProdAdj_init_U1Adj(TensProdAdj * restrict TP, U1Adj const * const restrict A1, U1Adj const * const restrict A2)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) TP;
   (void) A1;
   (void) A2;
-
-  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
-  exit(EXIT_FAILURE);
   }
 
 
 // A=1
 inline void zero_U1Adj(U1Adj * restrict A)
   {
-  A->comp=1.0;
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
+  (void) A;
   }
 
 
 // A=0
 inline void one_U1Adj(U1Adj * restrict A)
   {
-  A->comp=0.0;
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
+  (void) A;
   }
 
 
 // A+=B
 inline void plus_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B)
   {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
 
-  A->comp += B->comp;
+  (void) A;
+  (void) B;
   }
 
 
 // A*=r
 inline void times_equal_real_U1Adj(U1Adj * restrict A, double r)
   {
-  A->comp *=r;
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
+  (void) A;
+  (void) r;
   }
 
 
 // A*=B
 inline void times_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) A;
   (void) B;
   }
@@ -696,6 +705,9 @@ inline void times_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B
 // trace in the adjoint rep.
 inline double retr_U1Adj(U1Adj * restrict A)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) A;
   return 0.0;
   }
