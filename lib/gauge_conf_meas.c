@@ -1456,8 +1456,8 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
      
         nondiag = nondiagaux * param->d_inv_vol / (double)NCOLOR / (double) NCOLOR;
 
-        printf("%g  %g\n", nondiag, nondiag/MIN_VALUE);
-        fflush(stdout);
+        // printf("%g  %g\n", nondiag, nondiag/MIN_VALUE);
+        // fflush(stdout);
         }
 
    // unitarize all the links
