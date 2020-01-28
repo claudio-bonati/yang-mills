@@ -9,7 +9,7 @@
 #include"../include/sun.h"
 
 // given the matrix NCOLOR*NCOLOR "in" extracts the i, j lines and column and
-// gives "xi" real number and "u" in SU(2)
+// returns "xi" real number and "u" in SU(2)
 // 4 xi^2 = redet2[s-s^(dag)+1*tr(s^(dag))]
 // u = [s-s^(dag)+1*tr(s^(dag))]/2/xi
 // (see Kennedy, Pendleton Phys. Lett. B 156, 393 (1985))
@@ -59,21 +59,6 @@ void ennetodue(SuN const * const in, int i, int j, double *xi, Su2 *u)
    u->comp[2]=auxr[0][1];
    u->comp[3]=auxi[0][0];
    }
-
-
-
-/// given the matrix NCOLOR*NCOLOR "in" extracts the i, j lines and column and
-// gives "u" in SU(2)
-// X = (x_ii, x_ij, x_ji, x_jj) = (x_ii + x_jj)/2*Id + i*\vec{x}*sigma con vec{x} = (Re(x_ij), Im(x_ji), 0.5*(x_ii - x_jj))
-void ennetodue_bis(SuN const * const in, int i, int j, Su2 *u)
-   {
-   u->comp[0] = 0.5*(creal(in->comp[m(i,i)]) +  cimag(in->comp[m(i,i)]) + creal(in->comp[m(j,j)]) + cimag(in->comp[m(j,j)]));
-   u->comp[1] = creal(in->comp[m(i,j)]);
-   u->comp[2] = cimag(in->comp[m(j,i)]);
-   u->comp[3] = 0.5*(creal(in->comp[m(i,i)]) + cimag(in->comp[m(i,i)]) - creal(in->comp[m(j,j)]) - cimag(in->comp[m(j,j)]));
-   }
-
-
 
 
 // given a 2*2 matrix extend to NCOLOR*NCOLOR with 1 on the diagonal

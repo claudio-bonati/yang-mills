@@ -6,6 +6,5 @@
 
 void ennetodue(SuN const * const in, int i, int j, double *xi, Su2 *u);
 void duetoenne(Su2 const * const in, int i, int j, SuN *out);
-void ennetodue_bis(SuN const * const in, int i, int j, Su2 *u);
 
 #endif
