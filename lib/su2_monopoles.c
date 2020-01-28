@@ -118,26 +118,32 @@ void diagonalize_X_Su2_aux(double overrelaxparam,
    double alpha_max=0, twoalpha_max=0, X_mod=0;
 
    X_mod = sqrt(X[0]*X[0] + X[1]*X[1] + X[2]*X[2]);
-   
-   X[0] = X[0]/X_mod;
-   X[1] = X[1]/X_mod;
-   X[2] = X[2]/X_mod;
-
-   X_mod = sqrt(X[0]*X[0] + X[1]*X[1]);
-   
    if(X_mod > MIN_VALUE)
      {
-     X[0] = X[0]/X_mod; // =sin(phi_max) in the paper
-     X[1] = X[1]/X_mod; // -cos(phi_max) in the paper
+     X[0] = X[0]/X_mod;
+     X[1] = X[1]/X_mod;
+     X[2] = X[2]/X_mod;
 
-     twoalpha_max = acos(X[2]);
+     X_mod = sqrt(X[0]*X[0] + X[1]*X[1]);
 
-     alpha_max = overrelaxparam*(twoalpha_max/2.0);
+     if(X_mod > MIN_VALUE)
+       {
+       X[0] = X[0]/X_mod; // =sin(phi_max) in the paper
+       X[1] = X[1]/X_mod; // -cos(phi_max) in the paper
 
-     G->comp[0] =  cos(alpha_max);
-     G->comp[1] = -sin(alpha_max)*X[1];
-     G->comp[2] =  sin(alpha_max)*X[0];
-     G->comp[3] = 0.0;
+       twoalpha_max = acos(X[2]);
+
+       alpha_max = overrelaxparam*(twoalpha_max/2.0);
+
+       G->comp[0] =  cos(alpha_max);
+       G->comp[1] = -sin(alpha_max)*X[1];
+       G->comp[2] =  sin(alpha_max)*X[0];
+       G->comp[3] = 0.0;
+       }
+     else
+       {
+       one_Su2(G);
+       }
      }
    else
      {

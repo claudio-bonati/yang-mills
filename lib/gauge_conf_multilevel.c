@@ -787,8 +787,7 @@ void multilevel_polycorr_long(Gauge_Conf * GC,
      // update on level zero
      update_for_multilevel(GC, geo, param, 0);
 
-     if(NLEVELS==1)
-       {
+     #if NLEVELS==1
        // compute Polyakov loop restricted to the slice
        compute_local_poly(GC, geo, param);
 
@@ -816,9 +815,7 @@ void multilevel_polycorr_long(Gauge_Conf * GC,
           TensProd_init(&TP, &(GC->loc_poly[slice][r]), &(GC->loc_poly[slice][r2]) );
           plus_equal_TensProd(&(GC->ml_polycorr[0][slice][r]), &TP);
           }
-       }
-     else  // NLEVELS>1
-       {
+     #else  // NLEVELS>1
        // initialyze ml_polycorr[1] to zero
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(raux)
@@ -858,8 +855,8 @@ void multilevel_polycorr_long(Gauge_Conf * GC,
 
           plus_equal_TensProd(&(GC->ml_polycorr[0][slice][r]), &TP);
           }
-       }
-    } // end update
+     #endif
+     } // end update
 
   if(iteration==param->d_ml_level0_repeat-1) // iteration starts from zero
     {
@@ -915,8 +912,7 @@ void multilevel_polycorradj_long(Gauge_Conf * GC,
      // update on level zero
      update_for_multilevel(GC, geo, param, 0);
 
-     if(NLEVELS==1)
-       {
+     #if NLEVELS==1
        // compute Polyakov loop restricted to the slice
        compute_local_polyadj(GC, geo, param);
 
@@ -944,9 +940,7 @@ void multilevel_polycorradj_long(Gauge_Conf * GC,
           TensProdAdj_initadj(&TP, &(GC->loc_polyadj[slice][r]), &(GC->loc_polyadj[slice][r2]) );
           plus_equal_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]), &TP);
           }
-       }
-     else  // NLEVELS>1
-       {
+     #else  // NLEVELS>1
        // initialyze ml_polycorr[1] to zero
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(raux)
@@ -986,8 +980,8 @@ void multilevel_polycorradj_long(Gauge_Conf * GC,
 
           plus_equal_TensProdAdj(&(GC->ml_polycorradj[0][slice][r]), &TP);
           }
-       }
-    } // end update
+     #endif
+     } // end update
 
   if(iteration==param->d_ml_level0_repeat-1) // iteration starts from zero
     {
@@ -1371,8 +1365,7 @@ void multilevel_tube_disc_long(Gauge_Conf * GC,
      // update on level zero
      update_for_multilevel(GC, geo, param, 0);
 
-     if(NLEVELS==1)
-       {
+     #if NLEVELS==1
        // compute Polyakov loop and plaquette restricted to the slice
        compute_local_poly_and_plaq(GC, geo, param);
 
@@ -1406,9 +1399,7 @@ void multilevel_tube_disc_long(Gauge_Conf * GC,
             plus_equal_TensProd(&(GC->ml_polyplaq[0][r]), &TP);
             }
           }
-       }
-     else  // NLEVELS>1
-       {
+     #else  // NLEVELS>1
        // initialyze ml_polycorr[1] and ml_polyplaq[1] to 0
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(raux)
@@ -1462,8 +1453,8 @@ void multilevel_tube_disc_long(Gauge_Conf * GC,
             plus_equal_TensProd(&(GC->ml_polyplaq[0][r]), &TP);
             }
           }
-       }
-    } // end update
+     #endif
+     } // end update
 
   if(iteration==param->d_ml_level0_repeat-1) // iteration starts from zero
     {
@@ -1856,8 +1847,7 @@ void multilevel_tubeadj_disc_long(Gauge_Conf * GC,
      // update on level zero
      update_for_multilevel(GC, geo, param, 0);
 
-     if(NLEVELS==1)
-       {
+     #if NLEVELS==1
        // compute the adjoing Polyakov loop and plaquette restricted to the slice
        compute_local_polyadj_and_plaq(GC, geo, param);
 
@@ -1892,9 +1882,7 @@ void multilevel_tubeadj_disc_long(Gauge_Conf * GC,
             plus_equal_TensProdAdj(&(GC->ml_polyplaqadj[0][r]), &TP);
             }
           }
-       }
-     else  // NLEVELS>1
-       {
+     #else  // NLEVELS>1
        // initialyze ml_polycorradj[1] and ml_polyplaqadj[1] to 0
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(raux)
@@ -1948,8 +1936,8 @@ void multilevel_tubeadj_disc_long(Gauge_Conf * GC,
             plus_equal_TensProdAdj(&(GC->ml_polyplaqadj[0][r]), &TP);
             }
           }
-       }
-    } // end update
+     #endif
+     } // end update
 
   if(iteration==param->d_ml_level0_repeat-1) // iteration starts from zero
     {
@@ -2399,8 +2387,7 @@ void multilevel_tube_conn_long(Gauge_Conf * GC,
      // update on level zero
      update_for_multilevel(GC, geo, param, 0);
 
-     if(NLEVELS==1)
-       {
+     #if NLEVELS==1
        // compute Polyakov loop, plaquette and connected plaquette restricted to the slice
        compute_local_poly_plaq_and_plaqconn(GC, geo, param);
 
@@ -2437,9 +2424,7 @@ void multilevel_tube_conn_long(Gauge_Conf * GC,
             plus_equal_TensProd(&(GC->ml_polyplaqconn[0][r]), &TP);
             }
           }
-       }
-     else  // NLEVELS>1
-       {
+     #else  // NLEVELS>1
        // initialyze ml_polycorr[1], ml_polyplaq[1] and ml_polyplaqconn[1] to 0
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(raux)
@@ -2501,8 +2486,8 @@ void multilevel_tube_conn_long(Gauge_Conf * GC,
             plus_equal_TensProd(&(GC->ml_polyplaqconn[0][r]), &TP);
             }
           }
-       }
-    } // end update
+     #endif
+     } // end update
 
   if(iteration==param->d_ml_level0_repeat-1) // iteration starts from zero
     {

@@ -1368,7 +1368,8 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
    int i, dir;
    long r;
    double lambda[NCOLOR];
-   const double overrelaxparam=1.85;
+   const double overrelaxparam=1.9; // 1.0 means no overrelaxation
+   const double target=1.0e-10;
    double nondiag, nondiagaux;
 
    // inizialize the matrix lambda = diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
@@ -1378,7 +1379,8 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
       }
  
    nondiag=1.0;
-   while(nondiag > MIN_VALUE)
+
+   while(nondiag > target)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
@@ -1389,7 +1391,7 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
 
            // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
            // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
-           for(dir=0;dir<STDIM;dir++)
+           for(dir=0; dir<STDIM; dir++)
               {
               equal(&(X_links[dir]), &(GC->lattice[r][dir]));
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
@@ -1416,7 +1418,7 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
 
            // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
            // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
-           for(dir=0;dir<STDIM;dir++)
+           for(dir=0; dir<STDIM; dir++)
               {
               equal(&(X_links[dir]), &(GC->lattice[r][dir]));
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
@@ -1440,12 +1442,12 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r, dir)  reduction(+ : nondiagaux)
         #endif
-        for(r=0;r<param->d_volume;r++)
+        for(r=0; r<param->d_volume; r++)
            {
            GAUGE_GROUP X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
            double counter;
 
-           for(dir=0;dir<STDIM;dir++)
+           for(dir=0; dir<STDIM; dir++)
               {
               equal(&(X_links[dir]), &(GC->lattice[r][dir]));
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
@@ -1456,9 +1458,10 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
      
         nondiag = nondiagaux * param->d_inv_vol / (double)NCOLOR / (double) NCOLOR;
 
-        // printf("%g  %g\n", nondiag, nondiag/MIN_VALUE);
-        // fflush(stdout);
+        printf("%g  %g\n", nondiag, nondiag/target);
+        fflush(stdout);
         }
+   printf("\n\n");
 
    // unitarize all the links
    #ifdef OPENMP_MODE
@@ -1639,17 +1642,9 @@ void wrap_search(Gauge_Conf *GC,
                  long r_tback,
                  int *num_wrap)
    {
-   if(STDIM!=4)
-     {
+   #if STDIM!=4
      fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
-     }
-   #ifdef DEBUG
-   if(DeGrand_current(GC, geo, r_tback, 0)==0)
-     {
-     fprintf(stderr, "Problems in DeGrand_current! (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
    #endif
 
    int dir, n_mu;
