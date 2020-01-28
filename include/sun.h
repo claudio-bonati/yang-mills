@@ -290,7 +290,7 @@ inline void lin_comb_SuN(SuN * restrict A,
 
 // A=lambda*B with lambda diagonal matrix
 inline void diag_matrix_times_SuN(SuN * restrict A,
-                                  double *lambda,
+                                  double const lambda[NCOLOR],
                                   SuN const * const restrict B)
   {
   #ifdef DEBUG
@@ -320,7 +320,7 @@ inline void diag_matrix_times_SuN(SuN * restrict A,
 
 // A=lambda*B^{dag} with lambda diagonal matrix
 inline void diag_matrix_times_dag_SuN(SuN * restrict A,
-                                      double *lambda,
+                                      double const lambda[NCOLOR],
                                       SuN const * const restrict B)
   {
   #ifdef DEBUG

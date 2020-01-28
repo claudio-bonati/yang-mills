@@ -104,11 +104,11 @@ void times_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
 
 // A = lambda*B with lambda diagonal marix
-void diag_matrix_times_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
+void diag_matrix_times_SuN(SuN * restrict A, double const lambda[NCOLOR], SuN const * const restrict B);
 
 
 // A=lambda*B^{dag} with lambda diagonal matrix
-void diag_matrix_times_dag_SuN(SuN * restrict A, double *lambda, SuN const * const restrict B);
+void diag_matrix_times_dag_SuN(SuN * restrict A, double const lambda[NCOLOR], SuN const * const restrict B);
 
 
 // A=B^{dag}*C

@@ -1368,8 +1368,8 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
    int i, dir;
    long r;
    double lambda[NCOLOR];
-   const double overrelaxparam=1.9; // 1.0 means no overrelaxation
-   const double target=1.0e-10;
+   const double overrelaxparam=1.85; // 1.0 means no overrelaxation
+   const double target=1.0e-8;
    double nondiag, nondiagaux;
 
    // inizialize the matrix lambda = diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
@@ -1377,9 +1377,8 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
       {
       lambda[i] = ( (double) NCOLOR -1.)/2. - (double) i;
       }
- 
-   nondiag=1.0;
 
+   nondiag=1;
    while(nondiag > target)
         {
         #ifdef OPENMP_MODE
@@ -1458,10 +1457,9 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
      
         nondiag = nondiagaux * param->d_inv_vol / (double)NCOLOR / (double) NCOLOR;
 
-        printf("%g  %g\n", nondiag, nondiag/target);
-        fflush(stdout);
+        // printf("%g  %g\n", nondiag, nondiag/target);
+        // fflush(stdout);
         }
-   printf("\n\n");
 
    // unitarize all the links
    #ifdef OPENMP_MODE

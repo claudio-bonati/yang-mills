@@ -103,11 +103,11 @@ void times_U1(U1 *A, U1 const * const B, U1 const * const C);
 
 
 // A=lambda*B with lambda diagonal matrix
-void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
+void diag_matrix_times_U1(U1 * restrict A, double const lambda[1], U1 const * const restrict B);
 
 
 // A=lambda*B^{dag} with lambda diagonal matrix
-void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
+void diag_matrix_times_dag_U1(U1 * restrict A, double const lambda[1], U1 const * const restrict B);
 
 
 // A=B^{dag}*C

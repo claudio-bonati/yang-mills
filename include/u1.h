@@ -379,7 +379,7 @@ inline void times_U1(U1 * restrict A,
 
 
 // A=lambda*B with lambda diagonal matrix
-inline void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B)
+inline void diag_matrix_times_U1(U1 * restrict A, double const lambda[1], U1 const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -399,7 +399,7 @@ inline void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * con
 
 
 // A=lambda*B^{dag} with lambda diagonal matrix
-inline void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B)
+inline void diag_matrix_times_dag_U1(U1 * restrict A, double const lambda[1], U1 const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)

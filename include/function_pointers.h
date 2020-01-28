@@ -89,11 +89,11 @@ int  (*print_on_binary_file_bigen)(FILE *fp, GAUGE_GROUP const * const A);
 int  (*read_from_file)(FILE *fp, GAUGE_GROUP *A);
 int  (*read_from_binary_file_bigen)(FILE *fp, GAUGE_GROUP *A);
 
-void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B);
-void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double *lambda, GAUGE_GROUP const * const restrict B); 
-void (*comp_MAG_gauge_transformation) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double OverRelaxParam, GAUGE_GROUP *G_mag);
-void (*comp_outdiagnorm_of_X) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *non_diag_contr);
-void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double lambda[NCOLOR], double *fmag);
+void (*diag_matrix_times)(GAUGE_GROUP * restrict A, double const lambda[NCOLOR], GAUGE_GROUP const * const restrict B);
+void (*diag_matrix_times_dag)(GAUGE_GROUP * restrict A, double const lambda[NCOLOR], GAUGE_GROUP const * const restrict B);
+void (*comp_MAG_gauge_transformation) (GAUGE_GROUP X_links[2*STDIM], double const lambda[NCOLOR], double OverRelaxParam, GAUGE_GROUP *G_mag);
+void (*comp_outdiagnorm_of_X) (GAUGE_GROUP X_links[2*STDIM], double const lambda[NCOLOR], double *non_diag_contr);
+void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double const lambda[NCOLOR], double *fmag);
 void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir);
 
 void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B);

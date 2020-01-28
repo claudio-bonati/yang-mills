@@ -103,10 +103,10 @@ void times_Su2(Su2 *A, Su2 const * const B, Su2 const * const C);
 
 
 // A = lambda*B with lambda diagonal marix
-void diag_matrix_times_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
+void diag_matrix_times_Su2(Su2 * restrict A, double const lambda[2], Su2 const * const restrict B);
 
 // A=lambda*B^{dag} with lambda diagonal matrix
-void diag_matrix_times_dag_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
+void diag_matrix_times_dag_Su2(Su2 * restrict A, double const lambda[2], Su2 const * const restrict B);
 
 
 // A=B^{dag}*C

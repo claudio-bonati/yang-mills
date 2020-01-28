@@ -20,8 +20,8 @@
 
 // This function compute the MAG gauge transformation in the SU(N) case
 void comp_MAG_gauge_transformation_SuN(SuN X_links[2*STDIM],
-                                       double lambda[NCOLOR],
-                                       double OverRelaxParam,
+                                       double const lambda[NCOLOR],
+                                       double overrelaxparam,
                                        SuN *G_mag)
 
    {
@@ -72,9 +72,9 @@ void comp_MAG_gauge_transformation_SuN(SuN X_links[2*STDIM],
  
    // Cycle on all the SU(2) subgroups
    // see M.D'Elia and C. Bonati Nuc. PHys B 877 (2012) 233-259
-   for(i=0;i<NCOLOR-1;i++)
+   for(i=0; i<NCOLOR-1; i++)
       {
-      for(j=i+1;j<NCOLOR;j++)
+      for(j=i+1; j<NCOLOR; j++)
          {
          vec_x[0] = creal(X.comp[m(i,j)]);
          vec_x[1] = cimag(X.comp[m(j,i)]);
@@ -84,7 +84,7 @@ void comp_MAG_gauge_transformation_SuN(SuN X_links[2*STDIM],
 
          if(X_mod>MIN_VALUE)
            {
-           diagonalize_X_Su2_aux(OverRelaxParam, vec_x, &G_mag_su2);
+           diagonalize_X_Su2_aux(overrelaxparam, vec_x, &G_mag_su2);
            duetoenne(&G_mag_su2, i, j, &aux_g);
 
            // update the X(n) matrix: X->GXGdag
@@ -93,42 +93,19 @@ void comp_MAG_gauge_transformation_SuN(SuN X_links[2*STDIM],
            equal_SuN(&X, &aux2);
 
 
-           // Build the gauge transformation matrix
+           // build the gauge transformation matrix
            times_SuN(&aux2, &aux_g, G_mag);
            equal_SuN(G_mag, &aux2);
            }
          }
       }
- 
-     #ifdef DEBUG
-     herm_real_check=0.0;
-     herm_imag_check=0.0;
-     trace_check = 0.0+0.0*I;
-
-     for(i=0; i<NCOLOR; i++)
-        {
-        trace_check += X.comp[m(i,i)];
-        for(j=i+1; j<NCOLOR; j++)
-           {
-           herm_real_check += creal(X.comp[m(i,j)]) - creal(X.comp[m(j,i)]);
-           herm_imag_check += cimag(X.comp[m(i,j)]) + cimag(X.comp[m(j,i)]);
-           }
-        }
-
-     if(fabs(herm_real_check) > MIN_VALUE*10 || fabs(herm_imag_check) > MIN_VALUE*10 || cabs(trace_check) > MIN_VALUE*10 )
-       {
-       fprintf(stderr, "herm_real_check = %.12g herm_imag_check = %.12g ", herm_real_check, herm_imag_check);
-       fprintf(stderr, "trace_check_real = %.12g trace_check_imag = %.12g ", creal(trace_check), cimag(trace_check));
-       fprintf(stderr, "(%s, %d)\n", __FILE__, __LINE__);
-       }
-     #endif     
-}
+   }
 
 
 // compute the squared absolute values of out-of-diagonal terms of X(n)
-void comp_outdiagnorm_of_X_SuN (SuN X_links[2*STDIM],
-                                double lambda[NCOLOR],
-                                double *outdiagnorm2)
+void comp_outdiagnorm_of_X_SuN(SuN X_links[2*STDIM],
+                               double const lambda[NCOLOR],
+                               double *outdiagnorm2)
    {
    int i, j, dir;
    double aux=0;
@@ -187,7 +164,7 @@ void comp_outdiagnorm_of_X_SuN (SuN X_links[2*STDIM],
 
 // compute the value of the functional to be maximized in MAG
 void comp_functional_fmag_SuN(SuN X_links[2*STDIM],
-                              double lambda[NCOLOR],
+                              double const lambda[NCOLOR],
                               double *fmag)
    {
    int dir, i;

@@ -473,7 +473,7 @@ inline void times_Su2(Su2 * restrict A,
 
 // A=lambda*B with lambda diagonal matrix
 inline void diag_matrix_times_Su2(Su2 * restrict A, 
-                                  double *lambda, 
+                                  double const lambda[2],
                                   Su2 const * const restrict B)
   {
   fprintf(stderr, "The function diag_matrix_times_Su2 cannot be defined using the Pauli representation of SU(2) ");
@@ -488,7 +488,7 @@ inline void diag_matrix_times_Su2(Su2 * restrict A,
 
 // A=lambda*B^{dag} with lambda diagonal matrix
 inline void diag_matrix_times_dag_Su2(Su2 * restrict A,
-                                      double *lambda,
+                                      double const lambda[2],
                                       Su2 const * const restrict B)
   {
   fprintf(stderr, "The function diag_matrix_times_dag_Su2 cannot be defined using the Pauli representation of SU(2) ");

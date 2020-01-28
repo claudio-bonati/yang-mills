@@ -16,7 +16,7 @@
 
 // This function compute the MAG gauge transformation in the SU(N) case
 void comp_MAG_gauge_transformation_U1(U1 X_links[2*STDIM],
-                                      double lambda[1],
+                                      double const lambda[1],
                                       double OverRelaxParam,
                                       U1 *G_mag)
    {  
@@ -29,7 +29,7 @@ void comp_MAG_gauge_transformation_U1(U1 X_links[2*STDIM],
 
 // compte the squared absolute values of out-of-diagonal terms of X(n)
 void comp_outdiagnorm_of_X_U1(U1 X_links[2*STDIM],
-                              double lambda[1],
+                              double const lambda[1],
                               double *non_diag_contr)
    {
    (void)non_diag_contr;
@@ -40,7 +40,7 @@ void comp_outdiagnorm_of_X_U1(U1 X_links[2*STDIM],
 
 // compute the value of the functional to be maximized in MAG
 void comp_functional_fmag_U1(U1 X_links[2*STDIM],
-                             double lambda[1],
+                             double const lambda[1],
                              double *fmag)
    {
    (void) fmag;
