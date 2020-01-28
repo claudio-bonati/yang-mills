@@ -295,19 +295,17 @@ void diag_projection_single_site_Su2(Gauge_Conf *GC,
                                      long r,
                                      int dir)
    {
-   double phi[2];
-   double complex U_matrix[4];
+   double phi0, phi1;
+   double complex U_matrix0, U_matrix3;
  
-   U_matrix[0]  =  link->comp[0] + link->comp[3]*I;     
-   U_matrix[1]  =  link->comp[2] + link->comp[1]*I;     
-   U_matrix[2]  = -link->comp[2] + link->comp[1]*I;     
-   U_matrix[3]  =  link->comp[0] - link->comp[3]*I;     
+   U_matrix0  =  link->comp[0] + link->comp[3]*I;
+   U_matrix3  =  link->comp[0] - link->comp[3]*I;
  
-   phi[0] = atan2(cimag(U_matrix[0]), creal(U_matrix[0]));
-   phi[1] = atan2(cimag(U_matrix[3]), creal(U_matrix[3]));
+   phi0 = atan2(cimag(U_matrix0), creal(U_matrix0));
+   phi1 = atan2(cimag(U_matrix3), creal(U_matrix3));
 
-   GC->diag_proj[r][dir][0] = phi[0];
-   GC->diag_proj[r][dir][1] = phi[1];
+   GC->diag_proj[r][dir][0] = phi0;
+   GC->diag_proj[r][dir][1] = phi1;
    }
 
 
