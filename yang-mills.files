@@ -84,3 +84,4 @@ lib/flavour_matrix.c
 src/debug_su2sun.c
 lib/gauge_conf_monopoles.c
 lib/gauge_conf_meas_multilevel.c
+src/yang_mills_polycorr_higgs.c

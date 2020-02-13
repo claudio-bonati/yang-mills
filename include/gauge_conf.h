@@ -316,14 +316,26 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
                                 Geometry const * const geo,
                                 GParam const * const param,
                                 FILE *datafilep);
+void optimize_multihit_polycorr_with_higgs(Gauge_Conf *GC,
+                                           Geometry const * const geo,
+                                           GParam const * const param,
+                                           FILE *datafilep);
 void optimize_multilevel_polycorr(Gauge_Conf *GC,
                                   Geometry const * const geo,
                                   GParam const * const param,
                                   FILE *datafilep);
+void optimize_multilevel_polycorr_with_higgs(Gauge_Conf *GC,
+                                             Geometry const * const geo,
+                                             GParam const * const param,
+                                             FILE *datafilep);
 void perform_measures_polycorr(Gauge_Conf * GC,
                                Geometry const * const geo,
                                GParam const * const param,
                                FILE *datafilep);
+void perform_measures_polycorr_with_higgs(Gauge_Conf * GC,
+                                          Geometry const * const geo,
+                                          GParam const * const param,
+                                          FILE *datafilep);
 
 void optimize_multihit_polycorradj(Gauge_Conf *GC,
                                    Geometry const * const geo,
@@ -385,6 +397,13 @@ void multihit(Gauge_Conf const * const GC,
               int dir,
               int num_hit,
               GAUGE_GROUP *G);
+void multihit_with_higgs(Gauge_Conf const * const GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         long r,
+                         int dir,
+                         int num_hit,
+                         GAUGE_GROUP *G);
 void multihitadj(Gauge_Conf const * const GC,
                  Geometry const * const geo,
                  GParam const * const param,
@@ -397,6 +416,10 @@ void update_for_multilevel(Gauge_Conf * GC,
                            Geometry const * const geo,
                            GParam const * const param,
                            int level);
+void update_for_multilevel_with_higgs(Gauge_Conf * GC,
+                                      Geometry const * const geo,
+                                      GParam const * const param,
+                                      int level);
 
 void compute_local_poly(Gauge_Conf *GC,
                         Geometry const * const geo,
@@ -405,9 +428,13 @@ void compute_local_polyadj(Gauge_Conf *GC,
                            Geometry const * const geo,
                            GParam const * const param);
 void multilevel_polycorr(Gauge_Conf *GC,
-                          Geometry const * const geo,
-                          GParam const * const param,
-                          int dt);
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         int dt);
+void multilevel_polycorr_with_higgs(Gauge_Conf *GC,
+                                    Geometry const * const geo,
+                                    GParam const * const param,
+                                    int dt);
 void multilevel_polycorradj(Gauge_Conf * GC,
                             Geometry const * const geo,
                             GParam const * const param,

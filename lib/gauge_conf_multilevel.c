@@ -56,6 +56,69 @@ void multihit(Gauge_Conf const * const GC,
   }
 
 
+void multihit_with_higgs(Gauge_Conf const * const GC,
+                         Geometry const * const geo,
+                         GParam const * const param,
+                         long r,
+                         int dir,
+                         int num_hit,
+                         GAUGE_GROUP *G)
+  {
+  if(num_hit>0)
+    {
+    int i;
+    const double inv_num_hit = 1.0/(double) num_hit;
+    GAUGE_GROUP staple, staple2, partial;
+
+    zero(G);
+    equal(&partial, &(GC->lattice[r][dir]));
+
+    // gauge part of the staple
+    if(fabs(param->d_beta)>MIN_VALUE)
+      {
+      #ifndef THETA_MODE
+        calcstaples_wilson(GC, geo, param, r, dir, &staple);
+      #else
+        // compute_clovers in direction "dir" HAS TO BE CALLED BEFORE!
+        calcstaples_with_topo(GC, geo, param, r, dir, &staple);
+      #endif
+      times_equal_real(&staple, param->d_beta);
+      }
+    else
+      {
+      zero(&staple);
+      }
+
+    // higgs part of the staple
+    if(fabs(param->d_higgs_beta)>MIN_VALUE)
+      {
+      vector_tensor_vector_vecs(&staple2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, dir)]));
+      times_equal_real(&staple2, param->d_higgs_beta*NHIGGS*NCOLOR); // NCOLOR is needed to compensate the
+                                                                     // 1/NCOLOR that is present in the gauge part
+      }
+    else
+      {
+      zero(&staple2);
+      }
+
+    plus_equal(&staple, &staple2);
+
+    for(i=0; i<num_hit; i++)
+       {
+       single_heatbath(&partial, &staple);
+       plus_equal(G, &partial);
+
+       unitarize(&partial);
+       }
+    times_equal_real(G, inv_num_hit);
+    }
+  else
+    {
+    equal(G, &(GC->lattice[r][dir]));
+    }
+  }
+
+
 void multihitadj(Gauge_Conf const * const GC,
                  Geometry const * const geo,
                  GParam const * const param,
@@ -210,6 +273,138 @@ void update_for_multilevel(Gauge_Conf * GC,
          }
       }
    }
+
+
+// perform a complete update of gauge and higgs on the given level
+void update_for_multilevel_with_higgs(Gauge_Conf * GC,
+                                      Geometry const * const geo,
+                                      GParam const * const param,
+                                      int level)
+   {
+   for(int i=0; i<STDIM; i++)
+      {
+      if(param->d_size[i]==1)
+        {
+        fprintf(stderr, "Error: this functon can not be used in the completely reduced case (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
+      }
+
+   long r;
+   int j, dir;
+
+   // heatbath
+   for(dir=0; dir<STDIM; dir++)
+      {
+      #ifdef THETA_MODE
+      compute_clovers(GC, geo, param, dir);
+      #endif
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=0; r<(param->d_volume)/2; r++)
+         {
+         int t, acc;
+         long rsp;
+
+         si_to_sisp_and_t(&rsp, &t, geo, r);
+         if((t % param->d_ml_step[level])!=0 || dir==0)
+           {
+           heatbath_with_higgs(GC, geo, param, r, dir);
+           }
+         if((t % param->d_ml_step[level])!=0)
+           {
+           acc=metropolis_for_higgs(GC, geo, param, r);
+           (void) acc; // just to avoid warning at compile time
+           }
+         }
+
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(r)
+      #endif
+      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         {
+         int t, acc;
+         long rsp;
+
+         si_to_sisp_and_t(&rsp, &t, geo, r);
+         if((t % param->d_ml_step[level])!=0 || dir==0)
+           {
+           heatbath_with_higgs(GC, geo, param, r, dir);
+           }
+         if((t % param->d_ml_step[level])!=0)
+           {
+           acc=metropolis_for_higgs(GC, geo, param, r);
+           (void) acc; // just to avoid warning at compile time
+           }
+         }
+      }
+
+   // overrelax
+   for(dir=0; dir<STDIM; dir++)
+      {
+      #ifdef THETA_MODE
+      compute_clovers(GC, geo, param, dir);
+      #endif
+
+      for(j=0; j<param->d_overrelax; j++)
+         {
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #endif
+         for(r=0; r<(param->d_volume)/2; r++)
+            {
+            int t;
+            long rsp;
+
+            si_to_sisp_and_t(&rsp, &t, geo, r);
+            if((t % param->d_ml_step[level])!=0 || dir==0)
+              {
+              overrelaxation_with_higgs(GC, geo, param, r, dir);
+              }
+            if((t % param->d_ml_step[level])!=0)
+              {
+              overrelaxation_for_higgs(GC, geo, param, r);
+              }
+            }
+
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r)
+         #endif
+         for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+            {
+            int t;
+            long rsp;
+
+            si_to_sisp_and_t(&rsp, &t, geo, r);
+            if((t % param->d_ml_step[level])!=0 || dir==0)
+              {
+              overrelaxation_with_higgs(GC, geo, param, r, dir);
+              }
+            if((t % param->d_ml_step[level])!=0)
+              {
+              overrelaxation_for_higgs(GC, geo, param, r);
+              }
+            }
+         }
+      }
+
+   // final unitarization
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      for(dir=0; dir<STDIM; dir++)
+         {
+         unitarize(&(GC->lattice[r][dir]));
+         normalize_vecs(&(GC->higgs[r]));
+         }
+      }
+   }
+
+
 
 
 // compute polyakov loop on a single slice
@@ -486,6 +681,224 @@ void multilevel_polycorr(Gauge_Conf * GC,
                              geo,
                              param,
                              param->d_ml_step[level+1]);
+
+         // update polycorr[level] with polycorr[level+1]
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(raux)
+         #endif
+         for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level]; raux++)
+            {
+            int j;
+            TensProd TP;
+
+            long r = raux/(param->d_size[0]/param->d_ml_step[level]);
+            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
+            one_TensProd(&TP);
+            for(j=0; j<param->d_ml_step[level]/param->d_ml_step[level+1]; j++)
+               {
+               times_equal_TensProd(&TP, &(GC->ml_polycorr[level+1][slice*param->d_ml_step[level]/param->d_ml_step[level+1]+j][r]));
+               }
+
+            plus_equal_TensProd(&(GC->ml_polycorr[level][slice][r]), &TP);
+            }
+
+         } // end of update
+
+      // normalize polycorr[level]
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(raux)
+      #endif
+      for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level]; raux++)
+         {
+         long r = raux/(param->d_size[0]/param->d_ml_step[level]);
+         int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
+         times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
+         }
+
+      break;
+      // end of the not innermost not outermost level
+
+    } // end of switch
+
+  } // end of multilevel
+
+
+// multilevel for polyakov correlator with higgs
+void multilevel_polycorr_with_higgs(Gauge_Conf * GC,
+                                    Geometry const * const geo,
+                                    GParam const * const param,
+                                    int dt)
+  {
+  int upd, level;
+  long raux;
+
+  // remember that d_size[0] >= d_ml_step[0]>d_ml_step[1]> d_ml_step[2] ...
+
+  level=-2;
+  // determine the level to be used
+  if(dt>param->d_ml_step[0])
+    {
+    level=-1;
+    }
+  else
+    {
+    int tmp;
+    for(tmp=0; tmp<NLEVELS; tmp++)
+       {
+       if(param->d_ml_step[tmp]==dt)
+         {
+         level=tmp;
+         tmp=NLEVELS+10;
+         }
+       }
+    if(level==-2)
+      {
+      fprintf(stderr, "Error in the determination of the level in the multilevel (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+    }
+
+  switch(level)
+    {
+    case -1 :     // LEVEL -1, do not average
+
+      // initialyze ml_polycorr[0] to 0
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(raux)
+      #endif
+      for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+         {
+         long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+         int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+         zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
+         }
+
+      // call lower levels
+      multilevel_polycorr_with_higgs(GC,
+                                     geo,
+                                     param,
+                                     param->d_ml_step[0]);
+
+      break;
+      // end of the outermost level
+
+    case NLEVELS-1 : // INNERMOST LEVEL
+
+      // in case level -1 is never used
+      if(level==0 && param->d_size[0]==param->d_ml_step[0])
+        {
+        // initialyze ml_polycorr[0] to 0
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(raux)
+        #endif
+        for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+           {
+           long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+           int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+           zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
+           }
+        }
+
+      // perform the update
+      for(upd=0; upd< param->d_ml_upd[level]; upd++)
+         {
+         update_for_multilevel_with_higgs(GC, geo, param, level);
+
+         // compute Polyakov loop restricted to the slice
+         compute_local_poly(GC, geo, param);
+
+         // compute the tensor products
+         // and update ml_polycorr[level]
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(raux)
+         #endif
+         for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level]; raux++)
+            {
+            TensProd TP;
+            long r1, r2;
+            int j, t_tmp;
+
+            long r = raux/(param->d_size[0]/param->d_ml_step[level]);
+            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
+            r1=sisp_and_t_to_si(geo, r, 0); // r is a 3d index, r1 is the 4d index value of (r,t=0)
+            for(j=0; j<param->d_dist_poly; j++)
+               {
+               r1=nnp(geo, r1, 1);
+               }
+            si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
+
+            TensProd_init(&TP, &(GC->loc_poly[slice][r]), &(GC->loc_poly[slice][r2]) );
+            plus_equal_TensProd(&(GC->ml_polycorr[level][slice][r]), &TP);
+            }
+
+        } // end of update
+
+      // normalize polycorr
+      #ifdef OPENMP_MODE
+      #pragma omp parallel for num_threads(NTHREADS) private(raux)
+      #endif
+      for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level]; raux++)
+         {
+         long r = raux/(param->d_size[0]/param->d_ml_step[level]);
+         int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level]) );
+
+         times_equal_real_TensProd(&(GC->ml_polycorr[level][slice][r]), 1.0/(double) param->d_ml_upd[level]);
+         }
+
+      break;
+      // end of innermost level
+
+    default:  // NOT THE INNERMOST NOT THE OUTERMOST LEVEL
+
+      if(level==-1 || level==NLEVELS-1)
+        {
+        fprintf(stderr, "Error in the multilevel (%s, %d)\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+        }
+
+      // in case level -1 is never used
+      if(level==0 && param->d_size[0]==param->d_ml_step[0])
+        {
+        // initialyze ml_polycorr[0] to 0
+        #ifdef OPENMP_MODE
+        #pragma omp parallel for num_threads(NTHREADS) private(raux)
+        #endif
+        for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+           {
+           long r = raux/(param->d_size[0]/param->d_ml_step[0]);
+           int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+
+           zero_TensProd(&(GC->ml_polycorr[0][slice][r]));
+           }
+        }
+
+      // perform the update
+      for(upd=0; upd< param->d_ml_upd[level]; upd++)
+         {
+         update_for_multilevel_with_higgs(GC, geo, param, level);
+
+         // initialyze ml_polycorr[level+1] to 0
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(raux)
+         #endif
+         for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[level+1]; raux++)
+            {
+            long r = raux/(param->d_size[0]/param->d_ml_step[level+1]);
+            int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[level+1]) );
+
+            zero_TensProd(&(GC->ml_polycorr[level+1][slice][r]));
+            }
+
+         // call higher levels
+         multilevel_polycorr_with_higgs(GC,
+                                        geo,
+                                        param,
+                                        param->d_ml_step[level+1]);
 
          // update polycorr[level] with polycorr[level+1]
          #ifdef OPENMP_MODE

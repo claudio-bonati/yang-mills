@@ -1549,9 +1549,16 @@ void heatbath_with_higgs(Gauge_Conf *GC,
     zero(&stap1);
     }
 
-  vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
-  times_equal_real(&stap2, param->d_higgs_beta*NHIGGS*NCOLOR); // NCOLOR is needed to compensate the
-                                                               // 1/NCOLOR that is present in the gauge part
+  if(fabs(param->d_higgs_beta)>MIN_VALUE)
+    {
+    vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
+    times_equal_real(&stap2, param->d_higgs_beta*NHIGGS*NCOLOR); // NCOLOR is needed to compensate the
+                                                                 // 1/NCOLOR that is present in the gauge part
+    }
+  else
+    {
+    zero(&stap2);
+    }
 
   plus_equal(&stap1, &stap2);
 
@@ -1591,9 +1598,16 @@ void overrelaxation_with_higgs(Gauge_Conf *GC,
     zero(&stap1);
     }
 
-  vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
-  times_equal_real(&stap2, param->d_higgs_beta*NHIGGS*NCOLOR); // NCOLOR is needed to compensate the
-                                                               // 1/NCOLOR that is present in the gauge part
+  if(fabs(param->d_higgs_beta)>MIN_VALUE)
+    {
+    vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
+    times_equal_real(&stap2, param->d_higgs_beta*NHIGGS*NCOLOR); // NCOLOR is needed to compensate the
+                                                                 // 1/NCOLOR that is present in the gauge part
+    }
+  else
+    {
+    zero(&stap2);
+    }
 
   plus_equal(&stap1, &stap2);
 
