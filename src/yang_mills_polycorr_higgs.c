@@ -84,6 +84,21 @@ void real_main(char *in_file)
          perform_measures_polycorr_with_higgs(&GC, &geo, &param, datafilep);
          }
 
+       if(count<param.d_thermal)
+         {
+         if(acc_local>0.33)
+           {
+           if(param.d_epsilon_metro<2.0)
+             {
+             param.d_epsilon_metro*=1.1;
+             }
+           }
+         else
+           {
+           param.d_epsilon_metro*=0.9;
+           }
+         }
+
        // save configuration for backup
        if(param.d_saveconf_back_every!=0)
          {
