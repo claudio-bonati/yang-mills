@@ -890,6 +890,7 @@ void print_parameters_polycorr_higgs(GParam * param, time_t time_start, time_t t
     #ifdef THETA_MODE
       fprintf(fp, "theta: %.10lf\n", param->d_theta);
     #endif
+    fprintf(fp, "higgs_beta: %.10lf\n", param->d_higgs_beta);
 
     fprintf(fp, "\n");
 
@@ -1020,6 +1021,91 @@ void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t ti
 
     fclose(fp);
     }
+
+
+// print simulation parameters
+void print_parameters_polycorr_higgs_long(GParam * param, time_t time_start, time_t time_end, double acc)
+    {
+    FILE *fp;
+    int i;
+    double diff_sec;
+
+    fp=fopen(param->d_log_file, "w");
+    fprintf(fp, "+-------------------------------------------------+\n");
+    fprintf(fp, "| Simulation details for yang_mills_polycorr_higgs_long |\n");
+    fprintf(fp, "+-------------------------------------------------+\n\n");
+
+    #ifdef OPENMP_MODE
+     fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
+    #endif
+
+    fprintf(fp, "number of colors: %d\n", NCOLOR);
+    fprintf(fp, "number of higgs fields: %d\n", NHIGGS);
+    fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
+
+    fprintf(fp, "lattice: %d", param->d_size[0]);
+    for(i=1; i<STDIM; i++)
+       {
+       fprintf(fp, "x%d", param->d_size[i]);
+       }
+    fprintf(fp, "\n\n");
+
+    fprintf(fp, "beta: %.10lf\n", param->d_beta);
+    #ifdef THETA_MODE
+      fprintf(fp, "theta: %.10lf\n", param->d_theta);
+    #endif
+    fprintf(fp, "higgs_beta: %.10lf\n", param->d_higgs_beta);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "overrelax: %d\n", param->d_overrelax);
+    fprintf(fp, "measevery: %d\n", param->d_measevery);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "start:                   %d\n", param->d_start);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "epsilon_metro: %.10lf\n", param->d_epsilon_metro);
+    fprintf(fp, "metropolis acceptance: %.10lf\n", acc);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "multihit:   %d\n", param->d_multihit);
+    fprintf(fp, "levels for multileves: %d\n", NLEVELS);
+    fprintf(fp, "multilevel steps: ");
+    for(i=0; i<NLEVELS; i++)
+       {
+       fprintf(fp, "%d ", param->d_ml_step[i]);
+       }
+    fprintf(fp, "\n");
+    fprintf(fp, "updates for levels: ");
+    for(i=0; i<NLEVELS; i++)
+       {
+       fprintf(fp, "%d ", param->d_ml_upd[i]);
+       }
+    fprintf(fp, "\n");
+    fprintf(fp, "level0_repeat:   %d\n", param->d_ml_level0_repeat);
+    fprintf(fp, "dist_poly:   %d\n", param->d_dist_poly);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "randseed: %u\n", param->d_randseed);
+    fprintf(fp, "\n");
+
+    diff_sec = difftime(time_end, time_start);
+    fprintf(fp, "Simulation time: %.3lf seconds\n", diff_sec );
+    fprintf(fp, "\n");
+
+    if(endian()==0)
+      {
+      fprintf(fp, "Little endian machine\n\n");
+      }
+    else
+      {
+      fprintf(fp, "Big endian machine\n\n");
+      }
+
+    fclose(fp);
+    }
+
+
 
 
 // print simulation parameters

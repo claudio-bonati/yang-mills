@@ -444,6 +444,12 @@ void multilevel_polycorr_long(Gauge_Conf * GC,
                               GParam const * const param,
                               int dt,
                               int iteration);
+void multilevel_polycorr_long_with_higgs(Gauge_Conf * GC,
+                                         Geometry const * const geo,
+                                         GParam const * const param,
+                                         int dt,
+                                         int iteration);
+
 void multilevel_polycorradj_long(Gauge_Conf * GC,
                                  Geometry const * const geo,
                                  GParam const * const param,

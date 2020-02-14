@@ -80,6 +80,7 @@ void print_parameters_local_fundadj(GParam const * const param, time_t time_star
 void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_end);
 void print_parameters_polycorr_higgs(GParam * param, time_t time_start, time_t time_end, double acc);
 void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t time_end);
+void print_parameters_polycorr_higgs_long(GParam * param, time_t time_start, time_t time_end, double acc);
 
 void print_parameters_t0(GParam * param, time_t time_start, time_t time_end);
 
