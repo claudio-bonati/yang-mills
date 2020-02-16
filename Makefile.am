@@ -74,11 +74,9 @@ su2 = ./include/su2.h \
       ./lib/su2_upd.c \
       ./lib/su2_monopoles.c 
 
-sun = ./include/sun_aux.h \
-      ./include/sun.h \
+sun = ./include/sun.h \
       ./include/sun_upd.h \
       ./include/sun_monopoles.h \
-      ./lib/sun_aux.c \
       ./lib/sun.c \
       ./lib/sun_upd.c \
       ./lib/sun_monopoles.c

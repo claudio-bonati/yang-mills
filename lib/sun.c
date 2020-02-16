@@ -13,7 +13,6 @@
 #include"../include/macro.h"
 #include"../include/random.h"
 #include"../include/sun.h"
-#include"../include/sun_aux.h"
 #include"../include/sun_upd.h"
 #include"../include/tens_prod.h"
 #include"../include/tens_prod_adj.h"

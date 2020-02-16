@@ -15,8 +15,6 @@
 #include"../include/sun_monopoles.h"
 #include"../include/su2_monopoles.h"
 #include"../include/sun.h"
-#include"../include/sun_aux.h"
-
 
 // This function compute the MAG gauge transformation in the SU(N) case
 void comp_MAG_gauge_transformation_SuN(SuN X_links[2*STDIM],
