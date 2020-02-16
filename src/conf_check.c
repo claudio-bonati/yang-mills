@@ -116,17 +116,24 @@ void computehash(char *infile, int dim, long volume, char *hash)
               fprintf(stderr, "Error in reading the file %s (%s, %d)\n", infile, __FILE__, __LINE__);
               exit(EXIT_FAILURE);
               }
-            #if NCOLOR==1
-              MD5_Update(&mdContext, &(link.comp), sizeof(double complex));
-            #elif NCOLOR==2
-              for(int k=0; k<4; k++)
-                 {
-                 MD5_Update(&mdContext, &(link.comp[k]), sizeof(double));
-                 }
-            #else
+            #if GGROUP==0
+              #if NCOLOR==1
+                MD5_Update(&mdContext, &(link.comp), sizeof(double complex));
+              #elif NCOLOR==2
+                for(int k=0; k<4; k++)
+                   {
+                   MD5_Update(&mdContext, &(link.comp[k]), sizeof(double));
+                   }
+              #else
+                for(int k=0; k<NCOLOR*NCOLOR; k++)
+                   {
+                   MD5_Update(&mdContext, &(link.comp[k]), sizeof(double complex));
+                   }
+              #endif
+            #elif GGROUP==1
               for(int k=0; k<NCOLOR*NCOLOR; k++)
                  {
-                 MD5_Update(&mdContext, &(link.comp[k]), sizeof(double complex));
+                 MD5_Update(&mdContext, &(link.comp[k]), sizeof(double));
                  }
             #endif
             }
@@ -159,6 +166,7 @@ int main (int argc, char **argv)
       printf("Usage: %s conf_file\n\n", argv[0]);
 
       printf("Compilation details:\n");
+      printf("\tGGROUP (gauge group): %s\n", QUOTEME(GGROUP));
       printf("\tN_c (number of colors): %d\n", NCOLOR);
       printf("\n");
       printf("\tINT_ALIGN: %s\n", QUOTEME(INT_ALIGN));

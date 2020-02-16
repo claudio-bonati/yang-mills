@@ -92,12 +92,13 @@ void single_heatbath_SuN(SuN *link, SuN const * const staple)
     double complex fii, fij, fji, fjj;
     int i, j, k;
 
+    equal_SuN(&aux, staple);     // aux=staple
+    times_equal_SuN(&aux, link); // aux=staple*link
+
     for(i=0; i<NCOLOR-1; i++)
        {
        for(j=i+1; j<NCOLOR; j++)
           {
-          equal_SuN(&aux, staple);     // aux=staple
-          times_equal_SuN(&aux, link); // aux=staple*link
           ennetodue_SuN(&aux, i, j, &xi, &u);
 
           xi*=2.0/((double) NCOLOR);
@@ -123,6 +124,15 @@ void single_heatbath_SuN(SuN *link, SuN const * const staple)
                link->comp[m(k,i)]=temp0;
                link->comp[m(k,j)]=temp1;
                }
+
+            // aux*=final
+            for(k=0; k<NCOLOR; k++)
+               {
+               temp0=aux.comp[m(k,i)]*fii + aux.comp[m(k,j)]*fji;
+               temp1=aux.comp[m(k,i)]*fij + aux.comp[m(k,j)]*fjj;
+               aux.comp[m(k,i)]=temp0;
+               aux.comp[m(k,j)]=temp1;
+               }
             }
           else
             {
@@ -141,6 +151,15 @@ void single_heatbath_SuN(SuN *link, SuN const * const staple)
                link->comp[m(k,i)]=temp0;
                link->comp[m(k,j)]=temp1;
                }
+
+            // aux*=final
+            for(k=0; k<NCOLOR; k++)
+               {
+               temp0=aux.comp[m(k,i)]*fii + aux.comp[m(k,j)]*fji;
+               temp1=aux.comp[m(k,i)]*fij + aux.comp[m(k,j)]*fjj;
+               aux.comp[m(k,i)]=temp0;
+               aux.comp[m(k,j)]=temp1;
+               }
             }
           }
        }
@@ -158,12 +177,13 @@ void single_heatbath_aux_SuN(SuN *link, SuN const * const staple, double beta)
     double complex fii, fij, fji, fjj;
     int i, j, k;
 
+    equal_SuN(&aux, staple);     // aux=staple
+    times_equal_SuN(&aux, link); // aux=staple*link
+
     for(i=0; i<NCOLOR-1; i++)
        {
        for(j=i+1; j<NCOLOR; j++)
           {
-          equal_SuN(&aux, staple);     // aux=staple
-          times_equal_SuN(&aux, link); // aux=staple*link
           ennetodue_SuN(&aux, i, j, &xi, &u);
 
           xi*=beta*2.0/((double) NCOLOR);
@@ -189,6 +209,15 @@ void single_heatbath_aux_SuN(SuN *link, SuN const * const staple, double beta)
                link->comp[m(k,i)]=temp0;
                link->comp[m(k,j)]=temp1;
                }
+
+            // aux*=final
+            for(k=0; k<NCOLOR; k++)
+               {
+               temp0=aux.comp[m(k,i)]*fii + aux.comp[m(k,j)]*fji;
+               temp1=aux.comp[m(k,i)]*fij + aux.comp[m(k,j)]*fjj;
+               aux.comp[m(k,i)]=temp0;
+               aux.comp[m(k,j)]=temp1;
+               }
             }
           }
        }
@@ -206,12 +235,13 @@ void single_overrelaxation_SuN(SuN *link, SuN const * const staple)
     double complex fii, fij, fji, fjj;
     int i, j, k;
 
+    equal_SuN(&aux, staple);     // aux=staple
+    times_equal_SuN(&aux, link); // aux=staple*link
+
     for(i=0; i<NCOLOR-1; i++)
        {
        for(j=i+1; j<NCOLOR; j++)
           { 
-          equal_SuN(&aux, staple);     // aux=staple
-          times_equal_SuN(&aux, link); // aux=staple*link
           ennetodue_SuN(&aux, i, j, &xi, &u);
 
           if(xi>MIN_VALUE)
@@ -231,6 +261,15 @@ void single_overrelaxation_SuN(SuN *link, SuN const * const staple)
                temp1=link->comp[m(k,i)]*fij + link->comp[m(k,j)]*fjj;
                link->comp[m(k,i)]=temp0;
                link->comp[m(k,j)]=temp1;
+               }
+
+            // aux*=final
+            for(k=0; k<NCOLOR; k++)
+               {
+               temp0=aux.comp[m(k,i)]*fii + aux.comp[m(k,j)]*fji;
+               temp1=aux.comp[m(k,i)]*fij + aux.comp[m(k,j)]*fjj;
+               aux.comp[m(k,i)]=temp0;
+               aux.comp[m(k,j)]=temp1;
                }
             }
           }

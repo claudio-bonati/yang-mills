@@ -7,11 +7,18 @@
 
 #include"macro.h"
 
+#if GGROUP == 0
+  #define MAXINDEX NCOLOR*NCOLOR -1
+#elif GGROUP == 1
+  #define MAXINDEX NCOLOR*(NCOLOR-1)/2
+#endif
+
+
 // see Luscher Weisz JHEP 0109 p. 010 (2001)   (hep-lat/0108014)
 
 typedef struct TensProdAdj {
   #if NCOLOR!=1
-    double comp[NCOLOR*NCOLOR-1][NCOLOR*NCOLOR-1][NCOLOR*NCOLOR-1][NCOLOR*NCOLOR-1] __attribute__((aligned(DOUBLE_ALIGN)));
+    double comp[MAXINDEX][MAXINDEX][MAXINDEX][MAXINDEX] __attribute__((aligned(DOUBLE_ALIGN)));
   #else // this will never be used, it is defined just to avoid warnings
      double comp[1][1][1][1] __attribute__((aligned(DOUBLE_ALIGN)));
   #endif
@@ -23,13 +30,13 @@ inline void zero_TensProdAdj(TensProdAdj * restrict A)
  {
  int i0, i1, i2, i3;
 
- for(i0=0; i0<NCOLOR*NCOLOR-1; i0++)
+ for(i0=0; i0<MAXINDEX; i0++)
     {
-    for(i1=0; i1<NCOLOR*NCOLOR-1; i1++)
+    for(i1=0; i1<MAXINDEX; i1++)
        {
-       for(i2=0; i2<NCOLOR*NCOLOR-1; i2++)
+       for(i2=0; i2<MAXINDEX; i2++)
           {
-          for(i3=0; i3<NCOLOR*NCOLOR-1; i3++)
+          for(i3=0; i3<MAXINDEX; i3++)
              {
              A->comp[i0][i1][i2][i3]=0.0;
              }
@@ -44,13 +51,13 @@ inline void one_TensProdAdj(TensProdAdj * restrict A)
  {
  int i0, i1, i2, i3;
 
- for(i0=0; i0<NCOLOR*NCOLOR-1; i0++)
+ for(i0=0; i0<MAXINDEX; i0++)
     {
-    for(i1=0; i1<NCOLOR*NCOLOR-1; i1++)
+    for(i1=0; i1<MAXINDEX; i1++)
        {
-       for(i2=0; i2<NCOLOR*NCOLOR-1; i2++)
+       for(i2=0; i2<MAXINDEX; i2++)
           {
-          for(i3=0; i3<NCOLOR*NCOLOR-1; i3++)
+          for(i3=0; i3<MAXINDEX; i3++)
              {
              A->comp[i0][i1][i2][i3]=0.0;
              }
@@ -58,9 +65,9 @@ inline void one_TensProdAdj(TensProdAdj * restrict A)
        }
     }
 
- for(i0=0; i0<NCOLOR*NCOLOR-1; i0++)
+ for(i0=0; i0<MAXINDEX; i0++)
     {
-    for(i1=0; i1<NCOLOR*NCOLOR-1; i1++)
+    for(i1=0; i1<MAXINDEX; i1++)
        {
        A->comp[i0][i0][i1][i1]=1.0;
        }
@@ -81,13 +88,13 @@ inline void equal_TensProdAdj(TensProdAdj * restrict A, TensProdAdj const * cons
 
  int i0, i1, i2, i3;
 
- for(i0=0; i0<NCOLOR*NCOLOR-1; i0++)
+ for(i0=0; i0<MAXINDEX; i0++)
     {
-    for(i1=0; i1<NCOLOR*NCOLOR-1; i1++)
+    for(i1=0; i1<MAXINDEX; i1++)
        {
-       for(i2=0; i2<NCOLOR*NCOLOR-1; i2++)
+       for(i2=0; i2<MAXINDEX; i2++)
           {
-          for(i3=0; i3<NCOLOR*NCOLOR-1; i3++)
+          for(i3=0; i3<MAXINDEX; i3++)
              {
              A->comp[i0][i1][i2][i3]=B->comp[i0][i1][i2][i3];
              }
@@ -102,13 +109,13 @@ inline void times_equal_real_TensProdAdj(TensProdAdj * restrict A, double r)
  {
  int i0, i1, i2, i3;
 
- for(i0=0; i0<NCOLOR*NCOLOR-1; i0++)
+ for(i0=0; i0<MAXINDEX; i0++)
     {
-    for(i1=0; i1<NCOLOR*NCOLOR-1; i1++)
+    for(i1=0; i1<MAXINDEX; i1++)
        {
-       for(i2=0; i2<NCOLOR*NCOLOR-1; i2++)
+       for(i2=0; i2<MAXINDEX; i2++)
           {
-          for(i3=0; i3<NCOLOR*NCOLOR-1; i3++)
+          for(i3=0; i3<MAXINDEX; i3++)
              {
              A->comp[i0][i1][i2][i3]*=r;
              }
@@ -131,13 +138,13 @@ inline void plus_equal_TensProdAdj(TensProdAdj * restrict A, TensProdAdj const *
 
  int i0, i1, i2, i3;
 
- for(i0=0; i0<NCOLOR*NCOLOR-1; i0++)
+ for(i0=0; i0<MAXINDEX; i0++)
     {
-    for(i1=0; i1<NCOLOR*NCOLOR-1; i1++)
+    for(i1=0; i1<MAXINDEX; i1++)
        {
-       for(i2=0; i2<NCOLOR*NCOLOR-1; i2++)
+       for(i2=0; i2<MAXINDEX; i2++)
           {
-          for(i3=0; i3<NCOLOR*NCOLOR-1; i3++)
+          for(i3=0; i3<MAXINDEX; i3++)
              {
              A->comp[i0][i1][i2][i3]+=B->comp[i0][i1][i2][i3];
              }
@@ -149,8 +156,8 @@ inline void plus_equal_TensProdAdj(TensProdAdj * restrict A, TensProdAdj const *
 
 // A=B*C
 inline void times_TensProdAdj(TensProdAdj * restrict A,
-                               TensProdAdj const * const restrict B,
-                               TensProdAdj const * const restrict C)
+                              TensProdAdj const * const restrict B,
+                              TensProdAdj const * const restrict C)
  {
  #ifdef DEBUG
  if(A==B || A==C || B==C)
@@ -165,18 +172,18 @@ inline void times_TensProdAdj(TensProdAdj * restrict A,
 
  double sum;
 
- for(i=0; i<NCOLOR*NCOLOR-1; i++)
+ for(i=0; i<MAXINDEX; i++)
     {
-    for(j=0; j<NCOLOR*NCOLOR-1; j++)
+    for(j=0; j<MAXINDEX; j++)
        {
-       for(k=0; k<NCOLOR*NCOLOR-1; k++)
+       for(k=0; k<MAXINDEX; k++)
           {
-          for(l=0; l<NCOLOR*NCOLOR-1; l++)
+          for(l=0; l<MAXINDEX; l++)
              {
              sum=0.0;
-             for(a=0; a<NCOLOR*NCOLOR-1; a++)
+             for(a=0; a<MAXINDEX; a++)
                 {
-                for(b=0; b<NCOLOR*NCOLOR-1; b++)
+                for(b=0; b<MAXINDEX; b++)
                    {
                    sum+=B->comp[i][a][k][b] * C->comp[a][j][b][l];
                    }
@@ -213,16 +220,16 @@ inline double retr_TensProdAdj(TensProdAdj const * const restrict A)
  double tr;
 
  tr=0.0;
- for(i0=0; i0<NCOLOR*NCOLOR-1; i0++)
+ for(i0=0; i0<MAXINDEX; i0++)
     {
-    for(i1=0; i1<NCOLOR*NCOLOR-1; i1++)
+    for(i1=0; i1<MAXINDEX; i1++)
        {
        tr+=A->comp[i0][i0][i1][i1];
        }
     }
 
  #if NCOLOR!=1    // just to avoid warnings
-   tr/=((NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1));
+   tr/=((MAXINDEX)*(MAXINDEX));
  #endif
 
  return tr;
@@ -246,6 +253,8 @@ int  read_from_binary_file_noswap_TensProdAdj(FILE *fp, TensProdAdj *A);
 int  read_from_binary_file_swap_TensProdAdj(FILE *fp, TensProdAdj *A);
 int  read_from_binary_file_bigen_TensProdAdj(FILE *fp, TensProdAdj *A);
 
+
+#undef MAXINDEX
 
 #endif // TENS_PRODAG_H
 

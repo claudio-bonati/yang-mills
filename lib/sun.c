@@ -102,14 +102,6 @@ void times_equal_dag_SuN(SuN *A, SuN const * const B);
 void times_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
 
-// A = lambda*B with lambda diagonal marix
-void diag_matrix_times_SuN(SuN * restrict A, double const lambda[NCOLOR], SuN const * const restrict B);
-
-
-// A=lambda*B^{dag} with lambda diagonal matrix
-void diag_matrix_times_dag_SuN(SuN * restrict A, double const lambda[NCOLOR], SuN const * const restrict B);
-
-
 // A=B^{dag}*C
 void times_dag1_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
@@ -120,6 +112,14 @@ void times_dag2_SuN(SuN *A, SuN const * const B, SuN const * const C);
 
 // A=B^{dag}*C^{dag}
 void times_dag12_SuN(SuN *A, SuN const * const B, SuN const * const C);
+
+
+// A = lambda*B with lambda diagonal marix
+void diag_matrix_times_SuN(SuN * restrict A, double const lambda[NCOLOR], SuN const * const restrict B);
+
+
+// A=lambda*B^{dag} with lambda diagonal matrix
+void diag_matrix_times_dag_SuN(SuN * restrict A, double const lambda[NCOLOR], SuN const * const restrict B);
 
 
 // SU(N) random matrix
@@ -166,61 +166,6 @@ void rand_matrix_SuN(SuN *A)
            }
         }
      }
-  }
-
-
-// generate a matrix in the algebra of SuN with gaussian
-// random components in the base T_i such that Tr(T_iT_j)=delta_{ij}
-void rand_algebra_gauss_matrix_SuN(SuN *A)
-  {
-  #if NCOLOR==1
-    (void) A; // just to avoid warnings
-  #else
-  int i, j;
-  double d1, d2, dd[NCOLOR-1];
-  const double nfactor=sqrt(2.0/(double)(NCOLOR*NCOLOR-NCOLOR));
-
-  zero_SuN(A);
-
-  // out of diagonal elements
-  for(i=0; i<NCOLOR; i++)
-     {
-     for(j=i+1; j<NCOLOR; j++)
-        {
-        gauss2(&d1, &d2);
-        A->comp[m(i,j)]=d1-d2*I;
-        A->comp[m(j,i)]=d1+d2*I;
-        }
-     }
-
-  // random numbes to be used in the diagonal
-  for(i=0; i<NCOLOR-1; i++)
-     {
-     dd[i]=gauss1();
-     }
-
-  // diagonal
-  if(NCOLOR==2)
-    {
-    A->comp[m(0,0)]=dd[0];
-    A->comp[m(1,1)]=-dd[0];
-    }
-  else
-    {
-    for(i=0; i<NCOLOR-2; i++)
-       {
-       A->comp[m(i,i)]+=dd[i];
-       A->comp[m(i+1,i+1)]-=dd[i];
-       }
-    for(i=0; i<NCOLOR-1; i++)
-       {
-       A->comp[m(i,i)]+=nfactor*dd[NCOLOR-2];
-       }
-    A->comp[m(NCOLOR-1,NCOLOR-1)]=nfactor*(1.0-(double)NCOLOR)*dd[NCOLOR-2];
-    }
-
-  times_equal_real_SuN(A, 1./sqrt(2.0));
-  #endif
   }
 
 
@@ -355,7 +300,7 @@ int scheck_SuN(SuN const * const restrict A)
 // sunitarize
 void unitarize_SuN(SuN * restrict A)
   {
-  const double beta_aux=1.0e+20;
+  //const double beta_aux=1.0e+20;
   double check;
   SuN force, guess, guess_old, helper, helper1, helper2;
 
@@ -370,8 +315,8 @@ void unitarize_SuN(SuN * restrict A)
          {
          equal_SuN(&guess_old, &guess);
 
-         // heatbath
-         single_heatbath_aux_SuN(&guess, &force, beta_aux); // minimize Tr(force*guess)
+         //single_heatbath_aux_SuN(&guess, &force, beta_aux); // minimize Tr(force*guess)
+         cool_SuN(&guess, &force);
 
          // compute the check
          equal_SuN(&helper, &guess);

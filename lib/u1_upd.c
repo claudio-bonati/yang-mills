@@ -17,6 +17,8 @@
 // the coupling is inside the staple
 //
 // based on Giovanni Iannelli master thesis (october 2018)
+// In practice it approximates cos(x)~1-x^2/2 and then correct
+// with a Metropolis step
 //
 void single_heatbath_U1(U1 * restrict link, U1 const * const restrict staple)
   {
@@ -34,7 +36,6 @@ void single_heatbath_U1(U1 * restrict link, U1 const * const restrict staple)
     y2=casuale();
 
     xnew=sqrt( -2./k*log(1 - y1*(1-exp(-k*PI*PI/2.0)) ) )*cos(PI2*(y2-0.5));
-
     prob=exp( k * (cos(xnew) -xold*xold/2.0 -cos(xold) +xnew*xnew/2.0 ));
 
     if(casuale()<prob)

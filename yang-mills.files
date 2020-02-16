@@ -86,3 +86,10 @@ lib/gauge_conf_monopoles.c
 lib/gauge_conf_meas_multilevel.c
 src/yang_mills_polycorr_higgs.c
 src/yang_mills_polycorr_higgs_long.c
+include/son.h
+lib/son.c
+lib/son_upd.c
+include/son_upd.h
+src/debug_son.c
+include/son_monopoles.h
+lib/son_monopoles.c

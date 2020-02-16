@@ -631,6 +631,7 @@ ST_dim
 Num_threads
 Num_levels
 N_c
+Gauge_Group
 OPENMP_CFLAGS
 EGREP
 GREP
@@ -698,6 +699,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -735,6 +737,7 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP
+Gauge_Group
 N_c
 Num_levels
 Num_threads
@@ -778,6 +781,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1030,6 +1034,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1167,7 +1180,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1320,6 +1333,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1373,7 +1387,8 @@ Some influential environment variables:
   CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
   CPP         C preprocessor
-  N_c         the number of colors (default 2)
+  Gauge_Group the gauge group (SuN or SoN, default SuN)
+  N_c         the number of colors (default 2, N_c=1 for SuN means U(1))
   Num_levels  the number of levels in multilevel (default 1)
   Num_threads number of threads to be used in OpenMP (default 1)
   ST_dim      spacetime dimensionality (default 4)
@@ -2149,7 +2164,7 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-am__api_version='1.14'
+am__api_version='1.15'
 
 ac_aux_dir=
 for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
@@ -2350,8 +2365,8 @@ test "$program_suffix" != NONE &&
 ac_script='s/[\\$]/&&/g;s/;s,x,x,$//'
 program_transform_name=`$as_echo "$program_transform_name" | sed "$ac_script"`
 
-# expand $ac_aux_dir to an absolute path
-am_aux_dir=`cd $ac_aux_dir && pwd`
+# Expand $ac_aux_dir to an absolute path.
+am_aux_dir=`cd "$ac_aux_dir" && pwd`
 
 if test x"${MISSING+set}" != xset; then
   case $am_aux_dir in
@@ -2370,7 +2385,7 @@ else
 $as_echo "$as_me: WARNING: 'missing' script is too old or missing" >&2;}
 fi
 
-if test x"${install_sh}" != xset; then
+if test x"${install_sh+set}" != xset; then
   case $am_aux_dir in
   *\ * | *\	*)
     install_sh="\${SHELL} '$am_aux_dir/install-sh'" ;;
@@ -2698,8 +2713,8 @@ MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
 # <http://lists.gnu.org/archive/html/automake/2012-07/msg00014.html>
 mkdir_p='$(MKDIR_P)'
 
-# We need awk for the "check" target.  The system "awk" is bad on
-# some platforms.
+# We need awk for the "check" target (and possibly the TAP driver).  The
+# system "awk" is bad on some platforms.
 # Always define AMTAR for backward compatibility.  Yes, it's still used
 # in the wild :-(  We should find a proper way to deprecate it ...
 AMTAR='$${TAR-tar}'
@@ -2756,6 +2771,7 @@ END
     as_fn_error $? "Your 'rm' program is bad, sorry." "$LINENO" 5
   fi
 fi
+
 
 ac_config_headers="$ac_config_headers config.h"
 
@@ -4676,6 +4692,9 @@ fi
 
 
 
+
+
+
 ### DEFINE & CO
 if test x${use_openmp} = xyes; then
 
@@ -4691,6 +4710,47 @@ fi
 
 
 ### TEST
+
+if test x${Gauge_Group} = x; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:
+   *****
+   No chosen value for Gauge_Group: using the default Gauge_Group=SuN
+   *****
+   " >&5
+$as_echo "$as_me: WARNING:
+   *****
+   No chosen value for Gauge_Group: using the default Gauge_Group=SuN
+   *****
+   " >&2;}
+
+cat >>confdefs.h <<_ACEOF
+#define GGROUP 0
+_ACEOF
+
+else
+  if test x${Gauge_Group} = xSuN; then
+
+cat >>confdefs.h <<_ACEOF
+#define GGROUP 0
+_ACEOF
+
+  else
+    if test x${Gauge_Group} = xSoN; then
+
+cat >>confdefs.h <<_ACEOF
+#define GGROUP 1
+_ACEOF
+
+    else
+      as_fn_error $? "
+       *****
+       Unrecognized value of Gauge_Group!
+       *****
+       " "$LINENO" 5
+    fi
+  fi
+fi
+
 if test x${N_c} = x; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:
    *****
@@ -4821,8 +4881,6 @@ fi
 
 
 ### CONDITIONALS
-
-
 
 
 ac_config_files="$ac_config_files Makefile"

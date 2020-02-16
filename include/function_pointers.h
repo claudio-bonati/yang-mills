@@ -6,6 +6,8 @@
 
 #include"flavour_matrix.h"
 #include"macro.h"
+#include"son.h"
+#include"son_upd.h"
 #include"su2.h"
 #include"su2_upd.h"
 #include"sun.h"

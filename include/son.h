@@ -1,5 +1,5 @@
-#ifndef SUN_H
-#define SUN_H
+#ifndef SON_H
+#define SON_H
 
 #include<complex.h>
 #include<math.h>
@@ -10,36 +10,36 @@
 #include"tens_prod.h"
 #include"tens_prod_adj.h"
 
-typedef struct SuN {
-   double complex comp[NCOLOR*NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
-} SuN;
+typedef struct SoN {
+   double comp[NCOLOR*NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
+} SoN;
 //
 //  the element [i][j] can be obtained by matrix.comp[m(i,j)] with m(i,j) defined in macro.h
 //
 
-typedef struct SuNAdj {
+typedef struct SoNAdj {
    #if NCOLOR!=1
-     double comp[(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1)] __attribute__((aligned(DOUBLE_ALIGN)));
+     double comp[NCOLOR*(NCOLOR-1)/2*NCOLOR*(NCOLOR-1)/2] __attribute__((aligned(DOUBLE_ALIGN)));
    #else // this will never be used, is defined just to avoid warnings
      double comp[1] __attribute__((aligned(DOUBLE_ALIGN)));
    #endif
-} SuNAdj;
+} SoNAdj;
 //
 //  the element [i][j] can be obtained by matrix.comp[madj(i,j)] with madj(i,j) defined in macro.h
 //
 
-typedef struct SuNVecs {
-   double complex comp[NCOLOR*NHIGGS] __attribute__((aligned(DOUBLE_ALIGN)));
-} SuNVecs;
+typedef struct SoNVecs {
+   double comp[NCOLOR*NHIGGS] __attribute__((aligned(DOUBLE_ALIGN)));
+} SoNVecs;
 //
-// different flavours are associated to different [NCOLOR] blocks of SuNVecs
+// different flavours are associated to different [NCOLOR] blocks of SoNVecs
 //
 
-// ***************** for SuN
+// ***************** for SoN
 
 
 // A=1
-inline void one_SuN(SuN * restrict A)
+inline void one_SoN(SoN * restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -49,18 +49,18 @@ inline void one_SuN(SuN * restrict A)
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
      {
-     A->comp[i]=0.0+0.0*I;
+     A->comp[i]=0.0;
      }
 
   for(i=0; i<NCOLOR; i++)
      {
-     A->comp[m(i,i)]=1.0+0.0*I;
+     A->comp[m(i,i)]=1.0;
      }
   }
 
 
 // A=0
-inline void zero_SuN(SuN * restrict A)
+inline void zero_SoN(SoN * restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -70,13 +70,13 @@ inline void zero_SuN(SuN * restrict A)
 
   for(i=0; i<NCOLOR*NCOLOR; i++)
      {
-     A->comp[i]=0.0+0.0*I;
+     A->comp[i]=0.0;
      }
   }
 
 
 // A=B
-inline void equal_SuN(SuN * restrict A, SuN const * const restrict B)
+inline void equal_SoN(SoN * restrict A, SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -101,7 +101,7 @@ inline void equal_SuN(SuN * restrict A, SuN const * const restrict B)
 
 
 // A=B^{dag}
-inline void equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
+inline void equal_dag_SoN(SoN * restrict A, SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -122,14 +122,14 @@ inline void equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
      {
      for(j=0; j<NCOLOR; j++)
         {
-        A->comp[m(i,j)]=conj(B->comp[m(j,i)]);
+        A->comp[m(i,j)]=B->comp[m(j,i)];
         }
      }
   }
 
 
 // A+=B
-inline void plus_equal_SuN(SuN * restrict A, SuN const * const restrict B)
+inline void plus_equal_SoN(SoN * restrict A, SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -154,7 +154,7 @@ inline void plus_equal_SuN(SuN * restrict A, SuN const * const restrict B)
 
 
 // A+=B^{dag}
-inline void plus_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
+inline void plus_equal_dag_SoN(SoN * restrict A, SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -175,14 +175,14 @@ inline void plus_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
      {
      for(j=0; j<NCOLOR; j++)
         {
-        A->comp[m(i,j)]+=conj(B->comp[m(j,i)]);
+        A->comp[m(i,j)]+=B->comp[m(j,i)];
         }
      }
   }
 
 
 // A-=B
-inline void minus_equal_SuN(SuN * restrict A, SuN const * const restrict B)
+inline void minus_equal_SoN(SoN * restrict A, SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -207,7 +207,7 @@ inline void minus_equal_SuN(SuN * restrict A, SuN const * const restrict B)
 
 
 // A-=(r*B)
-inline void minus_equal_times_real_SuN(SuN * restrict A, SuN const * const restrict B, double r)
+inline void minus_equal_times_real_SoN(SoN * restrict A, SoN const * const restrict B, double r)
   {
   #ifdef DEBUG
   if(A==B)
@@ -232,7 +232,7 @@ inline void minus_equal_times_real_SuN(SuN * restrict A, SuN const * const restr
 
 
 // A-=B^{dag}
-inline void minus_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
+inline void minus_equal_dag_SoN(SoN * restrict A, SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -253,16 +253,16 @@ inline void minus_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
      {
      for(j=0; j<NCOLOR; j++)
         {
-        A->comp[m(i,j)]-=conj(B->comp[m(j,i)]);
+        A->comp[m(i,j)]-=B->comp[m(j,i)];
         }
      }
   }
 
 
 // A=b*B+c*C
-inline void lin_comb_SuN(SuN * restrict A,
-                  double b, SuN const * const restrict B,
-                  double c, SuN const * const restrict C)
+inline void lin_comb_SoN(SoN * restrict A,
+                         double b, SoN const * const restrict B,
+                         double c, SoN const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -288,9 +288,9 @@ inline void lin_comb_SuN(SuN * restrict A,
 
 
 // A=b*B^{dag}+c*C
-inline void lin_comb_dag1_SuN(SuN * restrict A,
-                       double b, SuN const * const restrict B,
-                       double c, SuN const * const restrict C)
+inline void lin_comb_dag1_SoN(SoN * restrict A,
+                              double b, SoN const * const restrict B,
+                              double c, SoN const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -312,16 +312,16 @@ inline void lin_comb_dag1_SuN(SuN * restrict A,
      {
      for(j=0; j<NCOLOR; j++)
         {
-        A->comp[m(i,j)]=b*conj(B->comp[m(j,i)])+c*(C->comp[m(i,j)]);
+        A->comp[m(i,j)]=b*B->comp[m(j,i)]+c*(C->comp[m(i,j)]);
         }
      }
   }
 
 
 // A=b*B+c*C^{dag}
-inline void lin_comb_dag2_SuN(SuN * restrict A,
-                       double b, SuN const * const restrict B,
-                       double c, SuN const * const restrict C)
+inline void lin_comb_dag2_SoN(SoN * restrict A,
+                              double b, SoN const * const restrict B,
+                              double c, SoN const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -343,16 +343,16 @@ inline void lin_comb_dag2_SuN(SuN * restrict A,
      {
      for(j=0; j<NCOLOR; j++)
         {
-        A->comp[m(i,j)]=b*(B->comp[m(i,j)])+c*conj(C->comp[m(j,i)]);
+        A->comp[m(i,j)]=b*(B->comp[m(i,j)])+c*C->comp[m(j,i)];
         }
      }
   }
 
 
 // A=b*B^{dag}+c*C^{dag}
-inline void lin_comb_dag12_SuN(SuN * restrict A,
-                        double b, SuN const * const restrict B,
-                        double c, SuN const * const restrict C)
+inline void lin_comb_dag12_SoN(SoN * restrict A,
+                               double b, SoN const * const restrict B,
+                               double c, SoN const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -374,14 +374,14 @@ inline void lin_comb_dag12_SuN(SuN * restrict A,
      {
      for(j=0; j<NCOLOR; j++)
         {
-        A->comp[m(i,j)]=b*conj(B->comp[m(j,i)])+c*conj(C->comp[m(j,i)]);
+        A->comp[m(i,j)]=b*B->comp[m(j,i)]+c*C->comp[m(j,i)];
         }
      }
   }
 
 
 // A*=r
-inline void times_equal_real_SuN(SuN * restrict A, double r)
+inline void times_equal_real_SoN(SoN * restrict A, double r)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -397,23 +397,18 @@ inline void times_equal_real_SuN(SuN * restrict A, double r)
 
 
 // A*=r
-inline void times_equal_complex_SuN(SuN * restrict A, double complex r)
+inline void times_equal_complex_SoN(SoN * restrict A, double complex r)
   {
-  #ifdef __INTEL_COMPILER
-  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
-  #endif
+  (void) A;
+  (void) r; // just to avoid warnings
 
-  int i;
-
-  for(i=0; i<NCOLOR*NCOLOR; i++)
-     {
-     A->comp[i]*=r;
-     }
+  fprintf(stderr, "The function times_equal_complex_SoN does not exist! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
   }
 
 
 // A*=B
-inline void times_equal_SuN(SuN * restrict A, SuN const * const restrict B)
+inline void times_equal_SoN(SoN * restrict A, SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -429,8 +424,8 @@ inline void times_equal_SuN(SuN * restrict A, SuN const * const restrict B)
   #endif
 
   int i, j, k;
-  double complex aux[NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
-  double complex sum;
+  double aux[NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
+  double sum;
 
   for(i=0; i<NCOLOR; i++)
      {
@@ -441,7 +436,7 @@ inline void times_equal_SuN(SuN * restrict A, SuN const * const restrict B)
 
      for(j=0; j<NCOLOR; j++)
         {
-        sum=0.0+0.0*I;
+        sum=0.0;
         for(k=0; k<NCOLOR; k++)
            {
            sum+=aux[k]*(B->comp[m(k,j)]);
@@ -453,7 +448,7 @@ inline void times_equal_SuN(SuN * restrict A, SuN const * const restrict B)
 
 
 // A*=B^{dag}
-inline void times_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
+inline void times_equal_dag_SoN(SoN * restrict A, SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -469,8 +464,8 @@ inline void times_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
   #endif
 
   int i, j, k;
-  double complex aux[NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
-  double complex sum;
+  double aux[NCOLOR] __attribute__((aligned(DOUBLE_ALIGN)));
+  double sum;
 
   for(i=0; i<NCOLOR; i++)
      {
@@ -481,10 +476,10 @@ inline void times_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
 
      for(j=0; j<NCOLOR; j++)
         {
-        sum=0.0+0.0*I;
+        sum=0.0;
         for(k=0; k<NCOLOR; k++)
            {
-           sum+=aux[k]*conj(B->comp[m(j,k)]);
+           sum+=aux[k]*B->comp[m(j,k)];
            }
         A->comp[m(i,j)]=sum;
         }
@@ -493,9 +488,9 @@ inline void times_equal_dag_SuN(SuN * restrict A, SuN const * const restrict B)
 
 
 // A=B*C
-inline void times_SuN(SuN * restrict A,
-                      SuN const * const restrict B,
-                      SuN const * const restrict C)
+inline void times_SoN(SoN * restrict A,
+                      SoN const * const restrict B,
+                      SoN const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -518,7 +513,7 @@ inline void times_SuN(SuN * restrict A,
      {
      for(j=0; j<NCOLOR; j++)
         {
-        sum=0.0+0.0*I;
+        sum=0.0;
         for(k=0; k<NCOLOR; k++)
            {
            sum+=(B->comp[m(i,k)])*(C->comp[m(k,j)]);
@@ -530,9 +525,9 @@ inline void times_SuN(SuN * restrict A,
 
 
 // A=B^{dag}*C
-inline void times_dag1_SuN(SuN * restrict A,
-                    SuN const * const restrict B,
-                    SuN const * const restrict C)
+inline void times_dag1_SoN(SoN * restrict A,
+                           SoN const * const restrict B,
+                           SoN const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -555,10 +550,10 @@ inline void times_dag1_SuN(SuN * restrict A,
      {
      for(j=0; j<NCOLOR; j++)
         {
-        sum=0.0+0.0*I;
+        sum=0.0;
         for(k=0; k<NCOLOR; k++)
            {
-           sum+=conj(B->comp[m(k,i)])*(C->comp[m(k,j)]);
+           sum+=B->comp[m(k,i)]*(C->comp[m(k,j)]);
            }
         A->comp[m(i,j)]=sum;
         }
@@ -567,9 +562,9 @@ inline void times_dag1_SuN(SuN * restrict A,
 
 
 // A=B*C^{dag}
-inline void times_dag2_SuN(SuN * restrict A,
-                    SuN const * const restrict B,
-                    SuN const * const restrict C)
+inline void times_dag2_SoN(SoN * restrict A,
+                           SoN const * const restrict B,
+                           SoN const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -586,16 +581,16 @@ inline void times_dag2_SuN(SuN * restrict A,
   #endif
 
   int i, j, k;
-  double complex sum;
+  double sum;
 
   for(i=0; i<NCOLOR; i++)
      {
      for(j=0; j<NCOLOR; j++)
         {
-        sum=0.0+0.0*I;
+        sum=0.0;
         for(k=0; k<NCOLOR; k++)
            {
-           sum+=(B->comp[m(i,k)])*conj(C->comp[m(j,k)]);
+           sum+=(B->comp[m(i,k)])*(C->comp[m(j,k)]);
            }
         A->comp[m(i,j)]=sum;
         }
@@ -604,9 +599,9 @@ inline void times_dag2_SuN(SuN * restrict A,
 
 
 // A=B^{dag}*C^{dag}
-inline void times_dag12_SuN(SuN * restrict A,
-                     SuN const * const restrict B,
-                     SuN const * const restrict C)
+inline void times_dag12_SoN(SoN * restrict A,
+                            SoN const * const restrict B,
+                            SoN const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -623,16 +618,16 @@ inline void times_dag12_SuN(SuN * restrict A,
   #endif
 
   int i, j, k;
-  double complex sum;
+  double sum;
 
   for(i=0; i<NCOLOR; i++)
      {
      for(j=0; j<NCOLOR; j++)
         {
-        sum=0.0+0.0*I;
+        sum=0.0;
         for(k=0; k<NCOLOR; k++)
            {
-           sum+=conj(B->comp[m(k,i)])*conj(C->comp[m(j,k)]);
+           sum+=(B->comp[m(k,i)])*(C->comp[m(j,k)]);
            }
         A->comp[m(i,j)]=sum;
         }
@@ -641,9 +636,9 @@ inline void times_dag12_SuN(SuN * restrict A,
 
 
 // A=lambda*B with lambda diagonal matrix
-inline void diag_matrix_times_SuN(SuN * restrict A,
+inline void diag_matrix_times_SoN(SoN * restrict A,
                                   double const lambda[NCOLOR],
-                                  SuN const * const restrict B)
+                                  SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -671,9 +666,9 @@ inline void diag_matrix_times_SuN(SuN * restrict A,
 
 
 // A=lambda*B^{dag} with lambda diagonal matrix
-inline void diag_matrix_times_dag_SuN(SuN * restrict A,
+inline void diag_matrix_times_dag_SoN(SoN * restrict A,
                                       double const lambda[NCOLOR],
-                                      SuN const * const restrict B)
+                                      SoN const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -700,13 +695,13 @@ inline void diag_matrix_times_dag_SuN(SuN * restrict A,
   }
 
 
-// SU(N) random matrix
-// generated a la Cabibbo Marinari with N(N-1)/2 SU(2) random matrices
-void rand_matrix_SuN(SuN *A);
+// SO(N) random matrix
+// generated a la Cabibbo Marinari with N(N-1)/2 SO(2) random matrices
+void rand_matrix_SoN(SoN *A);
 
 
 // l2 norm of the matrix
-inline double norm_SuN(SuN const * const restrict A)
+inline double norm_SoN(SoN const * const restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -718,7 +713,7 @@ inline double norm_SuN(SuN const * const restrict A)
   ris=0.0;
   for(i=0; i<NCOLOR*NCOLOR; i++)
      {
-     aux=cabs(A->comp[i]);
+     aux=fabs(A->comp[i]);
      ris+=aux*aux;
      }
   return sqrt(ris);
@@ -726,7 +721,7 @@ inline double norm_SuN(SuN const * const restrict A)
 
 
 // real part of the trace /N
-inline double retr_SuN(SuN const * const restrict A)
+inline double retr_SoN(SoN const * const restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -734,52 +729,48 @@ inline double retr_SuN(SuN const * const restrict A)
 
   int i;
   double ris;
-  double complex tr;
+  double tr;
 
-  tr=0.0+0.0*I;
+  tr=0.0;
   for(i=0; i<NCOLOR; i++)
      {
      tr+=A->comp[m(i,i)];
      }
-  ris=creal(tr)/(double)NCOLOR;
+  ris=tr/(double)NCOLOR;
   return ris;
   }
 
 
 // imaginary part of the trace /N
-inline double imtr_SuN(SuN const * const restrict A)
+inline double imtr_SoN(SoN const * const restrict A)
   {
-  #ifdef __INTEL_COMPILER
-  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
-  #endif
+  (void) A; // just to avoid warnings
 
-  int i;
-  double ris;
-  double complex tr;
-
-  tr=0.0+0.0*I;
-  for(i=0; i<NCOLOR; i++)
-     {
-     tr+=A->comp[m(i,i)];
-     }
-  ris=cimag(tr)/(double)NCOLOR;
-  return ris;
+  return 0.0;
   }
 
 
 // LU decomposition with partial pivoting
-void LU_SuN(SuN const * const A, SuN *ris, int *sign);
+void LU_SoN(SoN const * const A, SoN *rif, int *sign);
 
 
 // determinant
-inline complex double det_SuN(SuN const * const restrict A)
+inline double det_SoN(SoN const * const restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
   #endif
 
-  #if NCOLOR==3
-    complex double ris=0.0+0.0*I;
+  #if NCOLOR==2
+    double ris=0.0;
+
+    ris+=(A->comp[m(0,0)])*(A->comp[m(1,1)]);
+    ris-=(A->comp[m(0,1)])*(A->comp[m(1,0)]);
+
+    return ris;
+
+  #elif NCOLOR==3
+    double ris=0.0;
 
     ris+=(A->comp[m(0,0)])*(A->comp[m(1,1)])*(A->comp[m(2,2)]);
     ris+=(A->comp[m(1,0)])*(A->comp[m(2,1)])*(A->comp[m(0,2)]);
@@ -791,18 +782,18 @@ inline complex double det_SuN(SuN const * const restrict A)
     return ris;
   #else
     int i;
-    double complex ris;
-    SuN lu;
+    double ris;
+    SoN lu;
 
     LU_SuN(A, &lu, &i);
 
     if(i>0)
       {
-      ris=1.0+0.0*I;
+      ris=1.0;
       }
     else
      {
-     ris=-1.0+0.0*I;
+     ris=-1.0;
      }
 
     for(i=0; i<NCOLOR; i++)
@@ -810,34 +801,34 @@ inline complex double det_SuN(SuN const * const restrict A)
        ris*=(lu.comp[m(i,i)]);
        }
 
-    return ris;
+    return real(ris);
   #endif
   }
 
 
-// gives 0 if the matrix is in SU(N) and 1 otherwise
-int scheck_SuN(SuN const * const A);
+// gives 0 if the matrix is in SO(N) and 1 otherwise
+int scheck_SoN(SoN const * const A);
 
 
 // sunitarize
-void unitarize_SuN(SuN *A);
+void unitarize_SoN(SoN *A);
 
 
 // takes the traceless antihermitian part
-inline void ta_SuN(SuN * restrict A)
+inline void ta_SoN(SoN * restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
   #endif
 
-  SuN aux, aux1;
-  double complex trace;
+  SoN aux, aux1;
+  double trace;
   int i;
 
-  equal_SuN(&aux, A);
-  equal_dag_SuN(&aux1, A);
-  minus_equal_SuN(&aux, &aux1);
-  times_equal_real_SuN(&aux, 0.5); // now aux=(A-A^{dag})/2
+  equal_SoN(&aux, A);
+  equal_dag_SoN(&aux1, A);
+  minus_equal_SoN(&aux, &aux1);
+  times_equal_real_SoN(&aux, 0.5); // now aux=(A-A^{dag})/2
 
   trace=aux.comp[m(0,0)];
   for(i=1; i<NCOLOR; i++)
@@ -851,60 +842,61 @@ inline void ta_SuN(SuN * restrict A)
      aux.comp[m(i,i)]-=trace;
      }
 
-  equal_SuN(A, &aux);
+  equal_SoN(A, &aux);
   }
 
 
 // eponential of the traceless antihermitian part
-inline void taexp_SuN(SuN * restrict A)
+inline void taexp_SoN(SoN * restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
   #endif
 
-  SuN aux, uno, ris;
+  SoN aux, uno, ris;
 
-  equal_SuN(&aux, A);
-  ta_SuN(&aux);
+  equal_SoN(&aux, A);
+  ta_SoN(&aux);
 
-  one_SuN(&uno);
+  one_SoN(&uno);
 
   // now aux is the traceless antihermitian part of the initial matrix
   // and we use
   // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
 
-  equal_SuN(&ris, &aux);
-  times_equal_real_SuN(&ris, 0.2);
-  plus_equal_SuN(&ris, &uno);
+  equal_SoN(&ris, &aux);
+  times_equal_real_SoN(&ris, 0.2);
+  plus_equal_SoN(&ris, &uno);
 
-  times_equal_SuN(&ris, &aux);
-  times_equal_real_SuN(&ris, 0.25);
-  plus_equal_SuN(&ris, &uno);
+  times_equal_SoN(&ris, &aux);
+  times_equal_real_SoN(&ris, 0.25);
+  plus_equal_SoN(&ris, &uno);
 
-  times_equal_SuN(&ris, &aux);
-  times_equal_real_SuN(&ris, 0.33333333333333333333);
-  plus_equal_SuN(&ris, &uno);
+  times_equal_SoN(&ris, &aux);
+  times_equal_real_SoN(&ris, 0.33333333333333333333);
+  plus_equal_SoN(&ris, &uno);
 
-  times_equal_SuN(&ris, &aux);
-  times_equal_real_SuN(&ris, 0.5);
-  plus_equal_SuN(&ris, &uno);
+  times_equal_SoN(&ris, &aux);
+  times_equal_real_SoN(&ris, 0.5);
+  plus_equal_SoN(&ris, &uno);
 
-  times_equal_SuN(&ris, &aux);
-  plus_equal_SuN(&ris, &uno);
+  times_equal_SoN(&ris, &aux);
+  plus_equal_SoN(&ris, &uno);
 
-  unitarize_SuN(&ris);
-  equal_SuN(A, &ris);
+  unitarize_SoN(&ris);
+  equal_SoN(A, &ris);
   }
 
 
+
 // return 0 if matrix is traceless antihermitian, 1 otherwise
-inline int ta_check_SuN(SuN const * const restrict A)
+inline int ta_check_SoN(SoN const * const restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
   #endif
 
-  double complex aux;
+  double aux;
   int i, j, ris;
 
   ris=0;
@@ -914,24 +906,24 @@ inline int ta_check_SuN(SuN const * const restrict A)
      {
      for(j=0; j<NCOLOR; j++)
         {
-        aux+=(A->comp[m(i,j)]+conj(A->comp[m(j,i)]));
+        aux+=(A->comp[m(i,j)]+A->comp[m(j,i)]);
         }
      }
-  if(cabs(aux)>MIN_VALUE) ris=1;
+  if(fabs(aux)>MIN_VALUE) ris=1;
 
   aux=0.0;
   for(i=0; i<NCOLOR; i++)
      {
      aux+=A->comp[m(i,i)];
      }
-  if(cabs(aux)>MIN_VALUE) ris=1;
+  if(fabs(aux)>MIN_VALUE) ris=1;
 
   return ris;
   }
 
 
 // exponential of a TA matrix
-inline void exp_of_ta_SuN(SuN * restrict A)
+inline void exp_of_ta_SoN(SoN * restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -941,78 +933,78 @@ inline void exp_of_ta_SuN(SuN * restrict A)
   // exp(x)=1+x(1+x/2(1+x/3*(1+x/4*(1+x/5*....
 
   #ifdef DEBUG
-  if(ta_check_SuN(A)!=0)
+  if(ta_check_SoN(A)!=0)
     {
     fprintf(stderr, "Trying to exp. a non TA matrix! (%s, %d)\n", __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   #endif
 
-  SuN aux, uno;
+  SoN aux, uno;
 
-  one_SuN(&uno);
-  equal_SuN(&aux, A); // in aux the initial matrix is stored
+  one_SoN(&uno);
+  equal_SoN(&aux, A); // in aux the initial matrix is stored
 
-  times_equal_real_SuN(A, 1.0/5.0);
-  plus_equal_SuN(A, &uno);
+  times_equal_real_SoN(A, 1.0/5.0);
+  plus_equal_SoN(A, &uno);
 
-  times_equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/4.0);
-  plus_equal_SuN(A, &uno);
+  times_equal_SoN(A, &aux);
+  times_equal_real_SoN(A, 1.0/4.0);
+  plus_equal_SoN(A, &uno);
 
-  times_equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/3.0);
-  plus_equal_SuN(A, &uno);
+  times_equal_SoN(A, &aux);
+  times_equal_real_SoN(A, 1.0/3.0);
+  plus_equal_SoN(A, &uno);
 
-  times_equal_SuN(A, &aux);
-  times_equal_real_SuN(A, 1.0/2.0);
-  plus_equal_SuN(A, &uno);
+  times_equal_SoN(A, &aux);
+  times_equal_real_SoN(A, 1.0/2.0);
+  plus_equal_SoN(A, &uno);
 
-  times_equal_SuN(A, &aux);
-  plus_equal_SuN(A, &uno);
+  times_equal_SoN(A, &aux);
+  plus_equal_SoN(A, &uno);
 
-  unitarize_SuN(A);
+  unitarize_SoN(A);
   }
 
 
 // print on screen
-void print_on_screen_SuN(SuN const * const A);
+void print_on_screen_SoN(SoN const * const A);
 
 
 // print on file
-int print_on_file_SuN(FILE *fp, SuN const * const A);
+int print_on_file_SoN(FILE *fp, SoN const * const A);
 
 
 // print on binary file without changing endiannes
-int print_on_binary_file_noswap_SuN(FILE *fp, SuN const * const A);
+int print_on_binary_file_noswap_SoN(FILE *fp, SoN const * const A);
 
 
 // print on binary file changing endiannes
-int print_on_binary_file_swap_SuN(FILE *fp, SuN const * const A);
+int print_on_binary_file_swap_SoN(FILE *fp, SoN const * const A);
 
 
 // print on binary file in bigendian
-int print_on_binary_file_bigen_SuN(FILE *fp, SuN const * const A);
+int print_on_binary_file_bigen_SoN(FILE *fp, SoN const * const A);
 
 
 // read from file
-int read_from_file_SuN(FILE *fp, SuN *A);
+int read_from_file_SoN(FILE *fp, SoN *A);
 
 
 // read from binary file without changing endiannes
-int read_from_binary_file_noswap_SuN(FILE *fp, SuN *A);
+int read_from_binary_file_noswap_SoN(FILE *fp, SoN *A);
 
 
 // read from binary file changing endianness
-int read_from_binary_file_swap_SuN(FILE *fp, SuN *A);
+int read_from_binary_file_swap_SN(FILE *fp, SoN *A);
 
 
 // read from binary file written in bigendian
-int read_from_binary_file_bigen_SuN(FILE *fp, SuN *A);
+int read_from_binary_file_bigen_SoN(FILE *fp, SoN *A);
 
 
 // initialize tensor product
-inline void TensProd_init_SuN(TensProd * restrict TP, SuN const * const restrict A1, SuN const * const restrict A2)
+inline void TensProd_init_SoN(TensProd * restrict TP, SoN const * const restrict A1, SoN const * const restrict A2)
   {
   #ifdef DEBUG
   if(A1==A2)
@@ -1038,7 +1030,7 @@ inline void TensProd_init_SuN(TensProd * restrict TP, SuN const * const restrict
            {
            for(l=0; l<NCOLOR; l++)
               {
-              TP->comp[i][j][k][l]=conj(A1->comp[m(i,j)])*A2->comp[m(k,l)];
+              TP->comp[i][j][k][l]=(A1->comp[m(i,j)])*A2->comp[m(k,l)];
               }
            }
         }
@@ -1046,49 +1038,49 @@ inline void TensProd_init_SuN(TensProd * restrict TP, SuN const * const restrict
   }
 
 
-// ***************** for SuNAdj
+// ***************** for SoNAdj
 
 
 
 // convert the fundamental representation matrix B to the adjoint representation matrix A
-inline void fund_to_adj_SuN(SuNAdj * restrict A, SuN const * const restrict B)
+inline void fund_to_adj_SoN(SoNAdj * restrict A, SoN const * const restrict B)
   {
   (void) A;
   (void) B;
 
-  fprintf(stderr, "The function fund_to_adj_SuN still has to be written (%s, %d)\n", __FILE__, __LINE__);
+  fprintf(stderr, "The function fund_to_adj_SoN still has to be written (%s, %d)\n", __FILE__, __LINE__);
   exit(EXIT_FAILURE);
   }
 
 
 // initialize tensor product in the adjoint representation
 // using two matrices in the fundamental representation
-inline void TensProdAdj_init_SuN(TensProdAdj * restrict TP, SuN const * const restrict A1, SuN const * const restrict A2)
+inline void TensProdAdj_init_SoN(TensProdAdj * restrict TP, SoN const * const restrict A1, SoN const * const restrict A2)
   {
   (void) TP;
   (void) A1;
   (void) A2;
 
-  fprintf(stderr, "The function TensProd_adj_init_SuN still has to be written (%s, %d)\n", __FILE__, __LINE__);
+  fprintf(stderr, "The function TensProd_adj_init_SoN still has to be written (%s, %d)\n", __FILE__, __LINE__);
   exit(EXIT_FAILURE);
   }
 
 
 // initialize tensor product in the adjoint representation
 // using two matrices in the adjoint representation
-inline void TensProdAdj_init_SuNAdj(TensProdAdj * restrict TP, SuNAdj const * const restrict A1, SuNAdj const * const restrict A2)
+inline void TensProdAdj_init_SoNAdj(TensProdAdj * restrict TP, SoNAdj const * const restrict A1, SoNAdj const * const restrict A2)
   {
   (void) TP;
   (void) A1;
   (void) A2;
 
-  fprintf(stderr, "The function TensProd_adj_init_SuNAdj still has to be written (%s, %d)\n", __FILE__, __LINE__);
+  fprintf(stderr, "The function TensProd_adj_init_SoNAdj still has to be written (%s, %d)\n", __FILE__, __LINE__);
   exit(EXIT_FAILURE);
   }
 
 
 // A=1
-inline void one_SuNAdj(SuNAdj * restrict A)
+inline void one_SoNAdj(SoNAdj * restrict A)
   {
   #ifdef __INTEL_COMPILER
     __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1096,12 +1088,12 @@ inline void one_SuNAdj(SuNAdj * restrict A)
 
   int i;
 
-  for(i=0; i<(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1); i++)
+  for(i=0; i<NCOLOR*(NCOLOR-1)/2*NCOLOR*(NCOLOR-1)/2; i++)
      {
      A->comp[i]=0.0;
      }
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  for(i=0; i<NCOLOR*(NCOLOR-1)/2; i++)
      {
      A->comp[madj(i,i)]=1.0;
      }
@@ -1109,7 +1101,7 @@ inline void one_SuNAdj(SuNAdj * restrict A)
 
 
 // A=0
-inline void zero_SuNAdj(SuNAdj * restrict A)
+inline void zero_SoNAdj(SoNAdj * restrict A)
   {
   #ifdef __INTEL_COMPILER
     __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1117,7 +1109,7 @@ inline void zero_SuNAdj(SuNAdj * restrict A)
 
   int i;
 
-  for(i=0; i<(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1); i++)
+  for(i=0; i<NCOLOR*(NCOLOR-1)/2*NCOLOR*(NCOLOR-1)/2; i++)
      {
      A->comp[i]=0.0;
      }
@@ -1125,7 +1117,7 @@ inline void zero_SuNAdj(SuNAdj * restrict A)
 
 
 // A+=B
-inline void plus_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restrict B)
+inline void plus_equal_SoNAdj(SoNAdj * restrict A, SoNAdj const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -1141,7 +1133,7 @@ inline void plus_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restrict
   #endif
 
   int i;
-  for(i=0; i<(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1); i++)
+  for(i=0; i<NCOLOR*(NCOLOR-1)/2*NCOLOR*(NCOLOR-1)/2; i++)
      {
      A->comp[i]+=B->comp[i];
      }
@@ -1149,7 +1141,7 @@ inline void plus_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restrict
 
 
 // A*=r
-inline void times_equal_real_SuNAdj(SuNAdj * restrict A, double r)
+inline void times_equal_real_SoNAdj(SoNAdj * restrict A, double r)
   {
   #ifdef __INTEL_COMPILER
     __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1157,7 +1149,7 @@ inline void times_equal_real_SuNAdj(SuNAdj * restrict A, double r)
 
   int i;
 
-  for(i=0; i<(NCOLOR*NCOLOR-1)*(NCOLOR*NCOLOR-1); i++)
+  for(i=0; i<NCOLOR*(NCOLOR-1)/2*NCOLOR*(NCOLOR-1)/2; i++)
      {
      A->comp[i]*=r;
      }
@@ -1165,7 +1157,7 @@ inline void times_equal_real_SuNAdj(SuNAdj * restrict A, double r)
 
 
 // A*=B
-inline void times_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restrict B)
+inline void times_equal_SoNAdj(SoNAdj * restrict A, SoNAdj const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -1182,20 +1174,20 @@ inline void times_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restric
 
   #if NCOLOR!=1  // just to avoid warnings
     int i, j, k;
-    double aux[NCOLOR*NCOLOR-1] __attribute__((aligned(DOUBLE_ALIGN)));
+    double aux[NCOLOR*(NCOLOR-1)/2] __attribute__((aligned(DOUBLE_ALIGN)));
     double sum;
 
-    for(i=0; i<NCOLOR*NCOLOR-1; i++)
+    for(i=0; i<NCOLOR*(NCOLOR-1)/2; i++)
        {
-       for(j=0; j<NCOLOR*NCOLOR-1; j++)
+       for(j=0; j<NCOLOR*(NCOLOR-1)/2; j++)
           {
           aux[j]=A->comp[madj(i,j)];
           }
 
-       for(j=0; j<NCOLOR*NCOLOR-1; j++)
+       for(j=0; j<NCOLOR*(NCOLOR-1)/2; j++)
           {
           sum=0.0;
-          for(k=0; k<NCOLOR*NCOLOR-1; k++)
+          for(k=0; k<NCOLOR*(NCOLOR-1)/2; k++)
              {
              sum+=aux[k]*(B->comp[madj(k,j)]);
              }
@@ -1210,29 +1202,29 @@ inline void times_equal_SuNAdj(SuNAdj * restrict A, SuNAdj const * const restric
 
 
 // trace in the adjoint rep.
-inline double retr_SuNAdj(SuNAdj * restrict A)
+inline double retr_SoNAdj(SoNAdj * restrict A)
   {
   int i;
   double ris=0.0;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  for(i=0; i<NCOLOR*(NCOLOR-1)/2; i++)
      {
      ris+=A->comp[madj(i,i)];
      }
 
   #if NCOLOR!=1
-    ris/=(NCOLOR*NCOLOR-1);
+    ris/=(NCOLOR*(NCOLOR-1)/2);
   #endif
 
   return ris;
   }
 
 
-// ***************** for SuNVecs
+// ***************** for SoNVecs
 
 
 // A=1
-inline void one_SuNVecs(SuNVecs * restrict A)
+inline void one_SoNVecs(SoNVecs * restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1248,7 +1240,7 @@ inline void one_SuNVecs(SuNVecs * restrict A)
 
 
 // A=0
-inline void zero_SuNVecs(SuNVecs * restrict A)
+inline void zero_SoNVecs(SoNVecs * restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1264,7 +1256,7 @@ inline void zero_SuNVecs(SuNVecs * restrict A)
 
 
 // A=B
-inline void equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B)
+inline void equal_SoNVecs(SoNVecs * restrict A, SoNVecs const * const restrict B)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1281,23 +1273,14 @@ inline void equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B
 
 
 // A -> A^{\dag}
-inline void conjugate_SuNVecs(SuNVecs * restrict A)
+inline void conjugate_SoNVecs(SoNVecs * restrict A)
   {
-  #ifdef __INTEL_COMPILER
-  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
-  #endif
-
-  int i;
-
-  for(i=0; i<NCOLOR*NHIGGS; i++)
-     {
-     A->comp[i]=conj(A->comp[i]);
-     }
+  (void) A; // just to avoid warning
   }
 
 
 // A-=B
-inline void minus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B)
+inline void minus_equal_SoNVecs(SoNVecs * restrict A, SoNVecs const * const restrict B)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1314,7 +1297,7 @@ inline void minus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const rest
 
 
 // A+=B
-inline void plus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restrict B)
+inline void plus_equal_SoNVecs(SoNVecs * restrict A, SoNVecs const * const restrict B)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1331,7 +1314,7 @@ inline void plus_equal_SuNVecs(SuNVecs * restrict A, SuNVecs const * const restr
 
 
 // *= with real number
-inline void times_equal_real_SuNVecs(SuNVecs * restrict A, double r)
+inline void times_equal_real_SoNVecs(SoNVecs * restrict A, double r)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1347,24 +1330,19 @@ inline void times_equal_real_SuNVecs(SuNVecs * restrict A, double r)
 
 
 // *= with complex number for a single component
-inline void times_equal_complex_single_SuNVecs(SuNVecs * restrict A, double complex r, int j)
+inline void times_equal_complex_single_SoNVecs(SoNVecs * restrict A, double complex r, int j)
   {
-  #ifdef __INTEL_COMPILER
-  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
-  #endif
+  fprintf(stderr, "times_equal_complex_single_SoNVecs can not be used! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
 
-  int i;
-
-  for(i=NCOLOR*j; i<NCOLOR*(j+1); i++)
-     {
-     A->comp[i]*=r;
-     }
+  (void) A;
+  (void) r;
+  (void) j; // juist to avoid warnings
   }
 
 
-
 // norm
-inline double norm_SuNVecs(SuNVecs const * const restrict A)
+inline double norm_SoNVecs(SoNVecs const * const restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
@@ -1375,7 +1353,7 @@ inline double norm_SuNVecs(SuNVecs const * const restrict A)
 
   for(i=0; i<NCOLOR*NHIGGS; i++)
      {
-     ris+=cabs(A->comp[i])*cabs(A->comp[i]);
+     ris+=fabs(A->comp[i])*fabs(A->comp[i]);
      }
 
   return sqrt(ris);
@@ -1383,24 +1361,24 @@ inline double norm_SuNVecs(SuNVecs const * const restrict A)
 
 
 // normalize
-inline void normalize_SuNVecs(SuNVecs * restrict A)
+inline void normalize_SoNVecs(SoNVecs * restrict A)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(A->comp), DOUBLE_ALIGN);
   #endif
 
-  double norm=norm_SuNVecs(A);
+  double norm=norm_SoNVecs(A);
 
-  times_equal_real_SuNVecs(A, 1.0/norm);
+  times_equal_real_SoNVecs(A, 1.0/norm);
   }
 
 
 // random vector (normalized)
-void rand_vec_SuNVecs(SuNVecs * restrict A);
+void rand_vec_SoNVecs(SoNVecs * restrict A);
 
 
 // real part of the scalar product re(v_1^{\dag}v_2)
-inline double re_scal_prod_SuNVecs(SuNVecs const * const restrict v1, SuNVecs const * const restrict v2)
+inline double re_scal_prod_SoNVecs(SoNVecs const * const restrict v1, SoNVecs const * const restrict v2)
   {
    #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -1412,7 +1390,7 @@ inline double re_scal_prod_SuNVecs(SuNVecs const * const restrict v1, SuNVecs co
 
   for(i=0; i<NCOLOR*NHIGGS; i++)
      {
-     ris+=creal( conj(v1->comp[i]) * v2->comp[i] );
+     ris+=(v1->comp[i]) * v2->comp[i];
      }
 
   return ris;
@@ -1420,7 +1398,10 @@ inline double re_scal_prod_SuNVecs(SuNVecs const * const restrict v1, SuNVecs co
 
 
 // real part of the scalar product re(v_1[a]^{\dag}v_2[b]) with a, b flavour indices
-inline double re_scal_prod_single_SuNVecs(SuNVecs const * const restrict v1, SuNVecs const * const restrict v2, int a, int b)
+inline double re_scal_prod_single_SoNVecs(SoNVecs const * const restrict v1,
+                                          SoNVecs const * const restrict v2,
+                                          int a,
+                                          int b)
   {
    #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -1432,15 +1413,19 @@ inline double re_scal_prod_single_SuNVecs(SuNVecs const * const restrict v1, SuN
 
   for(i=0; i<NCOLOR; i++)
      {
-     ris+=creal( conj(v1->comp[a*NCOLOR+i]) * v2->comp[b*NCOLOR+i] );
+     ris+=v1->comp[a*NCOLOR+i] * v2->comp[b*NCOLOR+i];
      }
 
   return ris;
   }
 
+
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
-inline void matrix_times_vector_single_SuNVecs(SuNVecs * restrict v1, SuN const * const restrict matrix, SuNVecs const * const restrict v2, int i)
+inline void matrix_times_vector_single_SoNVecs(SoNVecs * restrict v1,
+                                               SoN const * const restrict matrix,
+                                               SoNVecs const * const restrict v2,
+                                               int i)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -1450,7 +1435,7 @@ inline void matrix_times_vector_single_SuNVecs(SuNVecs * restrict v1, SuN const 
 
   int j, k;
 
-  equal_SuNVecs(v1, v2);
+  equal_SoNVecs(v1, v2);
 
   for(j=0; j<NCOLOR; j++)
      {
@@ -1469,7 +1454,9 @@ inline void matrix_times_vector_single_SuNVecs(SuNVecs * restrict v1, SuN const 
 
 // all the components of v2 are multiplied by "matrix"
 // v1=matrix*v2
-inline void matrix_times_vector_all_SuNVecs(SuNVecs * restrict v1, SuN const * const restrict matrix, SuNVecs const * const restrict v2)
+inline void matrix_times_vector_all_SoNVecs(SoNVecs * restrict v1,
+                                            SoN const * const restrict matrix,
+                                            SoNVecs const * const restrict v2)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -1499,7 +1486,9 @@ inline void matrix_times_vector_all_SuNVecs(SuNVecs * restrict v1, SuN const * c
 
 // tensor product of two vectors
 // Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
-inline void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * const restrict v1, SuNVecs const * const restrict v2)
+inline void vector_tensor_vector_SoNVecs(SoN * restrict matrix,
+                                         SoNVecs const * const restrict v1,
+                                         SoNVecs const * const restrict v2)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
@@ -1509,7 +1498,7 @@ inline void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * 
 
   int i, j, k;
 
-  zero_SuN(matrix);
+  zero_SoN(matrix);
 
   for(i=0; i<NHIGGS; i++)
      {
@@ -1517,7 +1506,7 @@ inline void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * 
         {
         for(k=0; k<NCOLOR; k++)
            {
-           matrix->comp[m(j,k)]+=v2->comp[NCOLOR*i+j]*conj(v1->comp[NCOLOR*i+k]);
+           matrix->comp[m(j,k)]+=v2->comp[NCOLOR*i+j]*(v1->comp[NCOLOR*i+k]);
            }
         }
      }
@@ -1527,7 +1516,7 @@ inline void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * 
 // initialize the flavour matrix with a vector
 // FM[mf(i,j)]=\sum_{on_gauge}conj(v1[i])v1[j] - delta^{ij}/N
 // i, j are the flavour indices
-inline void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * const restrict v1)
+inline void init_FMatrix_SoNVecs(FMatrix * restrict fmatrix, SoNVecs const * const restrict v1)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(fmatrix->comp), DOUBLE_ALIGN);
@@ -1544,7 +1533,7 @@ inline void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * con
         {
         for(k=0; k<NCOLOR; k++)
            {
-           fmatrix->comp[mf(i,j)]+= conj(v1->comp[NCOLOR*i+k])*v1->comp[NCOLOR*j+k];
+           fmatrix->comp[mf(i,j)]+= (v1->comp[NCOLOR*i+k])*v1->comp[NCOLOR*j+k];
            }
         }
      }
@@ -1557,14 +1546,14 @@ inline void init_FMatrix_SuNVecs(FMatrix * restrict fmatrix, SuNVecs const * con
 
 
 // return a double coumplex number to check the fate of U(1) flavour symmetry
-inline double complex HiggsU1Obs_SuNVecs(SuNVecs const * const restrict v1)
+inline double complex HiggsU1Obs_SoNVecs(SoNVecs const * const restrict v1)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
   #endif
 
   #if NHIGGS >=NCOLOR
-    SuN aux;
+    SoN aux;
     int i, j;
 
     for(i=0; i<NCOLOR; i++)
@@ -1575,7 +1564,7 @@ inline double complex HiggsU1Obs_SuNVecs(SuNVecs const * const restrict v1)
           }
        }
 
-    return det_SuN(&aux);
+    return (double complex) det_SoN(&aux);
   #else
     (void) v1;
     return 0.0 + 0.0*I;
@@ -1584,35 +1573,36 @@ inline double complex HiggsU1Obs_SuNVecs(SuNVecs const * const restrict v1)
 
 
 // print on file
-int print_on_file_SuNVecs(FILE *fp, SuNVecs const * const A);
+int print_on_file_SoNVecs(FILE *fp, SoNVecs const * const A);
 
 
 // print on binary file without changing endiannes
-int print_on_binary_file_noswap_SuNVecs(FILE *fp, SuNVecs const * const A);
+int print_on_binary_file_noswap_SoNVecs(FILE *fp, SoNVecs const * const A);
 
 
 // print on binary file changing endiannes
-int print_on_binary_file_swap_SuNVecs(FILE *fp, SuNVecs const * const A);
+int print_on_binary_file_swap_SoNVecs(FILE *fp, SoNVecs const * const A);
 
 
 // print on binary file in bigendian
-int print_on_binary_file_bigen_SuNVecs(FILE *fp, SuNVecs const * const A);
+int print_on_binary_file_bigen_SoNVecs(FILE *fp, SoNVecs const * const A);
 
 
 // read from file
-int read_from_file_SuNVecs(FILE *fp, SuNVecs *A);
+int read_from_file_SoNVecs(FILE *fp, SoNVecs *A);
 
 
 // read from binary file without changing endiannes
-int read_from_binary_file_noswap_SuNVecs(FILE *fp, SuNVecs *A);
+int read_from_binary_file_noswap_SoNVecs(FILE *fp, SoNVecs *A);
 
 
 // read from binary file changing endianness
-int read_from_binary_file_swap_SuNVecs(FILE *fp, SuNVecs *A);
+int read_from_binary_file_swap_SoNVecs(FILE *fp, SoNVecs *A);
 
 
 // read from binary file written in bigendian
-int read_from_binary_file_bigen_SuNVecs(FILE *fp, SuNVecs *A);
+int read_from_binary_file_bigen_SoNVecs(FILE *fp, SoNVecs *A);
 
 
-#endif
+
+#endif // SON_H

@@ -76,7 +76,10 @@ fi
 
 
 ### VARIABLES
-AC_ARG_VAR(N_c, the number of colors (default 2))
+
+AC_ARG_VAR(Gauge_Group, the gauge group (SuN or SoN, default SuN))
+
+AC_ARG_VAR(N_c, the number of colors (default 2, N_c=1 for SuN means U(1)))
 
 AC_ARG_VAR(Num_levels, the number of levels in multilevel (default 1))
 
@@ -98,6 +101,30 @@ fi
 
 
 ### TEST
+
+if test x${Gauge_Group} = x; then
+  AC_MSG_WARN([ 
+   *****
+   No chosen value for Gauge_Group: using the default Gauge_Group=SuN
+   ***** 
+   ])
+  AC_DEFINE_UNQUOTED(GGROUP, 0, [Gauge group, 0=SuN, 1=SoN])
+else
+  if test x${Gauge_Group} = xSuN; then
+    AC_DEFINE_UNQUOTED(GGROUP, 0, [Gauge group, 0=SuN, 1=SoN])
+  else
+    if test x${Gauge_Group} = xSoN; then
+      AC_DEFINE_UNQUOTED(GGROUP, 1, [Gauge group, 0=SuN, 1=SoN])
+    else
+      AC_MSG_ERROR([ 
+       *****
+       Unrecognized value of Gauge_Group!
+       ***** 
+       ])
+    fi 
+  fi
+fi
+
 if test x${N_c} = x; then
   AC_MSG_WARN([ 
    *****
@@ -159,8 +186,6 @@ fi
 
 
 ### CONDITIONALS
-
-
 
 
 AC_CONFIG_FILES([Makefile])

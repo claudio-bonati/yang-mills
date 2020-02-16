@@ -11,6 +11,11 @@
 #include"../include/macro.h"
 #include"../include/tens_prod_adj.h"
 
+#if GGROUP == 0
+  #define MAXINDEX NCOLOR*NCOLOR -1
+#elif GGROUP == 1
+  #define MAXINDEX NCOLOR*(NCOLOR-1)/2
+#endif
 
 // initialize to zero
 void zero_TensProdAdj(TensProdAdj * restrict A);
@@ -49,13 +54,13 @@ void print_on_screen_TensProdAdj(TensProdAdj const * const A)
   {
   int i, j, k, l;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  for(i=0; i<MAXINDEX; i++)
      {
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+     for(j=0; j<MAXINDEX; j++)
         {
-        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+        for(k=0; k<MAXINDEX; k++)
            {
-           for(l=0; l<NCOLOR*NCOLOR-1; l++)
+           for(l=0; l<MAXINDEX; l++)
               {
               printf("%.16lf ", A->comp[i][j][k][l]);
               }
@@ -70,13 +75,13 @@ int print_on_file_TensProdAdj(FILE *fp, TensProdAdj const * const A)
   {
   int i, j, k, l, err;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  for(i=0; i<MAXINDEX; i++)
      {
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+     for(j=0; j<MAXINDEX; j++)
         {
-        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+        for(k=0; k<MAXINDEX; k++)
            {
-           for(l=0; l<NCOLOR*NCOLOR-1; l++)
+           for(l=0; l<MAXINDEX; l++)
               {
               err=fprintf(fp, "%.16lf", A->comp[i][j][k][l]);
               if(err!=1)
@@ -99,13 +104,13 @@ int print_on_binary_file_noswap_TensProdAdj(FILE *fp, TensProdAdj const * const 
   size_t err;
   double re;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  for(i=0; i<MAXINDEX; i++)
      {
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+     for(j=0; j<MAXINDEX; j++)
         {
-        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+        for(k=0; k<MAXINDEX; k++)
            {
-           for(l=0; l<NCOLOR*NCOLOR-1; l++)
+           for(l=0; l<MAXINDEX; l++)
               {
               re=A->comp[i][j][k][l];
 
@@ -129,13 +134,13 @@ int print_on_binary_file_swap_TensProdAdj(FILE *fp, TensProdAdj const * const A)
   size_t err;
   double re;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  for(i=0; i<MAXINDEX; i++)
      {
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+     for(j=0; j<MAXINDEX; j++)
         {
-        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+        for(k=0; k<MAXINDEX; k++)
            {
-           for(l=0; l<NCOLOR*NCOLOR-1; l++)
+           for(l=0; l<MAXINDEX; l++)
               {
               re=A->comp[i][j][k][l];
 
@@ -178,13 +183,13 @@ int read_from_file_TensProdAdj(FILE *fp, TensProdAdj *A)
   int i, j, k, l, err;
   double re;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  for(i=0; i<MAXINDEX; i++)
      {
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+     for(j=0; j<MAXINDEX; j++)
         {
-        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+        for(k=0; k<MAXINDEX; k++)
            {
-           for(l=0; l<NCOLOR*NCOLOR-1; l++)
+           for(l=0; l<MAXINDEX; l++)
               {
               err=fscanf(fp, "%lg", &re);
               if(err!=1)
@@ -208,13 +213,13 @@ int read_from_binary_file_noswap_TensProdAdj(FILE *fp, TensProdAdj *A)
   size_t err;
   double re;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  for(i=0; i<MAXINDEX; i++)
      {
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+     for(j=0; j<MAXINDEX; j++)
         {
-        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+        for(k=0; k<MAXINDEX; k++)
            {
-           for(l=0; l<NCOLOR*NCOLOR-1; l++)
+           for(l=0; l<MAXINDEX; l++)
               {
               err=0;
 
@@ -241,13 +246,13 @@ int read_from_binary_file_swap_TensProdAdj(FILE *fp, TensProdAdj *A)
   size_t err;
   double re;
 
-  for(i=0; i<NCOLOR*NCOLOR-1; i++)
+  for(i=0; i<MAXINDEX; i++)
      {
-     for(j=0; j<NCOLOR*NCOLOR-1; j++)
+     for(j=0; j<MAXINDEX; j++)
         {
-        for(k=0; k<NCOLOR*NCOLOR-1; k++)
+        for(k=0; k<MAXINDEX; k++)
            {
-           for(l=0; l<NCOLOR*NCOLOR-1; l++)
+           for(l=0; l<MAXINDEX; l++)
               {
               err=0;
 
@@ -286,5 +291,6 @@ int read_from_binary_file_bigen_TensProdAdj(FILE *fp, TensProdAdj *A)
   return err;
   }
 
+#undef MAXINDEX
 
 #endif

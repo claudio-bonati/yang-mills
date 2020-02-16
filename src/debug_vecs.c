@@ -26,7 +26,7 @@ int main(void)
   printf("PROGRAM FOR THE DEBUG OF VECS [for U1, Su2 and SuN] \n");
   printf("***************************************************\n\n");
 
-
+  printf("GGROUP=%s\n", QUOTEME(GGROUP));
   printf("NCOLOR=%s\n", QUOTEME(NCOLOR));
   printf("NHIGGS=%s\n\n", QUOTEME(NHIGGS));
 

@@ -340,17 +340,24 @@ void compute_md5sum_conf(char *res, Gauge_Conf const * const GC, GParam const * 
         {
         equal(&matrix, &(GC->lattice[si][mu]));
 
-        #if NCOLOR==1
-          MD5_Update(&mdContext, &(matrix.comp), sizeof(double complex));
-        #elif NCOLOR==2
-          for(k=0; k<4; k++)
-             {
-             MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double));
-             }
-        #else
+        #if GGROUP == 0
+          #if NCOLOR==1
+            MD5_Update(&mdContext, &(matrix.comp), sizeof(double complex));
+          #elif NCOLOR==2
+            for(k=0; k<4; k++)
+               {
+               MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double));
+               }
+          #else
+            for(k=0; k<NCOLOR*NCOLOR; k++)
+               {
+               MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double complex));
+               }
+          #endif
+        #elif GGROUP == 1
           for(k=0; k<NCOLOR*NCOLOR; k++)
              {
-             MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double complex));
+             MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double));
              }
         #endif
         }
@@ -829,17 +836,23 @@ void compute_md5sum_polycorradj(char *res, Gauge_Conf const * const GC, GParam c
 
   MD5_Init(&mdContext);
 
+  #if GGROUP == 0
+    #define MAXVALUE NCOLOR*NCOLOR-1
+  #elif GGROUP == 1
+    #define MAXVALUE (NCOLOR*(NCOLOR-1)/2)
+  #endif
+
   for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
      {
      for(i=0; i<(param->d_space_vol); i++)
         {
-        for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
+        for(n1=0; n1<MAXVALUE; n1++)
            {
-           for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
+           for(n2=0; n2<MAXVALUE; n2++)
               {
-              for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
+              for(n3=0; n3<MAXVALUE; n3++)
                  {
-                 for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
+                 for(n4=0; n4<MAXVALUE; n4++)
                     {
                     MD5_Update(&mdContext, &((GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double));
                     }
@@ -848,6 +861,8 @@ void compute_md5sum_polycorradj(char *res, Gauge_Conf const * const GC, GParam c
            }
         }
      }
+
+  #undef MAXVALUE
 
   MD5_Final(c, &mdContext);
 
@@ -1322,17 +1337,23 @@ void compute_md5sum_tubeadj_disc_stuff(char *res, Gauge_Conf const * const GC, G
 
   MD5_Init(&mdContext);
 
+  #if GGROUP == 0
+    #define MAXVALUE NCOLOR*NCOLOR-1
+  #elif GGROUP == 1
+    #define MAXVALUE (NCOLOR*(NCOLOR-1)/2)
+  #endif
+
   for(j=0; j<param->d_size[0]/param->d_ml_step[0]; j++)
      {
      for(i=0; i<(param->d_space_vol); i++)
         {
-        for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
+        for(n1=0; n1<MAXVALUE; n1++)
            {
-           for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
+           for(n2=0; n2<MAXVALUE; n2++)
               {
-              for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
+              for(n3=0; n3<MAXVALUE; n3++)
                  {
-                 for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
+                 for(n4=0; n4<MAXVALUE; n4++)
                     {
                     MD5_Update(&mdContext, &((GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double));
                     }
@@ -1344,13 +1365,13 @@ void compute_md5sum_tubeadj_disc_stuff(char *res, Gauge_Conf const * const GC, G
 
   for(i=0; i<(param->d_space_vol); i++)
      {
-     for(n1=0; n1<NCOLOR*NCOLOR-1; n1++)
+     for(n1=0; n1<MAXVALUE; n1++)
         {
-        for(n2=0; n2<NCOLOR*NCOLOR-1; n2++)
+        for(n2=0; n2<MAXVALUE; n2++)
            {
-           for(n3=0; n3<NCOLOR*NCOLOR-1; n3++)
+           for(n3=0; n3<MAXVALUE; n3++)
               {
-              for(n4=0; n4<NCOLOR*NCOLOR-1; n4++)
+              for(n4=0; n4<MAXVALUE; n4++)
                  {
                  MD5_Update(&mdContext, &((GC->ml_polyplaqadj[0][i]).comp[n1][n2][n3][n4]), sizeof(double));
                  }
@@ -1358,6 +1379,8 @@ void compute_md5sum_tubeadj_disc_stuff(char *res, Gauge_Conf const * const GC, G
            }
         }
      }
+
+  #undef MAXVALUE
 
   MD5_Final(c, &mdContext);
 
@@ -1977,20 +2000,27 @@ void compute_md5sum_higgs(char *res, Gauge_Conf const * const GC, GParam const *
 
      equal_vecs(&vec, &(GC->higgs[si]));
 
-     #if NCOLOR==1
-       for(k=0; k<NHIGGS; k++)
-          {
-          MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double complex));
-          }
-     #elif NCOLOR==2
-       for(k=0; k<4*NHIGGS; k++)
-          {
-          MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double));
-          }
-     #else
+     #if GGROUP==0
+       #if NCOLOR==1
+         for(k=0; k<NHIGGS; k++)
+            {
+            MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double complex));
+            }
+       #elif NCOLOR==2
+         for(k=0; k<4*NHIGGS; k++)
+            {
+            MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double));
+            }
+       #else
+         for(k=0; k<NHIGGS*NCOLOR; k++)
+            {
+            MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double complex));
+            }
+       #endif
+     #elif GGROUP==1
        for(k=0; k<NHIGGS*NCOLOR; k++)
           {
-          MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double complex));
+          MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double));
           }
      #endif
      }
