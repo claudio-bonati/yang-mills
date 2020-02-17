@@ -166,64 +166,6 @@ void single_heatbath_SuN(SuN *link, SuN const * const staple)
     }
 
 
-// Pseudo-heatbath by Cabibbo-Marinari (Phys. Lett. B 119, p.387 (1982)) in the implementation by
-// Kennedy, Pendleton (Phys. Lett. B 156, p.393 (1985))
-void single_heatbath_aux_SuN(SuN *link, SuN const * const staple, double beta)
-    {
-    SuN aux;
-    Su2 u, v, w;
-    double xi, p0;
-    double complex temp0, temp1;
-    double complex fii, fij, fji, fjj;
-    int i, j, k;
-
-    equal_SuN(&aux, staple);     // aux=staple
-    times_equal_SuN(&aux, link); // aux=staple*link
-
-    for(i=0; i<NCOLOR-1; i++)
-       {
-       for(j=i+1; j<NCOLOR; j++)
-          {
-          ennetodue_SuN(&aux, i, j, &xi, &u);
-
-          xi*=beta*2.0/((double) NCOLOR);
-
-          if(xi>MIN_VALUE)
-            {
-            randheat_Su2(xi, &p0);
-
-            equal_dag_Su2(&w, &u);   // w=u^{dag}
-            rand_matrix_p0_Su2(p0, &v);
-            times_equal_Su2(&w, &v); // w*=v
-
-            fii= w.comp[0] + (w.comp[3])*I;
-            fij= w.comp[2] + (w.comp[1])*I;
-            fji=-w.comp[2] + (w.comp[1])*I;
-            fjj= w.comp[0] - (w.comp[3])*I;
-
-            // link*=final
-            for(k=0; k<NCOLOR; k++)
-               {
-               temp0=link->comp[m(k,i)]*fii + link->comp[m(k,j)]*fji;
-               temp1=link->comp[m(k,i)]*fij + link->comp[m(k,j)]*fjj;
-               link->comp[m(k,i)]=temp0;
-               link->comp[m(k,j)]=temp1;
-               }
-
-            // aux*=final
-            for(k=0; k<NCOLOR; k++)
-               {
-               temp0=aux.comp[m(k,i)]*fii + aux.comp[m(k,j)]*fji;
-               temp1=aux.comp[m(k,i)]*fij + aux.comp[m(k,j)]*fjj;
-               aux.comp[m(k,i)]=temp0;
-               aux.comp[m(k,j)]=temp1;
-               }
-            }
-          }
-       }
-    }
-
-
 // Pseudo-overrelaxation by Cabibbo-Marinari (Phys. Lett. B 119, p.387 (1982)) in the implementation by
 // Kennedy, Pendleton (Phys. Lett. B 156, p.393 (1985))
 void single_overrelaxation_SuN(SuN *link, SuN const * const staple)

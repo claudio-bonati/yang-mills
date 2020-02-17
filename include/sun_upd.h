@@ -8,7 +8,6 @@ void ennetodue_SuN(SuN const * const in, int i, int j, double *xi, Su2 *u);
 void duetoenne_SuN(Su2 const * const in, int i, int j, SuN *out);
 
 void single_heatbath_SuN(SuN *link, SuN const * const staple);
-void single_heatbath_aux_SuN(SuN *link, SuN const * const staple, double beta);
 void single_overrelaxation_SuN(SuN *link, SuN const * const staple);
 void cool_SuN(SuN *link, SuN const * const staple);
 

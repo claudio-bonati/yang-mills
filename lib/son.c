@@ -287,7 +287,6 @@ int scheck_SoN(SoN const * const restrict A)
 // sunitarize
 void unitarize_SoN(SoN * restrict A)
   {
-  //const double beta_aux=1.0e+20;
   double check;
   SoN force, guess, guess_old, helper, helper1, helper2;
 
@@ -302,8 +301,7 @@ void unitarize_SoN(SoN * restrict A)
          {
          equal_SoN(&guess_old, &guess);
 
-         // heatbath
-         //single_heatbath_aux_SoN(&guess, &force, beta_aux); // minimize Tr(force*guess)
+         // maximize Tr(force*guess)
          cool_SoN(&guess, &force);
 
          // compute the check
