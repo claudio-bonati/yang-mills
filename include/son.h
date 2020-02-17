@@ -785,7 +785,7 @@ inline double det_SoN(SoN const * const restrict A)
     double ris;
     SoN lu;
 
-    LU_SuN(A, &lu, &i);
+    LU_SoN(A, &lu, &i);
 
     if(i>0)
       {
@@ -801,7 +801,7 @@ inline double det_SoN(SoN const * const restrict A)
        ris*=(lu.comp[m(i,i)]);
        }
 
-    return real(ris);
+    return ris;
   #endif
   }
 
@@ -1323,6 +1323,22 @@ inline void times_equal_real_SoNVecs(SoNVecs * restrict A, double r)
   int i;
 
   for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]*=r;
+     }
+  }
+
+
+// *= with double for a single component
+inline void times_equal_real_single_SoNVecs(SoNVecs * restrict A, double r, int j)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=NCOLOR*j; i<NCOLOR*(j+1); i++)
      {
      A->comp[i]*=r;
      }

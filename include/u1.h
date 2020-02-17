@@ -831,6 +831,17 @@ inline void times_equal_real_U1Vecs(U1Vecs * restrict A, double r)
   }
 
 
+// *= with real for a single component
+inline void times_equal_real_single_U1Vecs(U1Vecs * restrict A, double r, int j)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  A->comp[j]*=r;
+  }
+
+
 // *= with complex number for a single component
 inline void times_equal_complex_single_U1Vecs(U1Vecs * restrict A, double complex r, int j)
   {

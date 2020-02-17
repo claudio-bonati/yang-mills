@@ -620,6 +620,8 @@ void plus_equal_SoNVecs(SoNVecs * restrict A, SoNVecs const * const restrict B);
 // *= with real number
 void times_equal_real_SoNVecs(SoNVecs * restrict A, double r);
 
+// *= with double for a single component
+void times_equal_real_single_SoNVecs(SoNVecs * restrict A, double r, int j);
 
 // *= with complex number for a single component
 void times_equal_complex_single_SoNVecs(SoNVecs * restrict A, double complex r, int j);

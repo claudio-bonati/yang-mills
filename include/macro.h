@@ -18,12 +18,12 @@
     #define GAUGE_VECS      SuNVecs
   #endif
 #elif GGROUP == 1
+  #define GAUGE_GROUP     SoN
+  #define GAUGE_GROUP_ADJ SoNAdj
+  #define GAUGE_VECS      SoNVecs
+
   #if NCOLOR == 1
-    #error N_c=1 incompatible with SoN
-  #else
-    #define GAUGE_GROUP     SoN
-    #define GAUGE_GROUP_ADJ SoNAdj
-    #define GAUGE_VECS      SoNVecs
+    #error N_c==1 incompatible with SoN
   #endif
 #endif
 

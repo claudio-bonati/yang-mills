@@ -460,6 +460,10 @@ void plus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B);
 void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r);
 
 
+// *= with real for a single component
+void times_equal_real_single_Su2Vecs(Su2Vecs * restrict A, double r, int j);
+
+
 // *= with complex number for a single component
 void times_equal_complex_single_Su2Vecs(Su2Vecs * restrict A, double complex r, int j);
 

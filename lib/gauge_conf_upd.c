@@ -1730,6 +1730,13 @@ int metropolis_for_higgs(Gauge_Conf *GC,
        #endif
        }
 
+     // random length change
+     if(NHIGGS>1)
+       {
+       times_equal_real_single_vecs(&new_vector, param->d_epsilon_metro*(2.0*casuale()-1.0), j);
+       normalize_vecs(&new_vector);
+       }
+
      new_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
 
      if(casuale()< exp(old_energy-new_energy))

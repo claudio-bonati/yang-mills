@@ -126,6 +126,7 @@ void (*minus_equal_vecs)(GAUGE_VECS * restrict A,
 void (*plus_equal_vecs)(GAUGE_VECS * restrict A,
                         GAUGE_VECS const * const restrict B);
 void (*times_equal_real_vecs)(GAUGE_VECS * restrict A, double r);
+void (*times_equal_real_single_vecs)(GAUGE_VECS * restrict A, double r, int j);
 void (*times_equal_complex_single_vecs)(GAUGE_VECS * restrict A, double complex r, int j);
 double (*norm_vecs)(GAUGE_VECS const * const restrict A);
 void (*normalize_vecs)(GAUGE_VECS * restrict A);
