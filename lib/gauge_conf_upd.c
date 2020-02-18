@@ -1733,7 +1733,7 @@ int metropolis_for_higgs(Gauge_Conf *GC,
      // random length change
      if(NHIGGS>1)
        {
-       times_equal_real_single_vecs(&new_vector, param->d_epsilon_metro*(2.0*casuale()-1.0), j);
+       times_equal_real_single_vecs(&new_vector, 1.0+param->d_epsilon_metro*(2.0*casuale()-1.0), j);
        normalize_vecs(&new_vector);
        }
 

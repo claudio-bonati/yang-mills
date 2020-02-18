@@ -28,13 +28,19 @@ if __name__=="__main__":
   try:
     infile =sys.argv[1]
   except:
-    print("USE: %s file_name block_size\n" % sys.argv[0])
+    print("USE: %s file_name therm_size block_size\n" % sys.argv[0])
     sys.exit(1)
 
   try:
-    blocksize =int(sys.argv[2])
+    thermsize =int(sys.argv[2])
   except:
-    print("USE: %s file_name block_size\n" % sys.argv[0])
+    print("USE: %s file_name therm_size block_size\n" % sys.argv[0])
+    sys.exit(1)
+
+  try:
+    blocksize =int(sys.argv[3])
+  except:
+    print("USE: %s file_name therm_size block_size\n" % sys.argv[0])
     sys.exit(1)
 
   if not os.path.isfile(infile):
@@ -47,8 +53,11 @@ if __name__=="__main__":
   def square(x):
     return x*x
 
+  if(thermsize==0):
+    thermsize=1   # to remove the header
+
   # data acquisition
-  indata=np.loadtxt(infile, skiprows=1000, dtype=np.float)
+  indata=np.loadtxt(infile, skiprows=thermsize, dtype=np.float)
   data=np.transpose(indata)     #column ordered
 
   print(blocksize, end=' ')

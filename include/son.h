@@ -507,7 +507,7 @@ inline void times_SoN(SoN * restrict A,
   #endif
 
   int i, j, k;
-  double complex sum;
+  double sum;
 
   for(i=0; i<NCOLOR; i++)
      {
@@ -544,7 +544,7 @@ inline void times_dag1_SoN(SoN * restrict A,
   #endif
 
   int i, j, k;
-  double complex sum;
+  double sum;
 
   for(i=0; i<NCOLOR; i++)
      {
@@ -689,7 +689,7 @@ inline void diag_matrix_times_dag_SoN(SoN * restrict A,
      {
      for(j=0; j<NCOLOR; j++)
         {
-        A->comp[m(i,j)] = lambda[i]*conj(B->comp[m(j,i)]);
+        A->comp[m(i,j)] = lambda[i]*B->comp[m(j,i)];
         }
      }
   }
@@ -1275,7 +1275,16 @@ inline void equal_SoNVecs(SoNVecs * restrict A, SoNVecs const * const restrict B
 // A -> A^{\dag}
 inline void conjugate_SoNVecs(SoNVecs * restrict A)
   {
-  (void) A; // just to avoid warning
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]=A->comp[i];
+     }
   }
 
 
@@ -1329,7 +1338,7 @@ inline void times_equal_real_SoNVecs(SoNVecs * restrict A, double r)
   }
 
 
-// *= with double for a single component
+// *= with real for a single component
 inline void times_equal_real_single_SoNVecs(SoNVecs * restrict A, double r, int j)
   {
   #ifdef __INTEL_COMPILER
@@ -1522,7 +1531,7 @@ inline void vector_tensor_vector_SoNVecs(SoN * restrict matrix,
         {
         for(k=0; k<NCOLOR; k++)
            {
-           matrix->comp[m(j,k)]+=v2->comp[NCOLOR*i+j]*(v1->comp[NCOLOR*i+k]);
+           matrix->comp[m(j,k)]+=(v2->comp[NCOLOR*i+j])*(v1->comp[NCOLOR*i+k]);
            }
         }
      }
@@ -1549,14 +1558,14 @@ inline void init_FMatrix_SoNVecs(FMatrix * restrict fmatrix, SoNVecs const * con
         {
         for(k=0; k<NCOLOR; k++)
            {
-           fmatrix->comp[mf(i,j)]+= (v1->comp[NCOLOR*i+k])*v1->comp[NCOLOR*j+k];
+           fmatrix->comp[mf(i,j)]+=( (v1->comp[NCOLOR*i+k])*(v1->comp[NCOLOR*j+k]) + 0.0*I );
            }
         }
      }
 
   for(i=0; i<NHIGGS; i++)
      {
-     fmatrix->comp[mf(i,i)]-=1.0/(double)NHIGGS;
+     fmatrix->comp[mf(i,i)]-=( 1.0/(double)NHIGGS + 0.0*I);
      }
   }
 
@@ -1580,7 +1589,7 @@ inline double complex HiggsU1Obs_SoNVecs(SoNVecs const * const restrict v1)
           }
        }
 
-    return (double complex) det_SoN(&aux);
+    return det_SoN(&aux) + 0.0*I;
   #else
     (void) v1;
     return 0.0 + 0.0*I;

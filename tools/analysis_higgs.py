@@ -66,30 +66,40 @@ if __name__=="__main__":
   def xigauge(x):
     return np.sqrt(x[1]/x[0])/L
 
+  if(therm==0):
+    therm=1   # to remove the header
+
   # data acquisition
   indata=np.loadtxt(infile, skiprows=therm, dtype=np.float)
   data=np.transpose(indata)     #column ordered
 
   #print(blocksize, end=' ')
 
+  # susceptibility of the higgs coupling term
   ris, err = jack.jackknife_for_secondary(susc, blocksize, [square, data[4]], [id, data[4]])
   print(ris, err, end=' ')
 
+  # magnetic susceptbility
   ris, err = jack.jackknife_for_primary(id, data[5], blocksize)
   print(ris, err, end=' ')
 
+  # U 
   ris, err = jack.jackknife_for_secondary(U, blocksize, [square, data[5]], [id, data[5]])
   print(ris, err, end=' ')
 
+  #xi2nd
   ris, err = jack.jackknife_for_secondary(xi2nd, blocksize, [id, data[5]], [id, data[6]])
   print(ris, err, end=' ')
 
+  # susceptibility of the U(1) variable
   ris, err = jack.jackknife_for_primary(id, data[7], blocksize)
   print(ris, err, end=' ')
 
+  # U of the U(1) variable
   ris, err = jack.jackknife_for_secondary(U, blocksize, [square, data[7]], [id, data[7]])
   print(ris, err, end=' ')
 
+  # xi2nd of the U(1) variable
   ris, err = jack.jackknife_for_secondary(xi2nd, blocksize, [id, data[7]], [id, data[8]])
   print(ris, err, end=' ')
 
