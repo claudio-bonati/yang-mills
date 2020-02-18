@@ -138,7 +138,7 @@ void single_heatbath_SoN(SoN *link, SoN const * const staple)
 void single_overrelaxation_SoN(SoN *link, SoN const * const staple)
     {
     SoN aux;
-    double xi, theta;
+    double xi, theta, theta_new;
     double fii, fij, fji, fjj, temp0, temp1;
     int i, j, k;
 
@@ -159,6 +159,32 @@ void single_overrelaxation_SoN(SoN *link, SoN const * const staple)
             fjj= cos(-2.0*theta);
 
             //link*=final
+            for(k=0; k<NCOLOR; k++)
+               {
+               temp0=link->comp[m(k,i)]*fii + link->comp[m(k,j)]*fji;
+               temp1=link->comp[m(k,i)]*fij + link->comp[m(k,j)]*fjj;
+               link->comp[m(k,i)]=temp0;
+               link->comp[m(k,j)]=temp1;
+               }
+            // aux*=final
+            for(k=0; k<NCOLOR; k++)
+               {
+               temp0=aux.comp[m(k,i)]*fii + aux.comp[m(k,j)]*fji;
+               temp1=aux.comp[m(k,i)]*fij + aux.comp[m(k,j)]*fjj;
+               aux.comp[m(k,i)]=temp0;
+               aux.comp[m(k,j)]=temp1;
+               }
+            }
+          else
+            {
+            theta_new=2*PI*casuale();
+
+            fii= cos(theta_new);
+            fij= sin(theta_new);
+            fji=-sin(theta_new);
+            fjj= cos(theta_new);
+
+            // link*=final
             for(k=0; k<NCOLOR; k++)
                {
                temp0=link->comp[m(k,i)]*fii + link->comp[m(k,j)]*fji;

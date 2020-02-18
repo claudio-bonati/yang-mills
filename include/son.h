@@ -1275,16 +1275,7 @@ inline void equal_SoNVecs(SoNVecs * restrict A, SoNVecs const * const restrict B
 // A -> A^{\dag}
 inline void conjugate_SoNVecs(SoNVecs * restrict A)
   {
-  #ifdef __INTEL_COMPILER
-  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
-  #endif
-
-  int i;
-
-  for(i=0; i<NCOLOR*NHIGGS; i++)
-     {
-     A->comp[i]=A->comp[i];
-     }
+  (void) A; // just to avoid warnings
   }
 
 
@@ -1378,7 +1369,7 @@ inline double norm_SoNVecs(SoNVecs const * const restrict A)
 
   for(i=0; i<NCOLOR*NHIGGS; i++)
      {
-     ris+=fabs(A->comp[i])*fabs(A->comp[i]);
+     ris+=(A->comp[i]*A->comp[i]);
      }
 
   return sqrt(ris);

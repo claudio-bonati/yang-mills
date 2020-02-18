@@ -36,7 +36,7 @@ and Tr_adj=|Tr|^2-1.
 In yang_mills_higgs the action is 
 
 -beta*(1/N)\sum_{plaquettes} Re(Tr(paquette)) 
--N_higgs*higgs_beta\sum_{r, mu}\sum_{i=1}^{N_higgs} ReTr([H_r^{(i)}]^{\dag} U_{r, mu} H_{r+mu}^{(i)} )
+-N_higgs*higgs_beta\sum_{r, mu}\sum_{i=1}^{N_higgs} Re([H_r^{(i)}]^{\dag} U_{r, mu} H_{r+mu}^{(i)} )
 
 where the sum on mu is just on positive orientations and Higgs fields are
 normalized according to

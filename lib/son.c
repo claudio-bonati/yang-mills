@@ -646,7 +646,6 @@ void rand_vec_SoNVecs(SoNVecs * restrict A)
 
   for(i=0; i<NCOLOR*NHIGGS; i++)
      {
-
      A->comp[i] = 1.0-2.0*casuale();
      }
 

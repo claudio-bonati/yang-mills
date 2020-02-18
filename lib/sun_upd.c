@@ -214,6 +214,33 @@ void single_overrelaxation_SuN(SuN *link, SuN const * const staple)
                aux.comp[m(k,j)]=temp1;
                }
             }
+          else
+            {
+            rand_matrix_Su2(&u);
+
+            fii= u.comp[0] + (u.comp[3])*I;
+            fij= u.comp[2] + (u.comp[1])*I;
+            fji=-u.comp[2] + (u.comp[1])*I;
+            fjj= u.comp[0] - (u.comp[3])*I;
+
+            // link*=final
+            for(k=0; k<NCOLOR; k++)
+               {
+               temp0=link->comp[m(k,i)]*fii + link->comp[m(k,j)]*fji;
+               temp1=link->comp[m(k,i)]*fij + link->comp[m(k,j)]*fjj;
+               link->comp[m(k,i)]=temp0;
+               link->comp[m(k,j)]=temp1;
+               }
+
+            // aux*=final
+            for(k=0; k<NCOLOR; k++)
+               {
+               temp0=aux.comp[m(k,i)]*fii + aux.comp[m(k,j)]*fji;
+               temp1=aux.comp[m(k,i)]*fij + aux.comp[m(k,j)]*fjj;
+               aux.comp[m(k,i)]=temp0;
+               aux.comp[m(k,j)]=temp1;
+               }
+            }
           }
        }
     }

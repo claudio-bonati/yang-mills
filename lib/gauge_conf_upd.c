@@ -1707,7 +1707,7 @@ int metropolis_for_higgs(Gauge_Conf *GC,
      {
      old_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&(GC->higgs[r]), &staple);
 
-     j=(int)(NHIGGS*casuale() - MIN_VALUE);
+     j=(int)(NHIGGS*casuale()*(1.0 - MIN_VALUE));
 
      rand_matrix(&matrix);
      times_equal_real(&matrix, param->d_epsilon_metro);
