@@ -1717,18 +1717,16 @@ int metropolis_for_higgs(Gauge_Conf *GC,
        {
        equal(&rnd_matrix, &matrix);
        matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
-       #if GGROUP != 1
-         times_equal_complex_single_vecs(&new_vector, cexp(I*param->d_epsilon_metro*PI*casuale()),j);
-       #endif
        }
      else
        {
        equal_dag(&rnd_matrix, &matrix);
        matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
-       #if GGROUP != 1
-         times_equal_complex_single_vecs(&new_vector, cexp(-I*param->d_epsilon_metro*PI*casuale()),j);
-       #endif
        }
+
+     #if GGROUP != 1
+        times_equal_complex_single_vecs(&new_vector, cexp(I*PI*param->d_epsilon_metro*(2.0*casuale()-1.0)),j);
+     #endif
 
      // random length change
      if(NHIGGS>1)

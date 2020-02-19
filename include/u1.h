@@ -203,8 +203,8 @@ inline void minus_equal_dag_U1(U1 * restrict A, U1 const * const restrict B)
 
 // A=b*B+c*C
 inline void lin_comb_U1(U1 * restrict A,
-                 double b, U1 const * const restrict B,
-                 double c, U1 const * const restrict C)
+                        double b, U1 const * const restrict B,
+                        double c, U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -226,8 +226,8 @@ inline void lin_comb_U1(U1 * restrict A,
 
 // A=b*B^{dag}+c*C
 inline void lin_comb_dag1_U1(U1 * restrict A,
-                      double b, U1 const * const restrict B,
-                      double c, U1 const * const restrict C)
+                             double b, U1 const * const restrict B,
+                             double c, U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -249,8 +249,8 @@ inline void lin_comb_dag1_U1(U1 * restrict A,
 
 // A=b*B+c*C^{dag}
 inline void lin_comb_dag2_U1(U1 * restrict A,
-                      double b, U1 const * const restrict B,
-                      double c, U1 const * const restrict C)
+                             double b, U1 const * const restrict B,
+                             double c, U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -272,8 +272,8 @@ inline void lin_comb_dag2_U1(U1 * restrict A,
 
 // A=b*B^{dag}+c*C^{dag}
 inline void lin_comb_dag12_U1(U1 * restrict A,
-                       double b, U1 const * const restrict B,
-                       double c, U1 const * const restrict C)
+                              double b, U1 const * const restrict B,
+                              double c, U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -394,7 +394,7 @@ inline void diag_matrix_times_U1(U1 * restrict A, double const lambda[1], U1 con
   __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
-  A->comp= B->comp * (*lambda);
+  A->comp= B->comp * (lambda[0]);
   }
 
 
@@ -414,14 +414,14 @@ inline void diag_matrix_times_dag_U1(U1 * restrict A, double const lambda[1], U1
   __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
-  A->comp= conj(B->comp) * (*lambda);
+  A->comp= conj(B->comp) * (lambda[0]);
   }
 
 
 // A=B^{dag}*C
 inline void times_dag1_U1(U1 * restrict A,
-                   U1 const * const restrict B,
-                   U1 const * const restrict C)
+                          U1 const * const restrict B,
+                          U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -443,8 +443,8 @@ inline void times_dag1_U1(U1 * restrict A,
 
 // A=B*C^{dag}
 inline void times_dag2_U1(U1 * restrict A,
-                   U1 const * const restrict B,
-                   U1 const * const restrict C)
+                          U1 const * const restrict B,
+                          U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -466,8 +466,8 @@ inline void times_dag2_U1(U1 * restrict A,
 
 // A=B^{dag}*C^{dag}
 inline void times_dag12_U1(U1 * restrict A,
-                    U1 const * const restrict B,
-                    U1 const * const restrict C)
+                           U1 const * const restrict B,
+                           U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -927,7 +927,10 @@ inline double re_scal_prod_single_U1Vecs(U1Vecs const * const restrict v1, U1Vec
 
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
-inline void matrix_times_vector_single_U1Vecs(U1Vecs * restrict v1, U1 const * const restrict matrix, U1Vecs const * const restrict v2, int i)
+inline void matrix_times_vector_single_U1Vecs(U1Vecs * restrict v1,
+                                              U1 const * const restrict matrix,
+                                              U1Vecs const * const restrict v2,
+                                              int i)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -943,7 +946,9 @@ inline void matrix_times_vector_single_U1Vecs(U1Vecs * restrict v1, U1 const * c
 
 // all the components of v2 are multiplied by "matrix"
 // v1=matrix*v2
-inline void matrix_times_vector_all_U1Vecs(U1Vecs * restrict v1, U1 const * const restrict matrix, U1Vecs const * const restrict v2)
+inline void matrix_times_vector_all_U1Vecs(U1Vecs * restrict v1,
+                                           U1 const * const restrict matrix,
+                                           U1Vecs const * const restrict v2)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -962,7 +967,9 @@ inline void matrix_times_vector_all_U1Vecs(U1Vecs * restrict v1, U1 const * cons
 
 // tensor product of two vectors
 // Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
-inline void vector_tensor_vector_U1Vecs(U1 * restrict matrix, U1Vecs const * const restrict v1, U1Vecs const * const restrict v2)
+inline void vector_tensor_vector_U1Vecs(U1 * restrict matrix,
+                                        U1Vecs const * const restrict v1,
+                                        U1Vecs const * const restrict v2)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);
