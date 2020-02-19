@@ -1724,17 +1724,6 @@ int metropolis_for_higgs(Gauge_Conf *GC,
        matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
        }
 
-     #if GGROUP != 1
-        times_equal_complex_single_vecs(&new_vector, cexp(I*PI*param->d_epsilon_metro*(2.0*casuale()-1.0)),j);
-     #endif
-
-     // random length change
-     if(NHIGGS>1)
-       {
-       times_equal_real_single_vecs(&new_vector, 1.0+param->d_epsilon_metro*(2.0*casuale()-1.0), j);
-       normalize_vecs(&new_vector);
-       }
-
      new_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
 
      if(casuale()< exp(old_energy-new_energy))

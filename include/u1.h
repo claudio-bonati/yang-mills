@@ -852,6 +852,7 @@ inline void times_equal_complex_single_U1Vecs(U1Vecs * restrict A, double comple
   A->comp[j]*=r;
   }
 
+
 // norm
 inline double norm_U1Vecs(U1Vecs const * const restrict A)
   {
