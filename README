@@ -5,8 +5,8 @@
 
 ** ACTION
 *****************************************************
-The action used is the standard Wilson action, which for the SU(N) group can be
-written as the sum of
+The action used is the standard Wilson action, which for the N colors can be
+generically written as the sum of
 
 -beta*(1/N)\sum_{plaquettes} Re(Tr(paquette))
 
@@ -31,7 +31,7 @@ In yang_mills_local_fundadj the action is
 -beta*(1/N)\sum_{plaquettes} Re(Tr(paquette)) 
 -adjbeta*(1/(N*N-1))\sum_{plaquettes} Tr_adj(paquette)
 
-and Tr_adj=|Tr|^2-1.
+and Tr_adj=|Tr_fund|^2-1.
 
 In yang_mills_higgs the action is 
 
@@ -49,12 +49,13 @@ for every site r.
 ** OTHER CONFIGURE PARAMETERS
 *****************************************************
 
-The choice of the gauge group happens at configuration time through the macro
-N_c (N_c=1, 2, ... are available, with N_c=1 corresponding to the U(1) gauge
-theory). As an example, to simulate the SU(5) gauge theory the program has to
-be configured using
+The choice of the gauge group happens at configuration time through the macros
+Gauge_Group and N_c. Two classes of gauge groups are implemented, the SoN and
+SuN classes (with N_c=1 for SuN corresponding to the U(1) gauge theory). As an
+example, to simulate the SU(5) gauge theory the program has to be configured
+using
 
-./configure N_c=5
+./configure Gauge_Group=SuN N_c=5
 
 Relevant configure options are
 
@@ -63,11 +64,12 @@ Relevant configure options are
 
 and the following macro are availbale
 
-N_c         the number of colors (default 2)
-Num_levels  the number of levels in multilevel (default 1)
-Num_threads number of threads to be used in OpenMP (default 1)
-ST_dim      spacetime dimensionality (default 4)
-N_higgs     the number of Higgs fields (default 1)
+Gauge_Group  the gauge group (SuN or SoN, default SuN)
+N_c          the number of colors (default 2)
+Num_levels   the number of levels in multilevel (default 1)
+Num_threads  number of threads to be used in OpenMP (default 1)
+ST_dim       spacetime dimensionality (default 4)
+N_higgs      the number of Higgs fields (default 1)
 
 
 After the configuration, the compilation is performed as usual by
