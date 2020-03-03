@@ -42,7 +42,7 @@ void real_main(char *in_file)
        {
        if(tmp!= param.d_size[count])
          {
-         fprintf(stderr, "When using yang_mills_polycorr_long all the spatial sizes have to be of equal length.\n");
+         fprintf(stderr, "When using yang_mills_polycorr_higgs_long all the spatial sizes have to be of equal length.\n");
          exit(EXIT_FAILURE);
          }
        }
