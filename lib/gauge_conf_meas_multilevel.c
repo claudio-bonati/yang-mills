@@ -818,7 +818,6 @@ void perform_measures_polycorr_long(Gauge_Conf *GC,
    }
 
 
-
 // to optimize the multilevel
 void optimize_multilevel_polycorradj_long(Gauge_Conf *GC,
                                           GParam const * const param,

@@ -11,8 +11,9 @@ bin_PROGRAMS = conf_check \
                yang_mills_local \
                yang_mills_local_fundadj \
                yang_mills_polycorr \
-               yang_mills_polycorr_higgs \
                yang_mills_polycorr_long \
+               yang_mills_polycorr_higgs \
+               yang_mills_polycorr_higgs_long \
                yang_mills_polycorradj \
                yang_mills_polycorradj_long \
                yang_mills_t0 \
@@ -225,11 +226,14 @@ yang_mills_local_fundadj_SOURCES=./src/yang_mills_local_fundadj.c \
 yang_mills_polycorr_SOURCES=./src/yang_mills_polycorr.c \
                             $(everything)
 
+yang_mills_polycorr_long_SOURCES=./src/yang_mills_polycorr_long.c \
+                                 $(everything)
+
 yang_mills_polycorr_higgs_SOURCES=./src/yang_mills_polycorr_higgs.c \
                                   $(everything)
 
-yang_mills_polycorr_long_SOURCES=./src/yang_mills_polycorr_long.c \
-                                 $(everything)
+yang_mills_polycorr_higgs_long_SOURCES=./src/yang_mills_polycorr_higgs_long.c \
+                                  $(everything)
 
 yang_mills_polycorradj_SOURCES=./src/yang_mills_polycorradj.c \
                                $(everything)

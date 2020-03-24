@@ -119,11 +119,11 @@ void real_main(char *in_file)
         }
       else // iteration >=0, perform multilevel
         {
-        multilevel_polycorr_higgs_long(&GC,
-                                       &geo,
-                                       &param,
-                                       param.d_ml_step[0],
-                                       iteration);
+        multilevel_polycorr_long_with_higgs(&GC,
+                                            &geo,
+                                            &param,
+                                            param.d_ml_step[0],
+                                            iteration);
         iteration+=1;
         if(iteration==param.d_ml_level0_repeat)
           {
