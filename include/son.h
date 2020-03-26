@@ -996,7 +996,7 @@ int read_from_binary_file_noswap_SoN(FILE *fp, SoN *A);
 
 
 // read from binary file changing endianness
-int read_from_binary_file_swap_SN(FILE *fp, SoN *A);
+int read_from_binary_file_swap_SoN(FILE *fp, SoN *A);
 
 
 // read from binary file written in bigendian
