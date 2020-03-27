@@ -50,6 +50,7 @@ if __name__=="__main__":
   f=open(infile, 'r')
   firstline=f.readline()
   f.close()
+  dim=int(firstline.split()[0])
   L=int(firstline.split()[2])
 
   # functions to be evaluated
@@ -58,7 +59,7 @@ if __name__=="__main__":
   def square(x):
     return x*x
   def susc(x):
-    return L*L*L*(x[0]-x[1]*x[1])
+    return (x[0]-x[1]*x[1])*np.power(L, dim)
   def U(x):
     return x[0]/x[1]/x[1]
   def xi2nd(x):
