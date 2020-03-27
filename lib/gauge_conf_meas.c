@@ -1077,7 +1077,7 @@ void higgs_interaction(Gauge_Conf const * const GC,
 // tildeG0=ReTr[(\sum_x Q_x)(\sum_y Q_y)]/volume/NHIGGS
 // tildeGminp=ReTr[(\sum_x Q_xe^{ipx})(\sum_y Q_ye^{-ipy)]/volume/NHIGGS
 //
-// tildeG0 is NHIGGS*susceptibility, tildeGminp is used to compute the 2nd momentum correlation function
+// tildeG0 is susceptibility/NHIGGS, tildeGminp is used to compute the 2nd momentum correlation function
 //
 // tildeD0=conj(\sum_x D_x) (\sum_y D_y) / volume
 // tildeDminp=(\sum_x D_x e^{ipx}) conj(\sum_y D_y e^{ipy}) /volume
