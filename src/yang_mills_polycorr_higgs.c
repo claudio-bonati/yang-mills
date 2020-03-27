@@ -181,6 +181,7 @@ void print_template_input(void)
     fprintf(fp,"\n");
     fprintf(fp, "#output files\n");
     fprintf(fp, "conf_file  conf.dat\n");
+    fprintf(fp, "higgs_conf_file  higgs_conf.dat\n");
     fprintf(fp, "data_file  dati.dat\n");
     fprintf(fp, "log_file   log.dat\n");
     fprintf(fp, "\n");
