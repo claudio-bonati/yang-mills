@@ -8,6 +8,7 @@
 #include<stdlib.h>
 #include<string.h>
 
+#include"../include/endianness.h"
 #include"../include/flavour_matrix.h"
 #include"../include/function_pointers.h"
 #include"../include/gparam.h"
@@ -342,22 +343,50 @@ void compute_md5sum_conf(char *res, Gauge_Conf const * const GC, GParam const * 
 
         #if GGROUP == 0
           #if NCOLOR==1
-            MD5_Update(&mdContext, &(matrix.comp), sizeof(double complex));
+            double complex dc=matrix.comp;
+            if(endian()==0)
+              {
+              double a = creal(dc);
+              double b = cimag(dc);
+              SwapBytesDouble(&a);
+              SwapBytesDouble(&b);
+              dc=a+b*I;
+              }
+            MD5_Update(&mdContext, &dc, sizeof(double complex));
           #elif NCOLOR==2
             for(k=0; k<4; k++)
                {
-               MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double));
+               double a=matrix.comp[k];
+               if(endian()==0)
+                 {
+                 SwapBytesDouble(&a);
+                 }
+               MD5_Update(&mdContext, &a, sizeof(double));
                }
           #else
             for(k=0; k<NCOLOR*NCOLOR; k++)
                {
-               MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double complex));
+               double complex dc=matrix.comp[k];
+               if(endian()==0)
+                 {
+                 double a = creal(dc);
+                 double b = cimag(dc);
+                 SwapBytesDouble(&a);
+                 SwapBytesDouble(&b);
+                 dc=a+b*I;
+                 }
+               MD5_Update(&mdContext, &dc, sizeof(double complex));
                }
           #endif
         #elif GGROUP == 1
           for(k=0; k<NCOLOR*NCOLOR; k++)
              {
-             MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double));
+             double a=matrix.comp[k];
+             if(endian()==0)
+               {
+               SwapBytesDouble(&a);
+               }
+             MD5_Update(&mdContext, &a, sizeof(double));
              }
         #endif
         }
@@ -601,7 +630,16 @@ void compute_md5sum_polycorr(char *res, Gauge_Conf const * const GC, GParam cons
                  {
                  for(n4=0; n4<NCOLOR; n4++)
                     {
-                    MD5_Update(&mdContext, &((GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                    double complex dc = (GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4];
+                    if(endian()==0)
+                      {
+                      double a = creal(dc);
+                      double b = cimag(dc);
+                      SwapBytesDouble(&a);
+                      SwapBytesDouble(&b);
+                      dc=a+b*I;
+                      }
+                    MD5_Update(&mdContext, &dc, sizeof(double complex));
                     }
                  }
               }
@@ -854,7 +892,12 @@ void compute_md5sum_polycorradj(char *res, Gauge_Conf const * const GC, GParam c
                  {
                  for(n4=0; n4<MAXVALUE; n4++)
                     {
-                    MD5_Update(&mdContext, &((GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double));
+                    double a = (GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4];
+                    if(endian()==0)
+                      {
+                      SwapBytesDouble(&a);
+                      }
+                    MD5_Update(&mdContext, &a, sizeof(double));
                     }
                  }
               }
@@ -1093,7 +1136,16 @@ void compute_md5sum_tube_disc_stuff(char *res, Gauge_Conf const * const GC, GPar
                  {
                  for(n4=0; n4<NCOLOR; n4++)
                     {
-                    MD5_Update(&mdContext, &((GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                    double complex dc = (GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4];
+                    if(endian()==0)
+                      {
+                      double a = creal(dc);
+                      double b = cimag(dc);
+                      SwapBytesDouble(&a);
+                      SwapBytesDouble(&b);
+                      dc=a+b*I;
+                      }
+                    MD5_Update(&mdContext, &dc, sizeof(double complex));
                     }
                  }
               }
@@ -1111,7 +1163,16 @@ void compute_md5sum_tube_disc_stuff(char *res, Gauge_Conf const * const GC, GPar
               {
               for(n4=0; n4<NCOLOR; n4++)
                  {
-                 MD5_Update(&mdContext, &((GC->ml_polyplaq[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                 double complex dc = (GC->ml_polyplaq[0][i]).comp[n1][n2][n3][n4];
+                 if(endian()==0)
+                   {
+                   double a = creal(dc);
+                   double b = cimag(dc);
+                   SwapBytesDouble(&a);
+                   SwapBytesDouble(&b);
+                   dc=a+b*I;
+                   }
+                 MD5_Update(&mdContext, &dc, sizeof(double complex));
                  }
               }
            }
@@ -1355,7 +1416,12 @@ void compute_md5sum_tubeadj_disc_stuff(char *res, Gauge_Conf const * const GC, G
                  {
                  for(n4=0; n4<MAXVALUE; n4++)
                     {
-                    MD5_Update(&mdContext, &((GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double));
+                    double a = (GC->ml_polycorradj[0][j][i]).comp[n1][n2][n3][n4];
+                    if(endian()==0)
+                      {
+                      SwapBytesDouble(&a);
+                      }
+                    MD5_Update(&mdContext, &a, sizeof(double));
                     }
                  }
               }
@@ -1373,7 +1439,12 @@ void compute_md5sum_tubeadj_disc_stuff(char *res, Gauge_Conf const * const GC, G
               {
               for(n4=0; n4<MAXVALUE; n4++)
                  {
-                 MD5_Update(&mdContext, &((GC->ml_polyplaqadj[0][i]).comp[n1][n2][n3][n4]), sizeof(double));
+                 double a = (GC->ml_polyplaqadj[0][i]).comp[n1][n2][n3][n4];
+                 if(endian()==0)
+                   {
+                   SwapBytesDouble(&a);
+                   }
+                 MD5_Update(&mdContext, &a, sizeof(double));
                  }
               }
            }
@@ -1630,7 +1701,16 @@ void compute_md5sum_tube_conn_stuff(char *res, Gauge_Conf const * const GC, GPar
                  {
                  for(n4=0; n4<NCOLOR; n4++)
                     {
-                    MD5_Update(&mdContext, &((GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                    double complex dc = (GC->ml_polycorr[0][j][i]).comp[n1][n2][n3][n4];
+                    if(endian()==0)
+                      {
+                      double a = creal(dc);
+                      double b = cimag(dc);
+                      SwapBytesDouble(&a);
+                      SwapBytesDouble(&b);
+                      dc=a+b*I;
+                      }
+                    MD5_Update(&mdContext, &dc, sizeof(double complex));
                     }
                  }
               }
@@ -1648,7 +1728,16 @@ void compute_md5sum_tube_conn_stuff(char *res, Gauge_Conf const * const GC, GPar
               {
               for(n4=0; n4<NCOLOR; n4++)
                  {
-                 MD5_Update(&mdContext, &((GC->ml_polyplaq[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                 double complex dc = (GC->ml_polyplaq[0][i]).comp[n1][n2][n3][n4];
+                 if(endian()==0)
+                   {
+                   double a = creal(dc);
+                   double b = cimag(dc);
+                   SwapBytesDouble(&a);
+                   SwapBytesDouble(&b);
+                   dc=a+b*I;
+                   }
+                 MD5_Update(&mdContext, &dc, sizeof(double complex));
                  }
               }
            }
@@ -1665,7 +1754,16 @@ void compute_md5sum_tube_conn_stuff(char *res, Gauge_Conf const * const GC, GPar
               {
               for(n4=0; n4<NCOLOR; n4++)
                  {
-                 MD5_Update(&mdContext, &((GC->ml_polyplaqconn[0][i]).comp[n1][n2][n3][n4]), sizeof(double complex));
+                 double complex dc=(GC->ml_polyplaqconn[0][i]).comp[n1][n2][n3][n4];
+                 if(endian()==0)
+                   {
+                   double a = creal(dc);
+                   double b = cimag(dc);
+                   SwapBytesDouble(&a);
+                   SwapBytesDouble(&b);
+                   dc=a+b*I;
+                   }
+                 MD5_Update(&mdContext, &dc, sizeof(double complex));
                  }
               }
            }
@@ -2004,22 +2102,50 @@ void compute_md5sum_higgs(char *res, Gauge_Conf const * const GC, GParam const *
        #if NCOLOR==1
          for(k=0; k<NHIGGS; k++)
             {
-            MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double complex));
+            double complex dc=vec.comp[k];
+            if(endian()==0)
+              {
+              double a = creal(dc);
+              double b = cimag(dc);
+              SwapBytesDouble(&a);
+              SwapBytesDouble(&b);
+              dc=a+b*I;
+              }
+            MD5_Update(&mdContext, &dc, sizeof(double complex));
             }
        #elif NCOLOR==2
          for(k=0; k<4*NHIGGS; k++)
             {
+            double a=vec.comp[k];
+            if(endian()==0)
+              {
+              SwapBytesDouble(&a);
+              }
             MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double));
             }
        #else
          for(k=0; k<NHIGGS*NCOLOR; k++)
             {
+            double complex dc=vec.comp[k];
+            if(endian()==0)
+              {
+              double a = creal(dc);
+              double b = cimag(dc);
+              SwapBytesDouble(&a);
+              SwapBytesDouble(&b);
+              dc=a+b*I;
+              }
             MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double complex));
             }
        #endif
      #elif GGROUP==1
        for(k=0; k<NHIGGS*NCOLOR; k++)
           {
+          double a=vec.comp[k];
+          if(endian()==0)
+            {
+            SwapBytesDouble(&a);
+            }
           MD5_Update(&mdContext, &(vec.comp[k]), sizeof(double));
           }
      #endif

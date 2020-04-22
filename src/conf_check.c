@@ -1,6 +1,7 @@
 #ifndef CONF_CHECK_C
 #define CONF_CHECK_C
 
+#include"../include/endianness.h"
 #include"../include/macro.h"
 
 #include<openssl/md5.h>
@@ -118,22 +119,50 @@ void computehash(char *infile, int dim, long volume, char *hash)
               }
             #if GGROUP==0
               #if NCOLOR==1
-                MD5_Update(&mdContext, &(link.comp), sizeof(double complex));
+                double complex dc=link.comp;
+                if(endian()==0)
+                  {
+                  double a = creal(dc);
+                  double b = cimag(dc);
+                  SwapBytesDouble(&a);
+                  SwapBytesDouble(&b);
+                  dc=a+b*I;
+                  }
+                MD5_Update(&mdContext, &dc, sizeof(double complex));
               #elif NCOLOR==2
                 for(int k=0; k<4; k++)
                    {
-                   MD5_Update(&mdContext, &(link.comp[k]), sizeof(double));
+                   double a=link.comp[k];
+                   if(endian()==0)
+                     {
+                     SwapBytesDouble(&a);
+                     }
+                   MD5_Update(&mdContext, &a, sizeof(double));
                    }
               #else
                 for(int k=0; k<NCOLOR*NCOLOR; k++)
                    {
-                   MD5_Update(&mdContext, &(link.comp[k]), sizeof(double complex));
+                   double complex dc=link.comp[k];
+                   if(endian()==0)
+                     {
+                     double a = creal(dc);
+                     double b = cimag(dc);
+                     SwapBytesDouble(&a);
+                     SwapBytesDouble(&b);
+                     dc=a+b*I;
+                     }
+                   MD5_Update(&mdContext, &dc, sizeof(double complex));
                    }
               #endif
             #elif GGROUP==1
               for(int k=0; k<NCOLOR*NCOLOR; k++)
                  {
-                 MD5_Update(&mdContext, &(link.comp[k]), sizeof(double));
+                 double a=link.comp[k];
+                 if(endian()==0)
+                   {
+                   SwapBytesDouble(&a);
+                   }
+                 MD5_Update(&mdContext, &a, sizeof(double));
                  }
             #endif
             }
