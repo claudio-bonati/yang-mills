@@ -1,7 +1,9 @@
 #ifndef ENDIANNESS_C
 #define ENDIANNESS_C
 
+#include<complex.h>
 #include<stdlib.h>
+#include<string.h>
 
 #include"../include/endianness.h"
 
@@ -59,5 +61,17 @@ void SwapBytesDouble(void *pv)
        }
     }
 
+void SwapBytesDoubleComplex(double complex *pv)
+    {
+    double aux[2];
+
+    aux[0]=creal(*pv);
+    aux[1]=cimag(*pv);
+
+    SwapBytesDouble(&aux[0]);
+    SwapBytesDouble(&aux[1]);
+
+    memcpy(pv, (void*)aux, sizeof(aux));
+    }
 
 #endif

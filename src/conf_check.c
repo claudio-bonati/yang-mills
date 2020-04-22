@@ -1,8 +1,8 @@
 #ifndef CONF_CHECK_C
 #define CONF_CHECK_C
 
-#include"../include/endianness.h"
 #include"../include/macro.h"
+#include"../include/endianness.h"
 
 #include<openssl/md5.h>
 #include<stdio.h>
@@ -122,11 +122,7 @@ void computehash(char *infile, int dim, long volume, char *hash)
                 double complex dc=link.comp;
                 if(endian()==0)
                   {
-                  double a = creal(dc);
-                  double b = cimag(dc);
-                  SwapBytesDouble(&a);
-                  SwapBytesDouble(&b);
-                  dc=a+b*I;
+                  SwapBytesDoubleComplex(&dc);
                   }
                 MD5_Update(&mdContext, &dc, sizeof(double complex));
               #elif NCOLOR==2
@@ -145,11 +141,7 @@ void computehash(char *infile, int dim, long volume, char *hash)
                    double complex dc=link.comp[k];
                    if(endian()==0)
                      {
-                     double a = creal(dc);
-                     double b = cimag(dc);
-                     SwapBytesDouble(&a);
-                     SwapBytesDouble(&b);
-                     dc=a+b*I;
+                     SwapBytesDoubleComplex(&dc);
                      }
                    MD5_Update(&mdContext, &dc, sizeof(double complex));
                    }
