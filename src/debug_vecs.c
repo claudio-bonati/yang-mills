@@ -81,7 +81,7 @@ int main(void)
     }
   printf("\n");
 
-  printf("VERIFY THAT OVERRELAXATION DOES NOT CHANGE THE ENERGY ...");
+  printf("VERIFY THAT OVERRELAXATION DOES NOT CHANGE ENERGY AND NORMALIZATION ...");
   rand_vecs(&M);
   equal_vecs(&L, &M);
   rand_vecs(&N);
@@ -95,13 +95,26 @@ int main(void)
 
   if(fabs(energy)<MIN_VALUE)
     {
+    printf("  OK  ");
+    }
+  else
+    {
+    printf("  ERROR!!!!!!!!!!!   DeltaE=%g  ", energy);
+    return EXIT_FAILURE;
+    }
+
+  equal_vecs(&L, &M);
+  energy=re_scal_prod_vecs(&M, &L);
+  if(fabs(energy-1)<MIN_VALUE)
+    {
     printf("  OK\n");
     }
   else
     {
-    printf("  ERROR!!!!!!!!!!!   DeltaE=%g\n", energy);
+    printf("  ERROR!!!!!!!!!!!\n");
     return EXIT_FAILURE;
     }
+
 
   printf("\nTEST PASSED\n\n");
 
