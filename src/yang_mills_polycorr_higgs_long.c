@@ -106,6 +106,11 @@ void real_main(char *in_file)
            update_with_higgs(&GC, &geo, &param, &acc_local);
            }
 
+        if(count>param.d_thermal)
+          {
+          acc+=acc_local;
+          }
+
         // save configuration
         write_conf_on_file(&GC, &param);
         write_higgs_on_file(&GC, &param);
@@ -139,6 +144,8 @@ void real_main(char *in_file)
       }
     time(&time2);
     // montecarlo end
+
+    acc/=(double)(param.d_sample-param.d_thermal);
 
     // close data file
     fclose(datafilep);
