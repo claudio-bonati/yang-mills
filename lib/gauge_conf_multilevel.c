@@ -27,47 +27,6 @@ void multihit(Gauge_Conf const * const GC,
     {
     int i;
     const double inv_num_hit = 1.0/(double) num_hit;
-    GAUGE_GROUP staple, partial;
-
-    zero(G);
-    equal(&partial, &(GC->lattice[r][dir]));
-    #ifndef THETA_MODE
-      calcstaples_wilson(GC, geo, param, r, dir, &staple);
-    #else
-      // compute_clovers in direction "dir" HAS TO BE CALLED BEFORE!
-      calcstaples_with_topo(GC, geo, param, r, dir, &staple);
-    #endif
-
-    times_equal_real(&staple, param->d_beta);
-
-    for(i=0; i<num_hit; i++)
-       {
-       single_heatbath(&partial, &staple);
-       plus_equal(G, &partial);
-
-       unitarize(&partial);
-       }
-    times_equal_real(G, inv_num_hit);
-    }
-  else
-    {
-    equal(G, &(GC->lattice[r][dir]));
-    }
-  }
-
-
-void multihit_with_higgs(Gauge_Conf const * const GC,
-                         Geometry const * const geo,
-                         GParam const * const param,
-                         long r,
-                         int dir,
-                         int num_hit,
-                         GAUGE_GROUP *G)
-  {
-  if(num_hit>0)
-    {
-    int i;
-    const double inv_num_hit = 1.0/(double) num_hit;
     GAUGE_GROUP staple, staple2, partial;
 
     zero(G);

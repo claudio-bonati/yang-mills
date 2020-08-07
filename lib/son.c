@@ -186,7 +186,7 @@ void LU_SoN(SoN const * const restrict A, SoN * restrict ris, int * restrict sig
      big=0.0;
      for(j=0; j<NCOLOR; j++)
         {
-        temp = cabs(ris->comp[m(i,j)]);
+        temp = fabs(ris->comp[m(i,j)]);
         if( temp>big ) big=temp;
         }
      vv[i]=1.0/big;
@@ -214,7 +214,7 @@ void LU_SoN(SoN const * const restrict A, SoN * restrict ris, int * restrict sig
            }
         ris->comp[m(i,j)]=sum;
 
-        temp = vv[i]*cabs(sum);
+        temp = vv[i]*fabs(sum);
         if(temp >= big)
           {
           big=temp;
