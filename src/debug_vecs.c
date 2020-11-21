@@ -23,7 +23,7 @@ int main(void)
   initrand(seme);
 
   printf("\n***************************************************\n");
-  printf("PROGRAM FOR THE DEBUG OF VECS [for U1, Su2 and SuN] \n");
+  printf("PROGRAM FOR THE DEBUG OF VECS \n");
   printf("***************************************************\n\n");
 
   printf("GGROUP=%s\n", QUOTEME(GGROUP));
@@ -64,6 +64,7 @@ int main(void)
     }
   printf("\n");
 
+  #if GGROUP == 0 // only for SuN groups
   printf("VERIFY THAT THE RANDOM PHASE MULTIPLICATION DOES NOT CHANGE THE NORMALIZATION ...");
   rand_vecs(&L);
   i=(int) (NHIGGS*casuale()-MIN_VALUE);
@@ -80,6 +81,7 @@ int main(void)
     return EXIT_FAILURE;
     }
   printf("\n");
+  #endif
 
   printf("VERIFY THAT OVERRELAXATION DOES NOT CHANGE ENERGY AND NORMALIZATION ...");
   rand_vecs(&M);
