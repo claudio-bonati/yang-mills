@@ -140,15 +140,16 @@ void cool_U1(U1 * restrict link, U1 const * const restrict staple)
 void single_overrelaxation_U1Vecs(U1Vecs *restrict link, U1Vecs const * const staple)
   {
   U1Vecs newlink;
-  double norm, scalprod;
+  double norm;
+  double complex scalprod;
 
   norm=norm_U1Vecs(staple);
   if(norm>MIN_VALUE)
     {
-    scalprod=re_scal_prod_U1Vecs(link, staple);
+    scalprod=complex_scal_prod_U1Vecs(staple, link);
 
     equal_U1Vecs(&newlink, staple);
-    times_equal_real_U1Vecs(&newlink, 2.0*scalprod/norm/norm);
+    times_equal_complex_U1Vecs(&newlink, 2.0*scalprod/norm/norm);
     minus_equal_U1Vecs(&newlink, link);
 
     equal_U1Vecs(link, &newlink);

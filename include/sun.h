@@ -1378,6 +1378,22 @@ inline void times_equal_complex_single_SuNVecs(SuNVecs * restrict A, double comp
   }
 
 
+// *= with complex number
+inline void times_equal_complex_SuNVecs(SuNVecs * restrict A, double complex r)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     A->comp[i]*=r;
+     }
+  }
+
+
 // norm
 inline double norm_SuNVecs(SuNVecs const * const restrict A)
   {
@@ -1433,6 +1449,25 @@ inline double re_scal_prod_SuNVecs(SuNVecs const * const restrict v1, SuNVecs co
   return ris;
   }
 
+
+// complex scalar product v_1^{\dag}v_2
+inline double complex complex_scal_prod_SuNVecs(SuNVecs const * const restrict v1, SuNVecs const * const restrict v2)
+  {
+   #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double complex ris=0.0 + 0.0*I;
+
+  for(i=0; i<NCOLOR*NHIGGS; i++)
+     {
+     ris+=conj(v1->comp[i]) * v2->comp[i];
+     }
+
+  return ris;
+  }
 
 // real part of the scalar product re(v_1[a]^{\dag}v_2[b]) with a, b flavour indices
 inline double re_scal_prod_single_SuNVecs(SuNVecs const * const restrict v1, SuNVecs const * const restrict v2, int a, int b)

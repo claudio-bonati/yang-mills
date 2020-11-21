@@ -1784,6 +1784,18 @@ void update_with_higgs(Gauge_Conf * GC,
          }
       }
 
+   // final unitarization
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      for(dir=0; dir<STDIM; dir++)
+         {
+         unitarize(&(GC->lattice[r][dir]));
+         }
+      }
+
    // overrelax links and higgs
    for(j=0; j<param->d_overrelax; j++)
       {
@@ -1804,6 +1816,18 @@ void update_with_higgs(Gauge_Conf * GC,
             {
             overrelaxation_with_higgs(GC, geo, param, r, dir);
             }
+
+         // final unitarization
+         #ifdef OPENMP_MODE
+         #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+         #endif
+         for(r=0; r<(param->d_volume); r++)
+            {
+            for(dir=0; dir<STDIM; dir++)
+               {
+               unitarize(&(GC->lattice[r][dir]));
+               }
+            }
          }
 
       #ifdef OPENMP_MODE
@@ -1821,6 +1845,15 @@ void update_with_higgs(Gauge_Conf * GC,
          {
          overrelaxation_for_higgs(GC, geo, param, r);
          }
+
+     // final normalization for higgs
+     #ifdef OPENMP_MODE
+     #pragma omp parallel for num_threads(NTHREADS) private(r)
+     #endif
+     for(r=0; r<(param->d_volume); r++)
+        {
+        normalize_vecs(&(GC->higgs[r]));
+        }
       }
 
    // metropolis on higgs
@@ -1840,6 +1873,15 @@ void update_with_higgs(Gauge_Conf * GC,
       a[r]+=metropolis_for_higgs(GC, geo, param, r);
       }
 
+   // final normalization for higgs
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      normalize_vecs(&(GC->higgs[r]));
+      }
+
    // acceptance computation
    asum=0;
    #ifdef OPENMP_MODE
@@ -1851,27 +1893,6 @@ void update_with_higgs(Gauge_Conf * GC,
       }
 
    *acc=((double)asum)*param->d_inv_vol/(double)NHIGGS;
-
-   // final unitarization
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
-      for(dir=0; dir<STDIM; dir++)
-         {
-         unitarize(&(GC->lattice[r][dir]));
-         }
-      }
-
-   // final normalization for higgs
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
-      normalize_vecs(&(GC->higgs[r]));
-      }
 
    free(a);
 

@@ -297,15 +297,16 @@ void cool_SuN(SuN *link, SuN const * const staple)
 void single_overrelaxation_SuNVecs(SuNVecs *restrict link, SuNVecs const * const staple)
   {
   SuNVecs newlink;
-  double norm, scalprod;
+  double norm;
+  double complex scalprod;
 
   norm=norm_SuNVecs(staple);
   if(norm>MIN_VALUE)
     {
-    scalprod=re_scal_prod_SuNVecs(link, staple);
+    scalprod=complex_scal_prod_SuNVecs(staple, link);
 
     equal_SuNVecs(&newlink, staple);
-    times_equal_real_SuNVecs(&newlink, 2.0*scalprod/norm/norm);
+    times_equal_complex_SuNVecs(&newlink, 2.0*scalprod/norm/norm);
     minus_equal_SuNVecs(&newlink, link);
 
     equal_SuNVecs(link, &newlink);

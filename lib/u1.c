@@ -420,6 +420,10 @@ void times_equal_real_single_U1Vecs(U1Vecs * restrict A, double r, int j);
 void times_equal_complex_single_U1Vecs(U1Vecs * restrict A, double complex r, int j);
 
 
+// *= with complex number
+void times_equal_complex_U1Vecs(U1Vecs * restrict A, double complex r);
+
+
 // norm
 double norm_U1Vecs(U1Vecs const * const restrict A);
 
@@ -452,6 +456,10 @@ void rand_vec_U1Vecs(U1Vecs * restrict A)
 
 // real part of the scalar product re(v_1^{\dag}v_2)
 double re_scal_prod_U1Vecs(U1Vecs const * const restrict v1, U1Vecs const * const restrict v2);
+
+
+// complex scalar product v_1^{\dag}v_2
+double complex complex_scal_prod_U1Vecs(U1Vecs const * const restrict v1, U1Vecs const * const restrict v2);
 
 
 // real part of the scalar product re(v_1[a]^{\dag}v_2[b]) with a, b flavour indices

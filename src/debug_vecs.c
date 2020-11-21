@@ -97,7 +97,7 @@ int main(void)
 
   if(fabs(energy)<MIN_VALUE)
     {
-    printf("  OK  ");
+    printf("  OK");
     }
   else
     {
@@ -105,8 +105,7 @@ int main(void)
     return EXIT_FAILURE;
     }
 
-  equal_vecs(&L, &M);
-  energy=re_scal_prod_vecs(&M, &L);
+  energy=norm_vecs(&M);
   if(fabs(energy-1)<MIN_VALUE)
     {
     printf("  OK\n");
@@ -116,7 +115,6 @@ int main(void)
     printf("  ERROR!!!!!!!!!!!\n");
     return EXIT_FAILURE;
     }
-
 
   printf("\nTEST PASSED\n\n");
 
