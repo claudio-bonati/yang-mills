@@ -45,88 +45,36 @@ void duetoenne_SoN(double theta, int i, int j, SoN *out)
    }
 
 
-// Pseudo-heatbath by Cabibbo-Marinari (Phys. Lett. B 119, p.387 (1982))
+// in fact it is a metropolis
 //
 // generate link according to the distibution \exp[-(1/N_c)ReTr(link*staple)]
 // the coupling is inside the staple
 //
 void single_heatbath_SoN(SoN *link, SoN const * const staple)
     {
-    SoN aux;
-    double xi, theta_old, theta_new, y1, y2, prob;
-    double fii, fij, fji, fjj, temp0, temp1;
-    int i, j, k;
-
-    equal_SoN(&aux, staple);     // aux=staple
-    times_equal_SoN(&aux, link); // aux=staple*link
+    int i, j;
+    SoN aux1, aux2, newlink;
+    double energy_old, energy_new;
 
     for(i=0; i<NCOLOR-1; i++)
        {
        for(j=i+1; j<NCOLOR; j++)
           {
-          ennetodue_SoN(&aux, i, j, &xi, &theta_old);
+          equal_SoN(&aux2, link);
+          times_equal_SoN(&aux2, staple);
+          energy_old=-retr_SoN(&aux2);
 
-          xi*=(2.0/(double)NCOLOR);
+          duetoenne_SoN(0.2*PI*(2.0*casuale()-1), i, j, &aux1);
+          equal_SoN(&newlink, link);
+          times_equal_SoN(&newlink, &aux1);
 
-          if(xi>MIN_VALUE)
+          equal_SoN(&aux2, &newlink);
+          times_equal_SoN(&aux2, staple);
+          energy_new=-retr_SoN(&aux2);
+
+          if(casuale()<exp(energy_old-energy_new))
             {
-            y1=casuale();
-            y2=casuale();
-
-            theta_new=sqrt( -2.0/xi*log(1 - y1*(1-exp(-xi*PI*PI/2.0)) ) )*cos(PI2*(y2-0.5));
-            prob=exp( xi * (cos(theta_new) -theta_old*theta_old/2.0 -cos(theta_old) +theta_new*theta_new/2.0 ));
-
-            if(casuale()<prob)
-              {
-              fii= cos(theta_new-theta_old);
-              fij= sin(theta_new-theta_old);
-              fji=-sin(theta_new-theta_old);
-              fjj= cos(theta_new-theta_old);
-
-              // link*=final
-              for(k=0; k<NCOLOR; k++)
-                 {
-                 temp0=link->comp[m(k,i)]*fii + link->comp[m(k,j)]*fji;
-                 temp1=link->comp[m(k,i)]*fij + link->comp[m(k,j)]*fjj;
-                 link->comp[m(k,i)]=temp0;
-                 link->comp[m(k,j)]=temp1;
-                 }
-              // aux*=final
-              for(k=0; k<NCOLOR; k++)
-                 {
-                 temp0=aux.comp[m(k,i)]*fii + aux.comp[m(k,j)]*fji;
-                 temp1=aux.comp[m(k,i)]*fij + aux.comp[m(k,j)]*fjj;
-                 aux.comp[m(k,i)]=temp0;
-                 aux.comp[m(k,j)]=temp1;
-                 }
-
-              }
-            }
-          else
-            {
-            theta_new=2*PI*casuale();
-
-            fii= cos(theta_new);
-            fij= sin(theta_new);
-            fji=-sin(theta_new);
-            fjj= cos(theta_new);
-
-            // link*=final
-            for(k=0; k<NCOLOR; k++)
-               {
-               temp0=link->comp[m(k,i)]*fii + link->comp[m(k,j)]*fji;
-               temp1=link->comp[m(k,i)]*fij + link->comp[m(k,j)]*fjj;
-               link->comp[m(k,i)]=temp0;
-               link->comp[m(k,j)]=temp1;
-               }
-            // aux*=final
-            for(k=0; k<NCOLOR; k++)
-               {
-               temp0=aux.comp[m(k,i)]*fii + aux.comp[m(k,j)]*fji;
-               temp1=aux.comp[m(k,i)]*fij + aux.comp[m(k,j)]*fjj;
-               aux.comp[m(k,i)]=temp0;
-               aux.comp[m(k,j)]=temp1;
-               }
+            equal_SoN(link, &newlink);
             }
           }
        }
