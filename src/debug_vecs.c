@@ -13,7 +13,7 @@
 int main(void)
   {
   unsigned int seme=0;
-  int i;
+  int i, k;
   double energy;
 
   GAUGE_VECS M, N, L;
@@ -63,6 +63,26 @@ int main(void)
     return EXIT_FAILURE;
     }
   printf("\n");
+
+
+  printf("VERIFY THAT THE TWO COMPONENT ROTATION DOES NOT CHANGE THE NORMALIZATION ...");
+  rand_vecs(&M);
+  i=(int) (NHIGGS*casuale()-MIN_VALUE);
+  k=(i+1 + (int)((NHIGGS-1)*casuale()*(1.0 - MIN_VALUE)) )% NHIGGS;
+  rotate_two_components_vecs(&L, &M, i, k, PI2*casuale());
+  energy=norm_vecs(&L);
+  if(fabs(energy-1) < MIN_VALUE)
+    {
+    printf("  OK\n");
+    }
+  else
+    {
+    printf("  ERROR!!!!!!!!!!!\n");
+    return EXIT_FAILURE;
+    }
+  printf("\n");
+
+
 
   #if GGROUP == 0 // only for SuN groups
   printf("VERIFY THAT THE RANDOM PHASE MULTIPLICATION DOES NOT CHANGE THE NORMALIZATION ...");

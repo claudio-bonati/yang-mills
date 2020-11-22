@@ -1003,6 +1003,30 @@ inline void matrix_times_vector_all_U1Vecs(U1Vecs * restrict v1,
   }
 
 
+// rotate two components of the vector
+inline void rotate_two_components_U1Vecs(U1Vecs * restrict v1,
+                                         U1Vecs const * const restrict v2,
+                                         int i,
+                                         int j,
+                                         double angle)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int k;
+
+  equal_U1Vecs(v1, v2);
+
+  for(k=0; k<NCOLOR; k++)
+     {
+     v1->comp[NCOLOR*i+k]= cos(angle)*v2->comp[NCOLOR*i+k] + sin(angle)*v2->comp[NCOLOR*j+k];
+     v1->comp[NCOLOR*j+k]=-sin(angle)*v2->comp[NCOLOR*i+k] + cos(angle)*v2->comp[NCOLOR*j+k];
+     }
+  }
+
+
 // tensor product of two vectors
 // Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
 inline void vector_tensor_vector_U1Vecs(U1 * restrict matrix,

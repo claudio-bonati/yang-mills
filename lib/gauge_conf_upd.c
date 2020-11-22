@@ -1675,6 +1675,8 @@ void overrelaxation_for_higgs(Gauge_Conf *GC,
   calcstaples_for_higgs(GC, geo, param, r, &staple);
 
   single_overrelaxation_vecs(&(GC->higgs[r]), &staple);
+
+  normalize_vecs(&(GC->higgs[r]));
   }
 
 
@@ -1732,8 +1734,54 @@ int metropolis_for_higgs(Gauge_Conf *GC,
        acc+=1;
        }
      }
+  normalize_vecs(&(GC->higgs[r]));
 
-  return acc;
+  #if GGROUP == 0 // only for SuN groups
+  for(i=0; i<NHIGGS; i++)
+     {
+     old_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&(GC->higgs[r]), &staple);
+
+     equal_vecs(&new_vector, &(GC->higgs[r]));
+     times_equal_complex_single_vecs(&new_vector, cexp(param->d_epsilon_metro*PI*(2.0*casuale()-1)*I), i);
+     new_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
+
+     if(casuale()< exp(old_energy-new_energy))
+       {
+       equal_vecs(&(GC->higgs[r]), &new_vector);
+       acc+=1;
+       }
+     }
+  #endif
+
+  if(NHIGGS>1)
+    {
+    int k;
+    double angle;
+
+    for(i=0; i<NHIGGS; i++)
+       {
+       old_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&(GC->higgs[r]), &staple);
+
+       j=(int)(NHIGGS*casuale()*(1.0 - MIN_VALUE));
+       k=(j+1 + (int)((NHIGGS-1)*casuale()*(1.0 - MIN_VALUE)) )% NHIGGS;
+
+       angle=PI*param->d_epsilon_metro*(2.0*casuale()-1.0);
+
+       rotate_two_components_vecs(&new_vector, &(GC->higgs[r]), j, k, angle);
+
+       new_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
+
+       if(casuale()< exp(old_energy-new_energy))
+         {
+         equal_vecs(&(GC->higgs[r]), &new_vector);
+         acc+=1;
+         }
+       }
+    normalize_vecs(&(GC->higgs[r]));
+    }
+
+
+  return acc/3;
   }
 
 
@@ -1846,14 +1894,7 @@ void update_with_higgs(Gauge_Conf * GC,
          overrelaxation_for_higgs(GC, geo, param, r);
          }
 
-     // final normalization for higgs
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r)
-     #endif
-     for(r=0; r<(param->d_volume); r++)
-        {
-        normalize_vecs(&(GC->higgs[r]));
-        }
+      // normalization for higgs is included in the update functions
       }
 
    // metropolis on higgs
@@ -1873,14 +1914,7 @@ void update_with_higgs(Gauge_Conf * GC,
       a[r]+=metropolis_for_higgs(GC, geo, param, r);
       }
 
-   // final normalization for higgs
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
-      normalize_vecs(&(GC->higgs[r]));
-      }
+   // normalization for higgs is included in the update functions
 
    // acceptance computation
    asum=0;

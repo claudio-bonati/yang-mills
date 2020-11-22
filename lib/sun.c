@@ -720,6 +720,14 @@ void matrix_times_vector_single_SuNVecs(SuNVecs * restrict v1, SuN const * const
 void matrix_times_vector_all_SuNVecs(SuNVecs * restrict v1, SuN const * const restrict matrix, SuNVecs const * const restrict v2);
 
 
+// rotate two components of the vector
+void rotate_two_components_SuNVecs(SuNVecs * restrict v1,
+                                   SuNVecs const * const restrict v2,
+                                   int i,
+                                   int j,
+                                   double angle);
+
+
 // tensor product of two vectors
 // Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
 void vector_tensor_vector_SuNVecs(SuN * restrict matrix, SuNVecs const * const restrict v1, SuNVecs const * const restrict v2);

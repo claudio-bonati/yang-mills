@@ -146,6 +146,11 @@ void (*matrix_times_vector_single_vecs)(GAUGE_VECS * restrict v1,
 void (*matrix_times_vector_all_vecs)(GAUGE_VECS * restrict v1,
                                      GAUGE_GROUP const * const restrict matrix,
                                      GAUGE_VECS const * const restrict v2);
+void (*rotate_two_components_vecs)(GAUGE_VECS * restrict v1,
+                                   GAUGE_VECS const * const restrict v2,
+                                   int i,
+                                   int j,
+                                   double angle);
 void (*vector_tensor_vector_vecs)(GAUGE_GROUP * restrict matrix,
                                   GAUGE_VECS const * const restrict v1,
                                   GAUGE_VECS const * const restrict v2);

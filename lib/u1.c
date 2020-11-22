@@ -476,6 +476,14 @@ void matrix_times_vector_single_U1Vecs(U1Vecs * restrict v1, U1 const * const re
 void matrix_times_vector_all_U1Vecs(U1Vecs * restrict v1, U1 const * const restrict matrix, U1Vecs const * const restrict v2);
 
 
+// rotate two components of the vector
+void rotate_two_components_U1Vecs(U1Vecs * restrict v1,
+                                  U1Vecs const * const restrict v2,
+                                  int i,
+                                  int j,
+                                  double angle);
+
+
 // tensor product of two vectors
 // Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
 void vector_tensor_vector_U1Vecs(U1 * restrict matrix, U1Vecs const * const restrict v1, U1Vecs const * const restrict v2);

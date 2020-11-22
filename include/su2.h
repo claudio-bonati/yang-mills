@@ -1310,6 +1310,30 @@ inline void matrix_times_vector_all_Su2Vecs(Su2Vecs * restrict v1, Su2 const * c
   }
 
 
+// rotate two components of the vector
+inline void rotate_two_components_Su2Vecs(Su2Vecs * restrict v1,
+                                          Su2Vecs const * const restrict v2,
+                                          int i,
+                                          int j,
+                                          double angle)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int k;
+
+  equal_Su2Vecs(v1, v2);
+
+  for(k=0; k<4; k++)
+     {
+     v1->comp[4*i+k]= cos(angle)*v2->comp[4*i+k] + sin(angle)*v2->comp[4*j+k];
+     v1->comp[4*j+k]=-sin(angle)*v2->comp[4*i+k] + cos(angle)*v2->comp[4*j+k];
+     }
+  }
+
+
 // tensor product of two vectors
 // Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
 inline void vector_tensor_vector_Su2Vecs(Su2 * restrict matrix, Su2Vecs const * const restrict v1, Su2Vecs const * const restrict v2)

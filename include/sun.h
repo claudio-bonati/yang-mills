@@ -1469,6 +1469,7 @@ inline double complex complex_scal_prod_SuNVecs(SuNVecs const * const restrict v
   return ris;
   }
 
+
 // real part of the scalar product re(v_1[a]^{\dag}v_2[b]) with a, b flavour indices
 inline double re_scal_prod_single_SuNVecs(SuNVecs const * const restrict v1, SuNVecs const * const restrict v2, int a, int b)
   {
@@ -1487,6 +1488,7 @@ inline double re_scal_prod_single_SuNVecs(SuNVecs const * const restrict v1, SuN
 
   return ris;
   }
+
 
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
@@ -1543,6 +1545,30 @@ inline void matrix_times_vector_all_SuNVecs(SuNVecs * restrict v1, SuN const * c
            v1->comp[NCOLOR*i+j] += matrix->comp[m(j,k)] * v2->comp[NCOLOR*i+k];
            }
         }
+     }
+  }
+
+
+// rotate two components of the vector
+inline void rotate_two_components_SuNVecs(SuNVecs * restrict v1,
+                                          SuNVecs const * const restrict v2,
+                                          int i,
+                                          int j,
+                                          double angle)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int k;
+
+  equal_SuNVecs(v1, v2);
+
+  for(k=0; k<NCOLOR; k++)
+     {
+     v1->comp[NCOLOR*i+k]= cos(angle)*v2->comp[NCOLOR*i+k] + sin(angle)*v2->comp[NCOLOR*j+k];
+     v1->comp[NCOLOR*j+k]=-sin(angle)*v2->comp[NCOLOR*i+k] + cos(angle)*v2->comp[NCOLOR*j+k];
      }
   }
 
