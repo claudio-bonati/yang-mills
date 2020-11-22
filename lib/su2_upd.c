@@ -157,6 +157,4 @@ void single_overrelaxation_Su2Vecs(Su2Vecs *restrict link, Su2Vecs const * const
   }
 
 
-
-
 #endif

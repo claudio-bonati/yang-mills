@@ -64,25 +64,25 @@ int main(void)
     }
   printf("\n");
 
-
-  printf("VERIFY THAT THE TWO COMPONENT ROTATION DOES NOT CHANGE THE NORMALIZATION ...");
-  rand_vecs(&M);
-  i=(int) (NHIGGS*casuale()-MIN_VALUE);
-  k=(i+1 + (int)((NHIGGS-1)*casuale()*(1.0 - MIN_VALUE)) )% NHIGGS;
-  rotate_two_components_vecs(&L, &M, i, k, PI2*casuale());
-  energy=norm_vecs(&L);
-  if(fabs(energy-1) < MIN_VALUE)
+  if(NHIGGS>1)
     {
-    printf("  OK\n");
+    printf("VERIFY THAT THE TWO COMPONENT ROTATION DOES NOT CHANGE THE NORMALIZATION ...");
+    rand_vecs(&M);
+    i=(int) (NHIGGS*casuale()-MIN_VALUE);
+    k=(i+1 + (int)((NHIGGS-1)*casuale()*(1.0 - MIN_VALUE)) )% NHIGGS;
+    rotate_two_components_vecs(&L, &M, i, k, PI2*casuale());
+    energy=norm_vecs(&L);
+    if(fabs(energy-1) < MIN_VALUE)
+      {
+      printf("  OK\n");
+      }
+    else
+      {
+      printf("  ERROR!!!!!!!!!!!\n");
+      return EXIT_FAILURE;
+      }
+    printf("\n");
     }
-  else
-    {
-    printf("  ERROR!!!!!!!!!!!\n");
-    return EXIT_FAILURE;
-    }
-  printf("\n");
-
-
 
   #if GGROUP == 0 // only for SuN groups
   printf("VERIFY THAT THE RANDOM PHASE MULTIPLICATION DOES NOT CHANGE THE NORMALIZATION ...");
@@ -135,6 +135,32 @@ int main(void)
     printf("  ERROR!!!!!!!!!!!\n");
     return EXIT_FAILURE;
     }
+  printf("\n");
+
+  printf("VERIFY THAT OVERRELAXATION IS REVERSIBLE ...");
+  rand_vecs(&M);
+  equal_vecs(&L, &M);
+  rand_vecs(&N);
+  times_equal_real_vecs(&N, casuale());
+
+  single_overrelaxation_vecs(&M, &N);
+  single_overrelaxation_vecs(&M, &N);
+
+  times_equal_real_vecs(&M, -1);
+  plus_equal_vecs(&M, &L);
+
+  energy=norm_vecs(&M);
+  if(fabs(energy)<MIN_VALUE)
+    {
+    printf("  OK");
+    }
+  else
+    {
+    printf("  ERROR!!!!!!!!!!!   Delta=%g  ", energy);
+    return EXIT_FAILURE;
+    }
+  printf("\n");
+
 
   printf("\nTEST PASSED\n\n");
 
