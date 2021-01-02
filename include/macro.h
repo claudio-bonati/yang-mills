@@ -59,6 +59,8 @@ static const double HALF_PI=1.57079632679489661923132169163975144209858469968755
                      + __GNUC_PATCHLEVEL__)
 
 // to activate posix_memalign in stdlib.h
+#ifndef _POSIX_C_SOURCE 
 #define _POSIX_C_SOURCE 200809L
+#endif
 
 #endif
