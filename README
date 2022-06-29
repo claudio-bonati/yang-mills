@@ -26,13 +26,6 @@ form
 The update is performed by means of heatbath and overrelaxation updates (and in
 some case also Metropolis updates) implemented a la Cabibbo-Marinari.
 
-In yang_mills_local_fundadj the action is
-
--beta*(1/N)\sum_{plaquettes} Re(Tr(paquette)) 
--adjbeta*(1/(N*N-1))\sum_{plaquettes} Tr_adj(paquette)
-
-and Tr_adj=|Tr_fund|^2-1.
-
 In yang_mills_higgs the action is 
 
 -beta*(1/N)\sum_{plaquettes} Re(Tr(paquette)) 

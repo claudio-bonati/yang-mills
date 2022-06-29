@@ -90,8 +90,7 @@ bin_PROGRAMS = conf_check$(EXEEXT) debug_rng$(EXEEXT) \
 	debug_su2$(EXEEXT) debug_su2_adj$(EXEEXT) \
 	debug_su2sun$(EXEEXT) debug_sun$(EXEEXT) debug_vecs$(EXEEXT) \
 	yang_mills_higgs$(EXEEXT) yang_mills_local$(EXEEXT) \
-	yang_mills_local_fundadj$(EXEEXT) yang_mills_polycorr$(EXEEXT) \
-	yang_mills_polycorr_long$(EXEEXT) \
+	yang_mills_polycorr$(EXEEXT) yang_mills_polycorr_long$(EXEEXT) \
 	yang_mills_polycorr_higgs$(EXEEXT) \
 	yang_mills_polycorr_higgs_long$(EXEEXT) \
 	yang_mills_polycorradj$(EXEEXT) \
@@ -189,11 +188,6 @@ am_yang_mills_local_OBJECTS = ./src/yang_mills_local.$(OBJEXT) \
 	$(am__objects_13)
 yang_mills_local_OBJECTS = $(am_yang_mills_local_OBJECTS)
 yang_mills_local_LDADD = $(LDADD)
-am_yang_mills_local_fundadj_OBJECTS =  \
-	./src/yang_mills_local_fundadj.$(OBJEXT) $(am__objects_13)
-yang_mills_local_fundadj_OBJECTS =  \
-	$(am_yang_mills_local_fundadj_OBJECTS)
-yang_mills_local_fundadj_LDADD = $(LDADD)
 am_yang_mills_polycorr_OBJECTS = ./src/yang_mills_polycorr.$(OBJEXT) \
 	$(am__objects_13)
 yang_mills_polycorr_OBJECTS = $(am_yang_mills_polycorr_OBJECTS)
@@ -291,9 +285,7 @@ SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
 	$(debug_su2sun_SOURCES) $(debug_sun_SOURCES) \
 	$(debug_vecs_SOURCES) $(yang_mills_higgs_SOURCES) \
-	$(yang_mills_local_SOURCES) \
-	$(yang_mills_local_fundadj_SOURCES) \
-	$(yang_mills_polycorr_SOURCES) \
+	$(yang_mills_local_SOURCES) $(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_higgs_SOURCES) \
 	$(yang_mills_polycorr_higgs_long_SOURCES) \
 	$(yang_mills_polycorr_long_SOURCES) \
@@ -310,9 +302,7 @@ DIST_SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
 	$(debug_su2sun_SOURCES) $(debug_sun_SOURCES) \
 	$(debug_vecs_SOURCES) $(yang_mills_higgs_SOURCES) \
-	$(yang_mills_local_SOURCES) \
-	$(yang_mills_local_fundadj_SOURCES) \
-	$(yang_mills_polycorr_SOURCES) \
+	$(yang_mills_local_SOURCES) $(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_higgs_SOURCES) \
 	$(yang_mills_polycorr_higgs_long_SOURCES) \
 	$(yang_mills_polycorr_long_SOURCES) \
@@ -621,9 +611,6 @@ yang_mills_higgs_SOURCES = ./src/yang_mills_higgs.c \
 yang_mills_local_SOURCES = ./src/yang_mills_local.c \
                           $(everything)
 
-yang_mills_local_fundadj_SOURCES = ./src/yang_mills_local_fundadj.c \
-                                 $(everything)
-
 yang_mills_polycorr_SOURCES = ./src/yang_mills_polycorr.c \
                             $(everything)
 
@@ -869,12 +856,6 @@ yang_mills_higgs$(EXEEXT): $(yang_mills_higgs_OBJECTS) $(yang_mills_higgs_DEPEND
 yang_mills_local$(EXEEXT): $(yang_mills_local_OBJECTS) $(yang_mills_local_DEPENDENCIES) $(EXTRA_yang_mills_local_DEPENDENCIES) 
 	@rm -f yang_mills_local$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(yang_mills_local_OBJECTS) $(yang_mills_local_LDADD) $(LIBS)
-./src/yang_mills_local_fundadj.$(OBJEXT): src/$(am__dirstamp) \
-	src/$(DEPDIR)/$(am__dirstamp)
-
-yang_mills_local_fundadj$(EXEEXT): $(yang_mills_local_fundadj_OBJECTS) $(yang_mills_local_fundadj_DEPENDENCIES) $(EXTRA_yang_mills_local_fundadj_DEPENDENCIES) 
-	@rm -f yang_mills_local_fundadj$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(yang_mills_local_fundadj_OBJECTS) $(yang_mills_local_fundadj_LDADD) $(LIBS)
 ./src/yang_mills_polycorr.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
@@ -998,7 +979,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_vecs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_higgs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_local.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_local_fundadj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr_higgs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr_higgs_long.Po@am__quote@
