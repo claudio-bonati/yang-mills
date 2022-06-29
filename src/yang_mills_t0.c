@@ -49,7 +49,6 @@ void real_main(char *in_file)
     datafilep=fopen(param.d_data_file, "a");
 
     // initialize geometry
-    init_indexing_lexeo();
     init_geometry(&geo, &param);
 
     // initialize gauge configurations

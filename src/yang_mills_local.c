@@ -50,7 +50,6 @@ void real_main(char *in_file)
       }
 
     // initialize geometry
-    init_indexing_lexeo();
     init_geometry(&geo, &param);
 
     // initialize gauge configuration

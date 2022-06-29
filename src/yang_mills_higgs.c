@@ -44,7 +44,6 @@ void real_main(char *in_file)
     init_data_file(&datafilep, &param);
 
     // initialize geometry
-    init_indexing_lexeo();
     init_geometry(&geo, &param);
 
     // initialize gauge configuration and higgs field

@@ -10,17 +10,14 @@
 #include"../include/gparam.h"
 
 // single index 4d = even/odd lexicographic index 4d
-// single index 3d = even/odd lexicographic index 3d
-void init_indexing_lexeo(void)
-  {
-  cart_to_si = &cart_to_lexeo;
-  si_to_cart = &lexeo_to_cart;
-  lex_to_si = &lex_to_lexeo;
-  si_to_lex = &lexeo_to_lex;
-  sisp_and_t_to_si_compute=&lexeosp_and_t_to_lexeo;
-  si_to_sisp_and_t_compute=&lexeo_to_lexeosp_and_t;
-  }
+// // single index 3d = even/odd lexicographic index 3d
 
+long (*cart_to_si)(int const * const cartcoord, GParam const * const param)=&cart_to_lexeo; // cartesian coordinates -> single index
+void (*si_to_cart)(int *cartcoord, long si, GParam const * const param)=&lexeo_to_cart;     // single index -> cartesian coordinates
+long (*lex_to_si)(long lex, GParam const * const param)=&lex_to_lexeo;          // lexicographic -> single index
+long (*si_to_lex)(long si, GParam const * const param)=&lexeo_to_lex;           // lexicographic -> single index
+long (*sisp_and_t_to_si_compute)(long sisp, int t, GParam const * const param)=&lexeosp_and_t_to_lexeo;            // single index spatial and time -> single index tot
+void (*si_to_sisp_and_t_compute)(long *sisp, int *t, long si, GParam const * const param)=&lexeo_to_lexeosp_and_t; // single index tot -> single index spatial and time
 
 // initialize geometry
 void init_geometry(Geometry *geo, GParam const * const param)
