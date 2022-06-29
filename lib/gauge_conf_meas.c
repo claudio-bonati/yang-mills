@@ -17,7 +17,6 @@
 #include"../include/tens_prod_adj.h"
 #include"../include/su2_monopoles.h"
 #include"../include/sun_monopoles.h"
-#include"../include/u1_monopoles.h"
 
 
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
@@ -639,7 +638,7 @@ double loc_topcharge(Gauge_Conf const * const GC,
 
    double ris=0.0; // initialized just to avoid compiler warnings
 
-   #if (STDIM==4 && NCOLOR>1)
+   #if (STDIM==4)
      GAUGE_GROUP aux1, aux2, aux3;
      double real1, real2, loc_charge;
      const double chnorm=1.0/(128.0*PI*PI);
@@ -679,16 +678,6 @@ double loc_topcharge(Gauge_Conf const * const GC,
         sign=-sign;
         }
      ris=(loc_charge*chnorm);
-   #endif
-
-   #if (STDIM==2 && NCOLOR==1)
-     GAUGE_GROUP u1matrix;
-     double angle;
-
-     plaquettep_matrix(GC, geo, param, r, 0, 1, &u1matrix);
-     angle=atan2(cimag(u1matrix.comp), creal(u1matrix.comp))/PI2;
-
-     ris=angle;
    #endif
 
    return ris;

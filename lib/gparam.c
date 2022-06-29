@@ -657,8 +657,6 @@ void print_parameters_local(GParam const * const param, time_t time_start, time_
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -727,8 +725,6 @@ void print_parameters_local_fundadj(GParam const * const param, time_t time_star
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -800,8 +796,6 @@ void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_en
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -882,8 +876,6 @@ void print_parameters_polycorr_higgs(GParam * param, time_t time_start, time_t t
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "number of higgs fields: %d\n", NHIGGS);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
@@ -971,8 +963,6 @@ void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t ti
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -1050,8 +1040,6 @@ void print_parameters_polycorr_higgs_long(GParam * param, time_t time_start, tim
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "number of higgs fields: %d\n", NHIGGS);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
@@ -1137,8 +1125,6 @@ void print_parameters_t0(GParam * param, time_t time_start, time_t time_end)
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -1188,8 +1174,6 @@ void print_parameters_tracedef(GParam const * const param, time_t time_start, ti
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -1267,8 +1251,6 @@ void print_parameters_tube_disc(GParam * param, time_t time_start, time_t time_e
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -1350,8 +1332,6 @@ void print_parameters_tube_disc_long(GParam * param, time_t time_start, time_t t
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -1432,8 +1412,6 @@ void print_parameters_tube_conn(GParam * param, time_t time_start, time_t time_e
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -1515,8 +1493,6 @@ void print_parameters_tube_conn_long(GParam * param, time_t time_start, time_t t
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
@@ -1596,8 +1572,6 @@ void print_parameters_higgs(GParam const * const param, time_t time_start, time_
      fprintf(fp, "using OpenMP with %d threads\n\n", NTHREADS);
     #endif
 
-    if(GGROUP==0) fprintf(fp, "SuN gauge group\n");
-    if(GGROUP==1) fprintf(fp, "SoN gauge group\n");
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "number of higgs fields: %d\n", NHIGGS);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);

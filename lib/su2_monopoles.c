@@ -12,7 +12,6 @@
 #include"../include/gparam.h"
 #include"../include/su2_monopoles.h"
 #include"../include/sun_monopoles.h"
-#include"../include/u1_monopoles.h"
 
 
 // This function compute the MAG gauge transformation

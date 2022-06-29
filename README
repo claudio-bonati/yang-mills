@@ -49,13 +49,11 @@ for every site r.
 ** OTHER CONFIGURE PARAMETERS
 *****************************************************
 
-The choice of the gauge group happens at configuration time through the macros
-Gauge_Group and N_c. Two classes of gauge groups are implemented, the SoN and
-SuN classes (with N_c=1 for SuN corresponding to the U(1) gauge theory). As an
-example, to simulate the SU(5) gauge theory the program has to be configured
-using
+The choice of the gauge group happens at configuration time through the macro
+N_c (the gauge group is SuN).  As an example, to simulate the SU(5) gauge
+theory the program has to be configured using
 
-./configure Gauge_Group=SuN N_c=5
+./configure N_c=5
 
 Relevant configure options are
 
@@ -64,7 +62,6 @@ Relevant configure options are
 
 and the following macro are availbale
 
-Gauge_Group  the gauge group (SuN or SoN, default SuN)
 N_c          the number of colors (default 2)
 Num_levels   the number of levels in multilevel (default 1)
 Num_threads  number of threads to be used in OpenMP (default 1)

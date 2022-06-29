@@ -11,11 +11,7 @@
 #include"../include/macro.h"
 #include"../include/tens_prod_adj.h"
 
-#if GGROUP == 0
-  #define MAXINDEX NCOLOR*NCOLOR -1
-#elif GGROUP == 1
-  #define MAXINDEX NCOLOR*(NCOLOR-1)/2
-#endif
+#define MAXINDEX NCOLOR*NCOLOR -1
 
 // initialize to zero
 void zero_TensProdAdj(TensProdAdj * restrict A);

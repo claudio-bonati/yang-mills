@@ -7,11 +7,7 @@
 
 #include"macro.h"
 
-#if GGROUP == 0
-  #define MAXINDEX NCOLOR*NCOLOR -1
-#elif GGROUP == 1
-  #define MAXINDEX NCOLOR*(NCOLOR-1)/2
-#endif
+#define MAXINDEX NCOLOR*NCOLOR -1
 
 
 // see Luscher Weisz JHEP 0109 p. 010 (2001)   (hep-lat/0108014)

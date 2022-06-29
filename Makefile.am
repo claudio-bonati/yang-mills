@@ -1,11 +1,9 @@
 bin_PROGRAMS = conf_check \
                debug_rng \
-               debug_son \
                debug_su2 \
                debug_su2_adj \
                debug_su2sun \
                debug_sun \
-               debug_u1 \
                debug_vecs \
                yang_mills_higgs \
                yang_mills_local \
@@ -65,13 +63,6 @@ geometry = ./include/geometry.h \
 gparam = ./include/gparam.h \
          ./lib/gparam.c
 
-son = ./include/son.h \
-      ./include/son_monopoles.h \
-      ./include/son_upd.h \
-      ./lib/son.c \
-      ./lib/son_monopoles.c \
-      ./lib/son_upd.c
-
 random = ./include/myrngparam.h \
          ./include/random.h \
          ./lib/random.c 
@@ -95,13 +86,6 @@ tens_prod = ./include/tens_prod.h \
             ./lib/tens_prod.c \
             ./lib/tens_prod_adj.c
 
-u1 = ./include/u1.h \
-     ./include/u1_upd.h \
-     ./include/u1_monopoles.h \
-     ./lib/u1.c \
-     ./lib/u1_upd.c \
-     ./lib/u1_monopoles.c
-
 everything =  $(align) \
               $(dSFMT)  \
               $(endian) \
@@ -111,12 +95,10 @@ everything =  $(align) \
               $(geometry) \
               $(gparam) \
               ./include/macro.h \
-              $(son) \
               $(random) \
               $(su2) \
               $(sun) \
-              $(tens_prod) \
-              $(u1) 
+              $(tens_prod) 
 
 conf_check_SOURCES=./src/conf_check.c \
                    $(align) \
@@ -126,26 +108,14 @@ conf_check_SOURCES=./src/conf_check.c \
                    $(funcpoint) \
                    $(gparam) \
                    $(random) \
-                   $(son) \
                    $(su2) \
                    $(sun) \
-                   $(tens_prod) \
-                   $(u1) 
+                   $(tens_prod) 
 
 debug_rng_SOURCES=./src/debug_rng.c \
                   $(align) \
                   $(dSFMT) \
                   $(random)
-
-debug_son_SOURCES=./src/debug_son.c \
-                  $(align) \
-                  $(dSFMT) \
-                  $(endian) \
-                  $(flavourmatrix) \
-                  ./include/macro.h \
-                  $(random) \
-                  $(son) \
-                  $(tens_prod) 
 
 debug_su2_SOURCES=./src/debug_su2.c \
                   $(align) \
@@ -190,16 +160,6 @@ debug_sun_SOURCES=./src/debug_sun.c \
                   $(sun) \
                   $(tens_prod) 
 
-debug_u1_SOURCES=./src/debug_u1.c \
-                  $(align) \
-                  $(dSFMT) \
-                  $(endian) \
-                  $(gparam) \
-                  ./include/macro.h \
-                  $(random) \
-                  $(tens_prod) \
-                  $(u1)
-
 debug_vecs_SOURCES=./src/debug_vecs.c \
                    $(align) \
                    $(dSFMT) \
@@ -208,11 +168,9 @@ debug_vecs_SOURCES=./src/debug_vecs.c \
                    $(gparam) \
                    ./include/macro.h \
                    $(random) \
-                   $(son) \
                    $(su2) \
                    $(sun) \
-                   $(tens_prod) \
-                   $(u1)
+                   $(tens_prod) 
 
 yang_mills_higgs_SOURCES=./src/yang_mills_higgs.c \
                           $(everything)

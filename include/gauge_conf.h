@@ -14,7 +14,6 @@
 #include"sun.h"
 #include"tens_prod.h"
 #include"tens_prod_adj.h"
-#include"u1.h"
 
 
 typedef struct Gauge_Conf {

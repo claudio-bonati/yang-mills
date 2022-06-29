@@ -179,7 +179,6 @@ int main (int argc, char **argv)
       printf("Usage: %s input_file\n\n", argv[0]);
 
       printf("Compilation details:\n");
-      printf("\tGGROUP: %s\n", QUOTEME(GGROUP));
       printf("\tN_c (number of colors): %d\n", NCOLOR);
       printf("\tN_higgs (number of higgs flavours): %d\n", NHIGGS);
       printf("\tST_dim (space-time dimensionality): %d\n", STDIM);

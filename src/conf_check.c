@@ -117,37 +117,8 @@ void computehash(char *infile, int dim, long volume, char *hash)
               fprintf(stderr, "Error in reading the file %s (%s, %d)\n", infile, __FILE__, __LINE__);
               exit(EXIT_FAILURE);
               }
-            #if GGROUP==0
-              #if NCOLOR==1
-                double complex dc=link.comp;
-                if(endian()==0)
-                  {
-                  SwapBytesDoubleComplex(&dc);
-                  }
-                MD5_Update(&mdContext, &dc, sizeof(double complex));
-              #elif NCOLOR==2
-                for(int k=0; k<4; k++)
-                   {
-                   double a=link.comp[k];
-                   if(endian()==0)
-                     {
-                     SwapBytesDouble(&a);
-                     }
-                   MD5_Update(&mdContext, &a, sizeof(double));
-                   }
-              #else
-                for(int k=0; k<NCOLOR*NCOLOR; k++)
-                   {
-                   double complex dc=link.comp[k];
-                   if(endian()==0)
-                     {
-                     SwapBytesDoubleComplex(&dc);
-                     }
-                   MD5_Update(&mdContext, &dc, sizeof(double complex));
-                   }
-              #endif
-            #elif GGROUP==1
-              for(int k=0; k<NCOLOR*NCOLOR; k++)
+            #if NCOLOR==2
+              for(int k=0; k<4; k++)
                  {
                  double a=link.comp[k];
                  if(endian()==0)
@@ -155,6 +126,16 @@ void computehash(char *infile, int dim, long volume, char *hash)
                    SwapBytesDouble(&a);
                    }
                  MD5_Update(&mdContext, &a, sizeof(double));
+                 }
+            #else
+              for(int k=0; k<NCOLOR*NCOLOR; k++)
+                 {
+                 double complex dc=link.comp[k];
+                 if(endian()==0)
+                   {
+                   SwapBytesDoubleComplex(&dc);
+                   }
+                 MD5_Update(&mdContext, &dc, sizeof(double complex));
                  }
             #endif
             }
@@ -187,7 +168,6 @@ int main (int argc, char **argv)
       printf("Usage: %s conf_file\n\n", argv[0]);
 
       printf("Compilation details:\n");
-      printf("\tGGROUP (gauge group): %s\n", QUOTEME(GGROUP));
       printf("\tN_c (number of colors): %d\n", NCOLOR);
       printf("\n");
       printf("\tINT_ALIGN: %s\n", QUOTEME(INT_ALIGN));

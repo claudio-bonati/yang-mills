@@ -1736,7 +1736,6 @@ int metropolis_for_higgs(Gauge_Conf *GC,
      }
   normalize_vecs(&(GC->higgs[r]));
 
-  #if GGROUP == 0 // only for SuN groups
   for(i=0; i<NHIGGS; i++)
      {
      old_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&(GC->higgs[r]), &staple);
@@ -1751,25 +1750,6 @@ int metropolis_for_higgs(Gauge_Conf *GC,
        acc+=1;
        }
      }
-  #else  // SoN groups
-  for(i=0; i<NHIGGS; i++)
-     {
-     if(casuale()<0.5)
-       {
-       old_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&(GC->higgs[r]), &staple);
-  
-       equal_vecs(&new_vector, &(GC->higgs[r]));
-       times_equal_real_single_vecs(&new_vector, -1.0, i);
-       new_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);
-  
-       if(casuale()< exp(old_energy-new_energy))
-         {
-         equal_vecs(&(GC->higgs[r]), &new_vector);
-         acc+=1;
-         }
-       }
-     }
-  #endif
 
   if(NHIGGS>1)
     {
