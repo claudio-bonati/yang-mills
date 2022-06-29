@@ -14,7 +14,6 @@
 #include"../include/sun_upd.h"
 
 #include"../include/tens_prod.h"
-#include"../include/tens_prod_adj.h"
 
 #if NCOLOR == 2
 
@@ -70,18 +69,8 @@ void (*comp_outdiagnorm_of_X) (GAUGE_GROUP helper_X[2*STDIM], double const lambd
 void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double const lambda[2], double *fmag) = &comp_functional_fmag_Su2;
 void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir) = &diag_projection_single_site_Su2;
 
-void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_Su2;
 
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_Su2;
-void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProdAdj_init_Su2;
-void (*TensProdAdj_initadj)(TensProdAdj *TP, GAUGE_GROUP_ADJ const * const A1, GAUGE_GROUP_ADJ const * const A2) = &TensProdAdj_init_Su2Adj;
-
-void (*one_adj)(GAUGE_GROUP_ADJ * restrict A)=&one_Su2Adj;
-void (*zero_adj)(GAUGE_GROUP_ADJ * restrict A)=&zero_Su2Adj;
-void (*plus_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&plus_equal_Su2Adj;
-void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r)=&times_equal_real_Su2Adj;
-void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&times_equal_Su2Adj;
-double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A)=&retr_Su2Adj;
 
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_heatbath_Su2;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_Su2;
@@ -174,18 +163,7 @@ void (*comp_MAG_gauge_transformation) (GAUGE_GROUP X_links[2*STDIM], double cons
 void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double const lambda[NCOLOR], double *fmag) = &comp_functional_fmag_SuN;
 void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir) = &diag_projection_single_site_SuN;
 
-void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B)=&fund_to_adj_SuN;
-
 void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProd_init_SuN;
-void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2) = &TensProdAdj_init_SuN;
-void (*TensProdAdj_initadj)(TensProdAdj *TP, GAUGE_GROUP_ADJ const * const A1, GAUGE_GROUP_ADJ const * const A2) = &TensProdAdj_init_SuNAdj;
-
-void (*one_adj)(GAUGE_GROUP_ADJ * restrict A)=&one_SuNAdj;
-void (*zero_adj)(GAUGE_GROUP_ADJ * restrict A)=&zero_SuNAdj;
-void (*plus_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&plus_equal_SuNAdj;
-void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r)=&times_equal_real_SuNAdj;
-void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B)=&times_equal_SuNAdj;
-double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A)=&retr_SuNAdj;
 
 void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_heatbath_SuN;
 void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple) = &single_overrelaxation_SuN;

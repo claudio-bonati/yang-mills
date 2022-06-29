@@ -14,7 +14,6 @@
 #include"../include/geometry.h"
 #include"../include/gauge_conf.h"
 #include"../include/tens_prod.h"
-#include"../include/tens_prod_adj.h"
 #include"../include/su2_monopoles.h"
 #include"../include/sun_monopoles.h"
 

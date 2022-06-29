@@ -5,20 +5,15 @@
 
 #if NCOLOR == 2
   #define GAUGE_GROUP     Su2
-  #define GAUGE_GROUP_ADJ Su2Adj
   #define GAUGE_VECS      Su2Vecs
 #else
   #define GAUGE_GROUP     SuN
-  #define GAUGE_GROUP_ADJ SuNAdj
   #define GAUGE_VECS      SuNVecs
 #endif
 
 // function to access matrix elements
 #define m(X,Y) ((X)*NCOLOR + (Y))  // for gauge group
 #define mf(X,Y) ((X)*NHIGGS + (Y)) // for higgs field
-
-#define madj(X,Y) ((X)*(NCOLOR*NCOLOR -1) + (Y))      // for the adjoint rep of SuN
-
 
 #define MIN_VALUE 1.0e-13
 

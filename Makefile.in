@@ -87,20 +87,16 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = conf_check$(EXEEXT) debug_rng$(EXEEXT) \
-	debug_su2$(EXEEXT) debug_su2_adj$(EXEEXT) \
-	debug_su2sun$(EXEEXT) debug_sun$(EXEEXT) debug_vecs$(EXEEXT) \
-	yang_mills_higgs$(EXEEXT) yang_mills_local$(EXEEXT) \
-	yang_mills_polycorr$(EXEEXT) yang_mills_polycorr_long$(EXEEXT) \
+	debug_su2$(EXEEXT) debug_su2sun$(EXEEXT) debug_sun$(EXEEXT) \
+	debug_vecs$(EXEEXT) yang_mills_higgs$(EXEEXT) \
+	yang_mills_local$(EXEEXT) yang_mills_polycorr$(EXEEXT) \
+	yang_mills_polycorr_long$(EXEEXT) \
 	yang_mills_polycorr_higgs$(EXEEXT) \
-	yang_mills_polycorr_higgs_long$(EXEEXT) \
-	yang_mills_polycorradj$(EXEEXT) \
-	yang_mills_polycorradj_long$(EXEEXT) yang_mills_t0$(EXEEXT) \
+	yang_mills_polycorr_higgs_long$(EXEEXT) yang_mills_t0$(EXEEXT) \
 	yang_mills_tracedef$(EXEEXT) yang_mills_tube_conn$(EXEEXT) \
 	yang_mills_tube_conn_long$(EXEEXT) \
 	yang_mills_tube_disc$(EXEEXT) \
-	yang_mills_tube_disc_long$(EXEEXT) \
-	yang_mills_tubeadj_disc$(EXEEXT) \
-	yang_mills_tubeadj_disc_long$(EXEEXT)
+	yang_mills_tube_disc_long$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -128,8 +124,7 @@ am__objects_8 = ./lib/su2.$(OBJEXT) ./lib/su2_monopoles.$(OBJEXT) \
 	./lib/su2_upd.$(OBJEXT)
 am__objects_9 = ./lib/sun.$(OBJEXT) ./lib/sun_monopoles.$(OBJEXT) \
 	./lib/sun_upd.$(OBJEXT)
-am__objects_10 = ./lib/tens_prod.$(OBJEXT) \
-	./lib/tens_prod_adj.$(OBJEXT)
+am__objects_10 = ./lib/tens_prod.$(OBJEXT)
 am_conf_check_OBJECTS = ./src/conf_check.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
 	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
@@ -146,12 +141,6 @@ am_debug_su2_OBJECTS = ./src/debug_su2.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_10)
 debug_su2_OBJECTS = $(am_debug_su2_OBJECTS)
 debug_su2_LDADD = $(LDADD)
-am_debug_su2_adj_OBJECTS = ./src/debug_su2_adj.$(OBJEXT) \
-	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
-	$(am__objects_4) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_10)
-debug_su2_adj_OBJECTS = $(am_debug_su2_adj_OBJECTS)
-debug_su2_adj_LDADD = $(LDADD)
 am_debug_su2sun_OBJECTS = ./src/debug_su2sun.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	$(am__objects_4) $(am__objects_7) $(am__objects_8) \
@@ -208,15 +197,6 @@ am_yang_mills_polycorr_long_OBJECTS =  \
 yang_mills_polycorr_long_OBJECTS =  \
 	$(am_yang_mills_polycorr_long_OBJECTS)
 yang_mills_polycorr_long_LDADD = $(LDADD)
-am_yang_mills_polycorradj_OBJECTS =  \
-	./src/yang_mills_polycorradj.$(OBJEXT) $(am__objects_13)
-yang_mills_polycorradj_OBJECTS = $(am_yang_mills_polycorradj_OBJECTS)
-yang_mills_polycorradj_LDADD = $(LDADD)
-am_yang_mills_polycorradj_long_OBJECTS =  \
-	./src/yang_mills_polycorradj_long.$(OBJEXT) $(am__objects_13)
-yang_mills_polycorradj_long_OBJECTS =  \
-	$(am_yang_mills_polycorradj_long_OBJECTS)
-yang_mills_polycorradj_long_LDADD = $(LDADD)
 am_yang_mills_t0_OBJECTS = ./src/yang_mills_t0.$(OBJEXT) \
 	$(am__objects_13)
 yang_mills_t0_OBJECTS = $(am_yang_mills_t0_OBJECTS)
@@ -243,16 +223,6 @@ am_yang_mills_tube_disc_long_OBJECTS =  \
 yang_mills_tube_disc_long_OBJECTS =  \
 	$(am_yang_mills_tube_disc_long_OBJECTS)
 yang_mills_tube_disc_long_LDADD = $(LDADD)
-am_yang_mills_tubeadj_disc_OBJECTS =  \
-	./src/yang_mills_tubeadj_disc.$(OBJEXT) $(am__objects_13)
-yang_mills_tubeadj_disc_OBJECTS =  \
-	$(am_yang_mills_tubeadj_disc_OBJECTS)
-yang_mills_tubeadj_disc_LDADD = $(LDADD)
-am_yang_mills_tubeadj_disc_long_OBJECTS =  \
-	./src/yang_mills_tubeadj_disc_long.$(OBJEXT) $(am__objects_13)
-yang_mills_tubeadj_disc_long_OBJECTS =  \
-	$(am_yang_mills_tubeadj_disc_long_OBJECTS)
-yang_mills_tubeadj_disc_long_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -282,39 +252,29 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
-	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
-	$(debug_su2sun_SOURCES) $(debug_sun_SOURCES) \
-	$(debug_vecs_SOURCES) $(yang_mills_higgs_SOURCES) \
-	$(yang_mills_local_SOURCES) $(yang_mills_polycorr_SOURCES) \
+	$(debug_su2_SOURCES) $(debug_su2sun_SOURCES) \
+	$(debug_sun_SOURCES) $(debug_vecs_SOURCES) \
+	$(yang_mills_higgs_SOURCES) $(yang_mills_local_SOURCES) \
+	$(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_higgs_SOURCES) \
 	$(yang_mills_polycorr_higgs_long_SOURCES) \
-	$(yang_mills_polycorr_long_SOURCES) \
-	$(yang_mills_polycorradj_SOURCES) \
-	$(yang_mills_polycorradj_long_SOURCES) \
-	$(yang_mills_t0_SOURCES) $(yang_mills_tracedef_SOURCES) \
-	$(yang_mills_tube_conn_SOURCES) \
+	$(yang_mills_polycorr_long_SOURCES) $(yang_mills_t0_SOURCES) \
+	$(yang_mills_tracedef_SOURCES) $(yang_mills_tube_conn_SOURCES) \
 	$(yang_mills_tube_conn_long_SOURCES) \
 	$(yang_mills_tube_disc_SOURCES) \
-	$(yang_mills_tube_disc_long_SOURCES) \
-	$(yang_mills_tubeadj_disc_SOURCES) \
-	$(yang_mills_tubeadj_disc_long_SOURCES)
+	$(yang_mills_tube_disc_long_SOURCES)
 DIST_SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
-	$(debug_su2_SOURCES) $(debug_su2_adj_SOURCES) \
-	$(debug_su2sun_SOURCES) $(debug_sun_SOURCES) \
-	$(debug_vecs_SOURCES) $(yang_mills_higgs_SOURCES) \
-	$(yang_mills_local_SOURCES) $(yang_mills_polycorr_SOURCES) \
+	$(debug_su2_SOURCES) $(debug_su2sun_SOURCES) \
+	$(debug_sun_SOURCES) $(debug_vecs_SOURCES) \
+	$(yang_mills_higgs_SOURCES) $(yang_mills_local_SOURCES) \
+	$(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_higgs_SOURCES) \
 	$(yang_mills_polycorr_higgs_long_SOURCES) \
-	$(yang_mills_polycorr_long_SOURCES) \
-	$(yang_mills_polycorradj_SOURCES) \
-	$(yang_mills_polycorradj_long_SOURCES) \
-	$(yang_mills_t0_SOURCES) $(yang_mills_tracedef_SOURCES) \
-	$(yang_mills_tube_conn_SOURCES) \
+	$(yang_mills_polycorr_long_SOURCES) $(yang_mills_t0_SOURCES) \
+	$(yang_mills_tracedef_SOURCES) $(yang_mills_tube_conn_SOURCES) \
 	$(yang_mills_tube_conn_long_SOURCES) \
 	$(yang_mills_tube_disc_SOURCES) \
-	$(yang_mills_tube_disc_long_SOURCES) \
-	$(yang_mills_tubeadj_disc_SOURCES) \
-	$(yang_mills_tubeadj_disc_long_SOURCES)
+	$(yang_mills_tube_disc_long_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -515,9 +475,7 @@ sun = ./include/sun.h \
       ./lib/sun_upd.c 
 
 tens_prod = ./include/tens_prod.h \
-            ./include/tens_prod_adj.h \
-            ./lib/tens_prod.c \
-            ./lib/tens_prod_adj.c
+            ./lib/tens_prod.c 
 
 everything = $(align) \
               $(dSFMT)  \
@@ -560,16 +518,6 @@ debug_su2_SOURCES = ./src/debug_su2.c \
                   $(random) \
                   $(su2) \
                   $(tens_prod) 
-
-debug_su2_adj_SOURCES = ./src/debug_su2_adj.c \
-                      $(align) \
-                      $(dSFMT) \
-                      $(endian) \
-                      $(flavourmatrix) \
-                      ./include/macro.h \
-                      $(random) \
-                      $(su2) \
-                      $(tens_prod) 
 
 debug_su2sun_SOURCES = ./src/debug_su2sun.c \
                       $(align) \
@@ -623,12 +571,6 @@ yang_mills_polycorr_higgs_SOURCES = ./src/yang_mills_polycorr_higgs.c \
 yang_mills_polycorr_higgs_long_SOURCES = ./src/yang_mills_polycorr_higgs_long.c \
                                   $(everything)
 
-yang_mills_polycorradj_SOURCES = ./src/yang_mills_polycorradj.c \
-                               $(everything)
-
-yang_mills_polycorradj_long_SOURCES = ./src/yang_mills_polycorradj_long.c \
-                                    $(everything)
-
 yang_mills_t0_SOURCES = ./src/yang_mills_t0.c \
                       $(everything)
 
@@ -646,12 +588,6 @@ yang_mills_tube_disc_SOURCES = ./src/yang_mills_tube_disc.c \
 
 yang_mills_tube_disc_long_SOURCES = ./src/yang_mills_tube_disc_long.c \
                                   $(everything)
-
-yang_mills_tubeadj_disc_SOURCES = ./src/yang_mills_tubeadj_disc.c \
-                                $(everything)
-
-yang_mills_tubeadj_disc_long_SOURCES = ./src/yang_mills_tubeadj_disc_long.c \
-                                     $(everything)
 
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -Werror -pedantic -Wconversion @OPENMP_CFLAGS@
 CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in higgs_conf.dat* mon.dat
@@ -790,8 +726,6 @@ lib/$(DEPDIR)/$(am__dirstamp):
 	lib/$(DEPDIR)/$(am__dirstamp)
 ./lib/tens_prod.$(OBJEXT): lib/$(am__dirstamp) \
 	lib/$(DEPDIR)/$(am__dirstamp)
-./lib/tens_prod_adj.$(OBJEXT): lib/$(am__dirstamp) \
-	lib/$(DEPDIR)/$(am__dirstamp)
 
 conf_check$(EXEEXT): $(conf_check_OBJECTS) $(conf_check_DEPENDENCIES) $(EXTRA_conf_check_DEPENDENCIES) 
 	@rm -f conf_check$(EXEEXT)
@@ -808,12 +742,6 @@ debug_rng$(EXEEXT): $(debug_rng_OBJECTS) $(debug_rng_DEPENDENCIES) $(EXTRA_debug
 debug_su2$(EXEEXT): $(debug_su2_OBJECTS) $(debug_su2_DEPENDENCIES) $(EXTRA_debug_su2_DEPENDENCIES) 
 	@rm -f debug_su2$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debug_su2_OBJECTS) $(debug_su2_LDADD) $(LIBS)
-./src/debug_su2_adj.$(OBJEXT): src/$(am__dirstamp) \
-	src/$(DEPDIR)/$(am__dirstamp)
-
-debug_su2_adj$(EXEEXT): $(debug_su2_adj_OBJECTS) $(debug_su2_adj_DEPENDENCIES) $(EXTRA_debug_su2_adj_DEPENDENCIES) 
-	@rm -f debug_su2_adj$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(debug_su2_adj_OBJECTS) $(debug_su2_adj_LDADD) $(LIBS)
 ./src/debug_su2sun.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
@@ -880,18 +808,6 @@ yang_mills_polycorr_higgs_long$(EXEEXT): $(yang_mills_polycorr_higgs_long_OBJECT
 yang_mills_polycorr_long$(EXEEXT): $(yang_mills_polycorr_long_OBJECTS) $(yang_mills_polycorr_long_DEPENDENCIES) $(EXTRA_yang_mills_polycorr_long_DEPENDENCIES) 
 	@rm -f yang_mills_polycorr_long$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(yang_mills_polycorr_long_OBJECTS) $(yang_mills_polycorr_long_LDADD) $(LIBS)
-./src/yang_mills_polycorradj.$(OBJEXT): src/$(am__dirstamp) \
-	src/$(DEPDIR)/$(am__dirstamp)
-
-yang_mills_polycorradj$(EXEEXT): $(yang_mills_polycorradj_OBJECTS) $(yang_mills_polycorradj_DEPENDENCIES) $(EXTRA_yang_mills_polycorradj_DEPENDENCIES) 
-	@rm -f yang_mills_polycorradj$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(yang_mills_polycorradj_OBJECTS) $(yang_mills_polycorradj_LDADD) $(LIBS)
-./src/yang_mills_polycorradj_long.$(OBJEXT): src/$(am__dirstamp) \
-	src/$(DEPDIR)/$(am__dirstamp)
-
-yang_mills_polycorradj_long$(EXEEXT): $(yang_mills_polycorradj_long_OBJECTS) $(yang_mills_polycorradj_long_DEPENDENCIES) $(EXTRA_yang_mills_polycorradj_long_DEPENDENCIES) 
-	@rm -f yang_mills_polycorradj_long$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(yang_mills_polycorradj_long_OBJECTS) $(yang_mills_polycorradj_long_LDADD) $(LIBS)
 ./src/yang_mills_t0.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
@@ -928,18 +844,6 @@ yang_mills_tube_disc$(EXEEXT): $(yang_mills_tube_disc_OBJECTS) $(yang_mills_tube
 yang_mills_tube_disc_long$(EXEEXT): $(yang_mills_tube_disc_long_OBJECTS) $(yang_mills_tube_disc_long_DEPENDENCIES) $(EXTRA_yang_mills_tube_disc_long_DEPENDENCIES) 
 	@rm -f yang_mills_tube_disc_long$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(yang_mills_tube_disc_long_OBJECTS) $(yang_mills_tube_disc_long_LDADD) $(LIBS)
-./src/yang_mills_tubeadj_disc.$(OBJEXT): src/$(am__dirstamp) \
-	src/$(DEPDIR)/$(am__dirstamp)
-
-yang_mills_tubeadj_disc$(EXEEXT): $(yang_mills_tubeadj_disc_OBJECTS) $(yang_mills_tubeadj_disc_DEPENDENCIES) $(EXTRA_yang_mills_tubeadj_disc_DEPENDENCIES) 
-	@rm -f yang_mills_tubeadj_disc$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(yang_mills_tubeadj_disc_OBJECTS) $(yang_mills_tubeadj_disc_LDADD) $(LIBS)
-./src/yang_mills_tubeadj_disc_long.$(OBJEXT): src/$(am__dirstamp) \
-	src/$(DEPDIR)/$(am__dirstamp)
-
-yang_mills_tubeadj_disc_long$(EXEEXT): $(yang_mills_tubeadj_disc_long_OBJECTS) $(yang_mills_tubeadj_disc_long_DEPENDENCIES) $(EXTRA_yang_mills_tubeadj_disc_long_DEPENDENCIES) 
-	@rm -f yang_mills_tubeadj_disc_long$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(yang_mills_tubeadj_disc_long_OBJECTS) $(yang_mills_tubeadj_disc_long_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -969,11 +873,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/sun_monopoles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/sun_upd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/tens_prod.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./lib/$(DEPDIR)/tens_prod_adj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/conf_check.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_rng.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2_adj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_su2sun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_sun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/debug_vecs.Po@am__quote@
@@ -983,16 +885,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr_higgs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr_higgs_long.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr_long.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorradj.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorradj_long.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_t0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tracedef.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tube_conn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tube_conn_long.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tube_disc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tube_disc_long.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tubeadj_disc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tubeadj_disc_long.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

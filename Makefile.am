@@ -1,7 +1,6 @@
 bin_PROGRAMS = conf_check \
                debug_rng \
                debug_su2 \
-               debug_su2_adj \
                debug_su2sun \
                debug_sun \
                debug_vecs \
@@ -11,16 +10,12 @@ bin_PROGRAMS = conf_check \
                yang_mills_polycorr_long \
                yang_mills_polycorr_higgs \
                yang_mills_polycorr_higgs_long \
-               yang_mills_polycorradj \
-               yang_mills_polycorradj_long \
                yang_mills_t0 \
                yang_mills_tracedef \
                yang_mills_tube_conn \
                yang_mills_tube_conn_long \
                yang_mills_tube_disc \
-               yang_mills_tube_disc_long \
-               yang_mills_tubeadj_disc \
-               yang_mills_tubeadj_disc_long
+               yang_mills_tube_disc_long 
 
 align = ./include/aligncheck.h \
         ./lib/aligncheck.c
@@ -81,9 +76,7 @@ sun = ./include/sun.h \
       ./lib/sun_upd.c 
 
 tens_prod = ./include/tens_prod.h \
-            ./include/tens_prod_adj.h \
-            ./lib/tens_prod.c \
-            ./lib/tens_prod_adj.c
+            ./lib/tens_prod.c 
 
 everything =  $(align) \
               $(dSFMT)  \
@@ -126,16 +119,6 @@ debug_su2_SOURCES=./src/debug_su2.c \
                   $(random) \
                   $(su2) \
                   $(tens_prod) 
-
-debug_su2_adj_SOURCES=./src/debug_su2_adj.c \
-                      $(align) \
-                      $(dSFMT) \
-                      $(endian) \
-                      $(flavourmatrix) \
-                      ./include/macro.h \
-                      $(random) \
-                      $(su2) \
-                      $(tens_prod) 
 
 debug_su2sun_SOURCES=./src/debug_su2sun.c \
                       $(align) \
@@ -189,12 +172,6 @@ yang_mills_polycorr_higgs_SOURCES=./src/yang_mills_polycorr_higgs.c \
 yang_mills_polycorr_higgs_long_SOURCES=./src/yang_mills_polycorr_higgs_long.c \
                                   $(everything)
 
-yang_mills_polycorradj_SOURCES=./src/yang_mills_polycorradj.c \
-                               $(everything)
-
-yang_mills_polycorradj_long_SOURCES=./src/yang_mills_polycorradj_long.c \
-                                    $(everything)
-
 yang_mills_t0_SOURCES=./src/yang_mills_t0.c \
                       $(everything)
 
@@ -213,12 +190,6 @@ yang_mills_tube_disc_SOURCES=./src/yang_mills_tube_disc.c \
 yang_mills_tube_disc_long_SOURCES=./src/yang_mills_tube_disc_long.c \
                                   $(everything)
 
-yang_mills_tubeadj_disc_SOURCES=./src/yang_mills_tubeadj_disc.c \
-                                $(everything)
-
-yang_mills_tubeadj_disc_long_SOURCES=./src/yang_mills_tubeadj_disc_long.c \
-                                     $(everything)
-   
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -Werror -pedantic -Wconversion @OPENMP_CFLAGS@
 
 CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in higgs_conf.dat* mon.dat

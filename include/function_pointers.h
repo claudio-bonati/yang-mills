@@ -10,7 +10,6 @@
 #include"sun.h"
 #include"sun_upd.h"
 #include"tens_prod.h"
-#include"tens_prod_adj.h"
 #include"geometry.h"
 #include"gparam.h"
 #include"gauge_conf.h"
@@ -93,18 +92,7 @@ extern void (*comp_outdiagnorm_of_X) (GAUGE_GROUP X_links[2*STDIM], double const
 extern void (*comp_functional_fmag) (GAUGE_GROUP X_links[2*STDIM], double const lambda[NCOLOR], double *fmag);
 extern void (*diag_projection_single_site) (Gauge_Conf *GC, GAUGE_GROUP *link, long r, int dir);
 
-extern void (*fund_to_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP const * const restrict B);
-
 extern void (*TensProd_init)(TensProd *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2);
-extern void (*TensProdAdj_init)(TensProdAdj *TP, GAUGE_GROUP const * const A1, GAUGE_GROUP const * const A2);
-extern void (*TensProdAdj_initadj)(TensProdAdj *TP, GAUGE_GROUP_ADJ const * const A1, GAUGE_GROUP_ADJ const * const A2);
-
-extern void (*one_adj)(GAUGE_GROUP_ADJ * restrict A);
-extern void (*zero_adj)(GAUGE_GROUP_ADJ * restrict A);
-extern void (*plus_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B);
-extern void (*times_equal_real_adj)(GAUGE_GROUP_ADJ * restrict A, double r);
-extern void (*times_equal_adj)(GAUGE_GROUP_ADJ * restrict A, GAUGE_GROUP_ADJ const * const restrict B);
-extern double (*retr_adj)(GAUGE_GROUP_ADJ * restrict A);
 
 extern void (*single_heatbath)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple);
 extern void (*single_overrelaxation)(GAUGE_GROUP *link, GAUGE_GROUP const * const staple);
