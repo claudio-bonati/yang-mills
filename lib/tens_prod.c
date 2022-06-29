@@ -26,8 +26,10 @@ void equal_TensProd(TensProd *A, TensProd const * const B);
 // A*=r real
 void times_equal_real_TensProd(TensProd *A, double r);
 
+
 // A*=r complex
 void times_equal_complex_TensProd(TensProd *A, double complex r);
+
 
 // A+=B
 void plus_equal_TensProd(TensProd *A, TensProd const * const B);
@@ -44,6 +46,8 @@ void times_equal_TensProd(TensProd *A, TensProd const * const B);
 
 
 double retr_TensProd(TensProd const * const A);
+
+
 double imtr_TensProd(TensProd const * const A);
 
 
