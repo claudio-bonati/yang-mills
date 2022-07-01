@@ -487,9 +487,11 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                FILE *datafilep)
   {
-  int i, sizes[STDIM];
-  Gauge_Conf smeared_GC, block_GC;
-  Geometry blockgeo;
+  #define NUMBLOCK 2
+
+  int i, j, sizes[STDIM];
+  Gauge_Conf smeared_GC, block_GC[NUMBLOCK];
+  Geometry blockgeo[NUMBLOCK];
 
   // smearing parameter
   const double alpha=0.2;
@@ -509,22 +511,45 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
      {
      sizes[i]=geo->d_size[i]/2;
      }
-  init_geometry(&blockgeo, sizes);
+  init_geometry(&(blockgeo[0]), sizes);
 
   // blocking
-  init_spatial_blocked_conf(&block_GC,
-                            &blockgeo,
+  init_spatial_blocked_conf(&(block_GC[0]),
+                            &(blockgeo[0]),
                             &smeared_GC,
                             geo,
                             alpha);
 
-  compute_and_print_corr_for_spectrum(&block_GC,
-                                      &blockgeo,
+  for(i=1; i<NUMBLOCK; i++)
+     {
+     // geometry for blocking
+     sizes[0]=(blockgeo[i-1]).d_size[0];
+     for(j=1; j<STDIM; j++)
+        {
+        sizes[j]=(blockgeo[i-1]).d_size[j]/2;
+        }
+     init_geometry(&(blockgeo[i]), sizes);
+   
+     // blocking
+     init_spatial_blocked_conf(&(block_GC[i]),
+                               &(blockgeo[i]),
+                               &(block_GC[i-1]),
+                               &(blockgeo[i-1]),
+                               alpha);
+     }
+
+  compute_and_print_corr_for_spectrum(&(block_GC[NUMBLOCK-1]),
+                                      &(blockgeo[NUMBLOCK-1]),
                                       datafilep);
 
   free_gauge_conf(&smeared_GC, geo);
-  free_gauge_conf(&block_GC, &blockgeo);
-  free_geometry(&blockgeo);
+  for(i=NUMBLOCK-1; i>=0; i--)
+     {
+     free_gauge_conf(&(block_GC[i]), &(blockgeo[i]));
+     free_geometry(&(blockgeo[i]));
+     }
+
+  #undef NUMBLOCK
   }
 
 
