@@ -35,7 +35,7 @@ void multihit(Gauge_Conf const * const GC,
     if(fabs(param->d_beta)>MIN_VALUE)
       {
       #ifndef THETA_MODE
-        calcstaples_wilson(GC, geo, param, r, dir, &staple);
+        calcstaples_wilson(GC, geo, r, dir, &staple);
       #else
         // compute_clovers in direction "dir" HAS TO BE CALLED BEFORE!
         calcstaples_with_topo(GC, geo, param, r, dir, &staple);
@@ -977,14 +977,14 @@ void multilevel_polycorr_long_with_higgs(Gauge_Conf * GC,
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(raux)
        #endif
-       for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+       for(raux=0; raux<geo->d_space_vol*geo->d_size[0]/param->d_ml_step[0]; raux++)
           {
           TensProd TP;
           long r1, r2;
           int j, t_tmp;
 
-          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
-          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+          long r = raux/(geo->d_size[0]/param->d_ml_step[0]);
+          int slice = (int) (raux % (geo->d_size[0]/param->d_ml_step[0]) );
 
           r1=sisp_and_t_to_si(geo, r, 0);
           for(j=0; j<param->d_dist_poly; j++)
@@ -1430,14 +1430,14 @@ void multilevel_tube_disc_long(Gauge_Conf * GC,
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(raux)
        #endif
-       for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+       for(raux=0; raux<geo->d_space_vol*geo->d_size[0]/param->d_ml_step[0]; raux++)
           {
           TensProd TP;
           long r1, r2;
           int j, t_tmp;
 
-          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
-          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+          long r = raux/(geo->d_size[0]/param->d_ml_step[0]);
+          int slice = (int) (raux % (geo->d_size[0]/param->d_ml_step[0]) );
 
           r1=sisp_and_t_to_si(geo, r, 0);
           for(j=0; j<param->d_dist_poly; j++)
@@ -1969,14 +1969,14 @@ void multilevel_tube_conn_long(Gauge_Conf * GC,
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(raux)
        #endif
-       for(raux=0; raux<param->d_space_vol*param->d_size[0]/param->d_ml_step[0]; raux++)
+       for(raux=0; raux<geo->d_space_vol*geo->d_size[0]/param->d_ml_step[0]; raux++)
           {
           TensProd TP;
           long r1, r2;
           int j, t_tmp;
 
-          long r = raux/(param->d_size[0]/param->d_ml_step[0]);
-          int slice = (int) (raux % (param->d_size[0]/param->d_ml_step[0]) );
+          long r = raux/(geo->d_size[0]/param->d_ml_step[0]);
+          int slice = (int) (raux % (geo->d_size[0]/param->d_ml_step[0]) );
 
           r1=sisp_and_t_to_si(geo, r, 0);
           for(j=0; j<param->d_dist_poly; j++)

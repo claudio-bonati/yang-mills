@@ -290,7 +290,11 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
   #endif
 
   #ifndef THETA_MODE
-  calcstaples_wilson(GC, geo, param, r, i, M);
+  fprintf(stderr, "using calcstaples_with_topo without THETA_MODE (%s, %d)", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
+  (void) param;
+  calcstaples_wilson(GC, geo, r, i, M);
   #else
 
   if(STDIM!=4)
@@ -466,7 +470,11 @@ void calcstaples_with_topo_nosum(Gauge_Conf const * const GC,
   #endif
 
   #ifndef THETA_MODE
-  calcstaples_wilson_nosum(GC, geo, param, r, i, M);
+  fprintf(stderr, "using calcstaples_with_topo_nosum without THETA_MODE (%s, %d)", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
+  (void) param;
+  calcstaples_wilson_nosum(GC, geo, r, i, M);
   #else
 
   if(STDIM!=4)
@@ -666,7 +674,7 @@ void heatbath(Gauge_Conf *GC,
   GAUGE_GROUP stap;
 
   #ifndef THETA_MODE
-    calcstaples_wilson(GC, geo, param, r, i, &stap);
+    calcstaples_wilson(GC, geo, r, i, &stap);
   #else
     calcstaples_with_topo(GC, geo, param, r, i, &stap);
   #endif
@@ -695,12 +703,12 @@ void overrelaxation(Gauge_Conf *GC,
     exit(EXIT_FAILURE);
     }
   #endif
-  (void) param; // just to avoid wornings
 
   GAUGE_GROUP stap;
 
   #ifndef THETA_MODE
-    calcstaples_wilson(GC, geo, param, r, i, &stap);
+    (void) param; // just to avoid wornings
+    calcstaples_wilson(GC, geo, r, i, &stap);
   #else
     calcstaples_with_topo(GC, geo, param, r, i, &stap);
   #endif
@@ -736,7 +744,7 @@ int metropolis(Gauge_Conf *GC,
   int acc, hits;
 
   #ifndef THETA_MODE
-    calcstaples_wilson(GC, geo, param, r, i, &stap);
+    calcstaples_wilson(GC, geo, r, i, &stap);
   #else
     calcstaples_with_topo(GC, geo, param, r, i, &stap);
   #endif
@@ -811,7 +819,7 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
   int j, acc, hits;
 
   #ifndef THETA_MODE
-    calcstaples_wilson(GC, geo, param, r, i, &stap_w);
+    calcstaples_wilson(GC, geo, r, i, &stap_w);
   #else
     calcstaples_with_topo(GC, geo, param, r, i, &stap_w);
   #endif
@@ -1246,7 +1254,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
 
 
 // n step of ape smearing with parameter alpha
-// new=Proj[old + alpha *staple ]
+// new=Proj[(1-alpha)old + alpha/STDIM *staple ]
 void ape_smearing(Gauge_Conf *GC,
                   Geometry const * const geo,
                   double alpha,
@@ -1274,7 +1282,7 @@ void ape_smearing(Gauge_Conf *GC,
              calcstaples_wilson(&helper1, geo, r, dir, &staple);
              equal(&link, &(helper1.lattice[r][dir]));
              times_equal_real(&link, 1-alpha);
-             times_equal_real(&staple, alpha/6.0);
+             times_equal_real(&staple, alpha/(2.0*(double)(STDIM-1)));
              plus_equal_dag(&link, &staple);
              unitarize(&link);
              equal(&(GC->lattice[r][dir]), &link);
@@ -1295,7 +1303,7 @@ void ape_smearing(Gauge_Conf *GC,
              calcstaples_wilson(GC, geo, r, dir, &staple);
              equal(&link, &(GC->lattice[r][dir]));
              times_equal_real(&link, 1-alpha);
-             times_equal_real(&staple, alpha/6.0);
+             times_equal_real(&staple, alpha/(2.0*(double)(STDIM-1)));
              plus_equal_dag(&link, &staple);
              unitarize(&link);
              equal(&(helper1.lattice[r][dir]), &link);

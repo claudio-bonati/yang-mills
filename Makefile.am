@@ -10,6 +10,7 @@ bin_PROGRAMS = conf_check \
                yang_mills_polycorr_long \
                yang_mills_polycorr_higgs \
                yang_mills_polycorr_higgs_long \
+               yang_mills_spectrum \
                yang_mills_t0 \
                yang_mills_tracedef \
                yang_mills_tube_conn \
@@ -171,6 +172,9 @@ yang_mills_polycorr_higgs_SOURCES=./src/yang_mills_polycorr_higgs.c \
 
 yang_mills_polycorr_higgs_long_SOURCES=./src/yang_mills_polycorr_higgs_long.c \
                                   $(everything)
+
+yang_mills_spectrum_SOURCES=./src/yang_mills_spectrum.c \
+                            $(everything)
 
 yang_mills_t0_SOURCES=./src/yang_mills_t0.c \
                       $(everything)

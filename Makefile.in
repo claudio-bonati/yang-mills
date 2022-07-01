@@ -92,7 +92,8 @@ bin_PROGRAMS = conf_check$(EXEEXT) debug_rng$(EXEEXT) \
 	yang_mills_local$(EXEEXT) yang_mills_polycorr$(EXEEXT) \
 	yang_mills_polycorr_long$(EXEEXT) \
 	yang_mills_polycorr_higgs$(EXEEXT) \
-	yang_mills_polycorr_higgs_long$(EXEEXT) yang_mills_t0$(EXEEXT) \
+	yang_mills_polycorr_higgs_long$(EXEEXT) \
+	yang_mills_spectrum$(EXEEXT) yang_mills_t0$(EXEEXT) \
 	yang_mills_tracedef$(EXEEXT) yang_mills_tube_conn$(EXEEXT) \
 	yang_mills_tube_conn_long$(EXEEXT) \
 	yang_mills_tube_disc$(EXEEXT) \
@@ -197,6 +198,10 @@ am_yang_mills_polycorr_long_OBJECTS =  \
 yang_mills_polycorr_long_OBJECTS =  \
 	$(am_yang_mills_polycorr_long_OBJECTS)
 yang_mills_polycorr_long_LDADD = $(LDADD)
+am_yang_mills_spectrum_OBJECTS = ./src/yang_mills_spectrum.$(OBJEXT) \
+	$(am__objects_13)
+yang_mills_spectrum_OBJECTS = $(am_yang_mills_spectrum_OBJECTS)
+yang_mills_spectrum_LDADD = $(LDADD)
 am_yang_mills_t0_OBJECTS = ./src/yang_mills_t0.$(OBJEXT) \
 	$(am__objects_13)
 yang_mills_t0_OBJECTS = $(am_yang_mills_t0_OBJECTS)
@@ -258,7 +263,8 @@ SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_higgs_SOURCES) \
 	$(yang_mills_polycorr_higgs_long_SOURCES) \
-	$(yang_mills_polycorr_long_SOURCES) $(yang_mills_t0_SOURCES) \
+	$(yang_mills_polycorr_long_SOURCES) \
+	$(yang_mills_spectrum_SOURCES) $(yang_mills_t0_SOURCES) \
 	$(yang_mills_tracedef_SOURCES) $(yang_mills_tube_conn_SOURCES) \
 	$(yang_mills_tube_conn_long_SOURCES) \
 	$(yang_mills_tube_disc_SOURCES) \
@@ -270,7 +276,8 @@ DIST_SOURCES = $(conf_check_SOURCES) $(debug_rng_SOURCES) \
 	$(yang_mills_polycorr_SOURCES) \
 	$(yang_mills_polycorr_higgs_SOURCES) \
 	$(yang_mills_polycorr_higgs_long_SOURCES) \
-	$(yang_mills_polycorr_long_SOURCES) $(yang_mills_t0_SOURCES) \
+	$(yang_mills_polycorr_long_SOURCES) \
+	$(yang_mills_spectrum_SOURCES) $(yang_mills_t0_SOURCES) \
 	$(yang_mills_tracedef_SOURCES) $(yang_mills_tube_conn_SOURCES) \
 	$(yang_mills_tube_conn_long_SOURCES) \
 	$(yang_mills_tube_disc_SOURCES) \
@@ -571,6 +578,9 @@ yang_mills_polycorr_higgs_SOURCES = ./src/yang_mills_polycorr_higgs.c \
 yang_mills_polycorr_higgs_long_SOURCES = ./src/yang_mills_polycorr_higgs_long.c \
                                   $(everything)
 
+yang_mills_spectrum_SOURCES = ./src/yang_mills_spectrum.c \
+                            $(everything)
+
 yang_mills_t0_SOURCES = ./src/yang_mills_t0.c \
                       $(everything)
 
@@ -808,6 +818,12 @@ yang_mills_polycorr_higgs_long$(EXEEXT): $(yang_mills_polycorr_higgs_long_OBJECT
 yang_mills_polycorr_long$(EXEEXT): $(yang_mills_polycorr_long_OBJECTS) $(yang_mills_polycorr_long_DEPENDENCIES) $(EXTRA_yang_mills_polycorr_long_DEPENDENCIES) 
 	@rm -f yang_mills_polycorr_long$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(yang_mills_polycorr_long_OBJECTS) $(yang_mills_polycorr_long_LDADD) $(LIBS)
+./src/yang_mills_spectrum.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+yang_mills_spectrum$(EXEEXT): $(yang_mills_spectrum_OBJECTS) $(yang_mills_spectrum_DEPENDENCIES) $(EXTRA_yang_mills_spectrum_DEPENDENCIES) 
+	@rm -f yang_mills_spectrum$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(yang_mills_spectrum_OBJECTS) $(yang_mills_spectrum_LDADD) $(LIBS)
 ./src/yang_mills_t0.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
@@ -885,6 +901,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr_higgs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr_higgs_long.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_polycorr_long.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_spectrum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_t0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tracedef.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./src/$(DEPDIR)/yang_mills_tube_conn.Po@am__quote@

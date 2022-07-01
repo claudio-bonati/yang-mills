@@ -92,3 +92,4 @@ include/son_upd.h
 src/debug_son.c
 include/son_monopoles.h
 lib/son_monopoles.c
+src/yang_mills_spectrum.c
