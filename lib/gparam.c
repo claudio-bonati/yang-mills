@@ -111,7 +111,7 @@ void readinput(char *in_file, GParam *param)
                   fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
                   exit(EXIT_FAILURE);
                   }
-                param->d_size[i]=temp_i;
+                param->d_sizeg[i]=temp_i;
                 }
              }
 
@@ -480,7 +480,7 @@ void readinput(char *in_file, GParam *param)
       // VARIOUS CHECKS
       if(param->d_ml_step[0]!=0)
         {
-        if(param->d_size[0] % param->d_ml_step[0] || param->d_size[0] < param->d_ml_step[0])
+        if(param->d_sizeg[0] % param->d_ml_step[0] || param->d_sizeg[0] < param->d_ml_step[0])
           {
           fprintf(stderr, "Error: size[0] has to be divisible by ml_step[0] and satisfy ml_step[0]<=size[0] (%s, %d)\n", __FILE__, __LINE__);
           exit(EXIT_FAILURE);
@@ -516,7 +516,7 @@ void readinput(char *in_file, GParam *param)
       err=0;
       for(i=0; i<STDIM; i++)
          {
-         if(param->d_size[i]==1)
+         if(param->d_sizeg[i]==1)
            {
            err=1;
            }
@@ -525,33 +525,8 @@ void readinput(char *in_file, GParam *param)
         {
         fprintf(stderr, "Error: all sizes has to be larger than 1: the totally reduced case is not implemented! (%s, %d)\n", __FILE__, __LINE__);
         }
-
-      init_derived_constants(param);
       }
     }
-
-
-void init_derived_constants(GParam *param)
-  {
-  int i;
-
-  // derived constants
-  param->d_volume=1;
-  for(i=0; i<STDIM; i++)
-     {
-     (param->d_volume)*=(param->d_size[i]);
-     }
-
-  param->d_space_vol=1;
-  // direction 0 is time
-  for(i=1; i<STDIM; i++)
-     {
-     (param->d_space_vol)*=(param->d_size[i]);
-     }
-
-  param->d_inv_vol=1.0/((double) param->d_volume);
-  param->d_inv_space_vol=1.0/((double) param->d_space_vol);
-  }
 
 
 // initialize data file
@@ -573,7 +548,7 @@ void init_data_file(FILE **dataf, GParam const * const param)
       fprintf(*dataf, "%d ", STDIM);
       for(i=0; i<STDIM; i++)
          {
-         fprintf(*dataf, "%d ", param->d_size[i]);
+         fprintf(*dataf, "%d ", param->d_sizeg[i]);
          }
       fprintf(*dataf, "\n");
       }
@@ -584,7 +559,7 @@ void init_data_file(FILE **dataf, GParam const * const param)
     fprintf(*dataf, "%d ", STDIM);
     for(i=0; i<STDIM; i++)
        {
-       fprintf(*dataf, "%d ", param->d_size[i]);
+       fprintf(*dataf, "%d ", param->d_sizeg[i]);
        }
     fprintf(*dataf, "\n");
     }
@@ -611,7 +586,7 @@ void init_mon_file(FILE **monof, GParam const * const param)
       fprintf(*monof, "%d ", STDIM);
       for(i=0; i<STDIM; i++)
          {
-         fprintf(*monof, "%d ", param->d_size[i]);
+         fprintf(*monof, "%d ", param->d_sizeg[i]);
          }
       fprintf(*monof, "\n");
       }
@@ -622,7 +597,7 @@ void init_mon_file(FILE **monof, GParam const * const param)
     fprintf(*monof, "%d ", STDIM);
     for(i=0; i<STDIM; i++)
        {
-       fprintf(*monof, "%d ", param->d_size[i]);
+       fprintf(*monof, "%d ", param->d_sizeg[i]);
        }
     fprintf(*monof, "\n");
     }
@@ -650,10 +625,10 @@ void print_parameters_local(GParam const * const param, time_t time_start, time_
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -718,10 +693,10 @@ void print_parameters_polycorr(GParam * param, time_t time_start, time_t time_en
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -799,10 +774,10 @@ void print_parameters_polycorr_higgs(GParam * param, time_t time_start, time_t t
     fprintf(fp, "number of higgs fields: %d\n", NHIGGS);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -885,10 +860,10 @@ void print_parameters_polycorr_long(GParam * param, time_t time_start, time_t ti
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -963,10 +938,10 @@ void print_parameters_polycorr_higgs_long(GParam * param, time_t time_start, tim
     fprintf(fp, "number of higgs fields: %d\n", NHIGGS);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -1047,10 +1022,10 @@ void print_parameters_t0(GParam * param, time_t time_start, time_t time_end)
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -1096,10 +1071,10 @@ void print_parameters_tracedef(GParam const * const param, time_t time_start, ti
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -1173,10 +1148,10 @@ void print_parameters_tube_disc(GParam * param, time_t time_start, time_t time_e
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -1254,10 +1229,10 @@ void print_parameters_tube_disc_long(GParam * param, time_t time_start, time_t t
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -1334,10 +1309,10 @@ void print_parameters_tube_conn(GParam * param, time_t time_start, time_t time_e
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -1415,10 +1390,10 @@ void print_parameters_tube_conn_long(GParam * param, time_t time_start, time_t t
     fprintf(fp, "number of colors: %d\n", NCOLOR);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 
@@ -1495,10 +1470,10 @@ void print_parameters_higgs(GParam const * const param, time_t time_start, time_
     fprintf(fp, "number of higgs fields: %d\n", NHIGGS);
     fprintf(fp, "spacetime dimensionality: %d\n\n", STDIM);
 
-    fprintf(fp, "lattice: %d", param->d_size[0]);
+    fprintf(fp, "lattice: %d", param->d_sizeg[0]);
     for(i=1; i<STDIM; i++)
        {
-       fprintf(fp, "x%d", param->d_size[i]);
+       fprintf(fp, "x%d", param->d_sizeg[i]);
        }
     fprintf(fp, "\n\n");
 

@@ -31,7 +31,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
   time_t time1, time2;
   GAUGE_GROUP matrix, tmp;
 
-  err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
+  err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) geo->d_space_vol * sizeof(double complex));
   if(err!=0)
     {
     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
@@ -39,7 +39,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
     }
 
   #ifdef THETA_MODE
-   compute_clovers(GC, geo, param, 0);
+   compute_clovers(GC, geo, 0);
   #endif
 
   fprintf(datafilep, "Multihit optimization: \n");
@@ -50,10 +50,10 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
      time(&time1);
 
      // polyakov loop computation
-     for(r=0; r<param->d_space_vol; r++)
+     for(r=0; r<geo->d_space_vol; r++)
         {
         one(&matrix);
-        for(i=0; i<param->d_size[0]; i++)
+        for(i=0; i<geo->d_size[0]; i++)
            {
            multihit(GC,
                     geo,
@@ -70,7 +70,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
      // average correlator computation
      poly_corr=0.0+I*0.0;
      poly_corr_abs=0.0;
-     for(r=0; r<param->d_space_vol; r++)
+     for(r=0; r<geo->d_space_vol; r++)
         {
         r1=sisp_and_t_to_si(geo, r, 0);
         for(i=0; i<param->d_dist_poly; i++)
@@ -82,12 +82,12 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
         poly_corr += poly_array[r]*conj(poly_array[r2]);
         poly_corr_abs += cabs(poly_array[r]*conj(poly_array[r2]));
         }
-     poly_corr*=param->d_inv_space_vol;
-     poly_corr_abs*=param->d_inv_space_vol;
+     poly_corr*=geo->d_inv_space_vol;
+     poly_corr_abs*=geo->d_inv_space_vol;
 
      // fluctuation of the average correlator computation
      poly_corr_fluct=0.0;
-     for(r=0; r<param->d_space_vol; r++)
+     for(r=0; r<geo->d_space_vol; r++)
         {
         r1=sisp_and_t_to_si(geo, r, 0);
         for(i=0; i<param->d_dist_poly; i++)
@@ -97,7 +97,7 @@ void optimize_multihit_polycorr(Gauge_Conf *GC,
         si_to_sisp_and_t(&r2, &t_tmp, geo, r1); // r2 is the spatial value of r1
         poly_corr_fluct+=cabs( poly_array[r]*conj(poly_array[r2]) - poly_corr );
         }
-     poly_corr_fluct*=param->d_inv_space_vol;
+     poly_corr_fluct*=geo->d_inv_space_vol;
 
 
      time(&time2);
@@ -124,7 +124,7 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
    double poly_corr_abs, poly_corr_fluct;
    double complex *poly_array;
 
-   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) geo->d_space_vol * sizeof(double complex));
    if(err!=0)
      {
      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
@@ -137,14 +137,14 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
    multilevel_polycorr(GC,
                        geo,
                        param,
-                       param->d_size[0]);
+                       geo->d_size[0]);
 
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+   for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
       {
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(r=0; r<geo->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          }
@@ -153,23 +153,23 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
    // averages
    poly_corr=0.0+I*0.0;
    poly_corr_abs=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
 
       poly_corr+=poly_array[r];
       poly_corr_abs+=cabs(poly_array[r]);
       }
-   poly_corr*=param->d_inv_space_vol;
-   poly_corr_abs*=param->d_inv_space_vol;
+   poly_corr*=geo->d_inv_space_vol;
+   poly_corr_abs*=geo->d_inv_space_vol;
 
    // fluctuations
    poly_corr_fluct=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       poly_corr_fluct += cabs(poly_array[r]-poly_corr);
       }
-   poly_corr_fluct*=param->d_inv_space_vol;
+   poly_corr_fluct*=geo->d_inv_space_vol;
 
    // normalizations
    for(i=0; i<NLEVELS; i++)
@@ -205,7 +205,7 @@ void optimize_multilevel_polycorr_with_higgs(Gauge_Conf *GC,
    double poly_corr_abs, poly_corr_fluct;
    double complex *poly_array;
 
-   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) geo->d_space_vol * sizeof(double complex));
    if(err!=0)
      {
      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
@@ -218,14 +218,14 @@ void optimize_multilevel_polycorr_with_higgs(Gauge_Conf *GC,
    multilevel_polycorr_with_higgs(GC,
                                   geo,
                                   param,
-                                  param->d_size[0]);
+                                  geo->d_size[0]);
 
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+   for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
       {
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(r=0; r<geo->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          }
@@ -234,23 +234,23 @@ void optimize_multilevel_polycorr_with_higgs(Gauge_Conf *GC,
    // averages
    poly_corr=0.0+I*0.0;
    poly_corr_abs=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
 
       poly_corr+=poly_array[r];
       poly_corr_abs+=cabs(poly_array[r]);
       }
-   poly_corr*=param->d_inv_space_vol;
-   poly_corr_abs*=param->d_inv_space_vol;
+   poly_corr*=geo->d_inv_space_vol;
+   poly_corr_abs*=geo->d_inv_space_vol;
 
    // fluctuations
    poly_corr_fluct=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       poly_corr_fluct += cabs(poly_array[r]-poly_corr);
       }
-   poly_corr_fluct*=param->d_inv_space_vol;
+   poly_corr_fluct*=geo->d_inv_space_vol;
 
    // normalizations
    for(i=0; i<NLEVELS; i++)
@@ -289,25 +289,25 @@ void perform_measures_polycorr(Gauge_Conf *GC,
      multilevel_polycorr(GC,
                          geo,
                          param,
-                         param->d_size[0]);
+                         geo->d_size[0]);
 
-     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+     for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
         #endif
-        for(r=0; r<param->d_space_vol; r++)
+        for(r=0; r<geo->d_space_vol; r++)
            {
            times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
            }
         }
 
      ris=0.0;
-     for(r=0; r<param->d_space_vol; r++)
+     for(r=0; r<geo->d_space_vol; r++)
         {
         ris+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
         }
-     ris*=param->d_inv_space_vol;
+     ris*=geo->d_inv_space_vol;
 
      fprintf(datafilep, "%.12g\n", ris);
      fflush(datafilep);
@@ -339,25 +339,25 @@ void perform_measures_polycorr_with_higgs(Gauge_Conf *GC,
      multilevel_polycorr_with_higgs(GC,
                                     geo,
                                     param,
-                                    param->d_size[0]);
+                                    geo->d_size[0]);
 
-     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+     for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
         #endif
-        for(r=0; r<param->d_space_vol; r++)
+        for(r=0; r<geo->d_space_vol; r++)
            {
            times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
            }
         }
 
      ris=0.0;
-     for(r=0; r<param->d_space_vol; r++)
+     for(r=0; r<geo->d_space_vol; r++)
         {
         ris+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
         }
-     ris*=param->d_inv_space_vol;
+     ris*=geo->d_inv_space_vol;
 
      fprintf(datafilep, "%.12g\n", ris);
      fflush(datafilep);
@@ -376,6 +376,7 @@ void perform_measures_polycorr_with_higgs(Gauge_Conf *GC,
 
 // to optimize the multilevel
 void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
+                                       Geometry const * const geo,
                                        GParam const * const param,
                                        FILE *datafilep)
    {
@@ -385,7 +386,7 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
    double complex poly_corr;
    double complex *poly_array;
 
-   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double complex));
+   err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) geo->d_space_vol * sizeof(double complex));
    if(err!=0)
      {
      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
@@ -395,12 +396,12 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
    fprintf(datafilep, "Multilevel optimization: ");
    fprintf(datafilep, "the smaller the value the better the update\n");
 
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+   for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
       {
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(r=0; r<geo->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          }
@@ -409,23 +410,23 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
    // average
    poly_corr=0.0+I*0.0;
    poly_corr_abs=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
 
       poly_corr+=poly_array[r];
       poly_corr_abs+=cabs(poly_array[r]);
       }
-   poly_corr*=param->d_inv_space_vol;
-   poly_corr_abs*=param->d_inv_space_vol;
+   poly_corr*=geo->d_inv_space_vol;
+   poly_corr_abs*=geo->d_inv_space_vol;
 
    // fluctuation
    poly_corr_fluct=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       poly_corr_fluct+=cabs(poly_array[r]-poly_corr);
       }
-   poly_corr_fluct*=param->d_inv_space_vol;
+   poly_corr_fluct*=geo->d_inv_space_vol;
 
    // normalization
    for(i=0; i<NLEVELS; i++)
@@ -456,6 +457,7 @@ void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
 
 // print the value of the polyakov loop correlator that has been computed by multilevel
 void perform_measures_polycorr_long(Gauge_Conf *GC,
+                                    Geometry const * const geo,
                                     GParam const * const param,
                                     FILE *datafilep)
    {
@@ -466,23 +468,23 @@ void perform_measures_polycorr_long(Gauge_Conf *GC,
      long r;
      int i;
 
-     for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+     for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
         #endif
-        for(r=0; r<param->d_space_vol; r++)
+        for(r=0; r<geo->d_space_vol; r++)
            {
            times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
            }
         }
 
      ris=0.0;
-     for(r=0; r<param->d_space_vol; r++)
+     for(r=0; r<geo->d_space_vol; r++)
         {
         ris+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
         }
-     ris*=param->d_inv_space_vol;
+     ris*=geo->d_inv_space_vol;
 
      fprintf(datafilep, "%.12g\n", ris);
      fflush(datafilep);
@@ -504,14 +506,14 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
    multilevel_tube_disc(GC,
                         geo,
                         param,
-                        param->d_size[0]);
+                        geo->d_size[0]);
 
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+   for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
       {
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(r=0; r<geo->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
@@ -520,24 +522,24 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
       risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
       risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    fprintf(datafilep, "\n");
@@ -547,6 +549,7 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
 // perform the computation of the string width with the
 // disconnected correlator that has been computed by multilevel (long version)
 void perform_measures_tube_disc_long(Gauge_Conf *GC,
+                                     Geometry const * const geo,
                                      GParam const * const param,
                                      FILE *datafilep)
    {
@@ -554,12 +557,12 @@ void perform_measures_tube_disc_long(Gauge_Conf *GC,
    long r;
    int i;
 
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+   for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
       {
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(r=0; r<geo->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
@@ -568,24 +571,24 @@ void perform_measures_tube_disc_long(Gauge_Conf *GC,
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
       risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
       risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    fprintf(datafilep, "\n");
@@ -607,14 +610,14 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
    multilevel_tube_conn(GC,
                         geo,
                         param,
-                        param->d_size[0]);
+                        geo->d_size[0]);
 
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+   for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
       {
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(r=0; r<geo->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
@@ -624,35 +627,35 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
       risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
       risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polyplaqconn[0][r]));
       risi+=imtr_TensProd(&(GC->ml_polyplaqconn[0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    fprintf(datafilep, "\n");
@@ -663,6 +666,7 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
 // print the value of the the string width with the
 // connected correlator that has been computed by multilevel
 void perform_measures_tube_conn_long(Gauge_Conf *GC,
+                                     Geometry const * const geo,
                                      GParam const * const param,
                                      FILE *datafilep)
    {
@@ -670,12 +674,12 @@ void perform_measures_tube_conn_long(Gauge_Conf *GC,
    long r;
    int i;
 
-   for(i=1; i<param->d_size[0]/param->d_ml_step[0]; i++)
+   for(i=1; i<geo->d_size[0]/param->d_ml_step[0]; i++)
       {
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<param->d_space_vol; r++)
+      for(r=0; r<geo->d_space_vol; r++)
          {
          times_equal_TensProd(&(GC->ml_polycorr[0][0][r]), &(GC->ml_polycorr[0][i][r]) );
          times_equal_TensProd(&(GC->ml_polyplaq[0][r]), &(GC->ml_polycorr[0][i][r]) );
@@ -685,35 +689,35 @@ void perform_measures_tube_conn_long(Gauge_Conf *GC,
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polycorr[0][0][r]));
       risi+=imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polyplaq[0][r]));
       risi+=imtr_TensProd(&(GC->ml_polyplaq[0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    risr=0.0;
    risi=0.0;
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       risr+=retr_TensProd(&(GC->ml_polyplaqconn[0][r]));
       risi+=imtr_TensProd(&(GC->ml_polyplaqconn[0][r]));
       }
-   risr*=param->d_inv_space_vol;
-   risi*=param->d_inv_space_vol;
+   risr*=geo->d_inv_space_vol;
+   risi*=geo->d_inv_space_vol;
    fprintf(datafilep, "%.12g %.12g ", risr, risi);
 
    fprintf(datafilep, "\n");

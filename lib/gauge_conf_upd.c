@@ -17,7 +17,6 @@
 // compute the staple in position r, direction i and save it in M
 void calcstaples_wilson(Gauge_Conf const * const GC,
                         Geometry const * const geo,
-                        GParam const * const param,
                         long r,
                         int i,
                         GAUGE_GROUP *M)
@@ -27,9 +26,9 @@ void calcstaples_wilson(Gauge_Conf const * const GC,
   GAUGE_GROUP link1, link2, link3, link12, stap;
 
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -37,8 +36,6 @@ void calcstaples_wilson(Gauge_Conf const * const GC,
     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #else
-  (void) param; // just to avoid warnings
   #endif
 
   zero(M); // M=0
@@ -100,7 +97,6 @@ void calcstaples_wilson(Gauge_Conf const * const GC,
 // position 0 of M is not used. It is used in simulations at imaginary theta values
 void calcstaples_wilson_nosum(Gauge_Conf const * const GC,
                               Geometry const * const geo,
-                              GParam const * const param,
                               long r,
                               int i,
                               GAUGE_GROUP *M)
@@ -110,9 +106,9 @@ void calcstaples_wilson_nosum(Gauge_Conf const * const GC,
   GAUGE_GROUP link1, link2, link3, link12, stap;
 
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -120,8 +116,6 @@ void calcstaples_wilson_nosum(Gauge_Conf const * const GC,
     fprintf(stderr, "i too large: i=%d >= %d (%s, %d)\n", i, STDIM, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #else
-  (void) param; // just to avoid warnings
   #endif
 
   count=0;
@@ -188,7 +182,7 @@ void calcstaples_wilson_nosum(Gauge_Conf const * const GC,
    GAUGE_GROUP helper;
    int m;
 
-   calcstaples_wilson(GC, geo, param, r, i, &helper);
+   calcstaples_wilson(GC, geo, r, i, &helper);
    for(m=0; m<2*(STDIM-1)+1; m++)
       {
       minus_equal(&helper, &(M[m]));
@@ -206,7 +200,6 @@ void calcstaples_wilson_nosum(Gauge_Conf const * const GC,
 // in practice a Polyakov loop without a link
 void calcstaples_tracedef(Gauge_Conf const * const GC,
                           Geometry const * const geo,
-                          GParam const * const param,
                           long r,
                           int i,
                           GAUGE_GROUP * M)
@@ -228,7 +221,7 @@ void calcstaples_tracedef(Gauge_Conf const * const GC,
     one(&aux);
 
     rnext=r;
-    for(j=1; j<param->d_size[0]; j++)
+    for(j=1; j<geo->d_size[0]; j++)
        {
        rnext=nnp(geo, rnext, 0);
        times_equal(&aux, &(GC->lattice[rnext][0]));
@@ -242,7 +235,6 @@ void calcstaples_tracedef(Gauge_Conf const * const GC,
 // compute all the clovers in directions ortogonal to "dir"
 void compute_clovers(Gauge_Conf const * const GC,
                      Geometry const * const geo,
-                     GParam const * const param,
                      int dir)
   {
   long r;
@@ -250,7 +242,7 @@ void compute_clovers(Gauge_Conf const * const GC,
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(r)
   #endif
-  for(r=0; r<param->d_volume; r++)
+  for(r=0; r<geo->d_volume; r++)
      {
      GAUGE_GROUP aux;
      int i, j;
@@ -261,7 +253,7 @@ void compute_clovers(Gauge_Conf const * const GC,
            {
            if(i!=dir && j!=dir)
              {
-             clover(GC, geo, param, r, i, j, &aux);
+             clover(GC, geo, r, i, j, &aux);
 
              equal(&(GC->clover_array[r][i][j]), &aux);
              minus_equal_dag(&(GC->clover_array[r][i][j]), &aux);  // clover_array[r][i][j]=aux-aux^{dag}
@@ -285,9 +277,9 @@ void calcstaples_with_topo(Gauge_Conf const * const GC,
                            GAUGE_GROUP *M)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -461,9 +453,9 @@ void calcstaples_with_topo_nosum(Gauge_Conf const * const GC,
                                  GAUGE_GROUP *M)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -659,9 +651,9 @@ void heatbath(Gauge_Conf *GC,
               int i)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -692,9 +684,9 @@ void overrelaxation(Gauge_Conf *GC,
                     int i)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -727,9 +719,9 @@ int metropolis(Gauge_Conf *GC,
                int numhits)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >=geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -801,9 +793,9 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
                              int numhits)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -834,7 +826,7 @@ int metropolis_with_tracedef(Gauge_Conf *GC,
      if(i==0) // just if we are updating a temporal link
        {
        // "staple" for trace deformation
-       calcstaples_tracedef(GC, geo, param, r, i, &stap_td);
+       calcstaples_tracedef(GC, geo, r, i, &stap_td);
 
        // trace deformation contribution to action_old
        times(&poly, &(GC->lattice[r][i]), &stap_td);
@@ -900,15 +892,6 @@ void update(Gauge_Conf * GC,
             Geometry const * const geo,
             GParam const * const param)
    {
-   for(int i=0; i<STDIM; i++)
-      {
-      if(param->d_size[i]==1)
-        {
-        fprintf(stderr, "Error: this functon can not be used in the completely reduced case (%s, %d)\n", __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
-        }
-      }
-
    long r;
    int j, dir;
 
@@ -916,13 +899,13 @@ void update(Gauge_Conf * GC,
    for(dir=0; dir<STDIM; dir++)
       {
       #ifdef THETA_MODE
-      compute_clovers(GC, geo, param, dir);
+      compute_clovers(GC, geo, dir);
       #endif
 
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif 
-      for(r=0; r<(param->d_volume)/2; r++)
+      for(r=0; r<(geo->d_volume)/2; r++)
          {
          heatbath(GC, geo, param, r, dir);
          }
@@ -930,7 +913,7 @@ void update(Gauge_Conf * GC,
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif 
-      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+      for(r=(geo->d_volume)/2; r<(geo->d_volume); r++)
          {
          heatbath(GC, geo, param, r, dir);
          } 
@@ -940,7 +923,7 @@ void update(Gauge_Conf * GC,
    for(dir=0; dir<STDIM; dir++)
       {
       #ifdef THETA_MODE
-      compute_clovers(GC, geo, param, dir);
+      compute_clovers(GC, geo, dir);
       #endif
 
       for(j=0; j<param->d_overrelax; j++)
@@ -948,7 +931,7 @@ void update(Gauge_Conf * GC,
          #ifdef OPENMP_MODE
          #pragma omp parallel for num_threads(NTHREADS) private(r)
          #endif 
-         for(r=0; r<(param->d_volume)/2; r++)
+         for(r=0; r<(geo->d_volume)/2; r++)
             {
             overrelaxation(GC, geo, param, r, dir);
             }
@@ -956,7 +939,7 @@ void update(Gauge_Conf * GC,
          #ifdef OPENMP_MODE
          #pragma omp parallel for num_threads(NTHREADS) private(r)
          #endif 
-         for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         for(r=(geo->d_volume)/2; r<(geo->d_volume); r++)
             {
             overrelaxation(GC, geo, param, r, dir);
             }
@@ -967,7 +950,7 @@ void update(Gauge_Conf * GC,
    #ifdef OPENMP_MODE
    #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
    #endif 
-   for(r=0; r<(param->d_volume); r++)
+   for(r=0; r<(geo->d_volume); r++)
       {
       for(dir=0; dir<STDIM; dir++)
          {
@@ -991,14 +974,14 @@ void update_with_trace_def(Gauge_Conf * GC,
 
    const int maxhits=5;
 
-   err=posix_memalign((void**)&a, (size_t)INT_ALIGN, (size_t) param->d_space_vol * sizeof(int));
+   err=posix_memalign((void**)&a, (size_t)INT_ALIGN, (size_t) geo->d_space_vol * sizeof(int));
    if(err!=0)
      {
      fprintf(stderr, "Problems in allocating a vector! (%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
 
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       a[r]=0;
       }
@@ -1007,13 +990,13 @@ void update_with_trace_def(Gauge_Conf * GC,
    for(dir=1; dir<STDIM; dir++)
       {
       #ifdef THETA_MODE
-      compute_clovers(GC, geo, param, dir);
+      compute_clovers(GC, geo, dir);
       #endif
 
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<(param->d_volume)/2; r++)
+      for(r=0; r<(geo->d_volume)/2; r++)
          {
          heatbath(GC, geo, param, r, dir);
          }
@@ -1021,23 +1004,23 @@ void update_with_trace_def(Gauge_Conf * GC,
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+      for(r=(geo->d_volume)/2; r<(geo->d_volume); r++)
          {
          heatbath(GC, geo, param, r, dir);
          }
       }
 
    // metropolis on temporal links
-   for(t=0; t<param->d_size[0]; t++)
+   for(t=0; t<geo->d_size[0]; t++)
       {
       #ifdef THETA_MODE
-      compute_clovers(GC, geo, param, 0);
+      compute_clovers(GC, geo, 0);
       #endif
 
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<(param->d_space_vol)/2; r++)
+      for(r=0; r<(geo->d_space_vol)/2; r++)
          {
          long r4=sisp_and_t_to_si(geo, r, t);
          a[r]+=metropolis_with_tracedef(GC, geo, param, r4, 0, maxhits);
@@ -1046,7 +1029,7 @@ void update_with_trace_def(Gauge_Conf * GC,
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=(param->d_space_vol)/2; r<(param->d_space_vol); r++)
+      for(r=(geo->d_space_vol)/2; r<(geo->d_space_vol); r++)
          {
          long r4=sisp_and_t_to_si(geo, r, t);
          a[r]+=metropolis_with_tracedef(GC, geo, param, r4, 0, maxhits);
@@ -1057,18 +1040,18 @@ void update_with_trace_def(Gauge_Conf * GC,
    #ifdef OPENMP_MODE
    #pragma omp parallel for reduction(+:asum) private(r)
    #endif
-   for(r=0; r<param->d_space_vol; r++)
+   for(r=0; r<geo->d_space_vol; r++)
       {
       asum+=(long)a[r];
       }
 
-   *acc=((double)asum)*param->d_inv_vol/(double)maxhits;
+   *acc=((double)asum)*geo->d_inv_vol/(double)maxhits;
 
    // overrelax spatial links
    for(dir=1; dir<STDIM; dir++)
       {
       #ifdef THETA_MODE
-      compute_clovers(GC, geo, param, dir);
+      compute_clovers(GC, geo, dir);
       #endif
 
       for(j=0; j<param->d_overrelax; j++)
@@ -1076,7 +1059,7 @@ void update_with_trace_def(Gauge_Conf * GC,
          #ifdef OPENMP_MODE
          #pragma omp parallel for num_threads(NTHREADS) private(r)
          #endif
-         for(r=0; r<(param->d_volume)/2; r++)
+         for(r=0; r<(geo->d_volume)/2; r++)
             {
             overrelaxation(GC, geo, param, r, dir);
             }
@@ -1084,7 +1067,7 @@ void update_with_trace_def(Gauge_Conf * GC,
          #ifdef OPENMP_MODE
          #pragma omp parallel for num_threads(NTHREADS) private(r)
          #endif
-         for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         for(r=(geo->d_volume)/2; r<(geo->d_volume); r++)
             {
             overrelaxation(GC, geo, param, r, dir);
             }
@@ -1095,7 +1078,7 @@ void update_with_trace_def(Gauge_Conf * GC,
    #ifdef OPENMP_MODE
    #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
    #endif
-   for(r=0; r<(param->d_volume); r++)
+   for(r=0; r<(geo->d_volume); r++)
       {
       for(dir=0; dir<STDIM; dir++)
          {
@@ -1113,7 +1096,6 @@ void update_with_trace_def(Gauge_Conf * GC,
 // perform n cooling steps minimizing the action at theta=0
 void cooling(Gauge_Conf *GC,
              Geometry const * const geo,
-             GParam const * const param,
              int n)
   {
   long r;
@@ -1127,20 +1109,20 @@ void cooling(Gauge_Conf *GC,
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
         #endif
-        for(r=0; r<(param->d_volume)/2; r++)
+        for(r=0; r<(geo->d_volume)/2; r++)
            {
            GAUGE_GROUP staple;
-           calcstaples_wilson(GC, geo, param, r, i, &staple);
+           calcstaples_wilson(GC, geo, r, i, &staple);
            cool(&(GC->lattice[r][i]), &staple);
            }
 
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r)
         #endif
-        for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+        for(r=(geo->d_volume)/2; r<(geo->d_volume); r++)
            {
            GAUGE_GROUP staple;
-           calcstaples_wilson(GC, geo, param, r, i, &staple);
+           calcstaples_wilson(GC, geo, r, i, &staple);
            cool(&(GC->lattice[r][i]), &staple);
            }
         }
@@ -1150,7 +1132,7 @@ void cooling(Gauge_Conf *GC,
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(r, i)
   #endif
-  for(r=0; r<(param->d_volume); r++)
+  for(r=0; r<(geo->d_volume); r++)
      {
      for(i=0; i<STDIM; i++)
         {
@@ -1166,7 +1148,6 @@ void gradflow_RKstep(Gauge_Conf *GC,
                      Gauge_Conf *helper1,
                      Gauge_Conf *helper2,
                      Geometry const * const geo,
-                     GParam const *const param,
                      double dt)
   {
   long r;
@@ -1178,7 +1159,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
      #endif
-     for(r=0; r<param->d_volume; r++)
+     for(r=0; r<geo->d_volume; r++)
         {
         equal(&(helper1->lattice[r][dir]), &(GC->lattice[r][dir]));
         equal(&(helper2->lattice[r][dir]), &(GC->lattice[r][dir]));
@@ -1191,11 +1172,11 @@ void gradflow_RKstep(Gauge_Conf *GC,
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
      #endif
-     for(r=0; r<param->d_volume; r++)
+     for(r=0; r<geo->d_volume; r++)
         {
         GAUGE_GROUP staple, aux, link;
 
-        calcstaples_wilson(helper1, geo, param, r, dir, &staple);
+        calcstaples_wilson(helper1, geo, r, dir, &staple);
         equal(&link, &(helper1->lattice[r][dir]));
         times(&aux, &link, &staple);                // aux=link*staple
         times_equal_real(&aux, -dt/4.0);
@@ -1212,11 +1193,11 @@ void gradflow_RKstep(Gauge_Conf *GC,
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
      #endif
-     for(r=0; r<param->d_volume; r++)
+     for(r=0; r<geo->d_volume; r++)
         {
         GAUGE_GROUP staple, aux, link;
 
-        calcstaples_wilson(GC, geo, param, r, dir, &staple);
+        calcstaples_wilson(GC, geo, r, dir, &staple);
         equal(&link, &(GC->lattice[r][dir]));
         times(&aux, &link, &staple);               // aux=link*staple
         times_equal_real(&aux, -dt*8.0/9.0);
@@ -1234,11 +1215,11 @@ void gradflow_RKstep(Gauge_Conf *GC,
      #ifdef OPENMP_MODE
      #pragma omp parallel for num_threads(NTHREADS) private(r)
      #endif
-     for(r=0; r<param->d_volume; r++)
+     for(r=0; r<geo->d_volume; r++)
         {
         GAUGE_GROUP staple, aux, link;
 
-        calcstaples_wilson(helper1, geo, param, r, dir, &staple);
+        calcstaples_wilson(helper1, geo, r, dir, &staple);
         equal(&link, &(helper1->lattice[r][dir]));
         times(&aux, &link, &staple);                   // aux=link*staple
         times_equal_real(&aux, -dt*3.0/4.0);
@@ -1252,7 +1233,7 @@ void gradflow_RKstep(Gauge_Conf *GC,
   #ifdef OPENMP_MODE
   #pragma omp parallel for num_threads(NTHREADS) private(r)
   #endif
-  for(r=0; r<(param->d_volume); r++)
+  for(r=0; r<(geo->d_volume); r++)
      {
      int i;
      for(i=0; i<STDIM; i++)
@@ -1268,7 +1249,6 @@ void gradflow_RKstep(Gauge_Conf *GC,
 // new=Proj[old + alpha *staple ]
 void ape_smearing(Gauge_Conf *GC,
                   Geometry const * const geo,
-                  GParam const *const param,
                   double alpha,
                   int n)
   {
@@ -1276,7 +1256,7 @@ void ape_smearing(Gauge_Conf *GC,
   long r;
   int dir, count;
 
-  init_gauge_conf_from_gauge_conf(&helper1, GC, param); //helper1=GC
+  init_gauge_conf_from_gauge_conf(&helper1, GC, geo); //helper1=GC
 
   for(count=0; count<n; count++)
      {
@@ -1287,11 +1267,11 @@ void ape_smearing(Gauge_Conf *GC,
           #ifdef OPENMP_MODE
           #pragma omp parallel for num_threads(NTHREADS) private(r)
           #endif
-          for(r=0; r<param->d_volume; r++)
+          for(r=0; r<geo->d_volume; r++)
              {
              GAUGE_GROUP staple, link;
 
-             calcstaples_wilson(&helper1, geo, param, r, dir, &staple);
+             calcstaples_wilson(&helper1, geo, r, dir, &staple);
              equal(&link, &(helper1.lattice[r][dir]));
              times_equal_real(&link, 1-alpha);
              times_equal_real(&staple, alpha/6.0);
@@ -1308,11 +1288,11 @@ void ape_smearing(Gauge_Conf *GC,
           #ifdef OPENMP_MODE
           #pragma omp parallel for num_threads(NTHREADS) private(r)
           #endif
-          for(r=0; r<param->d_volume; r++)
+          for(r=0; r<geo->d_volume; r++)
              {
              GAUGE_GROUP staple, link;
 
-             calcstaples_wilson(GC, geo, param, r, dir, &staple);
+             calcstaples_wilson(GC, geo, r, dir, &staple);
              equal(&link, &(GC->lattice[r][dir]));
              times_equal_real(&link, 1-alpha);
              times_equal_real(&staple, alpha/6.0);
@@ -1331,14 +1311,14 @@ void ape_smearing(Gauge_Conf *GC,
        #ifdef OPENMP_MODE
        #pragma omp parallel for num_threads(NTHREADS) private(r)
        #endif
-       for(r=0; r<param->d_volume; r++)
+       for(r=0; r<geo->d_volume; r++)
           {
           equal(&(GC->lattice[r][dir]), &(helper1.lattice[r][dir]));
           }
        }
     }
 
-  free_gauge_conf(&helper1, param);
+  free_gauge_conf(&helper1, geo);
   }
 
 
@@ -1350,9 +1330,9 @@ void heatbath_with_higgs(Gauge_Conf *GC,
                          int i)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -1366,7 +1346,7 @@ void heatbath_with_higgs(Gauge_Conf *GC,
 
   if(fabs(param->d_beta)>MIN_VALUE)
     {
-    calcstaples_wilson(GC, geo, param, r, i, &stap1);
+    calcstaples_wilson(GC, geo, r, i, &stap1);
     times_equal_real(&stap1, param->d_beta);
     }
   else
@@ -1399,9 +1379,9 @@ void overrelaxation_with_higgs(Gauge_Conf *GC,
                                int i)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   if(i >= STDIM)
@@ -1415,7 +1395,7 @@ void overrelaxation_with_higgs(Gauge_Conf *GC,
 
   if(fabs(param->d_beta)>MIN_VALUE)
     {
-    calcstaples_wilson(GC, geo, param, r, i, &stap1);
+    calcstaples_wilson(GC, geo, r, i, &stap1);
     times_equal_real(&stap1, param->d_beta);
     }
   else
@@ -1443,18 +1423,15 @@ void overrelaxation_with_higgs(Gauge_Conf *GC,
 // compute the staple for the higgs field
 void calcstaples_for_higgs(Gauge_Conf *GC,
                            Geometry const * const geo,
-                           GParam const * const param,
                            long r,
                            GAUGE_VECS *staple)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
-  #else
-  (void) param; // just to avoid warnings
   #endif
 
   int i;
@@ -1484,20 +1461,19 @@ void calcstaples_for_higgs(Gauge_Conf *GC,
 // perform an update of the higgs field with overrelaxation
 void overrelaxation_for_higgs(Gauge_Conf *GC,
                               Geometry const * const geo,
-                              GParam const * const param,
                               long r)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   #endif
 
   GAUGE_VECS staple;
 
-  calcstaples_for_higgs(GC, geo, param, r, &staple);
+  calcstaples_for_higgs(GC, geo, r, &staple);
 
   single_overrelaxation_vecs(&(GC->higgs[r]), &staple);
 
@@ -1513,9 +1489,9 @@ int metropolis_for_higgs(Gauge_Conf *GC,
                          long r)
   {
   #ifdef DEBUG
-  if(r >= param->d_volume)
+  if(r >= geo->d_volume)
     {
-    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+    fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, geo->d_volume, __FILE__, __LINE__);
     exit(EXIT_FAILURE);
     }
   #endif
@@ -1525,7 +1501,7 @@ int metropolis_for_higgs(Gauge_Conf *GC,
   GAUGE_VECS staple, new_vector;
   GAUGE_GROUP identity_matrix, matrix, rnd_matrix;
 
-  calcstaples_for_higgs(GC, geo, param, r, &staple);
+  calcstaples_for_higgs(GC, geo, r, &staple);
 
   one(&identity_matrix);
 
@@ -1623,14 +1599,14 @@ void update_with_higgs(Gauge_Conf * GC,
    long r, asum;
    int j, dir;
 
-   err=posix_memalign((void**)&a, (size_t)INT_ALIGN, (size_t) param->d_volume * sizeof(int));
+   err=posix_memalign((void**)&a, (size_t)INT_ALIGN, (size_t) geo->d_volume * sizeof(int));
    if(err!=0)
      {
      fprintf(stderr, "Problems in allocating a vector! (%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
 
-   for(r=0; r<param->d_volume; r++)
+   for(r=0; r<geo->d_volume; r++)
       {
       a[r]=0;
       }
@@ -1641,7 +1617,7 @@ void update_with_higgs(Gauge_Conf * GC,
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<(param->d_volume)/2; r++)
+      for(r=0; r<(geo->d_volume)/2; r++)
          {
          heatbath_with_higgs(GC, geo, param, r, dir);
          }
@@ -1649,7 +1625,7 @@ void update_with_higgs(Gauge_Conf * GC,
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+      for(r=(geo->d_volume)/2; r<(geo->d_volume); r++)
          {
          heatbath_with_higgs(GC, geo, param, r, dir);
          }
@@ -1659,7 +1635,7 @@ void update_with_higgs(Gauge_Conf * GC,
    #ifdef OPENMP_MODE
    #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
    #endif
-   for(r=0; r<(param->d_volume); r++)
+   for(r=0; r<(geo->d_volume); r++)
       {
       for(dir=0; dir<STDIM; dir++)
          {
@@ -1675,7 +1651,7 @@ void update_with_higgs(Gauge_Conf * GC,
          #ifdef OPENMP_MODE
          #pragma omp parallel for num_threads(NTHREADS) private(r)
          #endif
-         for(r=0; r<(param->d_volume)/2; r++)
+         for(r=0; r<(geo->d_volume)/2; r++)
             {
             overrelaxation_with_higgs(GC, geo, param, r, dir);
             }
@@ -1683,7 +1659,7 @@ void update_with_higgs(Gauge_Conf * GC,
          #ifdef OPENMP_MODE
          #pragma omp parallel for num_threads(NTHREADS) private(r)
          #endif
-         for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+         for(r=(geo->d_volume)/2; r<(geo->d_volume); r++)
             {
             overrelaxation_with_higgs(GC, geo, param, r, dir);
             }
@@ -1692,7 +1668,7 @@ void update_with_higgs(Gauge_Conf * GC,
          #ifdef OPENMP_MODE
          #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
          #endif
-         for(r=0; r<(param->d_volume); r++)
+         for(r=0; r<(geo->d_volume); r++)
             {
             for(dir=0; dir<STDIM; dir++)
                {
@@ -1704,17 +1680,17 @@ void update_with_higgs(Gauge_Conf * GC,
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=0; r<(param->d_volume)/2; r++)
+      for(r=0; r<(geo->d_volume)/2; r++)
          {
-         overrelaxation_for_higgs(GC, geo, param, r);
+         overrelaxation_for_higgs(GC, geo, r);
          }
 
       #ifdef OPENMP_MODE
       #pragma omp parallel for num_threads(NTHREADS) private(r)
       #endif
-      for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+      for(r=(geo->d_volume)/2; r<(geo->d_volume); r++)
          {
-         overrelaxation_for_higgs(GC, geo, param, r);
+         overrelaxation_for_higgs(GC, geo, r);
          }
 
       // normalization for higgs is included in the update functions
@@ -1724,7 +1700,7 @@ void update_with_higgs(Gauge_Conf * GC,
    #ifdef OPENMP_MODE
    #pragma omp parallel for num_threads(NTHREADS) private(r)
    #endif
-   for(r=0; r<(param->d_volume)/2; r++)
+   for(r=0; r<(geo->d_volume)/2; r++)
       {
       a[r]+=metropolis_for_higgs(GC, geo, param, r);
       }
@@ -1732,7 +1708,7 @@ void update_with_higgs(Gauge_Conf * GC,
    #ifdef OPENMP_MODE
    #pragma omp parallel for num_threads(NTHREADS) private(r)
    #endif
-   for(r=(param->d_volume)/2; r<(param->d_volume); r++)
+   for(r=(geo->d_volume)/2; r<(geo->d_volume); r++)
       {
       a[r]+=metropolis_for_higgs(GC, geo, param, r);
       }
@@ -1744,12 +1720,12 @@ void update_with_higgs(Gauge_Conf * GC,
    #ifdef OPENMP_MODE
    #pragma omp parallel for reduction(+:asum) private(r)
    #endif
-   for(r=0; r<param->d_volume; r++)
+   for(r=0; r<geo->d_volume; r++)
       {
       asum+=(long)a[r];
       }
 
-   *acc=((double)asum)*param->d_inv_vol/(double)NHIGGS;
+   *acc=((double)asum)*geo->d_inv_vol/(double)NHIGGS;
 
    free(a);
 

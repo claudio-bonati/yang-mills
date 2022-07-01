@@ -49,12 +49,12 @@ void real_main(char *in_file)
     datafilep=fopen(param.d_data_file, "a");
 
     // initialize geometry
-    init_geometry(&geo, &param);
+    init_geometry(&geo, param.d_sizeg);
 
     // initialize gauge configurations
-    init_gauge_conf(&GC, &param);
-    init_gauge_conf_from_gauge_conf(&help1, &GC, &param);
-    init_gauge_conf_from_gauge_conf(&help2, &GC, &param);
+    init_gauge_conf(&GC, &geo, &param);
+    init_gauge_conf_from_gauge_conf(&help1, &GC, &geo);
+    init_gauge_conf_from_gauge_conf(&help2, &GC, &geo);
 
     time(&time1);
     gftime=0.0;
@@ -62,10 +62,10 @@ void real_main(char *in_file)
     energy_clover_old=0.0;
     while(count<max_count)
          {
-         gradflow_RKstep(&GC, &help1, &help2, &geo, &param, param.d_gfstep);
+         gradflow_RKstep(&GC, &help1, &help2, &geo, param.d_gfstep);
          gftime+=param.d_gfstep;
 
-         clover_disc_energy(&GC, &geo, &param, &energy_clover);
+         clover_disc_energy(&GC, &geo, &energy_clover);
          tch=topcharge(&GC, &geo, &param);
 
          fprintf(datafilep, "# %.13lf  %.13lf  %.13lf  %.13lf\n", gftime,
@@ -99,12 +99,12 @@ void real_main(char *in_file)
     print_parameters_t0(&param, time1, time2);
 
     // free gauge configurations
-    free_gauge_conf(&GC, &param);
-    free_gauge_conf(&help1, &param);
-    free_gauge_conf(&help2, &param);
+    free_gauge_conf(&GC, &geo);
+    free_gauge_conf(&help1, &geo);
+    free_gauge_conf(&help2, &geo);
 
     // free geometry
-    free_geometry(&geo, &param);
+    free_geometry(&geo);
     }
 
 

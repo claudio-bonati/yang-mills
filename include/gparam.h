@@ -8,7 +8,7 @@
 
 typedef struct GParam {
   // lattice dimensions
-  int d_size[STDIM];
+  int d_sizeg[STDIM];
 
   // simulation parameters
   double d_beta;
@@ -58,17 +58,11 @@ typedef struct GParam {
   // random seed
   unsigned int d_randseed;
 
-  // derived constants
-  long d_volume;           // total volume
-  double d_inv_vol;        // 1 / tot. volume
-  long d_space_vol;        // spatial component of the volume
-  double d_inv_space_vol;  // 1 / spatial component of the volume
 } GParam;
 
 
 void remove_white_line_and_comments(FILE *input);
 void readinput(char *in_file, GParam *param);
-void init_derived_constants(GParam *param);
 
 void init_data_file(FILE **dataf, GParam const * const param);
 void init_mon_file(FILE **monof, GParam const * const param);

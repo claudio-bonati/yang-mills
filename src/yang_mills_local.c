@@ -50,10 +50,10 @@ void real_main(char *in_file)
       }
 
     // initialize geometry
-    init_geometry(&geo, &param);
+    init_geometry(&geo, param.d_sizeg);
 
     // initialize gauge configuration
-    init_gauge_conf(&GC, &param);
+    init_gauge_conf(&GC, &geo, &param);
 
     // montecarlo
     time(&time1);
@@ -73,10 +73,10 @@ void real_main(char *in_file)
          if(count % param.d_saveconf_back_every == 0 )
            {
            // simple
-           write_conf_on_file(&GC, &param);
+           write_conf_on_file(&GC, &geo, &param);
 
            // backup copy
-           write_conf_on_file_back(&GC, &param);
+           write_conf_on_file_back(&GC, &geo, &param);
            }
          }
 
@@ -88,7 +88,7 @@ void real_main(char *in_file)
            strcpy(name, param.d_conf_file);
            sprintf(aux, "%ld", GC.update_index);
            strcat(name, aux);
-           write_conf_on_file_with_name(&GC, &param, name);
+           write_conf_on_file_with_name(&GC, &geo, name);
            }
          }
        }
@@ -107,17 +107,17 @@ void real_main(char *in_file)
     // save configuration
     if(param.d_saveconf_back_every!=0)
       {
-      write_conf_on_file(&GC, &param);
+      write_conf_on_file(&GC, &geo, &param);
       }
 
     // print simulation details
     print_parameters_local(&param, time1, time2);
 
     // free gauge configuration
-    free_gauge_conf(&GC, &param);
+    free_gauge_conf(&GC, &geo);
 
     // free geometry
-    free_geometry(&geo, &param);
+    free_geometry(&geo);
     }
 
 

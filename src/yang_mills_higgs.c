@@ -44,11 +44,11 @@ void real_main(char *in_file)
     init_data_file(&datafilep, &param);
 
     // initialize geometry
-    init_geometry(&geo, &param);
+    init_geometry(&geo, param.d_sizeg);
 
     // initialize gauge configuration and higgs field
-    init_gauge_conf(&GC, &param);
-    init_higgs_conf(&GC, &param);
+    init_gauge_conf(&GC, &geo, &param);
+    init_higgs_conf(&GC, &geo, &param);
 
     // acceptance of the metropolis update
     acc=0.0;
@@ -82,7 +82,7 @@ void real_main(char *in_file)
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {
-         perform_measures_higgs(&GC, &geo, &param, datafilep);
+         perform_measures_higgs(&GC, &geo, datafilep);
          }
 
        // save configuration for backup
@@ -91,12 +91,12 @@ void real_main(char *in_file)
          if(count % param.d_saveconf_back_every == 0 )
            {
            // simple
-           write_conf_on_file(&GC, &param);
-           write_higgs_on_file(&GC, &param);
+           write_conf_on_file(&GC, &geo, &param);
+           write_higgs_on_file(&GC, &geo, &param);
 
            // backup copy
-           write_conf_on_file_back(&GC, &param);
-           write_higgs_on_file_back(&GC, &param);
+           write_conf_on_file_back(&GC, &geo, &param);
+           write_higgs_on_file_back(&GC, &geo, &param);
            }
          }
        }
@@ -111,19 +111,19 @@ void real_main(char *in_file)
     // save configuration
     if(param.d_saveconf_back_every!=0)
       {
-      write_conf_on_file(&GC, &param);
-      write_higgs_on_file(&GC, &param);
+      write_conf_on_file(&GC, &geo, &param);
+      write_higgs_on_file(&GC, &geo, &param);
       }
 
     // print simulation details
     print_parameters_higgs(&param, time1, time2, acc);
 
     // free gauge configuration and higgs fields
-    free_gauge_conf(&GC, &param);
+    free_gauge_conf(&GC, &geo);
     free_higgs_conf(&GC);
 
     // free geometry
-    free_geometry(&geo, &param);
+    free_geometry(&geo);
     }
 
 

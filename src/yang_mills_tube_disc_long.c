@@ -36,10 +36,10 @@ void real_main(char *in_file)
     // read input file
     readinput(in_file, &param);
 
-    int tmp=param.d_size[1];
+    int tmp=param.d_sizeg[1];
     for(count=2; count<STDIM; count++)
        {
-       if(tmp!= param.d_size[count])
+       if(tmp!= param.d_sizeg[count])
          {
          fprintf(stderr, "When using yang_mills_tube_disc_long all the spatial sizes have to be of equal length.\n");
          exit(EXIT_FAILURE);
@@ -53,13 +53,13 @@ void real_main(char *in_file)
     init_data_file(&datafilep, &param);
 
     // initialize geometry
-    init_geometry(&geo, &param);
+    init_geometry(&geo, param.d_sizeg);
 
     // initialize gauge configuration
-    init_gauge_conf(&GC, &param);
+    init_gauge_conf(&GC, &geo, &param);
 
     // allocate ml_polycorr and ml_polyplaq arrays
-    alloc_tube_disc_stuff(&GC, &param);
+    alloc_tube_disc_stuff(&GC, &geo, &param);
 
     // montecarlo starts
     time(&time1);
@@ -71,19 +71,19 @@ void real_main(char *in_file)
          }
 
       // save configuration
-      write_conf_on_file(&GC, &param);
+      write_conf_on_file(&GC, &geo, &param);
       // backup copy
-      write_conf_on_file_back(&GC, &param);
+      write_conf_on_file_back(&GC, &geo, &param);
 
       // save multilevel stuff
-      write_tube_disc_stuff_on_file(&GC, &param, 0);
+      write_tube_disc_stuff_on_file(&GC, &geo, &param, 0);
       }
     else // CONTINUATION OF PREVIOUS SIMULATION
       {
       int count, iteration;
 
       // read multilevel stuff
-      read_tube_disc_stuff_from_file(&GC, &param, &iteration);
+      read_tube_disc_stuff_from_file(&GC, &geo, &param, &iteration);
 
       if(iteration<0) // update the conf, no multilevel
         {
@@ -93,12 +93,12 @@ void real_main(char *in_file)
            }
 
         // save configuration
-        write_conf_on_file(&GC, &param);
+        write_conf_on_file(&GC, &geo, &param);
         // backup copy
-        write_conf_on_file_back(&GC, &param);
+        write_conf_on_file_back(&GC, &geo, &param);
 
         // save multilevel stuff
-        write_tube_disc_stuff_on_file(&GC, &param, 0);
+        write_tube_disc_stuff_on_file(&GC, &geo, &param, 0);
         }
       else // iteration >=0, perform multilevel
         {
@@ -111,13 +111,13 @@ void real_main(char *in_file)
         if(iteration==param.d_ml_level0_repeat)
           {
           // print the measure
-          perform_measures_tube_disc_long(&GC, &param, datafilep);
+          perform_measures_tube_disc_long(&GC, &geo, &param, datafilep);
 
           iteration=-1; // next time the conf will be updated, no multilevel
           }
 
         // save multilevel stuff
-        write_tube_disc_stuff_on_file(&GC, &param, iteration);
+        write_tube_disc_stuff_on_file(&GC, &geo, &param, iteration);
         }
       }
     time(&time2);
@@ -129,20 +129,20 @@ void real_main(char *in_file)
     // save configuration
     if(param.d_saveconf_back_every!=0)
       {
-      write_conf_on_file(&GC, &param);
+      write_conf_on_file(&GC, &geo, &param);
       }
 
     // print simulation details
     print_parameters_tube_disc_long(&param, time1, time2);
 
     // free gauge configuration
-    free_gauge_conf(&GC, &param);
+    free_gauge_conf(&GC, &geo);
 
     // free ml_polycorr and ml_polyplaq
-    free_tube_disc_stuff(&GC, &param);
+    free_tube_disc_stuff(&GC, &geo, &param);
 
     // free geometry
-    free_geometry(&geo, &param);
+    free_geometry(&geo);
     }
 
 

@@ -37,10 +37,10 @@ void real_main(char *in_file)
     // read input file
     readinput(in_file, &param);
 
-    int tmp=param.d_size[1];
+    int tmp=param.d_sizeg[1];
     for(count=2; count<STDIM; count++)
        {
-       if(tmp!= param.d_size[count])
+       if(tmp!= param.d_sizeg[count])
          {
          fprintf(stderr, "When using yang_mills_polycorr_higgs_long all the spatial sizes have to be of equal length.\n");
          exit(EXIT_FAILURE);
@@ -54,14 +54,14 @@ void real_main(char *in_file)
     init_data_file(&datafilep, &param);
 
     // initialize geometry
-    init_geometry(&geo, &param);
+    init_geometry(&geo, param.d_sizeg);
 
     // initialize gauge configuration
-    init_gauge_conf(&GC, &param);
-    init_higgs_conf(&GC, &param);
+    init_gauge_conf(&GC, &geo, &param);
+    init_higgs_conf(&GC, &geo, &param);
 
     // initialize ml_polycorr arrays
-    alloc_polycorr_stuff(&GC, &param);
+    alloc_polycorr_stuff(&GC, &geo, &param);
 
     // acceptance of the metropolis update
     acc=0.0;
@@ -81,22 +81,22 @@ void real_main(char *in_file)
         }
 
       // save configuration
-      write_conf_on_file(&GC, &param);
-      write_higgs_on_file(&GC, &param);
+      write_conf_on_file(&GC, &geo, &param);
+      write_higgs_on_file(&GC, &geo, &param);
 
       // backup copy
-      write_conf_on_file_back(&GC, &param);
-      write_higgs_on_file_back(&GC, &param);
+      write_conf_on_file_back(&GC, &geo, &param);
+      write_higgs_on_file_back(&GC, &geo, &param);
 
       // save ml polycorr arrays
-      write_polycorr_on_file(&GC, &param, 0);
+      write_polycorr_on_file(&GC, &geo, &param, 0);
       }
     else // CONTINUATION OF PREVIOUS SIMULATION
       {
       int count, iteration;
 
       // read multilevel stuff
-      read_polycorr_from_file(&GC, &param, &iteration);
+      read_polycorr_from_file(&GC, &geo, &param, &iteration);
 
       if(iteration<0) // update the conf, no multilevel
         {
@@ -111,15 +111,15 @@ void real_main(char *in_file)
           }
 
         // save configuration
-        write_conf_on_file(&GC, &param);
-        write_higgs_on_file(&GC, &param);
+        write_conf_on_file(&GC, &geo, &param);
+        write_higgs_on_file(&GC, &geo, &param);
 
         // backup copy
-        write_conf_on_file_back(&GC, &param);
-        write_higgs_on_file(&GC, &param);
+        write_conf_on_file_back(&GC, &geo, &param);
+        write_higgs_on_file(&GC, &geo, &param);
 
         // save multilevel stuff
-        write_polycorr_on_file(&GC, &param, 0);
+        write_polycorr_on_file(&GC, &geo, &param, 0);
         }
       else // iteration >=0, perform multilevel
         {
@@ -132,13 +132,13 @@ void real_main(char *in_file)
         if(iteration==param.d_ml_level0_repeat)
           {
           // print the measure
-          perform_measures_polycorr_long(&GC, &param, datafilep);
+          perform_measures_polycorr_long(&GC, &geo, &param, datafilep);
 
           iteration=-1; // next time the conf will be updated, no multilevel
           }
 
         // save multilevel stuff
-        write_polycorr_on_file(&GC, &param, iteration);
+        write_polycorr_on_file(&GC, &geo, &param, iteration);
         }
       }
     time(&time2);
@@ -152,22 +152,22 @@ void real_main(char *in_file)
     // save configuration
     if(param.d_saveconf_back_every!=0)
       {
-      write_conf_on_file(&GC, &param);
-      write_higgs_on_file(&GC, &param);
+      write_conf_on_file(&GC, &geo, &param);
+      write_higgs_on_file(&GC, &geo, &param);
       }
 
     // print simulation details
     print_parameters_polycorr_higgs_long(&param, time1, time2, acc);
 
     // free gauge configuration
-    free_gauge_conf(&GC, &param);
+    free_gauge_conf(&GC, &geo);
     free_higgs_conf(&GC);
 
     // free ml_polycorr
-    free_polycorr_stuff(&GC, &param);
+    free_polycorr_stuff(&GC, &geo, &param);
 
     // free geometry
-    free_geometry(&geo, &param);
+    free_geometry(&geo);
     }
 
 

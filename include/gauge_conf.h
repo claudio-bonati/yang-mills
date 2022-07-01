@@ -48,143 +48,157 @@ typedef struct Gauge_Conf {
 
 // in gauge_conf_def.c
 void init_gauge_conf(Gauge_Conf *GC,
+                     Geometry const * const geo,
                      GParam const * const param);
 void read_gauge_conf(Gauge_Conf *GC,
+                     Geometry const * const geo,
                      GParam const * const param);
 void free_gauge_conf(Gauge_Conf *GC,
-                     GParam const * const param);
+                     Geometry const * const geo);
 void write_conf_on_file_with_name(Gauge_Conf const * const GC,
-                                  GParam const * const param,
+                                  Geometry const * const geo,
                                   char const * const namefile);
 void write_conf_on_file(Gauge_Conf const * const GC,
+                        Geometry const * const geo,
                         GParam const * const param);
 void write_conf_on_file_back(Gauge_Conf const * const GC,
+                             Geometry const * const geo,
                              GParam const * const param);
 void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC,
                                      Gauge_Conf const * const GC2,
-                                     GParam const * const param);
+                                     Geometry const * const geo);
 void compute_md5sum_conf(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                          Gauge_Conf const * const GC,
-                         GParam const * const param);
+                         Geometry const * const geo);
 
 void alloc_polycorr_stuff(Gauge_Conf *GC,
+                          Geometry const * const geo,
                           GParam const * const param);
 void free_polycorr_stuff(Gauge_Conf *GC,
-                         GParam const * const param);
+                         Geometry const * const geo,
+                         GParam const * const gparam);
 void write_polycorr_on_file(Gauge_Conf const * const GC,
+                            Geometry const * const geo,
                             GParam const * const param,
                             int iteration);
 void read_polycorr_from_file(Gauge_Conf const * const GC,
+                             Geometry const * const geo,
                              GParam const * const param,
                              int *iteration);
 void compute_md5sum_polycorr(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                              Gauge_Conf const * const GC,
+                             Geometry const * const geo,
                              GParam const * const param);
 
 void alloc_tube_disc_stuff(Gauge_Conf *GC,
+                           Geometry const * const geo,
                            GParam const * const param);
 void free_tube_disc_stuff(Gauge_Conf *GC,
+                          Geometry const * const geo,
                           GParam const * const param);
 void write_tube_disc_stuff_on_file(Gauge_Conf const * const GC,
+                                   Geometry const * const geo,
                                    GParam const * const param,
                                    int iteration);
 void read_tube_disc_stuff_from_file(Gauge_Conf const * const GC,
+                                    Geometry const * const geo,
                                     GParam const * const param,
                                     int *iteration);
 void compute_md5sum_tube_disc_stuff(char *res,     // the lenght is 2*MD5_DIGEST_LENGTH
                                     Gauge_Conf const * const GC,
+                                    Geometry const * const geo,
                                     GParam const * const param);
 
 void alloc_tube_conn_stuff(Gauge_Conf *GC,
+                           Geometry const * const geo,
                            GParam const * const param);
 void free_tube_conn_stuff(Gauge_Conf *GC,
+                          Geometry const * const geo,
                           GParam const * const param);
 void write_tube_conn_stuff_on_file(Gauge_Conf const * const GC,
+                                   Geometry const * const geo,
                                    GParam const * const param,
                                    int iteration);
 void read_tube_conn_stuff_from_file(Gauge_Conf const * const GC,
+                                    Geometry const * const geo,
                                     GParam const * const param,
                                     int *iteration);
 void compute_md5sum_tube_conn_stuff(char *res,  // the lenght is 2*MD5_DIGEST_LENGTH
                                     Gauge_Conf const * const GC,
+                                    Geometry const * const geo,
                                     GParam const * const param);
 
 void alloc_clover_array(Gauge_Conf *GC,
-                        GParam const * const param);
+                        Geometry const * const geo);
 void end_clover_array(Gauge_Conf *GC,
-                      GParam const * const param);
+                      Geometry const * const geo);
 
 void init_higgs_conf(Gauge_Conf *GC,
+                     Geometry const * const geo,
                      GParam const * const param);
 void read_higgs_conf(Gauge_Conf *GC,
+                     Geometry const * const geo,
                      GParam const * const param);
 void free_higgs_conf(Gauge_Conf *GC);
 void write_higgs_on_file_with_name(Gauge_Conf const * const GC,
-                                   GParam const * const param,
+                                   Geometry const * const geo,
                                    char const * const namefile);
 void write_higgs_on_file(Gauge_Conf const * const GC,
+                         Geometry const * const geo,
                          GParam const * const param);
 void write_higgs_on_file_back(Gauge_Conf const * const GC,
+                              Geometry const * const geo,
                               GParam const * const param);
 void compute_md5sum_higgs(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                           Gauge_Conf const * const GC,
-                          GParam const * const param);
+                          Geometry const * const geo);
 
 void alloc_diag_proj_stuff(Gauge_Conf *GC,
-                           GParam const * const param);
+                           Geometry const * const geo);
 void free_diag_proj_stuff(Gauge_Conf *GC,
-                          GParam const * const param);
+                          Geometry const * const geo);
 
 
 // in gauge_conf_meas.c
 double plaquettep(Gauge_Conf const * const GC,
                   Geometry const * const geo,
-                  GParam const * const param,
                   long r,
                   int i,
                   int j);
 double complex plaquettep_complex(Gauge_Conf const * const GC,
                                   Geometry const * const geo,
-                                  GParam const * const param,
                                   long r,
                                   int i,
                                   int j);
 void plaquettep_matrix(Gauge_Conf const * const GC,
                        Geometry const * const geo,
-                       GParam const * const param,
                        long r,
                        int i,
                        int j,
                        GAUGE_GROUP *matrix);
 void clover(Gauge_Conf const * const GC,
             Geometry const * const geo,
-            GParam const * const param,
             long r,
             int i,
             int j,
             GAUGE_GROUP *M);
 void plaquette(Gauge_Conf const * const GC,
                Geometry const * const geo,
-               GParam const * const param,
                double *plaqs,
                double *plaqt);
 void clover_disc_energy(Gauge_Conf const * const GC,
                         Geometry const * const geo,
-                        GParam const * const param,
                         double *energy);
 void polyakov(Gauge_Conf const * const GC,
               Geometry const * const geo,
-              GParam const * const param,
               double *repoly,
               double *impoly);
 void polyakov_adj(Gauge_Conf const * const GC,
                   Geometry const * const geo,
-                  GParam const * const param,
                   double *repoly,
                   double *impoly);
 void polyakov_for_tracedef(Gauge_Conf const * const GC,
                            Geometry const * const geo,
-                           GParam const * const param,
                            double *repoly,
                            double *impoly);
 double loc_topcharge(Gauge_Conf const * const GC,
@@ -209,36 +223,31 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
 
 void higgs_interaction(Gauge_Conf const * const GC,
                        Geometry const * const geo,
-                       GParam const * const param,
                        double *he);
 void compute_flavour_observables(Gauge_Conf const * const GC,
-                                 GParam const * const param,
+                                 Geometry const * const geo,
                                  double *tildeG0,
                                  double *tildeGminp,
                                  double *tildeD0,
                                  double *tildeDminp);
 void compute_flavour_observables_corr(Gauge_Conf const * const GC,
                                       Geometry const * const geo,
-                                      GParam const * const param,
                                       double *corrQQ,
                                       double *corr0string0,
                                       double *corr0string1);
 void perform_measures_higgs(Gauge_Conf * GC,
                             Geometry const * const geo,
-                            GParam const * const param,
                             FILE *datafilep);
 void perform_measures_higgs_for_testing(Gauge_Conf *GC,
                                         Geometry const * const geo,
-                                        GParam const * const param,
                                         FILE *datafilep);
 
 void max_abelian_gauge_fix(Gauge_Conf *GC,
-                           Geometry const * const geo,
-                           GParam const * const param);
+                           Geometry const * const geo);
 void diag_projection(Gauge_Conf *GC,
-                     GParam const * const param);
+                     Geometry const * const geo);
 void U1_extract(Gauge_Conf *GC,
-                GParam const * const param,
+                Geometry const * const geo,
                 int subg);
 void Di_Fjk(Gauge_Conf *GC,
             Geometry const * const geo,
@@ -287,9 +296,11 @@ void perform_measures_polycorr_with_higgs(Gauge_Conf * GC,
                                           FILE *datafilep);
 
 void optimize_multilevel_polycorr_long(Gauge_Conf *GC,
+                                       Geometry const * const geo,
                                        GParam const * const param,
                                        FILE *datafilep);
 void perform_measures_polycorr_long(Gauge_Conf * GC,
+                                    Geometry const * const geo,
                                     GParam const * const param,
                                     FILE *datafilep);
 
@@ -298,6 +309,7 @@ void perform_measures_tube_disc(Gauge_Conf *GC,
                                 GParam const * const param,
                                 FILE *datafilep);
 void perform_measures_tube_disc_long(Gauge_Conf *GC,
+                                     Geometry const * const geo,
                                      GParam const * const param,
                                      FILE *datafilep);
 
@@ -306,6 +318,7 @@ void perform_measures_tube_conn(Gauge_Conf *GC,
                                 GParam const * const param,
                                 FILE *datafilep);
 void perform_measures_tube_conn_long(Gauge_Conf *GC,
+                                     Geometry const * const geo,
                                      GParam const * const param,
                                      FILE *datafilep);
 
@@ -379,25 +392,21 @@ void multilevel_tube_conn_long(Gauge_Conf * GC,
 // in gauge_conf_upd.c
 void calcstaples_wilson(Gauge_Conf const * const GC,
                         Geometry const * const geo,
-                        GParam const * const gparam,
                         long r,
                         int i,
                         GAUGE_GROUP *M);
 void calcstaples_wilson_nosum(Gauge_Conf const * const GC,
                               Geometry const * const geo,
-                              GParam const * const gparam,
                               long r,
                               int i,
                               GAUGE_GROUP *M);
 void calcstaples_tracedef(Gauge_Conf const * const GC,
                           Geometry const * const geo,
-                          GParam const * const param,
                           long r,
                           int i,
                           GAUGE_GROUP * M);
 void compute_clovers(Gauge_Conf const * const GC,
                      Geometry const * const geo,
-                     GParam const * const param,
                      int direction);
 void calcstaples_with_topo(Gauge_Conf const * const GC,
                            Geometry const * const geo,
@@ -445,17 +454,14 @@ void update_with_trace_def(Gauge_Conf *GC,
 
 void cooling(Gauge_Conf *GC,
              Geometry const * const geo,
-             GParam const * const param,
              int n);
 void gradflow_RKstep(Gauge_Conf *GC,
                      Gauge_Conf *helper1,
                      Gauge_Conf *helper2,
                      Geometry const * const geo,
-                     GParam const *const param,
                      double dt);
 void ape_smearing(Gauge_Conf *GC,
                   Geometry const * const geo,
-                  GParam const *const param,
                   double alpha,
                   int n);
 
@@ -471,12 +477,10 @@ void overrelaxation_with_higgs(Gauge_Conf *GC,
                                int i);
 void calcstaples_for_higgs(Gauge_Conf *GC,
                            Geometry const * const geo,
-                           GParam const * const param,
                            long r,
                            GAUGE_VECS *staple);
 void overrelaxation_for_higgs(Gauge_Conf *GC,
                               Geometry const * const geo,
-                              GParam const * const param,
                               long r);
 int metropolis_for_higgs(Gauge_Conf *GC,
                          Geometry const * const geo,
