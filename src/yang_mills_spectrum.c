@@ -18,12 +18,12 @@
 #include"../include/gparam.h"
 #include"../include/random.h"
 
-void spatialblocking_notime_singlesite(Gauge_Conf const * const GC,
-                                       Geometry const * const geo,
-                                       long r,
-                                       int i,
-                                       double blockcoeff,
-                                       GAUGE_GROUP *M)
+void spatialblocking_singlesite(Gauge_Conf const * const GC,
+                                Geometry const * const geo,
+                                long r,
+                                int i,
+                                double blockcoeff,
+                                GAUGE_GROUP *M)
   {
   int j, l;
   long k, k1;
@@ -116,16 +116,14 @@ void spatialblocking_notime_singlesite(Gauge_Conf const * const GC,
        }
      }
 
-
    equal(M, &(GC->lattice[r][i]));
    times_equal(M, &(GC->lattice[nnp(geo, r, i)][i]));
 
    times_equal_real(&stap, blockcoeff/(2.0*(double)(STDIM-2)));
    times_equal_real(M, 1.0-blockcoeff);
-   plus_equal_dag(M, &stap);   // dag is important!
+   plus_equal_dag(M, &stap);
    unitarize(M);
    }
-
 
 
 // create spatially blocked configurations (i.e. L_spatial->L_spatial/2)
@@ -135,19 +133,20 @@ void init_spatial_blocked_conf(Gauge_Conf *blockGC,
                                Geometry const * const geo,
                                double blockcoeff)
   {
-  for(int index=1; index<STDIM; index++)
-     {
-     if(geo->d_size[index] % 2 != 0)
-       {
-       fprintf(stderr, "Problem with spatial size not even: %d ! (%s, %d)\n", geo->d_size[index], __FILE__, __LINE__);
-       exit(EXIT_FAILURE);
-       }
-     }
 
   long rb, r;
   int blockcart[STDIM], cart[STDIM];
   int i, mu, err;
   GAUGE_GROUP M;
+
+  for(i=1; i<STDIM; i++)
+     {
+     if(geo->d_size[i] % 2 != 0)
+       {
+       fprintf(stderr, "Problem with spatial size not even: %d ! (%s, %d)\n", geo->d_size[i], __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     }
 
   // allocate the lattice
   err=posix_memalign((void**)&(blockGC->lattice), (size_t) DOUBLE_ALIGN, (size_t) blockgeo->d_volume * sizeof(GAUGE_GROUP *));
@@ -179,10 +178,10 @@ void init_spatial_blocked_conf(Gauge_Conf *blockGC,
 
      equal(&(blockGC->lattice[rb][0]), &(GC->lattice[r][0]) );
 
-     for(mu=0; mu<STDIM; mu++)
+     for(mu=1; mu<STDIM; mu++)
         {
         // this is the real point where the blocking is performed
-        spatialblocking_notime_singlesite(GC, geo, r, mu, blockcoeff, &M);
+        spatialblocking_singlesite(GC, geo, r, mu, blockcoeff, &M);
         equal(&(blockGC->lattice[rb][mu]), &M);
         }
      }
@@ -344,8 +343,9 @@ void spatial_ape_smearing(Gauge_Conf const * const GC,
                           double alpha,
                           int smearing_steps)
   {
-  int step;
+  int i, step;
   long r;
+  GAUGE_GROUP M;
   Gauge_Conf staple_GC;
   
   init_gauge_conf_from_gauge_conf(&staple_GC, GC, geo);
@@ -354,9 +354,6 @@ void spatial_ape_smearing(Gauge_Conf const * const GC,
      {
      for(r = 0; r < geo->d_volume; r++)
         {
-        int i;             
-        GAUGE_GROUP M;     
-
         for(i = 1; i < STDIM; i++)
            {
            calcstaples_wilson_no_time(GC, geo, r, i, &M);
@@ -366,12 +363,11 @@ void spatial_ape_smearing(Gauge_Conf const * const GC,
 
      for(r = 0; r < geo->d_volume; r++)
         {
-        int i;
         for(i = 1; i < STDIM; i++)
            {
            times_equal_real(&(staple_GC.lattice[r][i]), alpha/(2.0*(double)(STDIM-2)));
            times_equal_real(&GC->lattice[r][i], 1.0-alpha);
-           plus_equal_dag(&GC->lattice[r][i], &(staple_GC.lattice[r][i])); // QUI E' IMPORTANTE CI SIA IL DAG!!
+           plus_equal_dag(&GC->lattice[r][i], &(staple_GC.lattice[r][i]));
            unitarize(&GC->lattice[r][i]); 
            }
         }
@@ -501,6 +497,7 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
   // smearing steps
   const int smearing_steps = 2;
 
+  // copy of the initial configuration
   init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
 
   // perform smearing
