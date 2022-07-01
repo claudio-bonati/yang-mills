@@ -28,7 +28,7 @@ void init_geometry(Geometry *geo, int insize[STDIM])
 
   for(i=0; i<STDIM; i++)
      {
-     geo->d_size[i]=insize[STDIM];
+     geo->d_size[i]=insize[i];
      }
 
   // derived constants
