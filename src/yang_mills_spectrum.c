@@ -597,7 +597,7 @@ void real_main(char *in_file)
       }
 
     // print simulation details
-    print_parameters_local(&param, time1, time2);
+    print_parameters_spectrum(&param, time1, time2);
 
     // free gauge configuration
     free_gauge_conf(&GC, &geo);

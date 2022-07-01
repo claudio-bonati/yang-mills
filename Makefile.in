@@ -148,9 +148,9 @@ am_debug_sun_OBJECTS = ./src/debug_sun.$(OBJEXT) $(am__objects_1) \
 debug_sun_OBJECTS = $(am_debug_sun_OBJECTS)
 debug_sun_LDADD = $(LDADD)
 am_debug_vecs_OBJECTS = ./src/debug_vecs.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_9) $(am__objects_10)
+	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9) $(am__objects_10)
 debug_vecs_OBJECTS = $(am_debug_vecs_OBJECTS)
 debug_vecs_LDADD = $(LDADD)
 am__objects_11 = ./lib/gauge_conf_def.$(OBJEXT) \
@@ -541,6 +541,7 @@ debug_vecs_SOURCES = ./src/debug_vecs.c \
                    $(align) \
                    $(dSFMT) \
                    $(endian) \
+                   $(flavourmatrix) \
                    $(funcpoint) \
                    $(gparam) \
                    ./include/macro.h \

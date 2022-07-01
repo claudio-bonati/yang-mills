@@ -147,6 +147,7 @@ debug_vecs_SOURCES=./src/debug_vecs.c \
                    $(align) \
                    $(dSFMT) \
                    $(endian) \
+                   $(flavourmatrix) \
                    $(funcpoint) \
                    $(gparam) \
                    ./include/macro.h \
