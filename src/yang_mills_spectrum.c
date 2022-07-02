@@ -119,8 +119,7 @@ void spatialblocking_singlesite(Gauge_Conf const * const GC,
    equal(M, &(GC->lattice[r][i]));
    times_equal(M, &(GC->lattice[nnp(geo, r, i)][i]));
 
-   times_equal_real(&stap, blockcoeff/(2.0*(double)(STDIM-2)));
-   times_equal_real(M, 1.0-blockcoeff);
+   times_equal_real(&stap, blockcoeff);
    plus_equal_dag(M, &stap);
    unitarize(M);
    }
@@ -338,10 +337,10 @@ void calcstaples_wilson_no_time(Gauge_Conf const * const GC,
    }
 
 
-void spatial_ape_smearing(Gauge_Conf const * const GC,
-                          Geometry const * const geo,
-                          double alpha,
-                          int smearing_steps)
+void spatial_smearing(Gauge_Conf const * const GC,
+                      Geometry const * const geo,
+                      double alpha,
+                      int smearing_steps)
   {
   int i, step;
   long r;
@@ -365,8 +364,7 @@ void spatial_ape_smearing(Gauge_Conf const * const GC,
         {
         for(i = 1; i < STDIM; i++)
            {
-           times_equal_real(&(staple_GC.lattice[r][i]), alpha/(2.0*(double)(STDIM-2)));
-           times_equal_real(&GC->lattice[r][i], 1.0-alpha);
+           times_equal_real(&(staple_GC.lattice[r][i]), alpha);
            plus_equal_dag(&GC->lattice[r][i], &(staple_GC.lattice[r][i]));
            unitarize(&GC->lattice[r][i]); 
            }
@@ -505,7 +503,7 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
     init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
 
     // perform smearing
-    spatial_ape_smearing(&smeared_GC, geo, alpha, smearing_steps);
+    spatial_smearing(&smeared_GC, geo, alpha, smearing_steps);
 
     // geometry for blocking
     sizes[0]=geo->d_size[0];
@@ -556,7 +554,7 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
     init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
 
     // perform smearing
-    spatial_ape_smearing(&smeared_GC, geo, alpha, smearing_steps);
+    spatial_smearing(&smeared_GC, geo, alpha, smearing_steps);
 
     compute_and_print_corr_for_spectrum(&smeared_GC,
                                         geo,
