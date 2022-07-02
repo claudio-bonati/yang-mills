@@ -512,10 +512,10 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
   #define NUMBLOCK 2
 
   // smearing parameter
-  const double alpha=0.2;
+  const double alpha=0.5;
 
   // smearing steps
-  const int smearing_steps = 2;
+  const int smearing_steps = 3;
 
   int i, j, sizes[STDIM];
   double complex *poly[NUMBLOCK+1];
