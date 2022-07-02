@@ -18,6 +18,8 @@
 #include"../include/gparam.h"
 #include"../include/random.h"
 
+
+// compute blocked link for a given site
 void spatialblocking_singlesite(Gauge_Conf const * const GC,
                                 Geometry const * const geo,
                                 long r,
@@ -189,12 +191,13 @@ void init_spatial_blocked_conf(Gauge_Conf *blockGC,
   }
 
 
+// compute real part of the plaquette
 void plaquette_re(Gauge_Conf const * const GC,
-                     Geometry const * const geo,
-                     long r,
-                     int i,
-                     int j, 
-                     double *replaq)
+                  Geometry const * const geo,
+                  long r,
+                  int i,
+                  int j,
+                  double *replaq)
    {
    GAUGE_GROUP matrix;
 
@@ -231,6 +234,7 @@ void plaquette_re(Gauge_Conf const * const GC,
    }
 
 
+// compute spatial polyakov loop
 void space_polyakov(Gauge_Conf const * const GC,
                     Geometry const * const geo,
                     long r,
@@ -250,6 +254,7 @@ void space_polyakov(Gauge_Conf const * const GC,
    }
 
 
+// compute staples with no time direction
 void calcstaples_wilson_no_time(Gauge_Conf const * const GC,
                                 Geometry const * const geo,
                                 long r,
@@ -337,6 +342,7 @@ void calcstaples_wilson_no_time(Gauge_Conf const * const GC,
    }
 
 
+// perform smearing on spatial links
 void spatial_smearing(Gauge_Conf const * const GC,
                       Geometry const * const geo,
                       double alpha,
@@ -375,18 +381,17 @@ void spatial_smearing(Gauge_Conf const * const GC,
   }
 
 
-void compute_and_print_corr_for_spectrum(Gauge_Conf const * const block_GC,
-                                         Geometry const * const blockgeo,
-                                         FILE *datafilep)
+// compute p=0 averages of the plaquette and polyakov operators
+void compute_operators_for_spectrum(Gauge_Conf const * const block_GC,
+                                    Geometry const * const blockgeo,
+                                    double *plaq,
+                                    double *av_plaq,
+                                    double complex *poly)
   {
-  int i, j, t, t1, t2;
+  int i, j, t;
   long rsp, r;
-  double *plaq, plaq_loc, av_plaq;
-  double complex *poly, poly_loc, av_poly;
-  double corr_plaq, corr_poly;
-
-  plaq = (double *) malloc((long unsigned int)(blockgeo->d_size[0])*sizeof(double));
-  poly = (double complex *) malloc((long unsigned int)(blockgeo->d_size[0])*sizeof(double complex));
+  double plaq_loc;
+  double complex poly_loc;
 
   for(t=0; t<blockgeo->d_size[0]; t++)
      {
@@ -413,12 +418,12 @@ void compute_and_print_corr_for_spectrum(Gauge_Conf const * const block_GC,
      plaq[t]/= (double) ((STDIM-1)*(STDIM-2)/2);
      }
 
-  av_plaq = 0.0;
+  *av_plaq = 0.0;
   for(t = 0; t < blockgeo->d_size[0]; t++)
      {
-     av_plaq += plaq[t];
+     *av_plaq += plaq[t];
      }
-  av_plaq /= (double)blockgeo->d_size[0];
+  *av_plaq /= (double)blockgeo->d_size[0];
 
   //toreloni
   for(t = 0; t<blockgeo->d_size[0]; t++)
@@ -431,61 +436,79 @@ void compute_and_print_corr_for_spectrum(Gauge_Conf const * const block_GC,
         }
      poly[t] /= (double complex) (blockgeo->d_space_vol);
      }
+  }
 
-  av_poly = 0.0+I*0.0;
-  for(t = 0; t < blockgeo->d_size[0]; t++)
-     {
-     av_poly += poly[t];
-     }
-  av_poly /= (double complex )blockgeo->d_size[0];
+
+// print correlators of the observables
+void compute_and_print_corr_for_spectrum(double **plaq,
+                                         double *av_plaq,
+                                         double complex **poly,
+                                         Geometry const * const geo,
+                                         int numblocks,
+                                         FILE *datafilep)
+  {
+  int i, j, t, t1, t2;
+  double corr_plaq, corr_poly;
 
   // Faccio la media dei correlatori della parte reale delle plaquette a distanza fissa t e la stampo
-  for(t = 0; t<blockgeo->d_size[0]/2; t++)
+  for(t = 0; t<geo->d_size[0]/2; t++)
      {
-     corr_plaq = 0.0;
-
-     for(t1 = 0; t1<blockgeo->d_size[0]; t1++)
+     for(i=0; i<numblocks+1; i++)
         {
-        t2=(t1+t) % blockgeo->d_size[0];
-        corr_plaq += plaq[t2]*plaq[t1];
-        }
-     corr_plaq/=(double) blockgeo->d_size[0];
+        for(j=i; j<numblocks+1; j++)
+           {
+           corr_plaq = 0.0;
 
-     fprintf(datafilep, " %.12f", corr_plaq);
+           for(t1 = 0; t1<geo->d_size[0]; t1++)
+              {
+              t2=(t1+t) % geo->d_size[0];
+              corr_plaq += plaq[i][t2]*plaq[j][t1];
+              }
+           corr_plaq/=(double) geo->d_size[0];
+
+           fprintf(datafilep, " %.12f", corr_plaq);
+           }
+        }
      }
 
   // Faccio la media dei correlatori dei polyakov spaziali a distanza fissa t e la stampo
-  for(t = 0; t<blockgeo->d_size[0]/2; t++)
+  for(t = 0; t<geo->d_size[0]/2; t++)
      {
-     corr_poly = 0.0;
-
-     for(t1 = 0; t1<blockgeo->d_size[0]; t1++)
+     for(i=0; i<numblocks+1; i++)
         {
-        t2=(t1+t) % blockgeo->d_size[0];
-        corr_poly += creal(conj(poly[t2])*poly[t1]);
-        }
-     corr_poly/=(double) blockgeo->d_size[0];
+        for(j=i; j<numblocks+1; j++)
+           {
+           corr_poly = 0.0;
 
-     fprintf(datafilep, " %.12f", corr_poly);
+           for(t1 = 0; t1<geo->d_size[0]; t1++)
+              {
+              t2=(t1+t) % geo->d_size[0];
+              corr_poly += creal(conj(poly[i][t2])*poly[j][t1]);
+              }
+           corr_poly/=(double) geo->d_size[0];
+
+           fprintf(datafilep, " %.12f", corr_poly);
+           }
+        }
      }
 
   // stampo le medie
-  fprintf(datafilep, " %.12f", av_plaq);
-  fprintf(datafilep, " %.12f", creal(av_poly));
+  for(i=0; i<numblocks+1; i++)
+     {
+     fprintf(datafilep, " %.12f", av_plaq[i]);
+     }
 
   fprintf(datafilep, "\n");
   fflush(datafilep);
-
-  free(plaq);
-  free(poly);
   }
+
 
 
 void perform_measures_spectrum(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                FILE *datafilep)
   {
-  #define USEBLOCKING
+  // number of blocking steps, must be >1
   #define NUMBLOCK 2
 
   // smearing parameter
@@ -494,77 +517,96 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
   // smearing steps
   const int smearing_steps = 2;
 
-  #ifdef USEBLOCKING
-    int i, j, sizes[STDIM];
-    Gauge_Conf smeared_GC, block_GC[NUMBLOCK];
-    Geometry blockgeo[NUMBLOCK];
+  int i, j, sizes[STDIM];
+  double complex *poly[NUMBLOCK+1];
+  double *plaq[NUMBLOCK+1], av_plaq[NUMBLOCK+1];
 
-    // copy of the initial configuration
-    init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
+  Gauge_Conf smeared_GC, block_GC[NUMBLOCK];
+  Geometry blockgeo[NUMBLOCK];
 
-    // perform smearing
-    spatial_smearing(&smeared_GC, geo, alpha, smearing_steps);
+  for(i=0; i<NUMBLOCK+1; i++)
+     {
+     plaq[i] = (double *) malloc((long unsigned int)(geo->d_size[0])*sizeof(double));
+     poly[i] = (double complex *) malloc((long unsigned int)(geo->d_size[0])*sizeof(double complex));
+     }
 
-    // geometry for blocking
-    sizes[0]=geo->d_size[0];
-    for(i=1; i<STDIM; i++)
-       {
-       sizes[i]=geo->d_size[i]/2;
-       }
-    init_geometry(&(blockgeo[0]), sizes);
+  // copy of the initial configuration
+  init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
 
-    // blocking
-    init_spatial_blocked_conf(&(block_GC[0]),
-                              &(blockgeo[0]),
-                              &smeared_GC,
-                              geo,
-                              alpha);
+  // perform smearing
+  spatial_smearing(&smeared_GC, geo, alpha, smearing_steps);
 
-    for(i=1; i<NUMBLOCK; i++)
-       {
-       // geometry for blocking
-       for(j=1; j<STDIM; j++)
-          {
-          sizes[j]/=2;
-          }
-       init_geometry(&(blockgeo[i]), sizes);
+  compute_operators_for_spectrum(&smeared_GC,
+                                 geo,
+                                 plaq[0],
+                                 &(av_plaq[0]),
+                                 poly[0]);
 
-       // blocking
-       init_spatial_blocked_conf(&(block_GC[i]),
-                                 &(blockgeo[i]),
-                                 &(block_GC[i-1]),
-                                 &(blockgeo[i-1]),
-                                 alpha);
-       }
+  // geometry for blocking
+  sizes[0]=geo->d_size[0];
+  for(i=1; i<STDIM; i++)
+     {
+     sizes[i]=geo->d_size[i]/2;
+     }
+  init_geometry(&(blockgeo[0]), sizes);
 
-    compute_and_print_corr_for_spectrum(&(block_GC[NUMBLOCK-1]),
-                                        &(blockgeo[NUMBLOCK-1]),
-                                        datafilep);
+  // blocking
+  init_spatial_blocked_conf(&(block_GC[0]),
+                            &(blockgeo[0]),
+                            &smeared_GC,
+                            geo,
+                            alpha);
 
-    free_gauge_conf(&smeared_GC, geo);
-    for(i=NUMBLOCK-1; i>=0; i--)
-       {
-       free_gauge_conf(&(block_GC[i]), &(blockgeo[i]));
-       free_geometry(&(blockgeo[i]));
-       }
-  #else
-    Gauge_Conf smeared_GC;
+  compute_operators_for_spectrum(&block_GC[0],
+                                 &blockgeo[0],
+                                 plaq[1],
+                                 &(av_plaq[1]),
+                                 poly[1]);
 
-    // copy of the initial configuration
-    init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
+  for(i=1; i<NUMBLOCK; i++)
+     {
+     // geometry for blocking
+     for(j=1; j<STDIM; j++)
+        {
+        sizes[j]/=2;
+        }
+     init_geometry(&(blockgeo[i]), sizes);
 
-    // perform smearing
-    spatial_smearing(&smeared_GC, geo, alpha, smearing_steps);
+     // blocking
+     init_spatial_blocked_conf(&(block_GC[i]),
+                               &(blockgeo[i]),
+                               &(block_GC[i-1]),
+                               &(blockgeo[i-1]),
+                               alpha);
 
-    compute_and_print_corr_for_spectrum(&smeared_GC,
-                                        geo,
-                                        datafilep);
+     compute_operators_for_spectrum(&block_GC[i],
+                                    &blockgeo[i],
+                                    plaq[i+1],
+                                    &(av_plaq[i+1]),
+                                    poly[i+1]);
+     }
 
-    free_gauge_conf(&smeared_GC, geo);
-  #endif
+  compute_and_print_corr_for_spectrum(plaq,
+                                      av_plaq,
+                                      poly,
+                                      geo,
+                                      NUMBLOCK,
+                                      datafilep);
+
+  free_gauge_conf(&smeared_GC, geo);
+  for(i=NUMBLOCK-1; i>=0; i--)
+     {
+     free_gauge_conf(&(block_GC[i]), &(blockgeo[i]));
+     free_geometry(&(blockgeo[i]));
+     }
+
+  for(i=0; i<NUMBLOCK+1; i++)
+     {
+     free(plaq[i]);
+     free(poly[i]);
+     }
 
   #undef NUMBLOCK
-  #undef USEBLOCKING
   }
 
 
