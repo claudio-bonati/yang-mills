@@ -88,7 +88,7 @@ void spatialblocking_singlesite(Gauge_Conf const * const GC,
 //
 //       i ^
 //         |   (1)
-//         |----<------+
+//         +----<------+
 //         |           |
 //     (2) V           |
 //         |           |
@@ -101,7 +101,7 @@ void spatialblocking_singlesite(Gauge_Conf const * const GC,
 //
 
        k=nnm(geo, r, j);
-       k1=nnp(geo, r, i);
+       k1=nnp(geo, k, i);
 
        equal(&link1, &(GC->lattice[nnp(geo, k1, i)][j]));  // link1 = (1)
        equal(&link2, &(GC->lattice[k1][i]));               // link2 = (2)
@@ -487,11 +487,8 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                FILE *datafilep)
   {
+  #define USEBLOCKING
   #define NUMBLOCK 2
-
-  int i, j, sizes[STDIM];
-  Gauge_Conf smeared_GC, block_GC[NUMBLOCK];
-  Geometry blockgeo[NUMBLOCK];
 
   // smearing parameter
   const double alpha=0.2;
@@ -499,57 +496,77 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
   // smearing steps
   const int smearing_steps = 2;
 
-  // copy of the initial configuration
-  init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
+  #ifdef USEBLOCKING
+    int i, j, sizes[STDIM];
+    Gauge_Conf smeared_GC, block_GC[NUMBLOCK];
+    Geometry blockgeo[NUMBLOCK];
 
-  // perform smearing
-  spatial_ape_smearing(&smeared_GC, geo, alpha, smearing_steps);
+    // copy of the initial configuration
+    init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
 
-  // geometry for blocking
-  sizes[0]=geo->d_size[0];
-  for(i=1; i<STDIM; i++)
-     {
-     sizes[i]=geo->d_size[i]/2;
-     }
-  init_geometry(&(blockgeo[0]), sizes);
+    // perform smearing
+    spatial_ape_smearing(&smeared_GC, geo, alpha, smearing_steps);
 
-  // blocking
-  init_spatial_blocked_conf(&(block_GC[0]),
-                            &(blockgeo[0]),
-                            &smeared_GC,
-                            geo,
-                            alpha);
+    // geometry for blocking
+    sizes[0]=geo->d_size[0];
+    for(i=1; i<STDIM; i++)
+       {
+       sizes[i]=geo->d_size[i]/2;
+       }
+    init_geometry(&(blockgeo[0]), sizes);
 
-  for(i=1; i<NUMBLOCK; i++)
-     {
-     // geometry for blocking
-     sizes[0]=(blockgeo[i-1]).d_size[0];
-     for(j=1; j<STDIM; j++)
-        {
-        sizes[j]=(blockgeo[i-1]).d_size[j]/2;
-        }
-     init_geometry(&(blockgeo[i]), sizes);
-   
-     // blocking
-     init_spatial_blocked_conf(&(block_GC[i]),
-                               &(blockgeo[i]),
-                               &(block_GC[i-1]),
-                               &(blockgeo[i-1]),
-                               alpha);
-     }
+    // blocking
+    init_spatial_blocked_conf(&(block_GC[0]),
+                              &(blockgeo[0]),
+                              &smeared_GC,
+                              geo,
+                              alpha);
 
-  compute_and_print_corr_for_spectrum(&(block_GC[NUMBLOCK-1]),
-                                      &(blockgeo[NUMBLOCK-1]),
-                                      datafilep);
+    for(i=1; i<NUMBLOCK; i++)
+       {
+       // geometry for blocking
+       for(j=1; j<STDIM; j++)
+          {
+          sizes[j]/=2;
+          }
+       init_geometry(&(blockgeo[i]), sizes);
 
-  free_gauge_conf(&smeared_GC, geo);
-  for(i=NUMBLOCK-1; i>=0; i--)
-     {
-     free_gauge_conf(&(block_GC[i]), &(blockgeo[i]));
-     free_geometry(&(blockgeo[i]));
-     }
+       // blocking
+       init_spatial_blocked_conf(&(block_GC[i]),
+                                 &(blockgeo[i]),
+                                 &(block_GC[i-1]),
+                                 &(blockgeo[i-1]),
+                                 alpha);
+       }
+
+    compute_and_print_corr_for_spectrum(&(block_GC[NUMBLOCK-1]),
+                                        &(blockgeo[NUMBLOCK-1]),
+                                        datafilep);
+
+    free_gauge_conf(&smeared_GC, geo);
+    for(i=NUMBLOCK-1; i>=0; i--)
+       {
+       free_gauge_conf(&(block_GC[i]), &(blockgeo[i]));
+       free_geometry(&(blockgeo[i]));
+       }
+  #else
+    Gauge_Conf smeared_GC;
+
+    // copy of the initial configuration
+    init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
+
+    // perform smearing
+    spatial_ape_smearing(&smeared_GC, geo, alpha, smearing_steps);
+
+    compute_and_print_corr_for_spectrum(&smeared_GC,
+                                        geo,
+                                        datafilep);
+
+    free_gauge_conf(&smeared_GC, geo);
+  #endif
 
   #undef NUMBLOCK
+  #undef USEBLOCKING
   }
 
 
