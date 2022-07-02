@@ -235,7 +235,7 @@ void plaquette_re(Gauge_Conf const * const GC,
 void space_polyakov(Gauge_Conf const * const GC,
                     Geometry const * const geo,
                     long r,
-                    double *repoly)
+                    double complex *poly)
    {
    int i;
    GAUGE_GROUP matrix;
@@ -247,7 +247,7 @@ void space_polyakov(Gauge_Conf const * const GC,
       r=nnp(geo, r, 1);
       }
          
-   *repoly = retr(&matrix);  
+   *poly = retr(&matrix)+imtr(&matrix);
    }
 
 
@@ -383,17 +383,17 @@ void compute_and_print_corr_for_spectrum(Gauge_Conf const * const block_GC,
   {
   int i, j, t, t1, t2;
   long rsp, r;
-  double *plaq_re, *poly_re;
-  double replaq, av_plaq_re, repoly, av_poly_re;
-  double corr_plaq_re_re, corr_poly_re_re;
+  double *plaq, plaq_loc, av_plaq;
+  double complex *poly, poly_loc, av_poly;
+  double corr_plaq, corr_poly;
 
-  plaq_re = (double*) malloc((long unsigned int)(blockgeo->d_size[0])*sizeof(double));
-  poly_re = (double*) malloc((long unsigned int)(blockgeo->d_size[0])*sizeof(double));
+  plaq = (double *) malloc((long unsigned int)(blockgeo->d_size[0])*sizeof(double));
+  poly = (double complex *) malloc((long unsigned int)(blockgeo->d_size[0])*sizeof(double complex));
 
   for(t=0; t<blockgeo->d_size[0]; t++)
      {
-     plaq_re[t]=0.0;
-     poly_re[t]=0.0;
+     plaq[t]=0.0;
+     poly[t]=0.0+I*0.0;
      }
 
   //Calcolo la somma delle placchette spaziali al tempo t
@@ -406,21 +406,21 @@ void compute_and_print_corr_for_spectrum(Gauge_Conf const * const block_GC,
            {
            for(j = i + 1; j < STDIM; j++)
               {
-              plaquette_re(block_GC, blockgeo, r, i, j, &replaq);
-              plaq_re[t] += replaq;  //somma placchette al tempo t
+              plaquette_re(block_GC, blockgeo, r, i, j, &plaq_loc);
+              plaq[t] += plaq_loc;  //somma placchette al tempo t
               }
            }
         }
-     plaq_re[t]/=(double) blockgeo->d_space_vol;
-     plaq_re[t]/= (double) ((STDIM-1)*(STDIM-2)/2);
+     plaq[t]/=(double) blockgeo->d_space_vol;
+     plaq[t]/= (double) ((STDIM-1)*(STDIM-2)/2);
      }
 
-  av_plaq_re = 0.0;
+  av_plaq = 0.0;
   for(t = 0; t < blockgeo->d_size[0]; t++)
      {
-     av_plaq_re += plaq_re[t];
+     av_plaq += plaq[t];
      }
-  av_plaq_re /= (double)blockgeo->d_size[0];
+  av_plaq /= (double)blockgeo->d_size[0];
 
   //toreloni
   for(t = 0; t<blockgeo->d_size[0]; t++)
@@ -428,58 +428,58 @@ void compute_and_print_corr_for_spectrum(Gauge_Conf const * const block_GC,
      for(rsp = 0; rsp < blockgeo->d_space_vol; rsp++)
         {
         r = sisp_and_t_to_si(blockgeo, rsp, t);
-        space_polyakov(block_GC, blockgeo, r, &repoly);
-        poly_re[t] += repoly;
+        space_polyakov(block_GC, blockgeo, r, &poly_loc);
+        poly[t] += poly_loc;
         }
-     poly_re[t] /= (double) (blockgeo->d_space_vol);
+     poly[t] /= (double complex) (blockgeo->d_space_vol);
      }
 
-  av_poly_re = 0.0;
+  av_poly = 0.0+I*0.0;
   for(t = 0; t < blockgeo->d_size[0]; t++)
      {
-     av_poly_re += poly_re[t];
+     av_poly += poly[t];
      }
-  av_poly_re /= (double)blockgeo->d_size[0];
+  av_poly /= (double complex )blockgeo->d_size[0];
 
   // Faccio la media dei correlatori della parte reale delle plaquette a distanza fissa t e la stampo
   for(t = 0; t<blockgeo->d_size[0]/2; t++)
      {
-     corr_plaq_re_re = 0.0;
+     corr_plaq = 0.0;
 
      for(t1 = 0; t1<blockgeo->d_size[0]; t1++)
         {
         t2=(t1+t) % blockgeo->d_size[0];
-        corr_plaq_re_re += plaq_re[t2]*plaq_re[t1];
+        corr_plaq += plaq[t2]*plaq[t1];
         }
-     corr_plaq_re_re/=(double) blockgeo->d_size[0];
+     corr_plaq/=(double) blockgeo->d_size[0];
 
-     fprintf(datafilep, " %.12f", corr_plaq_re_re);
+     fprintf(datafilep, " %.12f", corr_plaq);
      }
 
-  // Faccio la media dei correlatori della parte reale dei polyakov spaziali a distanza fissa t e la stampo
+  // Faccio la media dei correlatori dei polyakov spaziali a distanza fissa t e la stampo
   for(t = 0; t<blockgeo->d_size[0]/2; t++)
      {
-     corr_poly_re_re = 0.0;
+     corr_poly = 0.0;
 
      for(t1 = 0; t1<blockgeo->d_size[0]; t1++)
         {
         t2=(t1+t) % blockgeo->d_size[0];
-        corr_poly_re_re += poly_re[t2]*poly_re[t1];
+        corr_poly += creal(conj(poly[t2])*poly[t1]);
         }
-     corr_poly_re_re/=(double) blockgeo->d_size[0];
+     corr_poly/=(double) blockgeo->d_size[0];
 
-     fprintf(datafilep, " %.12f", corr_poly_re_re);
+     fprintf(datafilep, " %.12f", corr_poly);
      }
 
   // stampo le medie
-  fprintf(datafilep, " %.12f", av_plaq_re);
-  fprintf(datafilep, " %.12f", av_poly_re);
+  fprintf(datafilep, " %.12f", av_plaq);
+  fprintf(datafilep, " %.12f", creal(av_poly));
 
   fprintf(datafilep, "\n");
   fflush(datafilep);
 
-  free(plaq_re);
-  free(poly_re);
+  free(plaq);
+  free(poly);
   }
 
 
