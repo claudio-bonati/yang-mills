@@ -9,7 +9,7 @@
 #include"../include/geometry.h"
 
 // single index 4d = even/odd lexicographic index 4d
-// // single index 3d = even/odd lexicographic index 3d
+// single index 3d = even/odd lexicographic index 3d
 
 long (*cart_to_si)(int const * const cartcoord, Geometry const * const geo)=&cart_to_lexeo; // cartesian coordinates -> single index
 void (*si_to_cart)(int *cartcoord, long si, Geometry const * const geo)=&lexeo_to_cart;     // single index -> cartesian coordinates

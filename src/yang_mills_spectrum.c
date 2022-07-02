@@ -425,13 +425,13 @@ void compute_and_print_corr_for_spectrum(Gauge_Conf const * const block_GC,
   //toreloni
   for(t = 0; t<blockgeo->d_size[0]; t++)
      {
-     for(rsp = 0; rsp < blockgeo->d_space_vol/blockgeo->d_size[1]; rsp++)
+     for(rsp = 0; rsp < blockgeo->d_space_vol; rsp++)
         {
         r = sisp_and_t_to_si(blockgeo, rsp, t);
         space_polyakov(block_GC, blockgeo, r, &repoly);
         poly_re[t] += repoly;
         }
-     poly_re[t] /= (double) (blockgeo->d_space_vol/blockgeo->d_size[1]);
+     poly_re[t] /= (double) (blockgeo->d_space_vol);
      }
 
   av_poly_re = 0.0;
