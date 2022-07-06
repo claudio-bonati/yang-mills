@@ -200,6 +200,19 @@ void free_gauge_conf(Gauge_Conf *GC, Geometry const * const geo)
   }
 
 
+// free configurations without clovers
+void free_gauge_conf_noclover(Gauge_Conf *GC, Geometry const * const geo)
+  {
+  long i;
+
+  for(i=0; i<(geo->d_volume); i++)
+     {
+     free(GC->lattice[i]);
+     }
+  free(GC->lattice);
+  }
+
+
 // save a configuration in ILDG-like format
 void write_conf_on_file_with_name(Gauge_Conf const * const GC,
                                   Geometry const * const geo,
@@ -321,6 +334,44 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
 
   GC->update_index=GC2->update_index;
   }
+
+
+// allocate GC and initialize with GC2
+// without clovers for theta dependence
+void init_gauge_conf_from_gauge_conf_noclover(Gauge_Conf *GC, Gauge_Conf const * const GC2, Geometry const * const geo)
+  {
+  long r;
+  int mu, err;
+
+  // allocate the lattice
+  err=posix_memalign((void**)&(GC->lattice), (size_t) DOUBLE_ALIGN, (size_t) geo->d_volume * sizeof(GAUGE_GROUP *));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  for(r=0; r<(geo->d_volume); r++)
+     {
+     err=posix_memalign((void**)&(GC->lattice[r]), (size_t) DOUBLE_ALIGN, (size_t) STDIM * sizeof(GAUGE_GROUP));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     }
+
+  // initialize GC
+  for(r=0; r<(geo->d_volume); r++)
+     {
+     for(mu=0; mu<STDIM; mu++)
+        {
+        equal(&(GC->lattice[r][mu]), &(GC2->lattice[r][mu]) );
+        }
+     }
+
+  GC->update_index=GC2->update_index;
+  }
+
 
 
 // compute the md5sum of the configuration and save it in res, that is a char[2*MD5_DIGEST_LENGTH]

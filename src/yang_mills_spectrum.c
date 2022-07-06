@@ -353,7 +353,7 @@ void spatial_smearing(Gauge_Conf const * const GC,
   GAUGE_GROUP M;
   Gauge_Conf staple_GC;
   
-  init_gauge_conf_from_gauge_conf(&staple_GC, GC, geo);
+  init_gauge_conf_from_gauge_conf_noclover(&staple_GC, GC, geo);
 
   for(step=0; step<smearing_steps; step++)
      {
@@ -377,7 +377,7 @@ void spatial_smearing(Gauge_Conf const * const GC,
         }
      }
 
-  free_gauge_conf(&staple_GC, geo);
+  free_gauge_conf_noclover(&staple_GC, geo);
   }
 
 
@@ -531,7 +531,7 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
      }
 
   // copy of the initial configuration
-  init_gauge_conf_from_gauge_conf(&smeared_GC, GC, geo);
+  init_gauge_conf_from_gauge_conf_noclover(&smeared_GC, GC, geo);
 
   // perform smearing
   spatial_smearing(&smeared_GC, geo, alpha, smearing_steps);
@@ -593,10 +593,10 @@ void perform_measures_spectrum(Gauge_Conf const * const GC,
                                       NUMBLOCK,
                                       datafilep);
 
-  free_gauge_conf(&smeared_GC, geo);
+  free_gauge_conf_noclover(&smeared_GC, geo);
   for(i=NUMBLOCK-1; i>=0; i--)
      {
-     free_gauge_conf(&(block_GC[i]), &(blockgeo[i]));
+     free_gauge_conf_noclover(&(block_GC[i]), &(blockgeo[i]));
      free_geometry(&(blockgeo[i]));
      }
 

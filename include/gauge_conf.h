@@ -55,6 +55,8 @@ void read_gauge_conf(Gauge_Conf *GC,
                      GParam const * const param);
 void free_gauge_conf(Gauge_Conf *GC,
                      Geometry const * const geo);
+void free_gauge_conf_noclover(Gauge_Conf *GC,
+                              Geometry const * const geo);
 void write_conf_on_file_with_name(Gauge_Conf const * const GC,
                                   Geometry const * const geo,
                                   char const * const namefile);
@@ -67,6 +69,9 @@ void write_conf_on_file_back(Gauge_Conf const * const GC,
 void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC,
                                      Gauge_Conf const * const GC2,
                                      Geometry const * const geo);
+void init_gauge_conf_from_gauge_conf_noclover(Gauge_Conf *GC,
+                                              Gauge_Conf const * const GC2,
+                                              Geometry const * const geo);
 void compute_md5sum_conf(char *res,        // the lenght is 2*MD5_DIGEST_LENGTH
                          Gauge_Conf const * const GC,
                          Geometry const * const geo);
