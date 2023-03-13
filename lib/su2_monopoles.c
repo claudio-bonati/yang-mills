@@ -16,7 +16,7 @@
 
 // This function compute the MAG gauge transformation
 void comp_MAG_gauge_transformation_Su2(Su2 X_links[2*STDIM],
-                                       double const lambda[NCOLOR],
+                                       double const lambda[2],
                                        double overrelaxparam,
                                        Su2 *G_mag)
 
