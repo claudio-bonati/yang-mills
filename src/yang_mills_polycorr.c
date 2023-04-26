@@ -36,10 +36,10 @@ void real_main(char *in_file)
     // read input file
     readinput(in_file, &param);
 
-    int tmp=geo.d_size[1];
+    int tmp=param.d_sizeg[1];
     for(count=2; count<STDIM; count++)
        {
-       if(tmp!= geo.d_size[count])
+       if(tmp!= param.d_sizeg[count])
          {
          fprintf(stderr, "When using yang_mills_polycorr all the spatial sizes have to be of equal length.\n");
          exit(EXIT_FAILURE);
