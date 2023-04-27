@@ -503,7 +503,7 @@ void readinput(char *in_file, GParam *param)
       #ifdef OPENMP_MODE
       for(i=0; i<STDIM; i++)
          {
-         temp_i = param->d_size[i] % 2;
+         temp_i = param->d_sizeg[i] % 2;
          if(temp_i!=0)
            {
            fprintf(stderr, "Error: size[%d] is not even.\n", i);
