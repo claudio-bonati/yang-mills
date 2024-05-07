@@ -24,7 +24,7 @@ typedef struct Su2Adj {
 
 //
 // a complex 2-vector \Phi = (\phi_1+i\phi_2, \phi_3+i\phi_4) can be conveniently rewritten as a 2x2 matrix \varphi
-// by using the auxilliary vector \tilde{\Phi}=i\sigma_2\Phi and
+// by using the auxilliary vector \tilde{\Phi}=i\sigma_2\Phi* and (see Montvay Muenster eq. 6.1)
 // \varphi=( \tilde{\Phi} | \Phi ) = \phi_3 Id + i\sigma_1\phi_2 +i\sigma_2\phi_1-i\sigma_3\phi_4
 // It is not difficult to show that
 // \tilde{U\Phi} = U \tilde{\Phi}
