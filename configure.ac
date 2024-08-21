@@ -114,10 +114,10 @@ fi
 if test x${Num_levels} = x; then
   AC_MSG_WARN([ 
    *****
-   No chosen value for Num_levels: using the default Num_levels=1
+   No chosen value for Num_levels: using the default Num_levels=2
    ***** 
    ])
-  AC_DEFINE_UNQUOTED(NLEVELS, 1, [Number of levels])
+  AC_DEFINE_UNQUOTED(NLEVELS, 2, [Number of levels])
 else
   AC_DEFINE_UNQUOTED(NLEVELS, ${Num_levels}, [Number of levels])
 fi
