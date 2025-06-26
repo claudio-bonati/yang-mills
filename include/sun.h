@@ -755,6 +755,27 @@ inline double imtr_SuN(SuN const * const restrict A)
   }
 
 
+// carg() of the trace
+inline double argtr_SuN(SuN const * const restrict A)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+  
+  int i;
+  double ris;
+  double complex tr;
+  
+  tr = 0.0 + 0.0 * I;
+  for(i = 0; i < NCOLOR; i++)
+     {
+     tr += A->comp[m(i, i)];
+     }
+  ris = carg(tr);
+  return ris;
+  }
+
+
 // LU decomposition with partial pivoting
 void LU_SuN(SuN const * const A, SuN *ris, int *sign);
 

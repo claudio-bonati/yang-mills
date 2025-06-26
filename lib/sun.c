@@ -179,6 +179,9 @@ double retr_SuN(SuN const * const A);
 // imaginary part of the trace /N
 double imtr_SuN(SuN const * const A);
 
+// carg() of the trace
+double argtr_SuN(SuN const * const restrict A);
+
 
 // LU decomposition with partial pivoting
 //   from Numerical Recipes in C, pag 46

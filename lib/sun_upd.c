@@ -250,10 +250,10 @@ void single_overrelaxation_SuN(SuN *link, SuN const * const staple)
 void cool_SuN(SuN *link, SuN const * const staple)
   {
   SuN prod;
-  Su2 aux2, aux2bis;
+  Su2 u, udag;
   double complex temp0, temp1;
   double complex fii, fij, fji, fjj;
-  double xi; // not used
+  double aux; 
   int i, j, k;
 
   equal_SuN(&prod, staple);         // prod=staple
@@ -263,14 +263,14 @@ void cool_SuN(SuN *link, SuN const * const staple)
      {
      for(j=i+1; j<NCOLOR; j++)
         {
-        ennetodue_SuN(&prod, i, j, &xi, &aux2);
+        ennetodue_SuN(&prod, i, j, &aux, &u); // aux not used in the following
 
-        equal_dag_Su2(&aux2bis, &aux2);   // aux2bis = (aux2)^{dag}
+        equal_dag_Su2(&udag, &u);   // udag = (u)^{dag}
 
-        fii= aux2bis.comp[0] + (aux2bis.comp[3])*I;
-        fij= aux2bis.comp[2] + (aux2bis.comp[1])*I;
-        fji=-aux2bis.comp[2] + (aux2bis.comp[1])*I;
-        fjj= aux2bis.comp[0] - (aux2bis.comp[3])*I;
+        fii= udag.comp[0] + (udag.comp[3])*I;
+        fij= udag.comp[2] + (udag.comp[1])*I;
+        fji=-udag.comp[2] + (udag.comp[1])*I;
+        fjj= udag.comp[0] - (udag.comp[3])*I;
 
         // link*=final
         for(k=0; k<NCOLOR; k++)
@@ -291,6 +291,11 @@ void cool_SuN(SuN *link, SuN const * const staple)
            }
         }
      }
+
+  // multiply by the center element that maximizes ReTr[staple * link]
+  aux = argtr_SuN(&prod);                         // aux = phase of ReTr[staple * link]
+  aux = round(aux / PI2_N ) * PI2_N;              // round aux to nearest center phase 
+  times_equal_complex_SuN(link, cexp(-I * aux));  // link *= exp(-i * aux)
   }
 
 
