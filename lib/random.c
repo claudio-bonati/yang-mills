@@ -61,7 +61,7 @@ void initrand(unsigned int s)
 
 
 // normal gaussian random number generator (polar method, knuth vol 2, p. 117)
-double gauss1()
+double gauss1(void)
    {
    double v1, v2, s, ris;
 

@@ -1523,12 +1523,9 @@ void monopoles_obs(Gauge_Conf *GC,
                    int subg, 
                    FILE* monofilep)
    {
-   double mean_wrap;
    long r, rsp, r_tback, r_tbackback;
    int n_mu, num_wrap, mono_charge;
    int cartcoord[4];
-
-   mean_wrap = 0.0;     // mean value of monopole wraps for unit volume
 
    for(rsp=0; rsp<geo->d_space_vol; rsp++)
       {
@@ -1549,8 +1546,6 @@ void monopoles_obs(Gauge_Conf *GC,
 
            num_wrap = 0;
            wrap_search(GC, geo, param, r, r_tback, &num_wrap);
-
-           mean_wrap += abs(num_wrap);
 
            lexeo_to_cart(cartcoord, r_tback, geo);
            if(n_mu == 1)
