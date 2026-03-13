@@ -120,8 +120,9 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
    {
    int i, err;
    long r;
-   double complex poly_corr;
-   double poly_corr_abs, poly_corr_fluct;
+   ////double complex poly_corr;
+   double poly_corr_abs;
+   //double poly_corr_fluct;
    double complex *poly_array;
 
    err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) geo->d_space_vol * sizeof(double complex));
@@ -151,34 +152,34 @@ void optimize_multilevel_polycorr(Gauge_Conf *GC,
       }
 
    // averages
-   poly_corr=0.0+I*0.0;
+   //poly_corr=0.0+I*0.0;
    poly_corr_abs=0.0;
    for(r=0; r<geo->d_space_vol; r++)
       {
       poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
 
-      poly_corr+=poly_array[r];
+      //poly_corr+=poly_array[r];
       poly_corr_abs+=cabs(poly_array[r]);
       }
-   poly_corr*=geo->d_inv_space_vol;
+   //poly_corr*=geo->d_inv_space_vol;
    poly_corr_abs*=geo->d_inv_space_vol;
 
    // fluctuations
-   poly_corr_fluct=0.0;
-   for(r=0; r<geo->d_space_vol; r++)
-      {
-      poly_corr_fluct += cabs(poly_array[r]-poly_corr);
-      }
-   poly_corr_fluct*=geo->d_inv_space_vol;
+   //poly_corr_fluct=0.0;
+   //for(r=0; r<geo->d_space_vol; r++)
+   //   {
+   //   poly_corr_fluct += cabs(poly_array[r]-poly_corr);
+   //   }
+   //poly_corr_fluct*=geo->d_inv_space_vol;
 
    // normalizations
    for(i=0; i<NLEVELS; i++)
       {
       poly_corr_abs*= sqrt(param->d_ml_upd[i]);
-      poly_corr_fluct*= sqrt(param->d_ml_upd[i]);
+      //poly_corr_fluct*= sqrt(param->d_ml_upd[i]);
       }
    poly_corr_abs*=sqrt(param->d_multihit);
-   poly_corr_fluct*=sqrt(param->d_multihit);
+   //poly_corr_fluct*=sqrt(param->d_multihit);
 
    fprintf(datafilep, "%.12g ", poly_corr_abs);
    for(i=0; i<NLEVELS; i++)
@@ -201,8 +202,9 @@ void optimize_multilevel_polycorr_with_higgs(Gauge_Conf *GC,
    {
    int i, err;
    long r;
-   double complex poly_corr;
-   double poly_corr_abs, poly_corr_fluct;
+   //double complex poly_corr;
+   double poly_corr_abs;
+   //double  poly_corr_fluct;
    double complex *poly_array;
 
    err=posix_memalign((void**)&poly_array, (size_t)DOUBLE_ALIGN, (size_t) geo->d_space_vol * sizeof(double complex));
@@ -232,34 +234,34 @@ void optimize_multilevel_polycorr_with_higgs(Gauge_Conf *GC,
       }
 
    // averages
-   poly_corr=0.0+I*0.0;
+   //poly_corr=0.0+I*0.0;
    poly_corr_abs=0.0;
    for(r=0; r<geo->d_space_vol; r++)
       {
       poly_array[r]=retr_TensProd(&(GC->ml_polycorr[0][0][r]))+I*imtr_TensProd(&(GC->ml_polycorr[0][0][r]));
 
-      poly_corr+=poly_array[r];
+      //poly_corr+=poly_array[r];
       poly_corr_abs+=cabs(poly_array[r]);
       }
-   poly_corr*=geo->d_inv_space_vol;
+   //poly_corr*=geo->d_inv_space_vol;
    poly_corr_abs*=geo->d_inv_space_vol;
 
    // fluctuations
-   poly_corr_fluct=0.0;
-   for(r=0; r<geo->d_space_vol; r++)
-      {
-      poly_corr_fluct += cabs(poly_array[r]-poly_corr);
-      }
-   poly_corr_fluct*=geo->d_inv_space_vol;
+   //poly_corr_fluct=0.0;
+   //for(r=0; r<geo->d_space_vol; r++)
+   //   {
+   //   poly_corr_fluct += cabs(poly_array[r]-poly_corr);
+   //   }
+   //poly_corr_fluct*=geo->d_inv_space_vol;
 
    // normalizations
    for(i=0; i<NLEVELS; i++)
       {
       poly_corr_abs*= sqrt(param->d_ml_upd[i]);
-      poly_corr_fluct*= sqrt(param->d_ml_upd[i]);
+      //poly_corr_fluct*= sqrt(param->d_ml_upd[i]);
       }
    poly_corr_abs*=sqrt(param->d_multihit);
-   poly_corr_fluct*=sqrt(param->d_multihit);
+   //poly_corr_fluct*=sqrt(param->d_multihit);
 
    fprintf(datafilep, "%.12g ", poly_corr_abs);
    for(i=0; i<NLEVELS; i++)
