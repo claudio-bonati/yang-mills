@@ -112,7 +112,7 @@ void single_overrelaxation_Su2(Su2 *link, Su2 const * const staple)
       times_equal_real_Su2(&matrix1, 1.0/p);     // matrix1*=(1/p)
       equal_dag_Su2(&matrix2, &matrix1);         // matrix2=matrix1^{dag}
 
-      times_dag1_Su2(&matrix1, &matrix2, link);  // matrix1=matrix2*link^{dag}
+      times_dag2_Su2(&matrix1, &matrix2, link);  // matrix1=matrix2*link^{dag}
       times_Su2(link, &matrix1, &matrix2);       // link=matrix1*matrix2
       }
     else
